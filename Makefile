@@ -30,6 +30,14 @@ backend-shell:
 backend-reload-server:
 	./docker_compose exec -T backend pkill -HUP gunicorn
 
+.PHONY: lint-python
+lint-python:
+	./docker_compose run --rm --no-deps --entrypoint="poetry run ./lint-python.bash" backend
+
+.PHONY: format-python
+format-python:
+	./docker_compose run --rm --no-deps --entrypoint="poetry run ./format-python.bash" backend
+
 .PHONY: start
 start:
 	./docker_compose up -d nginx
