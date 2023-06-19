@@ -37,3 +37,11 @@ lint backend:
   script:
     - cd /src/app/
     - poetry run ./lint-python.bash
+
+audit backend dependencies:
+  stage: test
+  image:
+    name: docker.io/aquasec/trivy:latest
+    entrypoint: [""]
+  script:
+    - trivy fs --exit-code 1 --no-progress --severity HIGH,CRITICAL ${CI_PROJECT_DIR}/backend/poetry.lock
