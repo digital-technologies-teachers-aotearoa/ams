@@ -1,0 +1,39 @@
+stages:
+  - build
+  - test
+
+.kaniko:
+  image:
+    name: gcr.io/kaniko-project/executor:v1.9.0-debug
+    entrypoint: [""]
+  before_script:
+    - mkdir -p /kaniko/.docker
+    - echo "$DOCKER_AUTH_CONFIG" > /kaniko/.docker/config.json
+
+.build:
+  extends:
+    - .kaniko
+  variables:
+    DOCKERFILE: Dockerfile
+    TARGET: ""
+    ARGS: ""
+  script:
+    - /kaniko/executor --cache=false --context $CONTEXT --dockerfile $DOCKERFILE --target "$TARGET" --destination $IMAGE $ARGS
+
+build backend:
+  stage: build
+  extends:
+    - .build
+  variables:
+    IMAGE: $CONTAINER_REGISTRY/dtta/ams/backend:${CI_PIPELINE_ID}-${CI_COMMIT_SHORT_SHA}
+    CONTEXT: $CI_PROJECT_DIR/backend
+    TARGET: production
+
+lint backend:
+  stage: test
+  image:
+    name: $CONTAINER_REGISTRY/dtta/ams/backend:${CI_PIPELINE_ID}-${CI_COMMIT_SHORT_SHA}
+    entrypoint: [""]
+  script:
+    - cd /src/app/
+    - poetry run ./lint-python.bash
