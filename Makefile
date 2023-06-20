@@ -30,6 +30,10 @@ backend-shell:
 backend-reload-server:
 	./docker_compose exec -T backend pkill -HUP gunicorn
 
+.PHONY: test-backend
+test-backend:
+	./docker_compose run -T --rm --entrypoint="poetry run pytest $(TESTS)" backend
+
 .PHONY: lint-python
 lint-python:
 	./docker_compose run --rm --no-deps --entrypoint="poetry run ./lint-python.bash" backend

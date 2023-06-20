@@ -38,6 +38,32 @@ lint backend:
     - cd /src/app/
     - poetry run ./lint-python.bash
 
+test backend:
+  stage: test
+  image:
+    name: $CONTAINER_REGISTRY/dtta/ams/backend:${CI_PIPELINE_ID}-${CI_COMMIT_SHORT_SHA}
+    entrypoint: [""]
+  services:
+    - name: docker.catalyst.net.nz/catalyst/postgres:14
+      alias: db
+  variables:
+    POSTGRES_DB: test_db
+    POSTGRES_USER: test_user
+    POSTGRES_PASSWORD: test password
+    PGPASSWORD: ${POSTGRES_PASSWORD}
+    POSTGRES_HOST: db
+    APPLICATION_DB_HOST: ${POSTGRES_HOST}
+    APPLICATION_DB_NAME: ${POSTGRES_DB}
+    APPLICATION_DB_USER: ${POSTGRES_USER}
+    APPLICATION_DB_PASSWORD: ${POSTGRES_PASSWORD}
+    APPLICATION_WEB_HOST: localhost
+    DJANGO_SETTINGS_MODULE: ams.settings
+    DJANGO_CONFIGURATION: Development
+    DJANGO_SECRET_KEY: test django secret key
+  script:
+    - cd /src/app
+    - poetry run pytest
+
 audit backend dependencies:
   stage: test
   image:

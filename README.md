@@ -16,18 +16,30 @@ After this is finished you can run `make start` to bring up application. If succ
 
 ### Makefile commands
 
-To open shell on the database:
+Run the backend tests:
+
+    make test-backend
+
+Python lint check:
+
+    make lint-python
+
+Format python code:
+
+    make format-python
+
+Open psql shell on the database:
 
     make db-shell
 
-To open a poetry shell on the backend:
+Open a poetry shell on the backend:
 
     make backend-shell
 
-To reload the backend server without restarting it:
+Reload the backend server without restarting it:
 
     make backend-reload-server
 
-To bring down the application:
+Bring down the application:
 
     make stop

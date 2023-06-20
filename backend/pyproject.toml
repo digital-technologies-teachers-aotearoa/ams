@@ -20,6 +20,9 @@ gunicorn = "*"
 sentry-sdk = "*"
 
 [tool.poetry.dev-dependencies]
+pytest = "*"
+pytest-django = "*"
+pytest-subtests = "*"
 mypy = "*"
 black = "*"
 flake8-bugbear = "*"
