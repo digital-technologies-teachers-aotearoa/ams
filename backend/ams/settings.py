@@ -1,4 +1,4 @@
-from os import environ
+from os import environ, path
 from pathlib import Path
 from typing import Iterable, Optional
 
@@ -42,6 +42,19 @@ class Common(Configuration):
         "django.contrib.sessions",
         "django.contrib.messages",
         "django.contrib.staticfiles",
+        "wagtail.contrib.forms",
+        "wagtail.contrib.redirects",
+        "wagtail.embeds",
+        "wagtail.sites",
+        "wagtail.users",
+        "wagtail.snippets",
+        "wagtail.documents",
+        "wagtail.images",
+        "wagtail.search",
+        "wagtail.admin",
+        "wagtail",
+        "modelcluster",
+        "taggit",
     ]
 
     MIDDLEWARE = [
@@ -52,6 +65,7 @@ class Common(Configuration):
         "django.contrib.auth.middleware.AuthenticationMiddleware",
         "django.contrib.messages.middleware.MessageMiddleware",
         "django.middleware.clickjacking.XFrameOptionsMiddleware",
+        "wagtail.contrib.redirects.middleware.RedirectMiddleware",
     ]
 
     ROOT_URLCONF = "ams.urls"
@@ -121,8 +135,24 @@ class Common(Configuration):
 
     # Static files (CSS, JavaScript, Images)
     # https://docs.djangoproject.com/en/4.2/howto/static-files/
+    # TODO: probably should serve static files from Nginx
 
     STATIC_URL = "static/"
+    STATIC_ROOT = BASE_DIR / "static"
+
+    STATICFILES_DIRS = [BASE_DIR / "ams/static"]
+
+    # User uploaded files
+    # https://docs.djangoproject.com/en/4.2/topics/files/
+    # TODO: need solution production solution for user uploaded files
+
+    MEDIA_URL = "media/"
+    MEDIA_ROOT = BASE_DIR / "media"
+
+    # Wagtail settings
+    # https://docs.wagtail.org/en/stable/reference/settings.html
+
+    WAGTAIL_SITE_NAME = "DTTA - Association Management Software"
 
     # Default primary key field type
     # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -132,3 +162,4 @@ class Common(Configuration):
 
 class Development(Common):
     DEBUG = True
+    CSRF_TRUSTED_ORIGINS = ["http://" + environ["APPLICATION_WEB_HOST"] + ":1800"]
