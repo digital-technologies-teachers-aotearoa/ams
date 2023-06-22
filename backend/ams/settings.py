@@ -36,6 +36,7 @@ class Common(Configuration):
     # Application definition
 
     INSTALLED_APPS = [
+        "ams.home",
         "django.contrib.admin",
         "django.contrib.auth",
         "django.contrib.contenttypes",
@@ -73,7 +74,9 @@ class Common(Configuration):
     TEMPLATES = [
         {
             "BACKEND": "django.template.backends.django.DjangoTemplates",
-            "DIRS": [],
+            "DIRS": [
+                path.join(BASE_DIR, "ams/templates"),
+            ],
             "APP_DIRS": True,
             "OPTIONS": {
                 "context_processors": [
@@ -153,6 +156,7 @@ class Common(Configuration):
     # https://docs.wagtail.org/en/stable/reference/settings.html
 
     WAGTAIL_SITE_NAME = "DTTA - Association Management Software"
+    WAGTAILADMIN_BASE_URL = environ["APPLICATION_WEB_HOST"] + "/cms"
 
     # Default primary key field type
     # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
