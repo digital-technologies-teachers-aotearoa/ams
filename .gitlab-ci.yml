@@ -1,5 +1,6 @@
 stages:
   - build
+  - scan
   - test
 
 .kaniko:
@@ -28,6 +29,28 @@ build backend:
     IMAGE: $CONTAINER_REGISTRY/dtta/ams/backend:${CI_PIPELINE_ID}-${CI_COMMIT_SHORT_SHA}
     CONTEXT: $CI_PROJECT_DIR/backend
     TARGET: production
+
+scan backend:
+  stage: scan
+  image:
+    name: docker.io/aquasec/trivy:latest
+    entrypoint: [""]
+  variables:
+    CRANE_VERSION: "v0.15.2"
+    CRANE_TAR: "go-containerregistry_Linux_x86_64.tar.gz"
+    CRANE_SHA256: "bd5f72ae96373ac640679a6108280b6d76698773ca21f293ae30cc17413e2ad1"
+    IMAGE: $CONTAINER_REGISTRY/dtta/ams/backend:${CI_PIPELINE_ID}-${CI_COMMIT_SHORT_SHA}
+  script:
+    - wget -O crane.tar.gz https://github.com/google/go-containerregistry/releases/download/$CRANE_VERSION/$CRANE_TAR
+    - echo "$CRANE_SHA256 crane.tar.gz" | sha256sum -c
+    - tar -xzf crane.tar.gz crane
+    - ./crane auth login -u $CONTAINER_REGISTRY_USER -p $CONTAINER_REGISTRY_PASSWORD $CONTAINER_REGISTRY
+    - ./crane pull $IMAGE image.tar
+    - trivy image --clear-cache
+    - trivy --cache-dir .trivycache/ image --download-db-only --no-progress
+    - trivy --cache-dir .trivycache/ image --exit-code 1 --no-progress --severity HIGH,CRITICAL --input image.tar
+    # Explicitly scan python dependencies in poetry.lock as trivy misses them when scanning the image
+    - trivy --cache-dir .trivycache/ fs --exit-code 1 --no-progress --severity HIGH,CRITICAL ${CI_PROJECT_DIR}/backend/poetry.lock
 
 lint backend:
   stage: test
@@ -63,11 +86,3 @@ test backend:
   script:
     - cd /src/app
     - poetry run pytest
-
-audit backend dependencies:
-  stage: test
-  image:
-    name: docker.io/aquasec/trivy:latest
-    entrypoint: [""]
-  script:
-    - trivy fs --exit-code 1 --no-progress --severity HIGH,CRITICAL ${CI_PROJECT_DIR}/backend/poetry.lock
