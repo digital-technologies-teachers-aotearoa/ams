@@ -1,4 +1,4 @@
-from os import environ, path
+from os import environ
 from pathlib import Path
 from typing import Iterable, Optional
 
@@ -37,7 +37,7 @@ class Common(Configuration):
 
     INSTALLED_APPS = [
         "ams.base",
-        "ams.home",
+        "ams.dtta",
         "django.contrib.admin",
         "django.contrib.auth",
         "django.contrib.contenttypes",
@@ -46,6 +46,7 @@ class Common(Configuration):
         "django.contrib.staticfiles",
         "wagtail.contrib.forms",
         "wagtail.contrib.redirects",
+        "wagtail.contrib.simple_translation",
         "wagtail.embeds",
         "wagtail.sites",
         "wagtail.users",
@@ -54,12 +55,14 @@ class Common(Configuration):
         "wagtail.images",
         "wagtail.search",
         "wagtail.admin",
+        "wagtail.locales",
         "wagtail",
         "modelcluster",
         "taggit",
     ]
 
     MIDDLEWARE = [
+        "django.middleware.locale.LocaleMiddleware",
         "django.middleware.security.SecurityMiddleware",
         "django.contrib.sessions.middleware.SessionMiddleware",
         "django.middleware.common.CommonMiddleware",
@@ -127,7 +130,7 @@ class Common(Configuration):
     # Internationalization
     # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-    LANGUAGE_CODE = "en-us"
+    LANGUAGE_CODE = "en"
 
     TIME_ZONE = "UTC"
 
@@ -154,6 +157,12 @@ class Common(Configuration):
 
     WAGTAIL_SITE_NAME = "DTTA - Association Management Software"
     WAGTAILADMIN_BASE_URL = environ["APPLICATION_WEB_HOST"] + "/cms"
+    WAGTAIL_I18N_ENABLED = True
+    WAGTAIL_CONTENT_LANGUAGES = LANGUAGES = [
+        ("en", "English"),
+        ("mi", "Maori"),
+    ]
+    WAGTAILSIMPLETRANSLATION_SYNC_PAGE_TREE = True
 
     # Default primary key field type
     # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
