@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  db:
+    image: 'docker.catalyst.net.nz/catalyst/postgres:14'
+    command: >-
+      postgres
+    environment:
+      - POSTGRES_PASSWORD
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    image: 'docker.catalyst.net.nz/dtta/ams/backend:${DOCKER_TAG}'
+    depends_on:
+      - db
+    environment:
+      - DJANGO_SETTINGS_MODULE=ams.settings
+      - DJANGO_SECRET_KEY
+      - DJANGO_CONFIGURATION
+      - APPLICATION_WEB_HOST
+      - APPLICATION_VERSION
+      - APPLICATION_DB_HOST
+      - APPLICATION_DB_NAME
+      - APPLICATION_DB_USER
+      - APPLICATION_DB_PASSWORD
+
+  nginx:
+    image: docker.catalyst.net.nz/catalyst/nginx:stable-jammy
+    ports:
+      - 1800:80
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

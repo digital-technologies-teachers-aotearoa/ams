@@ -1,0 +1,88 @@
+stages:
+  - build
+  - scan
+  - test
+
+.kaniko:
+  image:
+    name: gcr.io/kaniko-project/executor:v1.9.0-debug
+    entrypoint: [""]
+  before_script:
+    - mkdir -p /kaniko/.docker
+    - echo "$DOCKER_AUTH_CONFIG" > /kaniko/.docker/config.json
+
+.build:
+  extends:
+    - .kaniko
+  variables:
+    DOCKERFILE: Dockerfile
+    TARGET: ""
+    ARGS: ""
+  script:
+    - /kaniko/executor --cache=false --context $CONTEXT --dockerfile $DOCKERFILE --target "$TARGET" --destination $IMAGE $ARGS
+
+build backend:
+  stage: build
+  extends:
+    - .build
+  variables:
+    IMAGE: $CONTAINER_REGISTRY/dtta/ams/backend:${CI_PIPELINE_ID}-${CI_COMMIT_SHORT_SHA}
+    CONTEXT: $CI_PROJECT_DIR/backend
+    TARGET: production
+
+scan backend:
+  stage: scan
+  image:
+    name: docker.io/aquasec/trivy:latest
+    entrypoint: [""]
+  variables:
+    CRANE_VERSION: "v0.15.2"
+    CRANE_TAR: "go-containerregistry_Linux_x86_64.tar.gz"
+    CRANE_SHA256: "bd5f72ae96373ac640679a6108280b6d76698773ca21f293ae30cc17413e2ad1"
+    IMAGE: $CONTAINER_REGISTRY/dtta/ams/backend:${CI_PIPELINE_ID}-${CI_COMMIT_SHORT_SHA}
+  script:
+    - wget -O crane.tar.gz https://github.com/google/go-containerregistry/releases/download/$CRANE_VERSION/$CRANE_TAR
+    - echo "$CRANE_SHA256 crane.tar.gz" | sha256sum -c
+    - tar -xzf crane.tar.gz crane
+    - ./crane auth login -u $CONTAINER_REGISTRY_USER -p $CONTAINER_REGISTRY_PASSWORD $CONTAINER_REGISTRY
+    - ./crane pull $IMAGE image.tar
+    - trivy image --clear-cache
+    - trivy --cache-dir .trivycache/ image --download-db-only --no-progress
+    - trivy --cache-dir .trivycache/ image --exit-code 1 --no-progress --severity HIGH,CRITICAL --input image.tar
+    # Explicitly scan python dependencies in poetry.lock as trivy misses them when scanning the image
+    - trivy --cache-dir .trivycache/ fs --exit-code 1 --no-progress --severity HIGH,CRITICAL ${CI_PROJECT_DIR}/backend/poetry.lock
+
+lint backend:
+  stage: test
+  image:
+    name: $CONTAINER_REGISTRY/dtta/ams/backend:${CI_PIPELINE_ID}-${CI_COMMIT_SHORT_SHA}
+    entrypoint: [""]
+  script:
+    - cd /src/app/
+    - poetry run ./lint-python.bash
+
+test backend:
+  stage: test
+  image:
+    name: $CONTAINER_REGISTRY/dtta/ams/backend:${CI_PIPELINE_ID}-${CI_COMMIT_SHORT_SHA}
+    entrypoint: [""]
+  services:
+    - name: docker.catalyst.net.nz/catalyst/postgres:14
+      alias: db
+  variables:
+    POSTGRES_DB: test_db
+    POSTGRES_USER: test_user
+    POSTGRES_PASSWORD: test password
+    PGPASSWORD: ${POSTGRES_PASSWORD}
+    POSTGRES_HOST: db
+    APPLICATION_DB_HOST: ${POSTGRES_HOST}
+    APPLICATION_DB_NAME: ${POSTGRES_DB}
+    APPLICATION_DB_USER: ${POSTGRES_USER}
+    APPLICATION_DB_PASSWORD: ${POSTGRES_PASSWORD}
+    APPLICATION_WEB_HOST: localhost
+    DJANGO_SETTINGS_MODULE: ams.settings
+    DJANGO_CONFIGURATION: Development
+    DJANGO_SECRET_KEY: test django secret key
+  script:
+    - cd /src/app
+    - poetry run pytest
