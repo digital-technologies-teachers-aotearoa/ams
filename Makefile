@@ -8,6 +8,7 @@ export $(shell sed 's/=.*//' .env)
 .PHONY: developer
 developer:
 	git config --local core.hooksPath 'git-hooks'
+	./docker_compose down
 	./docker_compose build backend
 	./docker_compose build db
 	./docker_compose build nginx
@@ -17,6 +18,7 @@ developer:
 	./docker_compose exec -T db createdb --username=postgres "$(APPLICATION_DB_NAME)"
 	./docker_compose run -T --rm --entrypoint="poetry install" backend
 	./docker_compose run -T --rm --entrypoint="poetry run ./manage.py migrate" backend
+	./docker_compose run -T --rm --entrypoint="poetry run ./manage.py createsuperuser --noinput" backend
 
 .PHONY: db-shell
 db-shell:
