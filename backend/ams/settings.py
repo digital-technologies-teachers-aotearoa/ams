@@ -36,6 +36,7 @@ class Common(Configuration):
     # Application definition
 
     INSTALLED_APPS = [
+        "ams.base",
         "ams.home",
         "django.contrib.admin",
         "django.contrib.auth",
@@ -74,9 +75,7 @@ class Common(Configuration):
     TEMPLATES = [
         {
             "BACKEND": "django.template.backends.django.DjangoTemplates",
-            "DIRS": [
-                path.join(BASE_DIR, "ams/templates"),
-            ],
+            "DIRS": [],
             "APP_DIRS": True,
             "OPTIONS": {
                 "context_processors": [
@@ -142,8 +141,6 @@ class Common(Configuration):
 
     STATIC_URL = "static/"
     STATIC_ROOT = BASE_DIR / "static"
-
-    STATICFILES_DIRS = [BASE_DIR / "ams/static"]
 
     # User uploaded files
     # https://docs.djangoproject.com/en/4.2/topics/files/
