@@ -11,6 +11,7 @@ RUN apt-get update \
     wget \
     binutils \
     build-essential \
+    gettext \
     python3-dev \
     python3-venv \
     postgresql-client-common \
