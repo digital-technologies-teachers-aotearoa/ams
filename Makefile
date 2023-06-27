@@ -26,6 +26,10 @@ db-shell:
 backend-shell:
 	./docker_compose exec -e SHELL=bash backend poetry shell
 
+.PHONY: backend-migrate
+backend-migrate:
+	./docker_compose run -T --rm --entrypoint="poetry run ./manage.py migrate" backend
+
 .PHONY: backend-reload-server
 backend-reload-server:
 	./docker_compose exec -T backend pkill -HUP gunicorn

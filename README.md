@@ -36,6 +36,10 @@ Open a poetry shell on the backend:
 
     make backend-shell
 
+Run django migrations:
+
+    make backend-migrate
+
 Reload the backend server without restarting it:
 
     make backend-reload-server
