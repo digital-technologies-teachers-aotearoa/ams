@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load static wagtailcore_tags i18n %}
+
+{% block body_class %}template-registerpage{% endblock %}
+
+{% block content %}
+
+<h1>{{ page.heading }}</h1>
+
+<p>{{ page.body|richtext }}</p>
+
+<div class="membership-options" style="text-align: center">
+    <a href="#">{% translate "Individual" %}</a>
+    <a href="#">{% translate "Organisation" %}</a>
+</div>
+
+{% endblock content %}

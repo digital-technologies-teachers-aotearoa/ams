@@ -32,6 +32,11 @@ backend-shell:
 backend-migrate:
 	./docker_compose run -T --rm --entrypoint="poetry run ./manage.py migrate" backend
 
+.PHONY: backend-make-migrations
+backend-make-migrations:
+	./docker_compose run -T --rm --entrypoint="poetry run ./manage.py makemigrations" backend
+
+
 .PHONY: backend-reload-server
 backend-reload-server:
 	./docker_compose exec -T backend pkill -HUP gunicorn

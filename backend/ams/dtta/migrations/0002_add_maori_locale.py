@@ -10,8 +10,8 @@ def add_maori_locale(apps: Any, schema_editor: Any) -> None:
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("wagtailcore", "0053_locale_model"),
-        ("dtta", "0003_homepage_body_homepage_heading"),
+        ("wagtailcore", "0083_workflowcontenttype"),
+        ("dtta", "0001_update_homepage"),
     ]
 
     operations = [
