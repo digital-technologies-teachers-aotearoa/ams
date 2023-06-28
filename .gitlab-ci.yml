@@ -2,6 +2,10 @@ stages:
   - build
   - scan
   - test
+  - deploy
+
+variables:
+  IMAGE_TAG: ${CI_PIPELINE_ID}-${CI_COMMIT_SHORT_SHA}
 
 .kaniko:
   image:
@@ -26,7 +30,7 @@ build backend:
   extends:
     - .build
   variables:
-    IMAGE: $CONTAINER_REGISTRY/dtta/ams/backend:${CI_PIPELINE_ID}-${CI_COMMIT_SHORT_SHA}
+    IMAGE: $CONTAINER_REGISTRY/dtta/ams/backend:${IMAGE_TAG}
     CONTEXT: $CI_PROJECT_DIR/backend
     TARGET: production
 
@@ -55,7 +59,7 @@ scan backend:
 lint backend:
   stage: test
   image:
-    name: $CONTAINER_REGISTRY/dtta/ams/backend:${CI_PIPELINE_ID}-${CI_COMMIT_SHORT_SHA}
+    name: $CONTAINER_REGISTRY/dtta/ams/backend:${IMAGE_TAG}
     entrypoint: [""]
   script:
     - cd /src/app/
@@ -64,7 +68,7 @@ lint backend:
 test backend:
   stage: test
   image:
-    name: $CONTAINER_REGISTRY/dtta/ams/backend:${CI_PIPELINE_ID}-${CI_COMMIT_SHORT_SHA}
+    name: $CONTAINER_REGISTRY/dtta/ams/backend:${IMAGE_TAG}
     entrypoint: [""]
   services:
     - name: docker.catalyst.net.nz/catalyst/postgres:14
@@ -86,3 +90,36 @@ test backend:
   script:
     - cd /src/app
     - poetry run pytest
+
+audit backend dependencies:
+  stage: test
+  image:
+    name: docker.io/aquasec/trivy:latest
+    entrypoint: [""]
+  script:
+    - trivy fs --exit-code 1 --no-progress --severity HIGH,CRITICAL ${CI_PROJECT_DIR}/backend/poetry.lock
+
+deploy to test:
+  stage: deploy
+  image:
+    name: debian:bullseye
+  rules:
+    - if: $CI_COMMIT_BRANCH == 'main'
+  before_script:
+  # lifted from https://medium.com/senzil/gitlab-ci-ssh-with-passphrase-deploy-example-358c9fb60e53
+  - apt-get update -y && apt-get install openssh-client rsync -y
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+  - echo 'echo "$SSH_PASSPHRASE"' > ~/.ssh/.print_ssh_password
+  - chmod 700 ~/.ssh/.print_ssh_password
+  - chmod +x ~/.ssh/.print_ssh_password
+  - echo "$SSH_KNOWN_HOSTS" >> ~/.ssh/known_hosts
+  - chmod 644 ~/.ssh/known_hosts
+  - eval $(ssh-agent -s)
+  - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | DISPLAY=":0.0" SSH_ASKPASS=~/.ssh/.print_ssh_password setsid ssh-add - > /dev/null
+  script:
+    - ssh deploy@202.49.241.53 'cd /opt/dtta-ams; docker-compose down --remove-orphans'
+    - rsync -aRvPc . deploy@202.49.241.53:/opt/dtta-ams/ --exclude .git
+    - ssh deploy@202.49.241.53 'cd /opt/dtta-ams; sed -i 's/DOCKER_TAG=.*/DOCKER_TAG=${IMAGE_TAG}/' .env'
+    - ssh deploy@202.49.241.53 'cd /opt/dtta-ams; docker-compose -f docker-compose.yml -f docker-compose.test.yml up -d'
+    - ssh deploy@202.49.241.53 'cd /opt/dtta-ams; docker-compose exec -it backend poetry manage.py migrate --noinput'

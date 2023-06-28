@@ -11,7 +11,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   backend:
-    image: 'docker.catalyst.net.nz/dtta/ams/backend:${DOCKER_TAG}'
+    image: 'harbor.catalyst.net.nz/dtta/ams/backend:${DOCKER_TAG}'
     depends_on:
       - db
     environment:
