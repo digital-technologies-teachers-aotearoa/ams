@@ -162,7 +162,7 @@ class Common(Configuration):
         ("en", "English"),
         ("mi", "Maori"),
     ]
-    WAGTAILSIMPLETRANSLATION_SYNC_PAGE_TREE = True
+    WAGTAILSIMPLETRANSLATION_SYNC_PAGE_TREE = False
 
     # Default primary key field type
     # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
