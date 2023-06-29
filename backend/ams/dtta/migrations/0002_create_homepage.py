@@ -9,14 +9,14 @@ def create_homepage(apps: Any, schema_editor: Any) -> None:
     ContentType = apps.get_model("contenttypes.ContentType")
     Page = apps.get_model("wagtailcore.Page")
     Site = apps.get_model("wagtailcore.Site")
-    HomePage = apps.get_model("home.HomePage")
+    HomePage = apps.get_model("dtta.HomePage")
 
     # Delete the default homepage
     # If migration is run multiple times, it may have already been deleted
     Page.objects.filter(id=2).delete()
 
     # Create content type for homepage model
-    homepage_content_type, __ = ContentType.objects.get_or_create(model="homepage", app_label="home")
+    homepage_content_type, __ = ContentType.objects.get_or_create(model="homepage", app_label="dtta")
 
     # Create a new homepage
     homepage = HomePage.objects.create(
@@ -31,20 +31,20 @@ def create_homepage(apps: Any, schema_editor: Any) -> None:
     )
 
     # Create a site with the new homepage set as the root
-    Site.objects.create(hostname="localhost", root_page=homepage, is_default_site=True)
+    Site.objects.create(root_page=homepage, is_default_site=True)
 
 
 def remove_homepage(apps: Any, schema_editor: Any) -> None:
     # Get models
     ContentType = apps.get_model("contenttypes.ContentType")
-    HomePage = apps.get_model("home.HomePage")
+    HomePage = apps.get_model("dtta.HomePage")
 
     # Delete the default homepage
     # Page and Site objects CASCADE
     HomePage.objects.filter(slug="home", depth=2).delete()
 
     # Delete content type for homepage model
-    ContentType.objects.filter(model="homepage", app_label="home").delete()
+    ContentType.objects.filter(model="homepage", app_label="dtta").delete()
 
 
 class Migration(migrations.Migration):
@@ -53,7 +53,7 @@ class Migration(migrations.Migration):
     ]
 
     dependencies = [
-        ("home", "0001_initial"),
+        ("dtta", "0001_initial"),
     ]
 
     operations = [

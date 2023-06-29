@@ -1,4 +1,4 @@
-from os import environ, path
+from os import environ
 from pathlib import Path
 from typing import Iterable, Optional
 
@@ -36,7 +36,8 @@ class Common(Configuration):
     # Application definition
 
     INSTALLED_APPS = [
-        "ams.home",
+        "ams.base",
+        "ams.dtta",
         "django.contrib.admin",
         "django.contrib.auth",
         "django.contrib.contenttypes",
@@ -45,6 +46,7 @@ class Common(Configuration):
         "django.contrib.staticfiles",
         "wagtail.contrib.forms",
         "wagtail.contrib.redirects",
+        "wagtail.contrib.simple_translation",
         "wagtail.embeds",
         "wagtail.sites",
         "wagtail.users",
@@ -53,12 +55,14 @@ class Common(Configuration):
         "wagtail.images",
         "wagtail.search",
         "wagtail.admin",
+        "wagtail.locales",
         "wagtail",
         "modelcluster",
         "taggit",
     ]
 
     MIDDLEWARE = [
+        "django.middleware.locale.LocaleMiddleware",
         "django.middleware.security.SecurityMiddleware",
         "django.contrib.sessions.middleware.SessionMiddleware",
         "django.middleware.common.CommonMiddleware",
@@ -74,9 +78,7 @@ class Common(Configuration):
     TEMPLATES = [
         {
             "BACKEND": "django.template.backends.django.DjangoTemplates",
-            "DIRS": [
-                path.join(BASE_DIR, "ams/templates"),
-            ],
+            "DIRS": [],
             "APP_DIRS": True,
             "OPTIONS": {
                 "context_processors": [
@@ -128,7 +130,7 @@ class Common(Configuration):
     # Internationalization
     # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-    LANGUAGE_CODE = "en-us"
+    LANGUAGE_CODE = "en"
 
     TIME_ZONE = "UTC"
 
@@ -143,8 +145,6 @@ class Common(Configuration):
     STATIC_URL = "static/"
     STATIC_ROOT = BASE_DIR / "static"
 
-    STATICFILES_DIRS = [BASE_DIR / "ams/static"]
-
     # User uploaded files
     # https://docs.djangoproject.com/en/4.2/topics/files/
     # TODO: need solution production solution for user uploaded files
@@ -157,6 +157,12 @@ class Common(Configuration):
 
     WAGTAIL_SITE_NAME = "DTTA - Association Management Software"
     WAGTAILADMIN_BASE_URL = environ["APPLICATION_WEB_HOST"] + "/cms"
+    WAGTAIL_I18N_ENABLED = True
+    WAGTAIL_CONTENT_LANGUAGES = LANGUAGES = [
+        ("en", "English"),
+        ("mi", "Maori"),
+    ]
+    WAGTAILSIMPLETRANSLATION_SYNC_PAGE_TREE = True
 
     # Default primary key field type
     # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
