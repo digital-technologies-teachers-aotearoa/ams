@@ -1,4 +1,8 @@
-from django.db.models import CharField
+from typing import List, Tuple
+
+from django.db.models import CharField, DecimalField, Model, TextChoices
+from django.utils.translation import gettext_lazy as _
+from relativedeltafield import RelativeDeltaField
 from wagtail.admin.panels import FieldPanel
 from wagtail.fields import RichTextField
 from wagtail.models import Page
@@ -21,3 +25,14 @@ class MembershipPage(Page):
     body = RichTextField(blank=True, default="Welcome to the membership page")
 
     content_panels = Page.content_panels + [FieldPanel("heading"), FieldPanel("body")]
+
+
+class MembershipOption(Model):
+    class MembershipOptionType(TextChoices):
+        INDIVIDUAL = "INDIVIDUAL", _("Individual")
+        ORGANISATION = "ORGANISATION", _("Organisation")
+
+    name = CharField(max_length=255, unique=True)
+    type = CharField(max_length=255, choices=MembershipOptionType.choices)
+    duration = RelativeDeltaField()
+    cost = DecimalField(max_digits=10, decimal_places=2)
