@@ -39,6 +39,8 @@ scan backend:
   image:
     name: docker.io/aquasec/trivy:latest
     entrypoint: [""]
+  # Due to a bad upstream image being able to completely break the pipeline, we should allow failures for now.
+  allow_failure: true
   variables:
     CRANE_VERSION: "v0.15.2"
     CRANE_TAR: "go-containerregistry_Linux_x86_64.tar.gz"
@@ -96,18 +98,25 @@ deploy to test:
   stage: deploy
   image:
     name: debian:bullseye
-  # rules:
-  #   - if: $CI_COMMIT_BRANCH == 'main'
+  rules:
+    - if: $CI_COMMIT_BRANCH == 'main'
   before_script:
   - apt-get update -y && apt-get install openssh-client rsync make -y
   - eval $(ssh-agent -s)
   - chmod 400 "$SSH_PRIVATE_KEY"
   - ssh-add "$SSH_PRIVATE_KEY"
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
   - echo "$SSH_KNOWN_HOSTS" >> ~/.ssh/known_hosts
   - chmod 644 ~/.ssh/known_hosts
   script:
-    - ssh -o SendEnv=$DEPLOY_APP_DIR $SSH_USER@$SSH_HOST 'cd $DEPLOY_APP_DIR && docker-compose down --remove-orphans'
-    - rsync -aRvPc . $SSH_USER@$SSH_HOST:$DEPLOY_APP_DIR --exclude .git
-    - ssh $SSH_USER@$SSH_HOST 'cd $DEPLOY_APP_DIR && sed -i 's/DOCKER_TAG=.*/DOCKER_TAG=${IMAGE_TAG}/' .env'
-    - ssh $SSH_USER@$SSH_HOST 'cd $DEPLOY_APP_DIR && docker-compose -f docker-compose.yml -f docker-compose.test.yml up -d'
-    - ssh $SSH_USER@$SSH_HOST 'cd $DEPLOY_APP_DIR && docker-compose exec -it backend poetry manage.py migrate --noinput'
+    # Tear down the existing deployment, remove orphan containers and clear volumes, and remove old images.
+    - ssh $SSH_USER@$SSH_HOST "cd $DEPLOY_APP_DIR && docker-compose down --remove-orphans -v && docker image prune -a -f"
+    # Bring in the .env file from CI
+    - cp $DOT_ENV_FILE .env
+    # Update the tag for the AMS docker image.
+    - sed -i "s/DOCKER_TAG=.*/DOCKER_TAG=${IMAGE_TAG}/" .env
+    # Copy over the new files - ignore the .git directory as the deployment does not need access to git history.
+    # `--del` is added to ensure that orphaned files get cleaned up.
+    - rsync -aRvPcp --del . $SSH_USER@$SSH_HOST:$DEPLOY_APP_DIR --exclude .git --exclude .htpasswd
+    - ssh $SSH_USER@$SSH_HOST "cd $DEPLOY_APP_DIR/ci/ && ./deploy.bash"

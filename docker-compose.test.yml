@@ -11,6 +11,7 @@ services:
           -c 'log_statement=all'
 
   backend:
+    user: '0:0' # This is due to shared docker volume permissions.
     environment:
       - DJANGO_SETTINGS_MODULE=ams.settings
       - DJANGO_SECRET_KEY
@@ -22,8 +23,11 @@ services:
       - APPLICATION_DB_USER
       - APPLICATION_DB_PASSWORD
       - PGPASSWORD=$POSTGRES_PASSWORD
+      - DJANGO_SUPERUSER_USERNAME
+      - DJANGO_SUPERUSER_PASSWORD
+      - DJANGO_SUPERUSER_EMAIL
     volumes:
-      - ./backend/ams/settings.py:/src/app/ams/settings.py
+      - static_data:/src/app/static
 
   nginx:
     ports:
@@ -33,3 +37,7 @@ services:
       - ./nginx/nginx-test.conf:/etc/nginx/conf.d/default.conf
       - .htpasswd:/etc/nginx/.htpasswd
       - /etc/letsencrypt:/etc/letsencrypt
+      - static_data:/usr/share/nginx/static:ro
+
+volumes:
+  static_data:
