@@ -37,6 +37,7 @@ class Common(Configuration):
 
     INSTALLED_APPS = [
         "ams.base",
+        "ams.users",
         "ams.dtta",
         "django.contrib.admin",
         "django.contrib.auth",

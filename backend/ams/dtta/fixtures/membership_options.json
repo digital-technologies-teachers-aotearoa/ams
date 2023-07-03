@@ -1,6 +1,6 @@
 [
   {
-    "model": "base.MembershipOption",
+    "model": "users.MembershipOption",
     "pk": 1,
     "fields": {
         "name": "Secondary School",
@@ -10,7 +10,7 @@
     }
   },
   {
-    "model": "base.MembershipOption",
+    "model": "users.MembershipOption",
     "pk": 2,
     "fields": {
         "name": "Primary School",
@@ -20,7 +20,7 @@
     }
   },
   {
-    "model": "base.MembershipOption",
+    "model": "users.MembershipOption",
     "pk": 3,
     "fields": {
         "name": "Kura Kaupapa",
@@ -30,7 +30,7 @@
     }
   },
   {
-    "model": "base.MembershipOption",
+    "model": "users.MembershipOption",
     "pk": 4,
     "fields": {
         "name": "Private",
