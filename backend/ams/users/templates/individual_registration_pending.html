@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load static wagtailcore_tags i18n %}
+
+{% block title %}{% translate "Membership Registration" %}{% endblock title %}
+
+{% block body_class %}individual-registration{% endblock %}
+
+{% block content %}
+
+<h1>{% translate "Membership Registration" %}</h1>
+
+<p>{% translate "User account created. Please check your email to verify your email." %}</p>
+
+{% endblock content %}

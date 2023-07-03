@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load static wagtailcore_tags i18n %}
+
+{% block title %}{% translate "Membership Registration" %}{% endblock title %}
+
+{% block body_class %}individual-registration{% endblock %}
+
+{% block content %}
+
+<h1>{% translate "Membership Registration" %}</h1>
+
+<form action="/users/individual-registration/" method="post">
+    {% csrf_token %}
+
+    <h2>{% translate "Personal Details" %}</h1>
+
+    <div class="registration-personal-detail-fields">
+        {% for field in personal_detail_fields %}
+            <div class="fieldWrapper">
+                <span style="display: inline-block; width: 200px;">{{ field.label_tag }}</span> {{ field }}
+                {{ field.errors }}
+            </div>
+        {% endfor %}
+    </table>
+
+    <h2>{% translate "Membership" %}</h1>
+
+    <p>{% translate "Sign me up for ..." %}</p>
+
+    <div class="registration-membership-fields">
+        {% for field in membership_fields %}
+            <div class="fieldWrapper">
+                {{ field }}
+                {{ field.errors }}
+            </div>
+        {% endfor %}
+    </div>
+
+    <br/>
+
+    <div>
+        <input type="button" value="Cancel" onClick="window.location='../../membership/';">
+        <input type="submit" value="Register">
+    </div>
+
+</form>
+
+{% endblock content %}

@@ -10,7 +10,7 @@
 <p>{{ page.body|richtext }}</p>
 
 <div class="membership-options" style="text-align: center">
-    <a href="#">{% translate "Individual" %}</a>
+    <a href="{% url "individual-registration" %}">{% translate "Individual" %}</a>
     <a href="#">{% translate "Organisation" %}</a>
 </div>
 
