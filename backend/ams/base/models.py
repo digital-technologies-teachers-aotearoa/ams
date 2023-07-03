@@ -1,5 +1,3 @@
-from typing import List, Tuple
-
 from django.db.models import CharField, DecimalField, Model, TextChoices
 from django.utils.translation import gettext_lazy as _
 from relativedeltafield import RelativeDeltaField
