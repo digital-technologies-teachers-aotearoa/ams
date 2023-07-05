@@ -173,3 +173,8 @@ class Common(Configuration):
 class Development(Common):
     DEBUG = True
     CSRF_TRUSTED_ORIGINS = ["http://" + environ["APPLICATION_WEB_HOST"] + ":1800"]
+
+
+class Testing(Common):
+    DEBUG = False
+    CSRF_TRUSTED_ORIGINS = ["https://" + environ["APPLICATION_WEB_HOST"]]

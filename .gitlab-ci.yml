@@ -2,6 +2,10 @@ stages:
   - build
   - scan
   - test
+  - deploy
+
+variables:
+  IMAGE_TAG: ${CI_PIPELINE_ID}-${CI_COMMIT_SHORT_SHA}
 
 .kaniko:
   image:
@@ -26,7 +30,7 @@ build backend:
   extends:
     - .build
   variables:
-    IMAGE: $CONTAINER_REGISTRY/dtta/ams/backend:${CI_PIPELINE_ID}-${CI_COMMIT_SHORT_SHA}
+    IMAGE: $CONTAINER_REGISTRY/dtta/ams/backend:${IMAGE_TAG}
     CONTEXT: $CI_PROJECT_DIR/backend
     TARGET: production
 
@@ -35,6 +39,8 @@ scan backend:
   image:
     name: docker.io/aquasec/trivy:latest
     entrypoint: [""]
+  # Due to a bad upstream image being able to completely break the pipeline, we should allow failures for now.
+  allow_failure: true
   variables:
     CRANE_VERSION: "v0.15.2"
     CRANE_TAR: "go-containerregistry_Linux_x86_64.tar.gz"
@@ -52,10 +58,11 @@ scan backend:
     # Explicitly scan python dependencies in poetry.lock as trivy misses them when scanning the image
     - trivy --cache-dir .trivycache/ fs --exit-code 1 --no-progress --severity HIGH,CRITICAL ${CI_PROJECT_DIR}/backend/poetry.lock
 
+
 lint backend:
   stage: test
   image:
-    name: $CONTAINER_REGISTRY/dtta/ams/backend:${CI_PIPELINE_ID}-${CI_COMMIT_SHORT_SHA}
+    name: $CONTAINER_REGISTRY/dtta/ams/backend:${IMAGE_TAG}
     entrypoint: [""]
   script:
     - cd /src/app/
@@ -64,7 +71,7 @@ lint backend:
 test backend:
   stage: test
   image:
-    name: $CONTAINER_REGISTRY/dtta/ams/backend:${CI_PIPELINE_ID}-${CI_COMMIT_SHORT_SHA}
+    name: $CONTAINER_REGISTRY/dtta/ams/backend:${IMAGE_TAG}
     entrypoint: [""]
   services:
     - name: docker.catalyst.net.nz/catalyst/postgres:14
@@ -86,3 +93,30 @@ test backend:
   script:
     - cd /src/app
     - poetry run pytest
+
+deploy to test:
+  stage: deploy
+  image:
+    name: debian:bullseye
+  rules:
+    - if: $CI_COMMIT_BRANCH == 'main'
+  before_script:
+  - apt-get update -y && apt-get install openssh-client rsync make -y
+  - eval $(ssh-agent -s)
+  - chmod 400 "$SSH_PRIVATE_KEY"
+  - ssh-add "$SSH_PRIVATE_KEY"
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+  - echo "$SSH_KNOWN_HOSTS" >> ~/.ssh/known_hosts
+  - chmod 644 ~/.ssh/known_hosts
+  script:
+    # Tear down the existing deployment, remove orphan containers and clear volumes, and remove old images.
+    - ssh $SSH_USER@$SSH_HOST "cd $DEPLOY_APP_DIR && docker-compose down --remove-orphans -v && docker image prune -a -f"
+    # Bring in the .env file from CI
+    - cp $DOT_ENV_FILE .env
+    # Update the tag for the AMS docker image.
+    - sed -i "s/DOCKER_TAG=.*/DOCKER_TAG=${IMAGE_TAG}/" .env
+    # Copy over the new files - ignore the .git directory as the deployment does not need access to git history.
+    # `--del` is added to ensure that orphaned files get cleaned up.
+    - rsync -aRvPcp --del . $SSH_USER@$SSH_HOST:$DEPLOY_APP_DIR --exclude .git --exclude .htpasswd
+    - ssh $SSH_USER@$SSH_HOST "cd $DEPLOY_APP_DIR/ci/ && ./deploy.bash"
