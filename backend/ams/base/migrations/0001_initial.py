@@ -28,7 +28,6 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 ("heading", models.CharField(blank=True, default="Home", max_length=255)),
-                ("registration_link_text", models.CharField(blank=True, default="Register", max_length=255)),
                 ("body", wagtail.fields.RichTextField(blank=True, default="Welcome to the homepage")),
             ],
             options={

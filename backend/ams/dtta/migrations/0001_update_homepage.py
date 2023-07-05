@@ -10,7 +10,6 @@ def update_homepage_content(apps: Any, schema_editor: Any) -> None:
 
     home_page = HomePage.objects.get(slug="home")
     home_page.heading = "Digital Technologies Teachers Aotearoa"
-    home_page.registration_link_text = "Register for DTTA"
     home_page.body = (
         "The Digital Technologies Teachers Aotearoa is an association with the goal of advocating "
         "for our subjects. The aim of the association is to create a community of teachers where we can "
