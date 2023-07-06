@@ -39,6 +39,7 @@ class Common(Configuration):
         "ams.base",
         "ams.users",
         "ams.dtta",
+        "registration",
         "django.contrib.admin",
         "django.contrib.auth",
         "django.contrib.contenttypes",
@@ -153,6 +154,13 @@ class Common(Configuration):
     MEDIA_URL = "media/"
     MEDIA_ROOT = BASE_DIR / "media"
 
+    # Email
+    # https://docs.djangoproject.com/en/4.2/topics/email/
+
+    EMAIL_HOST = "fakesmtp.catalyst.net.nz"
+    EMAIL_HOST_USER = "dtta-ams@fakesmtp.catalyst.net.nz"
+    EMAIL_HOST_PASSWORD = environ["EMAIL_HOST_PASSWORD"]
+
     # Wagtail settings
     # https://docs.wagtail.org/en/stable/reference/settings.html
 
@@ -164,6 +172,13 @@ class Common(Configuration):
         ("mi", "Maori"),
     ]
     WAGTAILSIMPLETRANSLATION_SYNC_PAGE_TREE = False
+
+    # Django registration redux
+    # https://django-registration-redux.readthedocs.io/en/latest/quickstart.html
+
+    ACCOUNT_ACTIVATION_DAYS = 7
+    REGISTRATION_AUTO_LOGIN = False
+    REGISTRATION_EMAIL_HTML = False
 
     # Default primary key field type
     # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

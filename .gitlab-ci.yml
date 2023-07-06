@@ -90,6 +90,7 @@ test backend:
     DJANGO_SETTINGS_MODULE: ams.settings
     DJANGO_CONFIGURATION: Development
     DJANGO_SECRET_KEY: test django secret key
+    EMAIL_HOST_PASSWORD:
   script:
     - cd /src/app
     - poetry run pytest
