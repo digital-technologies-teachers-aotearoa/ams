@@ -21,3 +21,10 @@ class MembershipPage(Page):
     )
 
     content_panels = Page.content_panels + [FieldPanel("heading"), FieldPanel("body")]
+
+
+class EmailConfirmationPage(Page):
+    heading = CharField(blank=True, max_length=255, default="Email Confirmation Successful!")
+    body = RichTextField(blank=True, default="Congratulations! Your email has been successfully confirmed.")
+
+    content_panels = Page.content_panels + [FieldPanel("heading"), FieldPanel("body")]
