@@ -50,7 +50,13 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 ("heading", models.CharField(blank=True, default="Membership", max_length=255)),
-                ("body", wagtail.fields.RichTextField(blank=True, default="Welcome to the membership page")),
+                (
+                    "body",
+                    wagtail.fields.RichTextField(
+                        blank=True,
+                        default="<p>You can sign up either individually or for your organisation.  Please select:</p>",
+                    ),
+                ),
             ],
             options={
                 "abstract": False,

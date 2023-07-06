@@ -16,6 +16,8 @@ class HomePage(Page):
 
 class MembershipPage(Page):
     heading = CharField(blank=True, max_length=255, default="Membership")
-    body = RichTextField(blank=True, default="Welcome to the membership page")
+    body = RichTextField(
+        blank=True, default="<p>You can sign up either individually or for your organisation.  Please select:</p>"
+    )
 
     content_panels = Page.content_panels + [FieldPanel("heading"), FieldPanel("body")]
