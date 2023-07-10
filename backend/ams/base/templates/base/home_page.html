@@ -5,7 +5,10 @@
 
 {% block content %}
 
-<div style="float:right"><a href="membership/">{% translate "Sign Up" %}</a></div>
+<div style="float:right">
+    <a href="users/login/?next=/">{% translate "Log In" %}</a>
+    <a href="membership/">{% translate "Sign Up" %}</a>
+</div>
 
 <h1>{{ page.heading }}</h1>
 
