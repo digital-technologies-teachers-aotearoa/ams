@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Log In" %}{% endblock %}
+
+{% block content %}
+
+<style>
+.login-fields span {
+    display: inline-block;
+    width: 200px;
+}
+</style>
+
+<h1>{% translate "Log In" %}</h1>
+
+<form method="post" action="">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ next }}" />
+
+    <div class="login-fields">
+
+        <div class="fieldWrapper">
+            <span><label for="id_username">{% translate "Email" %}:</label></span>
+            <input type="text" name="username" autofocus autocapitalize="none" autocomplete="username" maxlength="150" required id="id_username">
+        </div>
+
+        <div class="fieldWrapper">
+            <span><label for="id_password">{% translate "Password" %}:</label></span>
+            <input type="password" name="password" autocomplete="current-password" required id="id_password">   
+        </div>
+
+        {% if form.errors %}
+            <p>{% translate "Invalid email or password" %}</p>
+        {% endif %}
+
+    </div>
+
+    <br/>
+
+    <div>
+        <input type="submit" value="{% translate "Log In" %}" />
+    </div>
+</form>
+
+{% endblock %}
+

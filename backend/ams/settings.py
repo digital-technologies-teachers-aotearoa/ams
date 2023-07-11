@@ -179,6 +179,7 @@ class Common(Configuration):
     ACCOUNT_ACTIVATION_DAYS = 7
     REGISTRATION_AUTO_LOGIN = False
     REGISTRATION_EMAIL_HTML = False
+    LOGIN_REDIRECT_URL = "/"
 
     # Default primary key field type
     # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
