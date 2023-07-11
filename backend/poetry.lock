@@ -522,6 +522,22 @@ url = "https://cat-prod-buildproxy.dmz.wgtn.cat-it.co.nz/root/pypi/+simple"
 reference = "package proxy"
 
 [[package]]
+name = "django-registration-redux"
+version = "2.12"
+description = "An extensible user-registration application for Django"
+optional = false
+python-versions = "*"
+files = [
+    {file = "django-registration-redux-2.12.tar.gz", hash = "sha256:2213bbe8732be72724034f4146f0255a7bd666eb5a5e1b2d8d8aa633fe8af894"},
+    {file = "django_registration_redux-2.12-py2.py3-none-any.whl", hash = "sha256:56fbc7b01a7f0f48812fe4d4e0729d2dac916e16f8aaed36b3f10129f2df9d0f"},
+]
+
+[package.source]
+type = "legacy"
+url = "https://cat-prod-buildproxy.dmz.wgtn.cat-it.co.nz/root/pypi/+simple"
+reference = "package proxy"
+
+[[package]]
 name = "django-relativedelta"
 version = "2.0.0"
 description = "Django alternative to DurationField using dateutil.relativedelta"
@@ -2149,4 +2165,4 @@ reference = "package proxy"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "a1cee8b13389106574c0961860b59e7f54a0b0690a36ba13991cb54b44a57fcc"
+content-hash = "c0e6a99c03b3330cee9b2af403e23f0143ef049700488669c5f4007380e25aba"

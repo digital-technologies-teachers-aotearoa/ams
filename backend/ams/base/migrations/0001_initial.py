@@ -50,7 +50,40 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 ("heading", models.CharField(blank=True, default="Membership", max_length=255)),
-                ("body", wagtail.fields.RichTextField(blank=True, default="Welcome to the membership page")),
+                (
+                    "body",
+                    wagtail.fields.RichTextField(
+                        blank=True,
+                        default="<p>You can sign up either individually or for your organisation.  Please select:</p>",
+                    ),
+                ),
+            ],
+            options={
+                "abstract": False,
+            },
+            bases=("wagtailcore.page",),
+        ),
+        migrations.CreateModel(
+            name="EmailConfirmationPage",
+            fields=[
+                (
+                    "page_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="wagtailcore.page",
+                    ),
+                ),
+                ("heading", models.CharField(blank=True, default="Email Confirmation Successful!", max_length=255)),
+                (
+                    "body",
+                    wagtail.fields.RichTextField(
+                        blank=True, default="Congratulations! Your email has been successfully confirmed."
+                    ),
+                ),
             ],
             options={
                 "abstract": False,

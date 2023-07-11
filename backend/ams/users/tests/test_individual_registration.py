@@ -1,7 +1,9 @@
 from typing import Any, Dict
 
 from django.contrib.auth.models import User
+from django.core import mail
 from django.test import TestCase
+from registration.models import RegistrationProfile
 
 from ..forms import IndividualRegistrationForm
 from ..models import MembershipOption, MembershipOptionType
@@ -47,7 +49,8 @@ class IndividualRegistrationFormTests(TestCase):
 
     def test_post_completed_form_to_endpoint_creates_expected_user(self) -> None:
         # When
-        response = self.client.post("/users/individual-registration/", self.form_values)
+        with self.captureOnCommitCallbacks(execute=True):
+            response = self.client.post("/users/individual-registration/", self.form_values)
 
         # Then
         self.assertEqual(201, response.status_code)
@@ -66,6 +69,23 @@ class IndividualRegistrationFormTests(TestCase):
         with self.subTest("created expected user membership"):
             self.assertEqual(user_membership.membership_option.name, self.form_values["membership_option"])
             self.assertIsNone(user_membership.approved_datetime)
+
+        with self.subTest("verification email sent"):
+            activation_key = RegistrationProfile.objects.get(user=user).activation_key
+
+            self.assertEqual(len(mail.outbox), 1)
+            self.assertEqual(mail.outbox[0].subject, "Account activation on testserver")
+            self.maxDiff = None
+            self.assertEqual(
+                mail.outbox[0].body,
+                f"""Hello {user.first_name},
+
+You're almost ready to start enjoying testserver.
+
+Simply click the link below to verify your email address.
+
+http://testserver/users/activate/{activation_key}/""",
+            )
 
     def test_blank_form_should_include_expected_values(self) -> None:
         # Given

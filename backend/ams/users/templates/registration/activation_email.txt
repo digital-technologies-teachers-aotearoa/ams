@@ -1,0 +1,7 @@
+Hello {{ user.first_name }},
+
+You're almost ready to start enjoying {{ site.name }}.
+
+Simply click the link below to verify your email address.
+
+http://{{ site.domain }}{% url 'activate-user' activation_key %}

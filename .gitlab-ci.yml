@@ -90,6 +90,9 @@ test backend:
     DJANGO_SETTINGS_MODULE: ams.settings
     DJANGO_CONFIGURATION: Development
     DJANGO_SECRET_KEY: test django secret key
+    EMAIL_HOST: localhost
+    EMAIL_HOST_USER: test
+    EMAIL_HOST_PASSWORD:
   script:
     - cd /src/app
     - poetry run pytest
@@ -100,6 +103,8 @@ deploy to test:
     name: debian:bullseye
   rules:
     - if: $CI_COMMIT_BRANCH == 'main'
+  variables:
+    RECREATE_DB: 1
   before_script:
   - apt-get update -y && apt-get install openssh-client rsync make -y
   - eval $(ssh-agent -s)
@@ -116,6 +121,9 @@ deploy to test:
     - cp $DOT_ENV_FILE .env
     # Update the tag for the AMS docker image.
     - sed -i "s/DOCKER_TAG=.*/DOCKER_TAG=${IMAGE_TAG}/" .env
+    # Add deployment variables
+    - echo "" >> .env
+    - echo "RECREATE_DB=${RECREATE_DB}" >> .env
     # Copy over the new files - ignore the .git directory as the deployment does not need access to git history.
     # `--del` is added to ensure that orphaned files get cleaned up.
     - rsync -aRvPcp --del . $SSH_USER@$SSH_HOST:$DEPLOY_APP_DIR --exclude .git --exclude .htpasswd
