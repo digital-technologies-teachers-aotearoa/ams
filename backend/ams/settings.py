@@ -157,8 +157,8 @@ class Common(Configuration):
     # Email
     # https://docs.djangoproject.com/en/4.2/topics/email/
 
-    EMAIL_HOST = "fakesmtp.catalyst.net.nz"
-    EMAIL_HOST_USER = "dtta-ams@fakesmtp.catalyst.net.nz"
+    EMAIL_HOST = environ["EMAIL_HOST"]
+    EMAIL_HOST_USER = environ["EMAIL_HOST_USER"]
     EMAIL_HOST_PASSWORD = environ["EMAIL_HOST_PASSWORD"]
 
     # Wagtail settings
