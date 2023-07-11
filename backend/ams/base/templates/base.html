@@ -1,4 +1,4 @@
-{% load static wagtailcore_tags wagtailuserbar %}
+{% load static wagtailcore_tags wagtailuserbar i18n %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -33,6 +33,27 @@
 
     <body class="{% block body_class %}{% endblock %}">
         {% wagtailuserbar %}
+
+        {# Header navigation bar #}
+        <div>
+            <div style="float:right">
+                {% if user.is_authenticated %}
+                    {% if user.first_name %}
+                        <span>You are logged in as {{ user.first_name }} {{ user.last_name }}</span>
+                    {% else %}
+                        <span>You are logged in as {{ user.username }}</span>
+                    {% endif %}
+                {% endif %}
+
+                <a href="users/login/?next={{ request.path | urlencode}}">{% translate "Log In" %}</a>
+                <a href="membership/">{% translate "Sign Up" %}</a>
+            </div>
+                {% if user.is_authenticated and user.member.status == "PENDING" %}
+                {% translate "Your membership is Pending" %}
+                {% endif %}
+            <div>
+            </div>
+        </div>
 
         {% block content %}{% endblock %}
 
