@@ -1,4 +1,4 @@
-{% load static wagtailcore_tags wagtailuserbar i18n %}
+{% load static wagtailcore_tags wagtailuserbar i18n localize_url %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -43,10 +43,12 @@
                     {% else %}
                         <span>You are logged in as {{ user.username }}</span>
                     {% endif %}
+                    <a href="{% url "auth_logout" %}?next={{ request.path | urlencode}}">{% translate "Log Out" %}</a>
+                {% else %}
+                    <a href="{% url "auth_login" %}?next={{ request.path | urlencode}}">{% translate "Log In" %}</a>
+                    <a href="{{ "membership/" | localize_url }}">{% translate "Sign Up" %}</a>
                 {% endif %}
 
-                <a href="users/login/?next={{ request.path | urlencode}}">{% translate "Log In" %}</a>
-                <a href="membership/">{% translate "Sign Up" %}</a>
             </div>
                 {% if user.is_authenticated and user.member.status == "PENDING" %}
                 {% translate "Your membership is Pending" %}
