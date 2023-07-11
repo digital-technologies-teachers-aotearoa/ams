@@ -20,6 +20,10 @@ Run the backend tests:
 
     make test-backend
 
+Run the backend tests, reusing an existing test database (faster):
+
+    make test-backend-reuse-db
+
 Python lint check:
 
     make lint-python

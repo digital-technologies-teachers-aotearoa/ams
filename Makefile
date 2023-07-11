@@ -46,6 +46,10 @@ backend-reload-server:
 test-backend:
 	./docker_compose run -T --rm --entrypoint="poetry run pytest $(TESTS)" backend
 
+.PHONY: test-backend-reuse-db
+test-backend-reuse-db:
+	./docker_compose run -T --rm --entrypoint="poetry run pytest --reuse-db $(TESTS)" backend
+
 .PHONY: lint-python
 lint-python:
 	./docker_compose run --rm --no-deps --entrypoint="poetry run ./lint-python.bash" backend
