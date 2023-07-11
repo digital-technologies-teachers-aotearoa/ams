@@ -1,12 +1,11 @@
 {% extends "base.html" %}
-{% load static wagtailcore_tags %}
+{% load static wagtailcore_tags i18n %}
 
 {% block body_class %}template-homepage{% endblock %}
 
-{% block extra_css %}
-{% endblock extra_css %}
-
 {% block content %}
+
+<div style="float:right"><a href="membership/">{% translate "Sign Up" %}</a></div>
 
 <h1>{{ page.heading }}</h1>
 
