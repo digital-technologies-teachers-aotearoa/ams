@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static wagtailcore_tags i18n %}
+{% load static wagtailcore_tags i18n localize_url %}
 
 {% block title %}{% translate "Membership Registration" %}{% endblock title %}
 
@@ -28,18 +28,26 @@
     <p>{% translate "Sign me up for ..." %}</p>
 
     <div class="registration-membership-fields">
-        {% for field in membership_fields %}
             <div class="fieldWrapper">
-                {{ field }}
-                {{ field.errors }}
+                {% for option in membership_option_field %}
+                    <div>
+                        <label for="{{option.id_for_label}}">
+                            {{option.tag}}
+                            <span>
+                                <strong>{{ option.data.value }}</strong>
+                                {{ option.choice_label }}
+                            </span>
+                        </label>
+                    </div>
+                 {% endfor %}
+                 {{ membership_option_field.errors }}
             </div>
-        {% endfor %}
     </div>
 
     <br/>
 
     <div>
-        <input type="button" value="Cancel" onClick="window.location='../../membership/';">
+        <input type="button" value="Cancel" onClick="window.location='{{ "membership/" | localize_url }}';">
         <input type="submit" value="Register">
     </div>
 

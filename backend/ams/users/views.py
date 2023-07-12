@@ -1,5 +1,8 @@
+from typing import Optional
+
 from django.conf import settings
 from django.contrib.sites.requests import RequestSite
+from django.forms import BoundField
 from django.http import HttpResponseRedirect
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
@@ -39,22 +42,26 @@ def individual_registration(request: HttpRequest) -> HttpResponse:
                 "individual_registration_pending.html",
                 status=201,
             )
-
-    form = IndividualRegistrationForm()
+    else:
+        form = IndividualRegistrationForm()
 
     personal_detail_fields = []
-    membership_fields = []
+    membership_option_field: Optional[BoundField] = None
 
     for field in form:
         if field.name == "membership_option":
-            membership_fields.append(field)
+            membership_option_field = field
         else:
             personal_detail_fields.append(field)
 
     return render(
         request,
         "individual_registration.html",
-        {"personal_detail_fields": personal_detail_fields, "membership_fields": membership_fields},
+        {
+            "form": form,
+            "personal_detail_fields": personal_detail_fields,
+            "membership_option_field": membership_option_field,
+        },
     )
 
 
