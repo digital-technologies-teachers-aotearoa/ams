@@ -45,6 +45,7 @@ class IndividualRegistrationFormTests(TestCase):
 
         # Then
         self.assertEqual(200, response.status_code)
+        self.assertFormError(response, "form", "email", "This field is required.")
         self.assertTemplateUsed(response, "individual_registration.html")
 
     def test_post_completed_form_to_endpoint_creates_expected_user(self) -> None:
