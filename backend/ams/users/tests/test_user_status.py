@@ -131,3 +131,25 @@ class UserStatusTests(TestCase):
 
         # Then
         self.assertNotContains(response, "Your membership is")
+
+    def test_should_include_admin_menu_for_admin_user(self) -> None:
+        # Given
+        self.user.is_superuser = True
+        self.user.save()
+
+        self.client.force_login(self.user)
+
+        # When
+        response = self.client.get("/")
+        self.assertContains(response, "admin-nav-menu")
+
+    def test_should_not_include_admin_menu_for_non_admin_user(self) -> None:
+        # Given
+        self.user.is_superuser = False
+        self.user.save()
+
+        self.client.force_login(self.user)
+
+        # When
+        response = self.client.get("/")
+        self.assertNotContains(response, "admin-nav-menu")
