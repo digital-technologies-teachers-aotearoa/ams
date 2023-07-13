@@ -1,6 +1,8 @@
 from typing import Optional
 
 from django.conf import settings
+from django.contrib.auth.mixins import UserPassesTestMixin
+from django.contrib.auth.models import User
 from django.contrib.sites.requests import RequestSite
 from django.forms import BoundField
 from django.http import HttpResponseRedirect
@@ -8,11 +10,13 @@ from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 from django.shortcuts import render
 from django.utils import timezone
+from django_tables2 import SingleTableView
 from registration.models import RegistrationProfile
 
 from ..base.models import EmailConfirmationPage
 from .forms import IndividualRegistrationForm
 from .models import MembershipOption, UserMembership
+from .tables import AdminUserTable
 
 
 def individual_registration(request: HttpRequest) -> HttpResponse:
@@ -78,3 +82,15 @@ def activate_user(request: HttpRequest, activation_key: str) -> HttpResponse:
             return HttpResponseRedirect("/")
 
     return HttpResponse(status=401)
+
+
+class UserIsAdminMixin(UserPassesTestMixin):
+    def test_func(self) -> bool:
+        is_superuser: bool = self.request.user.is_superuser
+        return is_superuser
+
+
+class AdminUserListView(UserIsAdminMixin, SingleTableView):
+    model = User
+    table_class = AdminUserTable
+    template_name = "admin_user_list.html"
