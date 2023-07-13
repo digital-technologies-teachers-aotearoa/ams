@@ -12,6 +12,12 @@ fi
 
 RECREATE_DB="${RECREATE_DB:-0}"
 
+if [ "$RECREATE_DB" -eq "1" ]
+then
+  # Remove named volumes including database volume
+  docker-compose down -v
+fi
+
 # Bring up the DB
 docker-compose $COMPOSEFILES up -d db
 until docker-compose exec -T db pg_isready -U postgres; do

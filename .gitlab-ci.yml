@@ -104,7 +104,7 @@ deploy to test:
   rules:
     - if: $CI_COMMIT_BRANCH == 'main'
   variables:
-    RECREATE_DB: 1
+    RECREATE_DB: 0
   before_script:
   - apt-get update -y && apt-get install openssh-client rsync make -y
   - eval $(ssh-agent -s)
@@ -115,8 +115,8 @@ deploy to test:
   - echo "$SSH_KNOWN_HOSTS" >> ~/.ssh/known_hosts
   - chmod 644 ~/.ssh/known_hosts
   script:
-    # Tear down the existing deployment, remove orphan containers and clear volumes, and remove old images.
-    - ssh $SSH_USER@$SSH_HOST "cd $DEPLOY_APP_DIR && docker-compose down --remove-orphans -v && docker image prune -a -f"
+    # Tear down the existing deployment, remove orphan containers and old images.
+    - ssh $SSH_USER@$SSH_HOST "cd $DEPLOY_APP_DIR && docker-compose down --remove-orphans && docker image prune -a -f"
     # Bring in the .env file from CI
     - cp $DOT_ENV_FILE .env
     # Update the tag for the AMS docker image.
