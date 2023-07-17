@@ -135,11 +135,13 @@ class Common(Configuration):
 
     LANGUAGE_CODE = "en"
 
-    TIME_ZONE = "UTC"
+    TIME_ZONE = "Pacific/Auckland"
 
     USE_I18N = True
 
     USE_TZ = True
+
+    SHORT_DATE_FORMAT = "d/m/Y"
 
     # Static files (CSS, JavaScript, Images)
     # https://docs.djangoproject.com/en/4.2/howto/static-files/

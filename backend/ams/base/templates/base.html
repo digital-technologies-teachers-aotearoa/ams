@@ -64,7 +64,8 @@
 
                     <div id="admin-nav-menu" style="display: none;">
                         <div style="float: right; text-align:center; border: 2px solid black; margin: 5px; padding: 5px; border-radius: 5px; width:200px">
-                            <a href="{% url "admin-user-list" %}">{% translate "Users" %}</a>
+                            <p><a href="{% url "admin-user-list" %}">{% translate "Users" %}</a></p>
+                            <p><a href="{% url "admin-user-memberships" %}">{% translate "User Memberships" %}</a></p>
                         </div>
                     </div>
                 {% endif %}
