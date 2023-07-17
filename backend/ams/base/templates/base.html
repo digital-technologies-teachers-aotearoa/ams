@@ -43,7 +43,7 @@
                     {% else %}
                         <span>You are logged in as {{ user.username }}</span>
                     {% endif %}
-                    <a href="{% url "auth_logout" %}?next={{ request.path | urlencode}}">{% translate "Log Out" %}</a>
+                    <a href="{% url "auth_logout" %}">{% translate "Log Out" %}</a>
                 {% else %}
                     <a href="{% url "auth_login" %}?next={{ request.path | urlencode}}">{% translate "Log In" %}</a>
                     <a href="{{ "membership/" | localize_url }}">{% translate "Sign Up" %}</a>
