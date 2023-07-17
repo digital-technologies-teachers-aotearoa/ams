@@ -49,6 +49,20 @@ class AdminUserListTests(TestCase):
         columns = [column.name for column in response.context["table"].columns]
         self.assertListEqual(expected_columns, columns)
 
+    def test_should_show_expected_headings(self) -> None:
+        # Given
+        self.client.force_login(self.user)
+
+        # When
+        response = self.client.get("/users/list/")
+
+        # Then
+        self.assertEqual(200, response.status_code)
+
+        expected_columns = ["Full Name", "Email", "Actions"]
+        columns = [column.header for column in response.context["table"].columns]
+        self.assertListEqual(expected_columns, columns)
+
     def test_should_show_expected_rows(self) -> None:
         # Given
         self.client.force_login(self.user)
