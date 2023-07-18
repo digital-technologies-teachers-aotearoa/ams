@@ -1,4 +1,5 @@
 {% load static wagtailcore_tags wagtailuserbar i18n localize_url %}
+{% load menu_tags %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -77,6 +78,8 @@
                 {% translate "Your membership is Pending" %}
                 {% endif %}
         </div>
+
+        {% main_menu max_levels=3 show_multiple_levels=True apply_active_classes=True %}
 
         {% block content %}{% endblock %}
 
