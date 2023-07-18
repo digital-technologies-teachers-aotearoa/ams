@@ -99,7 +99,7 @@ class AdminUserMembershipsTests(TestCase):
 
         expected_rows = [
             [
-                f"{self.user.first_name} {self.user.last_name}",
+                self.user.get_full_name(),
                 self.user_membership.membership_option.name,
                 "1 month",
                 "Approved",
@@ -130,7 +130,7 @@ class AdminUserMembershipsTests(TestCase):
 
         expected_rows = [
             [
-                f"{self.user.first_name} {self.user.last_name}",
+                self.user.get_full_name(),
                 self.user_membership.membership_option.name,
                 "1 month",
                 "Pending",

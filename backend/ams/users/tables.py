@@ -42,15 +42,16 @@ class AdminUserMembershipTable(Table):
         verbose_name=_("Actions"), template_name="admin_user_membership_actions.html", orderable=False
     )
 
-    def render_full_name(self, value: str, record: User) -> str:
-        return f"{value} {record.user.last_name}"
+    def render_full_name(self, value: str, record: UserMembership) -> str:
+        full_name: str = record.user.get_full_name()
+        return full_name
 
-    def render_status(self, value: datetime, record: User) -> Any:
+    def render_status(self, value: datetime, record: UserMembership) -> Any:
         if record.approved_datetime:
             return _("Approved")
         return _("Pending")
 
-    def render_duration(self, value: relativedelta, record: User) -> Any:
+    def render_duration(self, value: relativedelta, record: UserMembership) -> Any:
         return format_membership_duration_in_months(value)
 
     class Meta:
