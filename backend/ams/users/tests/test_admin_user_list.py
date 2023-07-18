@@ -77,6 +77,6 @@ class AdminUserListTests(TestCase):
         for row in response.context["table"].rows:
             rows.append([cell for cell in row.cells])
 
-        expected_rows = [[f"{self.user.first_name} {self.user.last_name}", self.user.email, ""]]
+        expected_rows = [[self.user.get_full_name(), self.user.email, ""]]
 
         self.assertListEqual(expected_rows, rows)

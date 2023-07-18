@@ -9,7 +9,8 @@ class AdminUserTable(Table):
     actions = TemplateColumn(verbose_name=_("Actions"), template_name="admin_user_actions.html", orderable=False)
 
     def render_full_name(self, value: str, record: User) -> str:
-        return f"{value} {record.last_name}"
+        full_name: str = record.get_full_name()
+        return full_name
 
     class Meta:
         fields = ("full_name", "email")
