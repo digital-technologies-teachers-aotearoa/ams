@@ -49,12 +49,30 @@
                     <a href="{{ "membership/" | localize_url }}">{% translate "Sign Up" %}</a>
                 {% endif %}
 
+                {% if user.is_superuser %}
+                    <script>
+                        function toggleAdminNavMenu() {
+                            var navMenuDiv = document.getElementById("admin-nav-menu");
+                            if(navMenuDiv) {
+                                navMenuDiv.style.display = navMenuDiv.style.display === "block" ? "none" : "block";
+                            }
+                        }
+
+                    </script>
+
+                    <a href="#" onClick="toggleAdminNavMenu();" style="text-decoration: none;">&#9881;</a>
+
+                    <div id="admin-nav-menu" style="display: none;">
+                        <div style="float: right; text-align:center; border: 2px solid black; margin: 5px; padding: 5px; border-radius: 5px; width:200px">
+                            <a href="{% url "admin-user-list" %}">{% translate "Users" %}</a>
+                        </div>
+                    </div>
+                {% endif %}
+
             </div>
                 {% if user.is_authenticated and user.member.status == "PENDING" %}
                 {% translate "Your membership is Pending" %}
                 {% endif %}
-            <div>
-            </div>
         </div>
 
         {% block content %}{% endblock %}

@@ -61,6 +61,7 @@ class Common(Configuration):
         "wagtail",
         "modelcluster",
         "taggit",
+        "django_tables2",
     ]
 
     MIDDLEWARE = [

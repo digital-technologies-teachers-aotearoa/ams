@@ -561,6 +561,28 @@ url = "https://cat-prod-buildproxy.dmz.wgtn.cat-it.co.nz/root/pypi/+simple"
 reference = "package proxy"
 
 [[package]]
+name = "django-tables2"
+version = "2.6.0"
+description = "Table/data-grid framework for Django"
+optional = false
+python-versions = "*"
+files = [
+    {file = "django-tables2-2.6.0.tar.gz", hash = "sha256:479eed04007cc04bcf764a6fb7a5e3955d94b878ba7f3a4bd4edbd2f7769e08d"},
+    {file = "django_tables2-2.6.0-py2.py3-none-any.whl", hash = "sha256:04f23c1181d93716c67085a3c324b449180fd0c5162ef4619acb0b2d9a166133"},
+]
+
+[package.dependencies]
+Django = ">=3.2"
+
+[package.extras]
+tablib = ["tablib"]
+
+[package.source]
+type = "legacy"
+url = "https://cat-prod-buildproxy.dmz.wgtn.cat-it.co.nz/root/pypi/+simple"
+reference = "package proxy"
+
+[[package]]
 name = "django-taggit"
 version = "3.1.0"
 description = "django-taggit is a reusable Django application for simple tagging."
@@ -2165,4 +2187,4 @@ reference = "package proxy"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "c0e6a99c03b3330cee9b2af403e23f0143ef049700488669c5f4007380e25aba"
+content-hash = "f3d8a7b1574be389489c3cf676e35e2b7740040ce513ccf614a6bdab38c0b37f"
