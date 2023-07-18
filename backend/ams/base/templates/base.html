@@ -43,7 +43,7 @@
                     {% else %}
                         <span>You are logged in as {{ user.username }}</span>
                     {% endif %}
-                    <a href="{% url "auth_logout" %}?next={{ request.path | urlencode}}">{% translate "Log Out" %}</a>
+                    <a href="{% url "auth_logout" %}">{% translate "Log Out" %}</a>
                 {% else %}
                     <a href="{% url "auth_login" %}?next={{ request.path | urlencode}}">{% translate "Log In" %}</a>
                     <a href="{{ "membership/" | localize_url }}">{% translate "Sign Up" %}</a>
@@ -64,7 +64,10 @@
 
                     <div id="admin-nav-menu" style="display: none;">
                         <div style="float: right; text-align:center; border: 2px solid black; margin: 5px; padding: 5px; border-radius: 5px; width:200px">
-                            <a href="{% url "admin-user-list" %}">{% translate "Users" %}</a>
+                            <ul style="list-style-type: none; margin: 0; padding: 0">
+                                <li><a href="{% url "admin-user-list" %}">{% translate "Users" %}</a></li>
+                                <li><a href="{% url "admin-user-memberships" %}">{% translate "User Memberships" %}</a></li>
+                            </ul>
                         </div>
                     </div>
                 {% endif %}

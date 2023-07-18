@@ -135,11 +135,13 @@ class Common(Configuration):
 
     LANGUAGE_CODE = "en"
 
-    TIME_ZONE = "UTC"
+    TIME_ZONE = "Pacific/Auckland"
 
     USE_I18N = True
 
     USE_TZ = True
+
+    SHORT_DATE_FORMAT = "d/m/Y"
 
     # Static files (CSS, JavaScript, Images)
     # https://docs.djangoproject.com/en/4.2/howto/static-files/
@@ -181,6 +183,7 @@ class Common(Configuration):
     REGISTRATION_AUTO_LOGIN = False
     REGISTRATION_EMAIL_HTML = False
     LOGIN_REDIRECT_URL = "/"
+    LOGOUT_REDIRECT_URL = "/"
 
     # Default primary key field type
     # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

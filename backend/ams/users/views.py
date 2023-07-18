@@ -16,7 +16,7 @@ from registration.models import RegistrationProfile
 from ..base.models import EmailConfirmationPage
 from .forms import IndividualRegistrationForm
 from .models import MembershipOption, UserMembership
-from .tables import AdminUserTable
+from .tables import AdminUserMembershipTable, AdminUserTable
 
 
 def individual_registration(request: HttpRequest) -> HttpResponse:
@@ -94,3 +94,9 @@ class AdminUserListView(UserIsAdminMixin, SingleTableView):
     model = User
     table_class = AdminUserTable
     template_name = "admin_user_list.html"
+
+
+class AdminUserMembershipListView(UserIsAdminMixin, SingleTableView):
+    model = UserMembership
+    table_class = AdminUserMembershipTable
+    template_name = "admin_user_memberships.html"
