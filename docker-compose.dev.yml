@@ -35,6 +35,7 @@ services:
       - APPLICATION_DB_USER
       - APPLICATION_DB_PASSWORD
       - PGPASSWORD=$POSTGRES_PASSWORD
+      - SENTRY_DSN
 
   nginx:
     volumes:
