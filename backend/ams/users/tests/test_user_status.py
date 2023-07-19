@@ -134,7 +134,7 @@ class UserStatusTests(TestCase):
 
     def test_should_include_admin_menu_for_admin_user(self) -> None:
         # Given
-        self.user.is_superuser = True
+        self.user.is_staff = True
         self.user.save()
 
         self.client.force_login(self.user)
@@ -145,7 +145,7 @@ class UserStatusTests(TestCase):
 
     def test_should_not_include_admin_menu_for_non_admin_user(self) -> None:
         # Given
-        self.user.is_superuser = False
+        self.user.is_staff = False
         self.user.save()
 
         self.client.force_login(self.user)

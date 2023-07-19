@@ -86,8 +86,8 @@ def activate_user(request: HttpRequest, activation_key: str) -> HttpResponse:
 
 class UserIsAdminMixin(UserPassesTestMixin):
     def test_func(self) -> bool:
-        is_superuser: bool = self.request.user.is_superuser
-        return is_superuser
+        is_staff: bool = self.request.user.is_staff
+        return is_staff
 
 
 class AdminUserListView(UserIsAdminMixin, SingleTableView):
