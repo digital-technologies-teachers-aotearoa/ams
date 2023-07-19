@@ -11,7 +11,7 @@ from ..models import MembershipOption, MembershipOptionType, UserMembership
 
 class AdminUserMembershipsTests(TestCase):
     def setUp(self) -> None:
-        self.user = User.objects.create_user(username="testuser", is_superuser=True)
+        self.user = User.objects.create_user(username="testuser", is_staff=True)
         self.user.first_name = "John"
         self.user.last_name = "Smith"
         self.user.email = "user@example.com"
@@ -32,7 +32,7 @@ class AdminUserMembershipsTests(TestCase):
 
     def test_should_not_allow_access_to_non_admin_user(self) -> None:
         # Given
-        self.user.is_superuser = False
+        self.user.is_staff = False
         self.user.save()
 
         self.client.force_login(self.user)
