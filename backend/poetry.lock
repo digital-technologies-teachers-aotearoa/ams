@@ -432,6 +432,27 @@ url = "https://cat-prod-buildproxy.dmz.wgtn.cat-it.co.nz/root/pypi/+simple"
 reference = "package proxy"
 
 [[package]]
+name = "django-cogwheels"
+version = "0.3"
+description = "A consistent, user-friendly solution for adding app-specific settings your Django package, reusable app or framework."
+optional = false
+python-versions = ">=3.4"
+files = [
+    {file = "django-cogwheels-0.3.tar.gz", hash = "sha256:848a4d9f2c96c582a4a4f2e7c276dfd95ab3905748cae13bb7c4b365a6717e94"},
+    {file = "django_cogwheels-0.3-py3-none-any.whl", hash = "sha256:197bd05e7114403d7301214b3f8a371c4fb6039cf21c811f099438b167b5ed21"},
+]
+
+[package.extras]
+development = ["Django (>=2.0,<2.1)", "django-extensions", "ipdb", "werkzeug"]
+docs = ["Sphinx (>=1.7.4)", "pyenchant (>=2.0)", "sphinx-rtd-theme (>=0.3)", "sphinxcontrib-spelling (>=1.4)"]
+testing = ["coverage"]
+
+[package.source]
+type = "legacy"
+url = "https://cat-prod-buildproxy.dmz.wgtn.cat-it.co.nz/root/pypi/+simple"
+reference = "package proxy"
+
+[[package]]
 name = "django-configurations"
 version = "2.4.1"
 description = "A helper for organizing Django settings."
@@ -2041,6 +2062,30 @@ url = "https://cat-prod-buildproxy.dmz.wgtn.cat-it.co.nz/root/pypi/+simple"
 reference = "package proxy"
 
 [[package]]
+name = "wagtailmenus"
+version = "3.1.8"
+description = "An app to help you manage menus in your Wagtail projects more consistently."
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "wagtailmenus-3.1.8-py3-none-any.whl", hash = "sha256:24456ab5a67342ae860c649f725c4fade414b1eafe8dc0dd84d24a19f72b27c7"},
+    {file = "wagtailmenus-3.1.8.tar.gz", hash = "sha256:177ef7e73718a3f2af26fafc769aa6aef8300af3691048e9a88852dbe3ef930c"},
+]
+
+[package.dependencies]
+django-cogwheels = "0.3"
+
+[package.extras]
+development = ["beautifulsoup4 (>=4.8,<4.10)", "coverage (>=4.5)", "django-debug-toolbar", "django-extensions", "django-webtest (>=1.9,<1.10)", "ipdb", "wagtail (>=2.15)", "werkzeug"]
+docs = ["Sphinx (>=1.7.4)", "pyenchant (>=2.0)", "sphinx-rtd-theme (>=0.3)", "sphinxcontrib-spelling (>=1.4)"]
+testing = ["beautifulsoup4 (>=4.8,<4.10)", "coverage (>=4.5)", "django-webtest (>=1.9,<1.10)"]
+
+[package.source]
+type = "legacy"
+url = "https://cat-prod-buildproxy.dmz.wgtn.cat-it.co.nz/root/pypi/+simple"
+reference = "package proxy"
+
+[[package]]
 name = "wcwidth"
 version = "0.2.6"
 description = "Measures the displayed width of unicode strings in a terminal"
@@ -2187,4 +2232,4 @@ reference = "package proxy"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "f3d8a7b1574be389489c3cf676e35e2b7740040ce513ccf614a6bdab38c0b37f"
+content-hash = "fbe4097f94165ce3add9035a671a8c89d3fbd1e89cd346bb690204ba5145cde9"
