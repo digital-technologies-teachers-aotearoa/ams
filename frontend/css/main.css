@@ -3894,7 +3894,7 @@ header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 89px;
+  min-height: 89px;
 }
 
 .footer-main {
@@ -3902,6 +3902,8 @@ header {
 }
 
 .footer-address {
+  padding: 30px 0 30px 0;
+  padding: 1.875rem 0 1.875rem 0;
   color: #ffffff;
   font-family: Roboto;
   font-size: 18px;
@@ -3913,6 +3915,7 @@ header {
 }
 .footer-links li {
   margin-bottom: 10px;
+  margin-bottom: 0.625rem;
 }
 .footer-links a {
   color: #ffffff;
