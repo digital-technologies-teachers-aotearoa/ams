@@ -1,0 +1,73 @@
+.card {
+  position: relative;
+}
+
+.card-standard {
+  background-color: $card-colour-background;
+  border: 2px solid $card-colour-border;
+}
+
+.card-graphic {
+  @include rem(padding, 40px);
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.card-graphic img {
+  max-width: 100%;
+}
+
+.card-content {
+  @include rem(padding, 30px 30px 60px 30px);
+  text-align: center;
+}
+
+.card-icon {
+  @include rem(width, 140px);
+  @include rem(height, 140px);
+  @include rem(line-height, 140px);
+  @include rem(margin-bottom, 20px);
+  background-color: $card-colour-icon;
+  display: inline-block;
+  text-align: center;
+  border-radius: 100%;
+}
+
+.card-arrow {
+  @include rem(height, 60px);
+  @include rem(width, 60px);
+  position: absolute;
+  border: 0;
+  padding: 0;
+  right: 0;
+  bottom: 0;
+  background-color: $card-colour-icon;
+}
+
+// Colours ( Convert to mixin )
+.card-orange {
+  .card-icon,
+  .card-arrow {
+    background-color: $dtta-orange;
+  }
+}
+.card-purple {
+  .card-icon,
+  .card-arrow {
+    background-color: $dtta-purple;
+  }
+}
+.card-teal {
+  .card-icon,
+  .card-arrow {
+    background-color: $dtta-teal;
+  }
+}
+.card-blue {
+  .card-icon,
+  .card-arrow {
+    background-color: $dtta-blue;
+  }
+}

@@ -1,0 +1,40 @@
+.footer-main {
+  background-color: $grey-mid;
+}
+
+.footer-address {
+  color: $white;
+  font-family: Roboto;
+  font-size: 18px;
+}
+
+.footer-links {
+  padding-left: 0;
+  list-style: none;
+
+  li {
+    margin-bottom: 10px;
+  }
+
+  a {
+    color: $white;
+  }
+}
+
+.footer-copyright {
+  @include rem(padding, 10px 0 10px 0);
+  background-color: $grey-mid-dark;
+  color: $white;
+  text-align: center;
+
+  p {
+    margin-bottom: 0;
+  }
+}
+
+.footer-panel {
+  @include rem(padding, 49px 30px 84px 32px);
+  position: relative;
+  text-align: center;
+  background-color: $dtta-lime;
+}

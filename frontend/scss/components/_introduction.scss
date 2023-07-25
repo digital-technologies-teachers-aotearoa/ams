@@ -1,0 +1,22 @@
+.introduction {
+  color: $dtta-lime;
+}
+
+.introduction-heading {
+  @include rem(margin-bottom, 40px);
+  font-size: 84px;
+  line-height: 1.1;
+  font-weight: 300;
+}
+
+.introduction-content {
+  @include rem(margin-bottom, 75px);
+  font-size: 28.5px;
+  line-height: 1.82;
+}
+
+.introduction-teachers-aotearoa {
+  @include media-breakpoint-up(lg) {
+    @include rem(padding-left, 120px);
+  }
+}

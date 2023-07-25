@@ -1,0 +1,12 @@
+html {
+  background-color: $user-details-bar-colour-background;
+}
+
+main {
+  @include rem(padding, 100px 0 140px 0);
+  background-color: $page-colour-background;
+}
+
+.container {
+  @include rem(max-width, 1324px);
+}

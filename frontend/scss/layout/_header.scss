@@ -1,0 +1,10 @@
+header {
+  background-color: $header-colour-background;
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 89px;
+}
