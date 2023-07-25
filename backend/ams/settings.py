@@ -164,8 +164,9 @@ class Common(Configuration):
     # https://docs.djangoproject.com/en/4.2/topics/email/
 
     EMAIL_HOST = environ["EMAIL_HOST"]
-    EMAIL_HOST_USER = environ["EMAIL_HOST_USER"]
-    EMAIL_HOST_PASSWORD = environ["EMAIL_HOST_PASSWORD"]
+    EMAIL_HOST_USER = environ.get("EMAIL_HOST_USER", "")
+    EMAIL_HOST_PASSWORD = environ.get("EMAIL_HOST_PASSWORD", "")
+    DEFAULT_FROM_EMAIL = environ.get("DEFAULT_FROM_EMAIL", "webmaster@localhost")
 
     # Wagtail settings
     # https://docs.wagtail.org/en/stable/reference/settings.html
