@@ -1,6 +1,13 @@
+/* Bootstrap 4.6.2 */
 @import "vendor/bootstrap/bootstrap-reboot";
 @import "vendor/bootstrap/bootstrap-grid";
 @import "vendor/bootstrap/transitions";
+
+/* Font Awesome 6.4.0 */
+@import "vendor/fontawesome/fontawesome";
+@import "vendor/fontawesome/regular";
+@import "vendor/fontawesome/solid";
+@import "vendor/fontawesome/brands";
 
 @import "mixins/rem";
 

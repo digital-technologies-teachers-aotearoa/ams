@@ -3,8 +3,8 @@ header {
 }
 
 .header-inner {
+  @include rem(min-height, 89px);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 89px;
 }

@@ -1,5 +1,5 @@
 .footer-main {
-  background-color: $grey-mid;
+  background-color: $footer-colour-background;
 }
 
 .footer-address {
@@ -29,7 +29,9 @@
   text-align: center;
 
   p {
+    font-size: 14px;
     margin-bottom: 0;
+    color: $text-mid;
   }
 }
 
@@ -38,4 +40,9 @@
   position: relative;
   text-align: center;
   background-color: $dtta-lime;
+}
+
+.footer-panel-heading {
+  font-size: 36px;
+  font-weight: 300;
 }

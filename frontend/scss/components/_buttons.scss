@@ -30,3 +30,15 @@
 .btn-view:hover {
   color: $dtta-green-light;
 }
+
+.btn-hollow-footer {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background-color: $footer-colour-background;
+  color: $white;
+}
+
+.btn-hollow-footer:hover {
+  color: $white;
+}

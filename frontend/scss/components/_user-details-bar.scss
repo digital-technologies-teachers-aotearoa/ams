@@ -2,8 +2,69 @@
   background-color: #e6e6e6;
 }
 
+.user-details-membership {
+  margin: 0;
+}
+
 .user-details-inner {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+.user-details-info {
+  float: right;
+  font-size: 12px;
+  margin: 0;
+}
+
+.user-details-name {
+  font-size: 16px;
+}
+
+.user-details-logout {
+  color: $text-dark;
+  font-weight: 500;
+  text-decoration: underline;
+}
+
+.user-details-logout:hover {
+  color: $text-dark;
+}
+
+.user-details-image {
+  width: 46px;
+  height: 46px;
+  background-color: #333;
+  border-radius: 100%;
+  margin-left: 15px;
+}
+
+.user-details-lang {
+  @include rem(padding, 15px 60px 15px 20px);
+  position: relative;
+  float: right;
+  right: 0;
+  top: 0;
+  color: $text-dark;
+  background-color: $user-details-button-colour-background;
+  font-weight: 500;
+  margin-left: 20px;
+
+  &:after {
+    font: var(--fa-font-solid);
+    content: "\f1de";
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    margin-top: -11px;
+    font-size: 22px;
+  }
+
+}
+
+.user-details-lang:hover {
+  color: $text-dark;
+  text-decoration: none;
 }
