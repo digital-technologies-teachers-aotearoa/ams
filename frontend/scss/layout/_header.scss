@@ -4,7 +4,9 @@ header {
 
 .header-inner {
   @include rem(min-height, 89px);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  @include media-breakpoint-up(lg) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
 }

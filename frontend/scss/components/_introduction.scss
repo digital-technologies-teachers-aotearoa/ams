@@ -3,16 +3,33 @@
 }
 
 .introduction-heading {
-  @include rem(margin-bottom, 40px);
-  font-size: 84px;
   line-height: 1.1;
   font-weight: 300;
+  font-size: 38px;
+  @include media-breakpoint-up(sm) {
+    @include rem(margin-bottom, 10px);
+    font-size: 48px;
+  }
+  @include media-breakpoint-up(md) {
+    @include rem(margin-bottom, 20px);
+    font-size: 64px;
+  }
+  @include media-breakpoint-up(lg) {
+    @include rem(margin-bottom, 40px);
+    font-size: 84pxx;
+  }
 }
 
 .introduction-content {
   @include rem(margin-bottom, 75px);
-  font-size: 28.5px;
   line-height: 1.82;
+  font-size: 20px;
+  @include media-breakpoint-up(md) {
+    font-size: 24px;
+  }
+  @include media-breakpoint-up(lg) {
+    font-size: 28.5px;
+  }
 }
 
 .introduction-teachers-aotearoa {
