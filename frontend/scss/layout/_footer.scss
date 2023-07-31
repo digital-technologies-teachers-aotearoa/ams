@@ -6,10 +6,19 @@
   @include rem(padding, 30px 0 30px 0);
   color: $white;
   font-family: Roboto;
+  font-weight: 500;
   font-size: 18px;
+  line-height: 32px;
+
+  a {
+    color: $white;
+  }
 }
 
 .footer-links {
+  @include media-breakpoint-up(sm) {
+    @include rem(margin-top, 69px);
+  }
   padding-left: 0;
   list-style: none;
 
@@ -19,6 +28,7 @@
 
   a {
     color: $white;
+    font-weight: 500;
   }
 }
 
@@ -45,4 +55,8 @@
 .footer-panel-heading {
   font-size: 36px;
   font-weight: 300;
+}
+
+.footer-logo {
+  @include rem(margin, 40px 0 10px 0);
 }

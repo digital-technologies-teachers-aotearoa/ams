@@ -15,14 +15,14 @@
 
 // Open and close button
 .navbar-toggle {
+  @include rem(padding, 10px);
+  @include rem(line-height, 1px);
+  @include rem(right, 15px);
+  @include rem(top, 15px);
   position: absolute;
   background-color: $navbar-toggle-colour-background;
   color: $navbar-toggle-colour;
   border: 0;
-  right: 15px;
-  top: 15px;
-  padding: 10px 10px 10px 10px;
-  line-height: 1px;
 
   &:after {
     font: var(--fa-font-solid);
@@ -45,8 +45,13 @@
 }
 
 .navbar-item {
+  border-bottom: 1px solid #fff;
   @include media-breakpoint-up(lg) {
     @include rem(margin-right, 65px);
+    border-bottom: 0;
+  }
+  &:last-child {
+    border-bottom: 0;
   }
 }
 
@@ -55,34 +60,81 @@
 }
 
 .navbar-link {
-  @include rem(padding, 5px 0 5px 0);
+  @include media-breakpoint-up(lg) {
+    border-bottom: 4px solid transparent;
+  }
+  @include rem(padding, 6px 0 6px 0);
+  position: relative;
   color: #fff;
   text-decoration: none;
   font-size: 18px;
   font-weight: 500;
   display: block;
-  border-bottom: 4px solid transparent;
 }
 
 .navbar-link:hover {
+  @include media-breakpoint-up(lg) {
+    border-bottom: 4px solid $dtta-lime;
+  }
   color: #fff;
-  border-bottom: 4px solid $dtta-lime;
   text-decoration: none;
 }
 
 .navbar-item.current {
   .navbar-link {
-    color: #fff;
-    border-bottom: 4px solid $dtta-lime;
+    color: $white;
     text-decoration: none;
+    @include media-breakpoint-up(lg) {
+      border-bottom: 4px solid $dtta-lime;
+    }
   }
 }
 
-
+.navbar-item:hover {
+  @include media-breakpoint-up(lg) {
+    .navbar-sublinks {
+      display: block !important;
+    }
+  }
+}
 
 .navbar-sublinks-toggle {
   display: none;
 }
+
 .navbar-sublinks {
+  padding-left: 0;
+  margin-left: 0;
+  list-style: none;
   display: none;
+  @include media-breakpoint-up(lg) {
+    @include rem(min-width, 182px);
+    position: absolute;
+    background-color: $dtta-lime;
+    z-index: 2;
+  }
+}
+
+.navbar-subitem {
+  color: $white;
+}
+
+.navbar-sublink {
+  @include rem(padding, 8px 0 8px 0);
+  display: block;
+  color: $white;
+  font-size: 16px;
+  @include media-breakpoint-up(lg) {
+    @include rem(padding, 14px 20px 14px 20px);
+    color: $text-dark;
+  }
+}
+
+.navbar-sublink:hover {
+  color: $white;
+  text-decoration: none;
+  @include media-breakpoint-up(lg) {
+    color: $text-dark;
+    background-color: $dtta-lime-dark;
+  }
 }
