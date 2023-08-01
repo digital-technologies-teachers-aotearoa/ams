@@ -8,7 +8,7 @@
 .navbar.collapse {
   &:not(.show) {
     @include media-breakpoint-up(lg) {
-      display: block !important;
+      display: block;
     }
   }
 }
@@ -23,11 +23,23 @@
   background-color: $navbar-toggle-colour-background;
   color: $navbar-toggle-colour;
   border: 0;
+  width: 50px;
+  height: 50px;
+  text-align: center;
+  line-height: auto;
 
   &:after {
     font: var(--fa-font-solid);
     content: "\f0c9";
-    font-size: 22px;
+    font-size: 26px;
+  }
+
+  &.collapsed {
+    &:after {
+      font: var(--fa-font-solid);
+      content: "\f00d";
+      font-size: 26px;
+    }
   }
 
   @include media-breakpoint-up(lg) {
@@ -45,7 +57,8 @@
 }
 
 .navbar-item {
-  border-bottom: 1px solid #fff;
+  border-bottom: 1px solid $navbar-line-colour;
+  position: relative;
   @include media-breakpoint-up(lg) {
     @include rem(margin-right, 65px);
     border-bottom: 0;
@@ -63,9 +76,9 @@
   @include media-breakpoint-up(lg) {
     border-bottom: 4px solid transparent;
   }
-  @include rem(padding, 6px 0 6px 0);
+  @include rem(padding, 11px 0 11px 0);
   position: relative;
-  color: #fff;
+  color: $white;
   text-decoration: none;
   font-size: 18px;
   font-weight: 500;
@@ -76,7 +89,11 @@
   @include media-breakpoint-up(lg) {
     border-bottom: 4px solid $dtta-lime;
   }
-  color: #fff;
+  @include media-breakpoint-down(lg) {
+    @include rem(padding, 11px 10px 11px 10px);
+    background-color: $grey-light;
+  }
+  color: $white;
   text-decoration: none;
 }
 
@@ -99,28 +116,75 @@
 }
 
 .navbar-sublinks-toggle {
-  display: none;
+  position: absolute;
+  background-color: transparent;
+  border: 0;
+  right: 0;
+  top: 0;
+  width: 50px;
+  height: 50px;
+  text-align: center;
+  line-height: auto;
+
+  &:after {
+    font: var(--fa-font-solid);
+    content: "\f077";
+    font-size: 22px;
+    color: $white;
+  }
+
+  &.collapsed {
+    &:after {
+      font: var(--fa-font-solid);
+      content: "\f078";
+      font-size: 22px;
+      color: $white;
+    }
+  }
+
+  @include media-breakpoint-up(lg) {
+    display: none;
+  }
 }
 
 .navbar-sublinks {
   padding-left: 0;
   margin-left: 0;
   list-style: none;
-  display: none;
+  border-top: 1px solid $navbar-line-colour;
   @include media-breakpoint-up(lg) {
     @include rem(min-width, 182px);
+    display: none;
+    border-top: 0;
     position: absolute;
-    background-color: $dtta-lime;
+    background-color: $navbar-colour-submenu-desktop-background;
     z-index: 2;
+  }
+}
+
+.navbar-sublink.collapse {
+  &:not(.show) {
+    @include media-breakpoint-up(lg) {
+      display: block;
+    }
   }
 }
 
 .navbar-subitem {
   color: $white;
+  border-bottom: 1px solid $navbar-line-colour;
+  @include media-breakpoint-up(lg) {
+    border: 0;
+  }
 }
 
+.navbar-subitem:last-child {
+  border-bottom: 0;
+}
+
+
 .navbar-sublink {
-  @include rem(padding, 8px 0 8px 0);
+  @include rem(padding, 8px 0 8px 30px);
   display: block;
   color: $white;
   font-size: 16px;
@@ -135,6 +199,6 @@
   text-decoration: none;
   @include media-breakpoint-up(lg) {
     color: $text-dark;
-    background-color: $dtta-lime-dark;
+    background-color: $navbar-colour-submenu-desktop-background-hover;
   }
 }

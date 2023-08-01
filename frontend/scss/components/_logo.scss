@@ -1,0 +1,17 @@
+.logo {
+  @include rem(margin-right, 70px);
+  display: inline-block;
+  @include media-breakpoint-up(lg) {
+    margin-right: 0;
+  }
+}
+
+.logo-main {
+  @include rem(margin-bottom, 10px);
+  display: inline-block;
+  margin-right: 30px;
+}
+
+.logo-tagline {
+  display: inline-block;
+}

@@ -4,6 +4,8 @@ header {
 
 .header-inner {
   @include rem(min-height, 89px);
+  padding-top: 20px;
+  padding-bottom: 20px;
   @include media-breakpoint-up(lg) {
     display: flex;
     align-items: center;

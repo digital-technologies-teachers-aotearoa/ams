@@ -11,9 +11,7 @@
   <header>
     <div class="header-inner container">
 
-      <a href="#" class="logo">
-        <img src="images/logos/logo.png">
-        <img src="images/logos/logo-tagline.png">
+      <a href="#" class="logo"><img class="logo-main" src="images/logos/logo.png"><img class="logo-tagline" src="images/logos/logo-tagline.png">
       </a>
 
       <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navigation" aria-expanded="false" aria-controls="navigation" aria-label="Toggle navigation">
@@ -23,8 +21,9 @@
         <ul class="navbar-links">
           <li class="navbar-item current">
             <a href="#" class="navbar-link">Community</a>
-            <button class="navbar-sublinks-toggle" data-parent="main-navigation" role="button" data-toggle="dropdown" aria-expanded="false">X</button>
-            <ul class="navbar-sublinks">
+
+            <button class="navbar-sublinks-toggle collapsed" type="button" data-toggle="collapse" data-target="#navbar-sublinks-one" data-parent="#navigation" aria-expanded="false" aria-controls="navbar-sublinks-one" aria-label="Toggle sub-navigation"></button>
+            <ul class="navbar-sublinks collapse" id="navbar-sublinks-one">
               <li class="navbar-subitem">
                 <a href="#" class="navbar-sublink">
                   Homepage
@@ -41,6 +40,7 @@
                 </a>
               </li>
             </ul>
+
           </li>
           <li class="navbar-item">
             <a href="#" class="navbar-link">Governance</a>

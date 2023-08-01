@@ -10,3 +10,7 @@ main {
 .container {
   @include rem(max-width, 1324px);
 }
+
+img {
+  max-width: 100%;
+}
