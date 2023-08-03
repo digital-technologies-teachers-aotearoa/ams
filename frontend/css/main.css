@@ -14332,12 +14332,12 @@ header {
 }
 .navbar-toggle:after {
   font: var(--fa-font-solid);
-  content: "\f0c9";
+  content: "\f00d";
   font-size: 26px;
 }
 .navbar-toggle.collapsed:after {
   font: var(--fa-font-solid);
-  content: "\f00d";
+  content: "\f0c9";
   font-size: 26px;
 }
 @media (min-width: 992px) {
@@ -14401,7 +14401,7 @@ header {
     border-bottom: 4px solid #c5ea6c;
   }
 }
-@media (max-width: 1199.98px) {
+@media (max-width: 991.98px) {
   .navbar-link:hover {
     padding: 11px 10px 11px 10px;
     padding: 0.6875rem 0.625rem 0.6875rem 0.625rem;
@@ -14416,6 +14416,13 @@ header {
 @media (min-width: 992px) {
   .navbar-item.current .navbar-link {
     border-bottom: 4px solid #c5ea6c;
+  }
+}
+
+@media (min-width: 992px) {
+  .navbar-item.has-children {
+    padding-right: 38px;
+    padding-right: 2.375rem;
   }
 }
 
@@ -14436,21 +14443,26 @@ header {
   text-align: center;
   line-height: auto;
 }
+@media (min-width: 992px) {
+  .navbar-sublinks-toggle {
+    width: 28px;
+  }
+}
 .navbar-sublinks-toggle:after {
   font: var(--fa-font-solid);
   content: "\f077";
-  font-size: 22px;
+  font-size: 20px;
   color: #ffffff;
 }
 .navbar-sublinks-toggle.collapsed:after {
   font: var(--fa-font-solid);
   content: "\f078";
-  font-size: 22px;
+  font-size: 20px;
   color: #ffffff;
 }
-@media (min-width: 992px) {
-  .navbar-sublinks-toggle {
-    display: none;
+@media (max-width: 991.98px) {
+  .navbar-sublinks-toggle:hover {
+    background-color: #6c6c6c;
   }
 }
 
@@ -14511,6 +14523,11 @@ header {
   color: #ffffff;
   text-decoration: none;
 }
+@media (max-width: 991.98px) {
+  .navbar-sublink:hover {
+    background-color: #6c6c6c;
+  }
+}
 @media (min-width: 992px) {
   .navbar-sublink:hover {
     color: #333333;
@@ -14525,12 +14542,22 @@ header {
 .user-details-membership {
   margin: 0;
 }
+@media (max-width: 1199.98px) {
+  .user-details-membership {
+    display: none;
+  }
+}
 
 .user-details-inner {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+@media (max-width: 1199.98px) {
+  .user-details-inner {
+    justify-content: end;
+  }
 }
 
 .user-details-info {
@@ -14539,8 +14566,19 @@ header {
   margin: 0;
 }
 
+@media (max-width: 767.98px) {
+  .user-details-text {
+    display: none;
+  }
+}
+
 .user-details-name {
   font-size: 16px;
+}
+@media (max-width: 575.98px) {
+  .user-details-name {
+    display: none;
+  }
 }
 
 .user-details-logout {
@@ -14558,6 +14596,7 @@ header {
   height: 46px;
   background-color: #333;
   border-radius: 100%;
+  border: 1px solid #333;
   margin-left: 15px;
 }
 
@@ -14586,6 +14625,11 @@ header {
 .user-details-lang:hover {
   color: #333333;
   text-decoration: none;
+}
+
+.user-details-status {
+  display: flex;
+  align-items: center;
 }
 
 .introduction {

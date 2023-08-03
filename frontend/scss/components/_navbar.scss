@@ -30,14 +30,14 @@
 
   &:after {
     font: var(--fa-font-solid);
-    content: "\f0c9";
+    content: "\f00d";
     font-size: 26px;
   }
 
   &.collapsed {
     &:after {
       font: var(--fa-font-solid);
-      content: "\f00d";
+      content: "\f0c9";
       font-size: 26px;
     }
   }
@@ -89,7 +89,7 @@
   @include media-breakpoint-up(lg) {
     border-bottom: 4px solid $dtta-lime;
   }
-  @include media-breakpoint-down(lg) {
+  @include media-breakpoint-down(md) {
     @include rem(padding, 11px 10px 11px 10px);
     background-color: $grey-light;
   }
@@ -104,6 +104,12 @@
     @include media-breakpoint-up(lg) {
       border-bottom: 4px solid $dtta-lime;
     }
+  }
+}
+
+.navbar-item.has-children {
+  @include media-breakpoint-up(lg) {
+    @include rem(padding-right, 38px);
   }
 }
 
@@ -126,10 +132,14 @@
   text-align: center;
   line-height: auto;
 
+  @include media-breakpoint-up(lg) {
+    width: 28px;
+  }
+
   &:after {
     font: var(--fa-font-solid);
     content: "\f077";
-    font-size: 22px;
+    font-size: 20px;
     color: $white;
   }
 
@@ -137,13 +147,15 @@
     &:after {
       font: var(--fa-font-solid);
       content: "\f078";
-      font-size: 22px;
+      font-size: 20px;
       color: $white;
     }
   }
 
-  @include media-breakpoint-up(lg) {
-    display: none;
+  @include media-breakpoint-down(md) {
+    &:hover {
+      background-color: $grey-light;
+    }
   }
 }
 
@@ -182,7 +194,6 @@
   border-bottom: 0;
 }
 
-
 .navbar-sublink {
   @include rem(padding, 8px 0 8px 30px);
   display: block;
@@ -197,6 +208,11 @@
 .navbar-sublink:hover {
   color: $white;
   text-decoration: none;
+
+  @include media-breakpoint-down(md) {
+    background-color: $grey-light;
+  }
+
   @include media-breakpoint-up(lg) {
     color: $text-dark;
     background-color: $navbar-colour-submenu-desktop-background-hover;
