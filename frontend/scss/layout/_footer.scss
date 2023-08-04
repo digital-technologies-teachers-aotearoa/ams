@@ -47,9 +47,10 @@
 
 .footer-panel {
   @include rem(padding, 49px 30px 84px 32px);
+  height: 100%;
   position: relative;
   text-align: center;
-  background-color: $dtta-lime;
+  background-color: $footer-panel-background;
 }
 
 .footer-panel-heading {

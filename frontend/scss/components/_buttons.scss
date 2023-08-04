@@ -22,13 +22,13 @@
 }
 
 .btn-view {
-  background-color: $dtta-cream-light;
-  color: $dtta-green-light;
+  background-color: $btn-view-colour-background;
+  color: $btn-view-colour-text;
   float: right;
 }
 
 .btn-view:hover {
-  color: $dtta-green-light;
+  color: $btn-view-colour-text-hover;
 }
 
 .btn-hollow-footer {

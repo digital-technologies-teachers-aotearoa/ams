@@ -87,7 +87,7 @@
 
 .navbar-link:hover {
   @include media-breakpoint-up(lg) {
-    border-bottom: 4px solid $dtta-lime;
+    border-bottom: 4px solid $navbar-colour-border-hover;
   }
   @include media-breakpoint-down(md) {
     @include rem(padding, 11px 10px 11px 10px);
@@ -102,7 +102,7 @@
     color: $white;
     text-decoration: none;
     @include media-breakpoint-up(lg) {
-      border-bottom: 4px solid $dtta-lime;
+      border-bottom: 4px solid $navbar-colour-border-current;
     }
   }
 }

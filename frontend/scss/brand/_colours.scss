@@ -8,20 +8,20 @@ $text-mid: #999999;
 $text-light: #ffffff;
 
 // Brand colours
-$dtta-green: #1a4c54;
-$dtta-green-light: #117175;
-$dtta-lime: #c5ea6c;
-$dtta-lime-faded: #e4f7b7;
-$dtta-lime-dark: #a7d267;
-$dtta-orange: #fb6f41;
-$dtta-purple: #433e5a;
-$dtta-teal: #2c8887;
-$dtta-blue: #2574b7;
-$dtta-cream: #f5e4d4;
-$dtta-cream-light: #e8e8e8;
+$brand-green: #1a4c54;
+$brand-green-light: #117175;
+$brand-lime: #c5ea6c;
+$brand-lime-faded: #e4f7b7;
+$brand-lime-dark: #a7d267;
+$brand-orange: #fb6f41;
+$brand-purple: #433e5a;
+$brand-teal: #2c8887;
+$brand-blue: #2574b7;
+$brand-cream: #f5e4d4;
+$brand-cream-light: #e8e8e8;
 
 // Layout
-$page-colour-background: $dtta-green;
+$page-colour-background: $brand-green;
 $header-colour-background: $grey-mid;
 $user-details-bar-colour-background: $grey-light;
 $footer-colour-background: $grey-mid;
@@ -30,27 +30,37 @@ $footer-colour-background: $grey-mid;
 $navbar-toggle-colour-background: $grey-light;
 $navbar-toggle-colour: $white;
 $navbar-line-colour: $grey-light;
-
-$navbar-colour-submenu-desktop-background: $dtta-lime;
-$navbar-colour-submenu-desktop-background-hover: $dtta-lime-dark;
+$navbar-colour-submenu-desktop-background: $brand-lime;
+$navbar-colour-submenu-desktop-background-hover: $brand-lime-dark;
+$navbar-colour-border-hover: $brand-lime;
+$navbar-colour-border-current: $brand-lime;
 
 // Userbar
-$user-details-button-colour-background: $dtta-lime;
+$user-details-button-colour-background: $brand-lime;
 
 // Cards
-$card-colour-background: $dtta-lime-faded;
+$card-colour-background: $brand-lime-faded;
+$card-colour-icon: $brand-orange;
+$card-colour-icon-first: $brand-orange;
+$card-colour-icon-second: $brand-purple;
+$card-colour-icon-third: $brand-teal;
+$card-colour-icon-fourth: $brand-blue;
 $card-colour-border: $white;
-$card-colour-icon: $dtta-orange;
-$card-colour-icon-first: $dtta-orange;
-$card-colour-icon-second: $dtta-purple;
-$card-colour-icon-third: $dtta-teal;
-$card-colour-icon-fourth: $dtta-blue;
 
 // Cards - Discussion
 $card-discussion-colour-title: $white;
-$card-discussion-colour-background: $dtta-cream;
-$card-discussion-colour-heading: $dtta-green;
+$card-discussion-colour-background: $brand-cream;
+$card-discussion-colour-heading: $brand-green;
 $card-discussion-colour-content: $text-dark;
 
 // Buttons
+$btn-view-colour-background: $brand-cream-light;
+$btn-view-colour-background-hover: $brand-cream-light;
+$btn-view-colour-text: $brand-green;
+$btn-view-colour-text-hover: $brand-green;
 
+// Footer
+$footer-panel-background: $brand-lime;
+
+// Introduction
+$introduction-colour-text: $brand-lime;

@@ -7,6 +7,10 @@
   border: 2px solid $card-colour-border;
 }
 
+.card-photo {
+  border: 2px solid $card-colour-border;
+}
+
 .card-graphic {
   @include rem(padding, 40px);
   position: relative;
@@ -50,24 +54,24 @@
 .card-orange {
   .card-icon,
   .card-arrow {
-    background-color: $dtta-orange;
+    background-color: $brand-orange;
   }
 }
 .card-purple {
   .card-icon,
   .card-arrow {
-    background-color: $dtta-purple;
+    background-color: $brand-purple;
   }
 }
 .card-teal {
   .card-icon,
   .card-arrow {
-    background-color: $dtta-teal;
+    background-color: $brand-teal;
   }
 }
 .card-blue {
   .card-icon,
   .card-arrow {
-    background-color: $dtta-blue;
+    background-color: $brand-blue;
   }
 }

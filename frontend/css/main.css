@@ -14260,6 +14260,7 @@ header {
 .footer-panel {
   padding: 49px 30px 84px 32px;
   padding: 3.0625rem 1.875rem 5.25rem 2rem;
+  height: 100%;
   position: relative;
   text-align: center;
   background-color: #c5ea6c;
@@ -14696,6 +14697,10 @@ header {
   border: 2px solid #ffffff;
 }
 
+.card-photo {
+  border: 2px solid #ffffff;
+}
+
 .card-graphic {
   padding: 40px;
   padding: 2.5rem;
@@ -14830,12 +14835,12 @@ header {
 
 .btn-view {
   background-color: #e8e8e8;
-  color: #117175;
+  color: #1a4c54;
   float: right;
 }
 
 .btn-view:hover {
-  color: #117175;
+  color: #1a4c54;
 }
 
 .btn-hollow-footer {
