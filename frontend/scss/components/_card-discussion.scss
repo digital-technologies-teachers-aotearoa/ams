@@ -3,6 +3,11 @@
   color: $card-discussion-colour-title;
   font-size: 48px;
   font-weight: 300;
+
+  @include media-breakpoint-down(sm) {
+    @include rem(max-width, 520px);
+    margin: 0 auto;
+  }
 }
 
 .card-discussion {

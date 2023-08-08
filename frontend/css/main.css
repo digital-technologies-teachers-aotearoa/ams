@@ -14636,6 +14636,13 @@ header {
 .introduction {
   color: #c5ea6c;
 }
+@media (max-width: 767.98px) {
+  .introduction {
+    max-width: 520px;
+    max-width: 32.5rem;
+    margin: 0 auto;
+  }
+}
 
 .introduction-heading {
   line-height: 1.1;
@@ -14689,6 +14696,9 @@ header {
 }
 
 .card {
+  max-width: 520px;
+  max-width: 32.5rem;
+  margin: 0 auto;
   position: relative;
 }
 
@@ -14775,6 +14785,13 @@ header {
   font-size: 48px;
   font-weight: 300;
 }
+@media (max-width: 767.98px) {
+  .card-discussion-title {
+    max-width: 520px;
+    max-width: 32.5rem;
+    margin: 0 auto;
+  }
+}
 
 .card-discussion {
   position: relative;
@@ -14853,4 +14870,12 @@ header {
 
 .btn-hollow-footer:hover {
   color: #ffffff;
+}
+
+@media (max-width: 767.98px) {
+  .btn-wrapper {
+    max-width: 520px;
+    max-width: 32.5rem;
+    margin: 0 auto;
+  }
 }

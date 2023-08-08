@@ -1,5 +1,10 @@
 .introduction {
   color: $introduction-colour-text;
+
+  @include media-breakpoint-down(sm) {
+    @include rem(max-width, 520px);
+    margin: 0 auto;
+  }
 }
 
 .introduction-heading {

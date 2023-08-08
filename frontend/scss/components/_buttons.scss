@@ -42,3 +42,10 @@
 .btn-hollow-footer:hover {
   color: $white;
 }
+
+.btn-wrapper {
+  @include media-breakpoint-down(sm) {
+    @include rem(max-width, 520px);
+    margin: 0 auto;
+  }
+}
