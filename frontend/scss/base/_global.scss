@@ -5,6 +5,7 @@ html {
 main {
   @include rem(padding, 100px 0 140px 0);
   background-color: $page-colour-background;
+  color: $brand-lime;
 }
 
 .container {

@@ -2,6 +2,7 @@
   @include rem(max-width, 520px);
   margin: 0 auto;
   position: relative;
+  color: $card-colour-text;
 }
 
 .card-standard {

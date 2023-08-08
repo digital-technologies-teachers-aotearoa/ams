@@ -1,0 +1,11 @@
+form {
+  background-color: $form-colour-background;
+  color: $text-dark;
+  @include rem(padding, 53px 57px 17px 76px);
+}
+
+.form-label {
+}
+
+.form-control {
+}

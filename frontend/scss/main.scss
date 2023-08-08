@@ -2,6 +2,8 @@
 @import "vendor/bootstrap/bootstrap-reboot";
 @import "vendor/bootstrap/bootstrap-grid";
 @import "vendor/bootstrap/transitions";
+@import "vendor/bootstrap/alert";
+@import "vendor/bootstrap/forms";
 
 /* Font Awesome 6.4.0 */
 @import "vendor/fontawesome/fontawesome";
@@ -27,3 +29,4 @@
 @import "components/card";
 @import "components/card-discussion";
 @import "components/buttons";
+@import "components/forms";
