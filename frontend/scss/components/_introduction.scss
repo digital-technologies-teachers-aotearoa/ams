@@ -21,7 +21,13 @@
   }
   @include media-breakpoint-up(lg) {
     @include rem(margin-bottom, 40px);
-    font-size: 84pxx;
+    font-size: 84px;
+  }
+
+  &.standard-page {
+    @include media-breakpoint-up(lg) {
+      font-size: 48px;
+    }
   }
 }
 
@@ -29,11 +35,19 @@
   @include rem(margin-bottom, 75px);
   line-height: 1.82;
   font-size: 20px;
+  
   @include media-breakpoint-up(md) {
     font-size: 24px;
   }
   @include media-breakpoint-up(lg) {
     font-size: 28.5px;
+  }
+
+  &.standard-page {
+    @include rem(max-width, 725px);
+    @include media-breakpoint-up(lg) {
+      font-size: 20px;
+    }
   }
 }
 

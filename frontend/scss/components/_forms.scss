@@ -1,11 +1,58 @@
 form {
   background-color: $form-colour-background;
   color: $text-dark;
-  @include rem(padding, 53px 57px 17px 76px);
+  @include rem(padding, 43px 37px 67px 37px);
+
+  @include media-breakpoint-up(sm) {
+    @include rem(padding, 53px 57px 67px 76px);
+  }
+}
+
+.form-heading {
+  font-size: 30px;
+  font-weight: 400;
+  @include rem(margin-bottom, 30px);
+}
+
+.form-group {
+  @include rem(margin-bottom, 40px);
+  display: flex;
+  flex-wrap: wrap;
+
+  input {
+    @extend .form-control; // extends from vendor bootstrap
+  }
 }
 
 .form-label {
+  font-size: 18px;
+  font-weight: 500;
+  flex-basis: 100%;
+  @include media-breakpoint-up(sm) {
+    @include rem(max-width, 238px);
+    flex-basis: 0;
+    flex-grow: 1;
+  }
 }
 
-.form-control {
+.form-input {
+  flex-basis: 100%;
+  @include media-breakpoint-up(sm) {
+    flex-basis: 0;
+    flex-grow: 1;
+  }
+}
+
+.form-input-short {
+  input {
+    @include media-breakpoint-up(sm) {
+      max-width: 265px;
+    }
+  }
+}
+
+.form-actions {
+  position: absolute;
+  right: 0;
+  bottom: 0;
 }

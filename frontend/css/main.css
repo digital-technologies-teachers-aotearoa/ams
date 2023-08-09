@@ -3967,7 +3967,7 @@ html {
   color: #040505;
 }
 
-.form-control {
+.form-control, .form-group input {
   display: block;
   width: 100%;
   height: calc(1.5em + 0.75rem + 2px);
@@ -3983,34 +3983,37 @@ html {
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 @media (prefers-reduced-motion: reduce) {
-  .form-control {
+  .form-control, .form-group input {
     transition: none;
   }
 }
-.form-control::-ms-expand {
+.form-control::-ms-expand, .form-group input::-ms-expand {
   background-color: transparent;
   border: 0;
 }
-.form-control:focus {
+.form-control:focus, .form-group input:focus {
   color: #495057;
   background-color: #fff;
   border-color: #80bdff;
   outline: 0;
   box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
-.form-control::placeholder {
+.form-control::placeholder, .form-group input::placeholder {
   color: #6c757d;
   opacity: 1;
 }
-.form-control:disabled, .form-control[readonly] {
+.form-control:disabled, .form-group input:disabled, .form-control[readonly], .form-group input[readonly] {
   background-color: #e9ecef;
   opacity: 1;
 }
 
-input[type=date].form-control,
+input[type=date].form-control, .form-group input[type=date],
 input[type=time].form-control,
+.form-group input[type=time],
 input[type=datetime-local].form-control,
-input[type=month].form-control {
+.form-group input[type=datetime-local],
+input[type=month].form-control,
+.form-group input[type=month] {
   appearance: none;
 }
 
@@ -4179,7 +4182,7 @@ textarea.form-control {
   display: block;
 }
 
-.was-validated .form-control:valid, .form-control.is-valid {
+.was-validated .form-control:valid, .was-validated .form-group input:valid, .form-group .was-validated input:valid, .form-control.is-valid, .form-group input.is-valid {
   border-color: #28a745;
   padding-right: calc(1.5em + 0.75rem) !important;
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3e%3cpath fill='%2328a745' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
@@ -4187,7 +4190,7 @@ textarea.form-control {
   background-position: right calc(0.375em + 0.1875rem) center;
   background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
 }
-.was-validated .form-control:valid:focus, .form-control.is-valid:focus {
+.was-validated .form-control:valid:focus, .was-validated .form-group input:valid:focus, .form-group .was-validated input:valid:focus, .form-control.is-valid:focus, .form-group input.is-valid:focus {
   border-color: #28a745;
   box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
 }
@@ -4280,7 +4283,7 @@ textarea.form-control {
   display: block;
 }
 
-.was-validated .form-control:invalid, .form-control.is-invalid {
+.was-validated .form-control:invalid, .was-validated .form-group input:invalid, .form-group .was-validated input:invalid, .form-control.is-invalid, .form-group input.is-invalid {
   border-color: #dc3545;
   padding-right: calc(1.5em + 0.75rem) !important;
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23dc3545' viewBox='0 0 12 12'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
@@ -4288,7 +4291,7 @@ textarea.form-control {
   background-position: right calc(0.375em + 0.1875rem) center;
   background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
 }
-.was-validated .form-control:invalid:focus, .form-control.is-invalid:focus {
+.was-validated .form-control:invalid:focus, .was-validated .form-group input:invalid:focus, .form-group .was-validated input:invalid:focus, .form-control.is-invalid:focus, .form-group input.is-invalid:focus {
   border-color: #dc3545;
   box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
 }
@@ -4369,7 +4372,7 @@ textarea.form-control {
     align-items: center;
     margin-bottom: 0;
   }
-  .form-inline .form-control {
+  .form-inline .form-control, .form-inline .form-group input, .form-group .form-inline input {
     display: inline-block;
     width: auto;
     vertical-align: middle;
@@ -15229,7 +15232,12 @@ header {
   .introduction-heading {
     margin-bottom: 40px;
     margin-bottom: 2.5rem;
-    font-size: 84pxx;
+    font-size: 84px;
+  }
+}
+@media (min-width: 992px) {
+  .introduction-heading.standard-page {
+    font-size: 48px;
   }
 }
 
@@ -15247,6 +15255,15 @@ header {
 @media (min-width: 992px) {
   .introduction-content {
     font-size: 28.5px;
+  }
+}
+.introduction-content.standard-page {
+  max-width: 725px;
+  max-width: 45.3125rem;
+}
+@media (min-width: 992px) {
+  .introduction-content.standard-page {
+    font-size: 20px;
   }
 }
 
@@ -15393,6 +15410,7 @@ header {
   padding: 1.25rem 1.875rem 1.25rem 1.875rem;
   font-size: 16px;
   font-size: 1rem;
+  border: 0;
   display: inline-block;
   font-weight: 500;
 }
@@ -15443,9 +15461,77 @@ header {
   }
 }
 
+.btn-form-cancel {
+  background-color: transparent;
+  text-decoration: underline;
+}
+.btn-form-cancel:hover {
+  text-decoration: underline;
+}
+
+.btn-form-register {
+  background-color: #1a4c54;
+  color: #ffffff;
+}
+
 form {
   background-color: #e4f7b7;
   color: #333333;
-  padding: 53px 57px 17px 76px;
-  padding: 3.3125rem 3.5625rem 1.0625rem 4.75rem;
+  padding: 43px 37px 67px 37px;
+  padding: 2.6875rem 2.3125rem 4.1875rem 2.3125rem;
+}
+@media (min-width: 576px) {
+  form {
+    padding: 53px 57px 67px 76px;
+    padding: 3.3125rem 3.5625rem 4.1875rem 4.75rem;
+  }
+}
+
+.form-heading {
+  font-size: 30px;
+  font-weight: 400;
+  margin-bottom: 30px;
+  margin-bottom: 1.875rem;
+}
+
+.form-group {
+  margin-bottom: 40px;
+  margin-bottom: 2.5rem;
+  display: flex;
+  flex-wrap: wrap;
+}
+.form-label {
+  font-size: 18px;
+  font-weight: 500;
+  flex-basis: 100%;
+}
+@media (min-width: 576px) {
+  .form-label {
+    max-width: 238px;
+    max-width: 14.875rem;
+    flex-basis: 0;
+    flex-grow: 1;
+  }
+}
+
+.form-input {
+  flex-basis: 100%;
+}
+@media (min-width: 576px) {
+  .form-input {
+    flex-basis: 0;
+    flex-grow: 1;
+  }
+}
+
+@media (min-width: 576px) {
+  .form-input-short input {
+    max-width: 265px;
+  }
+}
+
+.form-actions {
+  position: absolute;
+  right: 0;
+  bottom: 0;
 }
