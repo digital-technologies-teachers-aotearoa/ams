@@ -1,7 +1,7 @@
 form {
+  @include rem(padding, 43px 37px 67px 37px);
   background-color: $form-colour-background;
   color: $text-dark;
-  @include rem(padding, 43px 37px 67px 37px);
 
   @include media-breakpoint-up(sm) {
     @include rem(padding, 53px 57px 67px 76px);
@@ -9,9 +9,9 @@ form {
 }
 
 .form-heading {
+  @include rem(margin-bottom, 30px);
   font-size: 30px;
   font-weight: 400;
-  @include rem(margin-bottom, 30px);
 }
 
 .form-group {
@@ -55,4 +55,8 @@ form {
   position: absolute;
   right: 0;
   bottom: 0;
+}
+
+.form-divider {
+  @include rem(margin-bottom, 30px);
 }

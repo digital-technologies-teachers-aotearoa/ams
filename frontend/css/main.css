@@ -15475,10 +15475,10 @@ header {
 }
 
 form {
-  background-color: #e4f7b7;
-  color: #333333;
   padding: 43px 37px 67px 37px;
   padding: 2.6875rem 2.3125rem 4.1875rem 2.3125rem;
+  background-color: #e4f7b7;
+  color: #333333;
 }
 @media (min-width: 576px) {
   form {
@@ -15488,10 +15488,10 @@ form {
 }
 
 .form-heading {
-  font-size: 30px;
-  font-weight: 400;
   margin-bottom: 30px;
   margin-bottom: 1.875rem;
+  font-size: 30px;
+  font-weight: 400;
 }
 
 .form-group {
@@ -15534,4 +15534,9 @@ form {
   position: absolute;
   right: 0;
   bottom: 0;
+}
+
+.form-divider {
+  margin-bottom: 30px;
+  margin-bottom: 1.875rem;
 }
