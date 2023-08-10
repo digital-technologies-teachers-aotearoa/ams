@@ -15153,6 +15153,27 @@ header {
   text-decoration: underline;
 }
 
+.user-details-login {
+  padding: 0 10px 0 10px;
+  padding: 0 0.625rem 0 0.625rem;
+  font-size: 18px;
+  color: #333333;
+  border-right: 2px solid #6c6c6c;
+}
+.user-details-login:hover {
+  color: #333333;
+}
+
+.user-details-signup {
+  padding: 0 10px 0 10px;
+  padding: 0 0.625rem 0 0.625rem;
+  font-size: 18px;
+  color: #333333;
+}
+.user-details-signup:hover {
+  color: #333333;
+}
+
 .user-details-logout:hover {
   color: #333333;
 }

@@ -44,6 +44,26 @@
   text-decoration: underline;
 }
 
+.user-details-login {
+  @include rem(padding, 0 10px 0 10px);
+  font-size: 18px;
+  color: $text-dark;
+  border-right: 2px solid $grey-light;
+
+  &:hover {
+    color: $text-dark;
+  }
+}
+
+.user-details-signup {
+  @include rem(padding, 0 10px 0 10px);
+  font-size: 18px;
+  color: $text-dark;
+  &:hover {
+    color: $text-dark;
+  }
+}
+
 .user-details-logout:hover {
   color: $text-dark;
 }
