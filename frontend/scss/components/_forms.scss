@@ -4,7 +4,10 @@
 }
 
 .form-panel-signup {
-  @include rem(padding, 52px 36px 63px 65px);
+  @include rem(padding, 30px 30px 30px 30px);
+  @include media-breakpoint-up(md) {
+    @include rem(padding, 52px 36px 63px 65px);
+  }
 }
 
 .form-panel-signup-details {
@@ -12,8 +15,11 @@
 }
 
 .form-panel-signin {
-  @include rem(padding, 52px 36px 63px 65px);
   @include rem(margin-bottom, 30px);
+  @include rem(padding, 30px 30px 30px 30px);
+  @include media-breakpoint-up(md) {
+    @include rem(padding, 52px 36px 63px 65px);
+  }
 }
 
 .form-panel-registration {
@@ -79,6 +85,11 @@
   position: absolute;
   right: 0;
   bottom: 0;
+}
+
+.form-actions-signin {
+  display: flex;
+  justify-content: end;
 }
 
 .form-divider {
