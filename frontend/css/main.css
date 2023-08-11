@@ -15521,6 +15521,10 @@ form {
   display: flex;
   flex-wrap: wrap;
 }
+.form-group input {
+  border: 1px solid #1a4c54;
+}
+
 .form-label {
   font-size: 18px;
   font-weight: 500;
@@ -15545,6 +15549,16 @@ form {
   }
 }
 
+.form-radio {
+  flex-basis: 100%;
+}
+@media (min-width: 576px) {
+  .form-radio {
+    flex-basis: 0;
+    flex-grow: 1;
+  }
+}
+
 @media (min-width: 576px) {
   .form-input-short input {
     max-width: 265px;
@@ -15560,4 +15574,35 @@ form {
 .form-divider {
   margin-bottom: 30px;
   margin-bottom: 1.875rem;
+}
+
+.form-membership {
+  margin-bottom: 40px;
+  margin-bottom: 2.5rem;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.form-membership-description {
+  font-size: 18px;
+  font-weight: 500;
+  flex-basis: 100%;
+}
+@media (min-width: 576px) {
+  .form-membership-description {
+    max-width: 238px;
+    max-width: 14.875rem;
+    flex-basis: 0;
+    flex-grow: 1;
+  }
+}
+
+.registration-membership-fields {
+  flex-basis: 100%;
+}
+@media (min-width: 576px) {
+  .registration-membership-fields {
+    flex-basis: 0;
+    flex-grow: 1;
+  }
 }

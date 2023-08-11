@@ -21,6 +21,7 @@ form {
 
   input {
     @extend .form-control; // extends from vendor bootstrap
+    border: 1px solid $form-colour-border;
   }
 }
 
@@ -36,6 +37,14 @@ form {
 }
 
 .form-input {
+  flex-basis: 100%;
+  @include media-breakpoint-up(sm) {
+    flex-basis: 0;
+    flex-grow: 1;
+  }
+}
+
+.form-radio {
   flex-basis: 100%;
   @include media-breakpoint-up(sm) {
     flex-basis: 0;
@@ -59,4 +68,29 @@ form {
 
 .form-divider {
   @include rem(margin-bottom, 30px);
+}
+
+.form-membership {
+  @include rem(margin-bottom, 40px);
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.form-membership-description {
+  font-size: 18px;
+  font-weight: 500;
+  flex-basis: 100%;
+  @include media-breakpoint-up(sm) {
+    @include rem(max-width, 238px);
+    flex-basis: 0;
+    flex-grow: 1;
+  }
+}
+
+.registration-membership-fields {
+  flex-basis: 100%;
+  @include media-breakpoint-up(sm) {
+    flex-basis: 0;
+    flex-grow: 1;
+  }
 }
