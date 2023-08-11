@@ -15495,20 +15495,44 @@ header {
   color: #ffffff;
 }
 
-form {
-  padding: 43px 37px 67px 37px;
-  padding: 2.6875rem 2.3125rem 4.1875rem 2.3125rem;
+.btn-form-signin {
+  background-color: #1a4c54;
+  color: #ffffff;
+}
+
+.form-panel {
   background-color: #e4f7b7;
   color: #333333;
 }
+
+.form-panel-signup {
+  padding: 52px 36px 63px 65px;
+  padding: 3.25rem 2.25rem 3.9375rem 4.0625rem;
+}
+
+.form-panel-signup-details {
+  font-size: 24px;
+}
+
+.form-panel-signin {
+  padding: 52px 36px 63px 65px;
+  padding: 3.25rem 2.25rem 3.9375rem 4.0625rem;
+  margin-bottom: 30px;
+  margin-bottom: 1.875rem;
+}
+
+.form-panel-registration {
+  padding: 43px 37px 67px 37px;
+  padding: 2.6875rem 2.3125rem 4.1875rem 2.3125rem;
+}
 @media (min-width: 576px) {
-  form {
+  .form-panel-registration {
     padding: 53px 57px 67px 76px;
     padding: 3.3125rem 3.5625rem 4.1875rem 4.75rem;
   }
 }
 
-.form-heading {
+.form-panel-heading {
   margin-bottom: 30px;
   margin-bottom: 1.875rem;
   font-size: 30px;
@@ -15605,4 +15629,14 @@ form {
     flex-basis: 0;
     flex-grow: 1;
   }
+}
+
+.form-forgot-password {
+  padding: 20px 20px 20px 20px;
+  padding: 1.25rem 1.25rem 1.25rem 1.25rem;
+  color: #333333;
+  text-decoration: underline;
+}
+.form-forgot-password:hover {
+  color: #333333;
 }
