@@ -1,0 +1,18 @@
+.table-container {
+  @include rem(padding, 20px);
+  background-color: $brand-lime;
+}
+
+.table,
+.table thead th,
+.table td {
+  border-color: #000;
+}
+
+.table a {
+  color: #000;
+
+  &:hover {
+    color: #000;
+  }
+}

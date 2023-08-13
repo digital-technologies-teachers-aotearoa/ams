@@ -1,5 +1,6 @@
 $white: #ffffff;
 $grey-faint: #f8f8f8;
+$grey-lighter: #e6e6e6;
 $grey-light: #6c6c6c;
 $grey-mid: #3e3d3b;
 $grey-mid-dark: #302f2e;
@@ -36,6 +37,8 @@ $navbar-colour-border-hover: $brand-lime;
 $navbar-colour-border-current: $brand-lime;
 
 // Userbar
+
+$user-details-colour-background: $grey-lighter;
 $user-details-button-colour-background: $brand-lime;
 
 // Cards
