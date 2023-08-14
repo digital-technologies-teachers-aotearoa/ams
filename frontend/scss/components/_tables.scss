@@ -1,6 +1,10 @@
 .table-container {
-  @include rem(padding, 20px);
-  background-color: $brand-lime;
+  @include rem(padding, 40px);
+  background-color: $brand-lime-faded;
+}
+
+.table {
+  
 }
 
 .table,
