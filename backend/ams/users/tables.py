@@ -85,8 +85,10 @@ class AdminUserDetailMembershipTable(Table):
     )
     start_date = DateColumn(verbose_name=_("Start Date"), accessor="created_datetime", short=True)
     approved_date = DateColumn(verbose_name=_("Approved Date"), accessor="approved_datetime", short=True)
+
+    # NOTE: this uses the same actions template as AdminUserMembershipTable
     actions = TemplateColumn(
-        verbose_name=_("Actions"), template_name="admin_user_view_membership_actions.html", orderable=False
+        verbose_name=_("Actions"), template_name="admin_user_membership_actions.html", orderable=False
     )
 
     def render_status(self, value: datetime, record: UserMembership) -> Any:

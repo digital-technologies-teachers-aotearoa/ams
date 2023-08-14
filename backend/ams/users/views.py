@@ -1,7 +1,6 @@
-from typing import Optional
+from typing import Any, Optional
 
 from django.conf import settings
-from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.auth.models import User
 from django.contrib.sites.requests import RequestSite
 from django.db.models import QuerySet
@@ -11,6 +10,7 @@ from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 from django.shortcuts import render
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from django.views.generic.detail import DetailView
 from django_tables2 import SingleTableMixin, SingleTableView
 from registration.models import RegistrationProfile
@@ -23,6 +23,7 @@ from .tables import (
     AdminUserMembershipTable,
     AdminUserTable,
 )
+from .utils import UserIsAdminMixin
 
 
 def individual_registration(request: HttpRequest) -> HttpResponse:
@@ -90,22 +91,45 @@ def activate_user(request: HttpRequest, activation_key: str) -> HttpResponse:
     return HttpResponse(status=401)
 
 
-class UserIsAdminMixin(UserPassesTestMixin):
-    def test_func(self) -> bool:
-        is_staff: bool = self.request.user.is_staff
-        return is_staff
-
-
 class AdminUserListView(UserIsAdminMixin, SingleTableView):
     model = User
     table_class = AdminUserTable
     template_name = "admin_user_list.html"
 
 
+def approve_user_membership(user_membership_id: int) -> HttpResponse:
+    user_membership = UserMembership.objects.get(pk=user_membership_id)
+
+    if not user_membership.approved_datetime:
+        user_membership.approved_datetime = timezone.now()
+        user_membership.save()
+        return True
+
+    return False
+
+
 class AdminUserMembershipListView(UserIsAdminMixin, SingleTableView):
     model = UserMembership
     table_class = AdminUserMembershipTable
     template_name = "admin_user_memberships.html"
+
+    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        if request.POST.get("action") == "approve_user_membership":
+            try:
+                user_membership_id = int(request.POST["user_membership_id"])
+                membership_approved = approve_user_membership(user_membership_id)
+            except Exception:
+                return HttpResponse(status=400)
+        else:
+            return HttpResponse(status=400)
+
+        self.object_list = self.get_queryset()
+        context = self.get_context_data()
+
+        if membership_approved:
+            context["show_messages"] = [_("Membership Approved")]
+
+        return self.render_to_response(context)
 
 
 class AdminUserDetailView(UserIsAdminMixin, SingleTableMixin, DetailView):
@@ -116,3 +140,21 @@ class AdminUserDetailView(UserIsAdminMixin, SingleTableMixin, DetailView):
 
     def get_table_data(self) -> QuerySet:
         return self.object.user_memberships.all()
+
+    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        if request.POST.get("action") == "approve_user_membership":
+            try:
+                user_membership_id = int(request.POST["user_membership_id"])
+                membership_approved = approve_user_membership(user_membership_id)
+            except Exception:
+                return HttpResponse(status=400)
+        else:
+            return HttpResponse(status=400)
+
+        self.object = self.get_object()
+        context = self.get_context_data()
+
+        if membership_approved:
+            context["show_messages"] = [_("Membership Approved")]
+
+        return self.render_to_response(context)
