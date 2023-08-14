@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load static wagtailcore_tags i18n %}
+{% load render_table from django_tables2 %}
+
+{% block title %}{% translate "User Account" %}{% endblock title %}
+
+{% block body_class %}admin-user-view{% endblock %}
+
+{% block content %}
+
+<div style="float:left; margin: 10px;">
+    
+    <div style="font-size: 100pt; text-align: center;"> &#x1F464; </div>
+    <h1>
+        {% if user_detail.first_name %}
+            {{user_detail.get_full_name}}
+        {% else %}
+            {{user_detail.username}}
+        {% endif %}
+    </h1>
+
+    <p><a href="mailto:{{user_detail.email | urlencode}}">{{user_detail.email}}</a></p>
+
+</div>
+
+<h1>{% translate "Memberships" %}</h1>
+
+{% render_table table %}
+
+{% endblock content %}

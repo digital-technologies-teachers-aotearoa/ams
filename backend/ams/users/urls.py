@@ -1,6 +1,7 @@
 from django.urls import include, path
 
 from .views import (
+    AdminUserDetailView,
     AdminUserListView,
     AdminUserMembershipListView,
     activate_user,
@@ -9,6 +10,7 @@ from .views import (
 
 urlpatterns = [
     path("list/", AdminUserListView.as_view(), name="admin-user-list"),
+    path("view/<int:pk>/", AdminUserDetailView.as_view(), name="admin-user-view"),
     path("memberships/", AdminUserMembershipListView.as_view(), name="admin-user-memberships"),
     path("individual-registration/", individual_registration, name="registration_register"),
     path("activate/<str:activation_key>/", activate_user, name="activate-user"),

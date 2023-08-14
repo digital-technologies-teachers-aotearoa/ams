@@ -75,8 +75,24 @@ class AdminUserListTests(TestCase):
 
         rows = []
         for row in response.context["table"].rows:
-            rows.append([cell for cell in row.cells])
+            row_cells = [cell for cell in row.cells]
 
-        expected_rows = [[self.user.get_full_name(), self.user.email, ""]]
+            # Ignore the actions column
+            row_cells.pop()
+
+            rows.append(row_cells)
+
+        expected_rows = [[self.user.get_full_name(), self.user.email]]
 
         self.assertListEqual(expected_rows, rows)
+
+    def test_should_show_expected_actions(self) -> None:
+        # Given
+        self.client.force_login(self.user)
+
+        # When
+        response = self.client.get("/users/list/")
+
+        actions = list(response.context["table"].rows[0])[-1]
+
+        self.assertRegex(actions, rf"\/users\/view\/{self.user.pk}\/")
