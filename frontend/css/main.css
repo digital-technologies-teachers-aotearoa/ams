@@ -1,4 +1,5 @@
-/* Bootstrap 4.6.2 */ /*!
+/* Bootstrap 4.6.2 */
+/*!
  * Bootstrap Reboot v4.6.2 (https://getbootstrap.com/)
  * Copyright 2011-2022 The Bootstrap Authors
  * Copyright 2011-2022 Twitter, Inc.
@@ -4716,6 +4717,35 @@ textarea.form-control {
 }
 .table-responsive > .table-bordered {
   border: 0;
+}
+
+.breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  list-style: none;
+  background-color: #e9ecef;
+  border-radius: 0.25rem;
+}
+
+.breadcrumb-item + .breadcrumb-item {
+  padding-left: 0.5rem;
+}
+.breadcrumb-item + .breadcrumb-item::before {
+  float: left;
+  padding-right: 0.5rem;
+  color: #6c757d;
+  content: "/";
+}
+.breadcrumb-item + .breadcrumb-item:hover::before {
+  text-decoration: underline;
+}
+.breadcrumb-item + .breadcrumb-item:hover::before {
+  text-decoration: none;
+}
+.breadcrumb-item.active {
+  color: #6c757d;
 }
 
 /* Font Awesome 6.4.0 */
@@ -15047,7 +15077,7 @@ body {
 }
 
 html {
-  background-color: #6c6c6c;
+  background-color: #302f2e;
 }
 
 main {
@@ -15535,8 +15565,6 @@ header {
 }
 @media (max-width: 767.98px) {
   .introduction {
-    max-width: 520px;
-    max-width: 32.5rem;
     margin: 0 auto;
   }
 }
@@ -15986,4 +16014,10 @@ header {
 }
 .table a:hover {
   color: #000;
+}
+
+.kitchen-sink-component {
+  display: block;
+  margin-bottom: 100px;
+  margin-bottom: 6.25rem;
 }

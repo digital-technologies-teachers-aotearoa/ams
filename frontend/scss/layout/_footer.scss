@@ -34,7 +34,7 @@
 
 .footer-copyright {
   @include rem(padding, 10px 0 10px 0);
-  background-color: $grey-mid-dark;
+  background-color: $page-colour-foreground;
   color: $white;
   text-align: center;
 

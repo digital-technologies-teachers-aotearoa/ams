@@ -1,0 +1,4 @@
+.kitchen-sink-component {
+  display: block;
+  @include rem(margin-bottom, 100px);
+}
