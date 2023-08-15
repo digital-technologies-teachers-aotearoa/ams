@@ -100,9 +100,8 @@
                     <img class="user-details-image" src="">
 
                   {% else %}
-                    <!-- TODO: different classes for sign up and log in ? -->
-                    <a href="{% url "auth_login" %}?next={{ request.path | urlencode}}" class="user-details-logout">{% translate "Log In" %}</a>
-                    <a href="{{ "membership/" | localize_url }}" class="user-details-logout">{% translate "Sign Up" %}</a>
+                    <a href="{% url "auth_login" %}?next={{ request.path | urlencode}}" class="user-details-login">{% translate "Log In" %}</a>
+                    <a href="{{ "membership/" | localize_url }}" class="user-details-signup">{% translate "Sign Up" %}</a>
                 {% endif %}
                 </p>
                 <a href="#" class="user-details-lang">English</a>
