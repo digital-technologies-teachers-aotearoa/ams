@@ -4250,7 +4250,7 @@ textarea.form-control {
   box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
 }
 
-.invalid-feedback {
+.invalid-feedback, .errorlist {
   display: none;
   width: 100%;
   margin-top: 0.25rem;
@@ -4277,9 +4277,10 @@ textarea.form-control {
   left: 5px;
 }
 
-.was-validated :invalid ~ .invalid-feedback,
+.was-validated :invalid ~ .invalid-feedback, .was-validated :invalid ~ .errorlist,
 .was-validated :invalid ~ .invalid-tooltip,
 .is-invalid ~ .invalid-feedback,
+.is-invalid ~ .errorlist,
 .is-invalid ~ .invalid-tooltip {
   display: block;
 }
@@ -4320,8 +4321,8 @@ textarea.form-control {
 .was-validated .form-check-input:invalid ~ .form-check-label, .form-check-input.is-invalid ~ .form-check-label {
   color: #dc3545;
 }
-.was-validated .form-check-input:invalid ~ .invalid-feedback,
-.was-validated .form-check-input:invalid ~ .invalid-tooltip, .form-check-input.is-invalid ~ .invalid-feedback,
+.was-validated .form-check-input:invalid ~ .invalid-feedback, .was-validated .form-check-input:invalid ~ .errorlist,
+.was-validated .form-check-input:invalid ~ .invalid-tooltip, .form-check-input.is-invalid ~ .invalid-feedback, .form-check-input.is-invalid ~ .errorlist,
 .form-check-input.is-invalid ~ .invalid-tooltip {
   display: block;
 }
@@ -15601,6 +15602,13 @@ header {
   }
 }
 
+@media (min-width: 992px) {
+  .introduction-subheading {
+    padding-left: 120px;
+    padding-left: 7.5rem;
+  }
+}
+
 .introduction-content {
   margin-bottom: 75px;
   margin-bottom: 4.6875rem;
@@ -15624,13 +15632,6 @@ header {
 @media (min-width: 992px) {
   .introduction-content.standard-page {
     font-size: 20px;
-  }
-}
-
-@media (min-width: 992px) {
-  .introduction-teachers-aotearoa {
-    padding-left: 120px;
-    padding-left: 7.5rem;
   }
 }
 
@@ -15995,6 +15996,16 @@ header {
 }
 .form-forgot-password:hover {
   color: #333333;
+}
+
+.errorlist {
+  list-style: none;
+  padding-left: 0;
+}
+
+.errorlist li {
+  margin-bottom: 2px;
+  margin-bottom: 0.125rem;
 }
 
 .table-container {

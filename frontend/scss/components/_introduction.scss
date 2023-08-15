@@ -30,6 +30,12 @@
   }
 }
 
+.introduction-subheading {
+  @include media-breakpoint-up(lg) {
+    @include rem(padding-left, 120px);
+  }
+}
+
 .introduction-content {
   @include rem(margin-bottom, 75px);
   line-height: 1.82;
@@ -47,11 +53,5 @@
     @include media-breakpoint-up(lg) {
       font-size: 20px;
     }
-  }
-}
-
-.introduction-teachers-aotearoa {
-  @include media-breakpoint-up(lg) {
-    @include rem(padding-left, 120px);
   }
 }

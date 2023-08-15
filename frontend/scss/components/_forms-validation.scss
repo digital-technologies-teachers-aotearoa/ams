@@ -1,0 +1,9 @@
+.errorlist {
+  @extend .invalid-feedback;
+  list-style: none;
+  padding-left: 0;
+}
+
+.errorlist li {
+  @include rem(margin-bottom, 2px);
+}
