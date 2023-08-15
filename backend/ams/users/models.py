@@ -36,7 +36,7 @@ class UserMembership(Model):
 class UserMemberStatus(TextChoices):
     NONE = "NONE", _("None")
     PENDING = "PENDING", _("Pending")
-    APPROVED = "APPROVED", _("Approved")
+    ACTIVE = "ACTIVE", _("Active")
 
 
 class UserMemberInfo:
@@ -50,7 +50,7 @@ class UserMemberInfo:
         if self.user_membership.approved_datetime is None:
             return UserMemberStatus.PENDING
 
-        return UserMemberStatus.APPROVED
+        return UserMemberStatus.ACTIVE
 
 
 def user_member_info(user: User) -> UserMemberInfo:

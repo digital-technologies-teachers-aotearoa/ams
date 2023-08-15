@@ -18,9 +18,9 @@ def full_name_or_username(user: User) -> str:
     return full_name
 
 
-def approved_status(user_membership: UserMembership) -> Any:
+def membership_status(user_membership: UserMembership) -> Any:
     if user_membership.approved_datetime:
-        return _("Approved")
+        return _("Active")
     return _("Pending")
 
 
@@ -64,7 +64,7 @@ class AdminUserMembershipTable(Table):
         return full_name_or_username(record.user)
 
     def render_status(self, value: datetime, record: UserMembership) -> Any:
-        return approved_status(record)
+        return membership_status(record)
 
     def render_duration(self, value: relativedelta, record: UserMembership) -> Any:
         return format_membership_duration_in_months(value)
@@ -92,7 +92,7 @@ class AdminUserDetailMembershipTable(Table):
     )
 
     def render_status(self, value: datetime, record: UserMembership) -> Any:
-        return approved_status(record)
+        return membership_status(record)
 
     def render_duration(self, value: relativedelta, record: UserMembership) -> Any:
         return format_membership_duration_in_months(value)

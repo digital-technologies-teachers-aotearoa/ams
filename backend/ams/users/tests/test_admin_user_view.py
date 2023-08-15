@@ -4,6 +4,7 @@ from dateutil.tz import gettz
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import TestCase
+from django.utils import timezone
 from django.utils.formats import date_format
 
 from ...test.utils import parse_response_table_rows
@@ -100,7 +101,7 @@ class AdminUserListTests(TestCase):
             [
                 self.user_membership.membership_option.name,
                 "1 month",
-                "Approved",
+                "Active",
                 date_format(self.user_membership.created_datetime, format="SHORT_DATE_FORMAT"),
                 date_format(self.user_membership.approved_datetime, format="SHORT_DATE_FORMAT"),
                 "",
@@ -146,6 +147,21 @@ class AdminUserListTests(TestCase):
 
         # Then
         self.assertEqual(200, response.status_code)
+
+        rows = parse_response_table_rows(response)
+
+        expected_rows = [
+            [
+                self.user_membership.membership_option.name,
+                "1 month",
+                "Active",
+                date_format(self.user_membership.created_datetime, format="SHORT_DATE_FORMAT"),
+                date_format(timezone.now().astimezone(self.time_zone), format="SHORT_DATE_FORMAT"),
+                "",
+            ]
+        ]
+
+        self.assertListEqual(expected_rows, rows)
 
         expected_messages = ["Membership Approved"]
         self.assertListEqual(expected_messages, response.context["show_messages"])
