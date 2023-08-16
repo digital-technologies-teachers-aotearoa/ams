@@ -5,43 +5,48 @@
 
 {% block content %}
 
-<style>
-.login-fields span {
-    display: inline-block;
-    width: 200px;
-}
-</style>
+<div class="row">
+    <div class="col-lg-6">
+        <div class="form-panel form-panel-signin">
+        <form action="" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ next }}" />
 
-<h1>{% translate "Log In" %}</h1>
+            <h2 class="form-panel-heading">{% translate "Log In" %}</h2>
 
-<form method="post" action="">
-    {% csrf_token %}
-    <input type="hidden" name="next" value="{{ next }}" />
+            <div class="form-group">
+                <div class="form-label">
+                    <label for="id_username">{% translate "Email" %}:</label>
+                </div>
 
-    <div class="login-fields">
+                <div class="form-input">
+                    <input type="text" name="username" autofocus autocapitalize="none" autocomplete="username" maxlength="150" required id="id_username">
+                </div>
+            </div>
 
-        <div class="fieldWrapper">
-            <span><label for="id_username">{% translate "Email" %}:</label></span>
-            <input type="text" name="username" autofocus autocapitalize="none" autocomplete="username" maxlength="150" required id="id_username">
+            <div class="form-group">
+                <div class="form-label">
+                    <label for="id_password">{% translate "Password" %}:</label>
+                </div>
+                <div class="form-input">
+                    <input type="password" name="password" required="" id="id_password">
+                </div>
+            </div>
+
+            {% if form.errors %}
+                <p class="invalid-feedback" style="display: block !important">{% translate "Invalid email or password" %}</p>
+            {% endif %}
+
+            <div class="form-actions-signin">
+                <a class="form-forgot-password" href="/users/password/reset">{% translate "Forgot your password?" %}</a>
+                <input class="btn btn-form-signin" type="submit" value="Log In">
+            </div>
+
+        </form>
+
         </div>
-
-        <div class="fieldWrapper">
-            <span><label for="id_password">{% translate "Password" %}:</label></span>
-            <input type="password" name="password" autocomplete="current-password" required id="id_password">   
-        </div>
-
-        {% if form.errors %}
-            <p>{% translate "Invalid email or password" %}</p>
-        {% endif %}
-
     </div>
-
-    <br/>
-
-    <div>
-        <input type="submit" value="{% translate "Log In" %}" />
-    </div>
-</form>
+</div>
 
 {% endblock %}
 
