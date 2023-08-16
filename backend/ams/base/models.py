@@ -6,10 +6,12 @@ from wagtail.models import Page
 
 class HomePage(Page):
     heading = CharField(blank=True, max_length=255, default="Home")
+    subheading = CharField(blank=True, max_length=255, default="")
     body = RichTextField(blank=True, default="Welcome to the homepage")
 
     content_panels = Page.content_panels + [
         FieldPanel("heading"),
+        FieldPanel("subheading"),
         FieldPanel("body"),
     ]
 
