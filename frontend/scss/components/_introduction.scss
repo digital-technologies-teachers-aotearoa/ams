@@ -28,6 +28,12 @@
       font-size: 48px;
     }
   }
+
+  &.membership-page {
+    @include media-breakpoint-up(lg) {
+      font-size: 48px;
+    }
+  }
 }
 
 .introduction-subheading {
@@ -50,6 +56,12 @@
 
   &.standard-page {
     @include rem(max-width, 725px);
+    @include media-breakpoint-up(lg) {
+      font-size: 20px;
+    }
+  }
+
+  &.membership-page {
     @include media-breakpoint-up(lg) {
       font-size: 20px;
     }

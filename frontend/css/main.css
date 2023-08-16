@@ -15601,6 +15601,11 @@ header {
     font-size: 48px;
   }
 }
+@media (min-width: 992px) {
+  .introduction-heading.membership-page {
+    font-size: 48px;
+  }
+}
 
 @media (min-width: 992px) {
   .introduction-subheading {
@@ -15631,6 +15636,11 @@ header {
 }
 @media (min-width: 992px) {
   .introduction-content.standard-page {
+    font-size: 20px;
+  }
+}
+@media (min-width: 992px) {
+  .introduction-content.membership-page {
     font-size: 20px;
   }
 }
