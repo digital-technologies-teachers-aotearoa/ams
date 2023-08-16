@@ -189,6 +189,13 @@ class Common(Configuration):
     LOGIN_REDIRECT_URL = "/"
     LOGOUT_REDIRECT_URL = "/"
 
+    # Django tables 2
+    # https://django-tables2.readthedocs.io/en/latest/pages/
+
+    DJANGO_TABLES2_TABLE_ATTRS = {
+        "class": "table table-striped table-bordered table-sm",
+    }
+
     # Default primary key field type
     # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
