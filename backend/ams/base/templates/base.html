@@ -29,6 +29,10 @@
         {% block extra_css %}
         {# Override this in templates to add extra stylesheets #}
         {% endblock %}
+
+        <script type="application/javascript" src="/static/js/vendor/jquery-3.7.0.slim.min.js"></script>
+        <script type="application/javascript" src="/static/js/vendor/bootstrap.bundle.min.js"></script>
+        <script type="application/javascript" src="/static/js/vendor/jquery.matchHeight-min.js"></script>
     </head>
 
     <body class="{% block body_class %}{% endblock %}">
@@ -140,10 +144,12 @@
           </div>
         </main>
 
+        {% include "footer.html" %}
+
+
         {% wagtailuserbar %}
 
-        {# Global javascript #}
-        <script type="text/javascript" src="{% static 'js/base.js' %}"></script>
+        <script type="application/javascript" src="/static/js/main.js"></script>
 
         {% block extra_js %}
         {# Override this in templates to add extra javascript #}
