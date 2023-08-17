@@ -1,6 +1,5 @@
 .introduction {
   color: $introduction-colour-text;
-
   @include media-breakpoint-down(sm) {
     margin: 0 auto;
   }

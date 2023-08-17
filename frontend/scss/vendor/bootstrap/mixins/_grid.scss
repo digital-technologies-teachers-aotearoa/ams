@@ -63,7 +63,7 @@
 // style grid.
 @mixin row-cols($count) {
   > * {
-    flex: 0 0 divide(100%, $count);
-    max-width: divide(100%, $count);
+    flex: 0 0 auto;
+    width: divide(100, $count);
   }
 }

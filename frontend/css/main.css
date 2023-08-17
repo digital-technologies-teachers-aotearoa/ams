@@ -406,33 +406,33 @@ html {
 }
 
 .row-cols-1 > * {
-  flex: 0 0 100%;
-  max-width: 100%;
+  flex: 0 0 auto;
+  width: 100;
 }
 
 .row-cols-2 > * {
-  flex: 0 0 50%;
-  max-width: 50%;
+  flex: 0 0 auto;
+  width: 50;
 }
 
 .row-cols-3 > * {
-  flex: 0 0 33.3333333333%;
-  max-width: 33.3333333333%;
+  flex: 0 0 auto;
+  width: 33.3333333333;
 }
 
 .row-cols-4 > * {
-  flex: 0 0 25%;
-  max-width: 25%;
+  flex: 0 0 auto;
+  width: 25;
 }
 
 .row-cols-5 > * {
-  flex: 0 0 20%;
-  max-width: 20%;
+  flex: 0 0 auto;
+  width: 20;
 }
 
 .row-cols-6 > * {
-  flex: 0 0 16.6666666667%;
-  max-width: 16.6666666667%;
+  flex: 0 0 auto;
+  width: 16.6666666667;
 }
 
 .col-auto {
@@ -612,28 +612,28 @@ html {
     max-width: 100%;
   }
   .row-cols-sm-1 > * {
-    flex: 0 0 100%;
-    max-width: 100%;
+    flex: 0 0 auto;
+    width: 100;
   }
   .row-cols-sm-2 > * {
-    flex: 0 0 50%;
-    max-width: 50%;
+    flex: 0 0 auto;
+    width: 50;
   }
   .row-cols-sm-3 > * {
-    flex: 0 0 33.3333333333%;
-    max-width: 33.3333333333%;
+    flex: 0 0 auto;
+    width: 33.3333333333;
   }
   .row-cols-sm-4 > * {
-    flex: 0 0 25%;
-    max-width: 25%;
+    flex: 0 0 auto;
+    width: 25;
   }
   .row-cols-sm-5 > * {
-    flex: 0 0 20%;
-    max-width: 20%;
+    flex: 0 0 auto;
+    width: 20;
   }
   .row-cols-sm-6 > * {
-    flex: 0 0 16.6666666667%;
-    max-width: 16.6666666667%;
+    flex: 0 0 auto;
+    width: 16.6666666667;
   }
   .col-sm-auto {
     flex: 0 0 auto;
@@ -777,28 +777,28 @@ html {
     max-width: 100%;
   }
   .row-cols-md-1 > * {
-    flex: 0 0 100%;
-    max-width: 100%;
+    flex: 0 0 auto;
+    width: 100;
   }
   .row-cols-md-2 > * {
-    flex: 0 0 50%;
-    max-width: 50%;
+    flex: 0 0 auto;
+    width: 50;
   }
   .row-cols-md-3 > * {
-    flex: 0 0 33.3333333333%;
-    max-width: 33.3333333333%;
+    flex: 0 0 auto;
+    width: 33.3333333333;
   }
   .row-cols-md-4 > * {
-    flex: 0 0 25%;
-    max-width: 25%;
+    flex: 0 0 auto;
+    width: 25;
   }
   .row-cols-md-5 > * {
-    flex: 0 0 20%;
-    max-width: 20%;
+    flex: 0 0 auto;
+    width: 20;
   }
   .row-cols-md-6 > * {
-    flex: 0 0 16.6666666667%;
-    max-width: 16.6666666667%;
+    flex: 0 0 auto;
+    width: 16.6666666667;
   }
   .col-md-auto {
     flex: 0 0 auto;
@@ -942,28 +942,28 @@ html {
     max-width: 100%;
   }
   .row-cols-lg-1 > * {
-    flex: 0 0 100%;
-    max-width: 100%;
+    flex: 0 0 auto;
+    width: 100;
   }
   .row-cols-lg-2 > * {
-    flex: 0 0 50%;
-    max-width: 50%;
+    flex: 0 0 auto;
+    width: 50;
   }
   .row-cols-lg-3 > * {
-    flex: 0 0 33.3333333333%;
-    max-width: 33.3333333333%;
+    flex: 0 0 auto;
+    width: 33.3333333333;
   }
   .row-cols-lg-4 > * {
-    flex: 0 0 25%;
-    max-width: 25%;
+    flex: 0 0 auto;
+    width: 25;
   }
   .row-cols-lg-5 > * {
-    flex: 0 0 20%;
-    max-width: 20%;
+    flex: 0 0 auto;
+    width: 20;
   }
   .row-cols-lg-6 > * {
-    flex: 0 0 16.6666666667%;
-    max-width: 16.6666666667%;
+    flex: 0 0 auto;
+    width: 16.6666666667;
   }
   .col-lg-auto {
     flex: 0 0 auto;
@@ -1107,28 +1107,28 @@ html {
     max-width: 100%;
   }
   .row-cols-xl-1 > * {
-    flex: 0 0 100%;
-    max-width: 100%;
+    flex: 0 0 auto;
+    width: 100;
   }
   .row-cols-xl-2 > * {
-    flex: 0 0 50%;
-    max-width: 50%;
+    flex: 0 0 auto;
+    width: 50;
   }
   .row-cols-xl-3 > * {
-    flex: 0 0 33.3333333333%;
-    max-width: 33.3333333333%;
+    flex: 0 0 auto;
+    width: 33.3333333333;
   }
   .row-cols-xl-4 > * {
-    flex: 0 0 25%;
-    max-width: 25%;
+    flex: 0 0 auto;
+    width: 25;
   }
   .row-cols-xl-5 > * {
-    flex: 0 0 20%;
-    max-width: 20%;
+    flex: 0 0 auto;
+    width: 20;
   }
   .row-cols-xl-6 > * {
-    flex: 0 0 16.6666666667%;
-    max-width: 16.6666666667%;
+    flex: 0 0 auto;
+    width: 16.6666666667;
   }
   .col-xl-auto {
     flex: 0 0 auto;
@@ -16041,4 +16041,44 @@ header {
   display: block;
   margin-bottom: 100px;
   margin-bottom: 6.25rem;
+}
+
+.membership-option {
+  padding: 30px 50px 30px 80px;
+  padding: 1.875rem 3.125rem 1.875rem 5rem;
+  font-size: 32px;
+  font-size: 2rem;
+  position: relative;
+  background-color: #eee;
+  color: #333333;
+  display: inline-block;
+  margin: 10px;
+}
+.membership-option:hover {
+  color: #333333;
+}
+.membership-option:hover:before {
+  color: #117175;
+}
+.membership-option:before {
+  font: var(--fa-font-solid);
+  font-size: 22px;
+  left: 30px;
+  position: absolute;
+  top: 50%;
+  margin-top: -11px;
+  color: #1a4c54;
+}
+@media (max-width: 575.98px) {
+  .membership-option {
+    display: block;
+  }
+}
+
+.membership-option-individual:before {
+  content: "\f007";
+}
+
+.membership-option-organisation:before {
+  content: "\f0c0";
 }
