@@ -3,6 +3,25 @@ main {
   background-color: #fff;
 }
 
+body {
+  color: black;
+}
+h1 {
+  color: red;
+}
+h2 {
+  color: red;
+}
+h3 {
+  color: red;
+}
+h4 {
+  color: red;
+}
+h5 {
+  color: red;
+}
+
 
 
 /* Header */
@@ -57,7 +76,12 @@ header {
 }
 
 .navbar-sublink {
-  color: red;
+  color: black;
+}
+
+.navbar-sublink:hover {
+  background-color: black;
+  color: white;
 }
 
 
@@ -146,6 +170,11 @@ header {
   background-color: black;
 }
 
+.btn-form-register {
+  background-color: white;
+  color: black;
+}
+
 
 
 /* Footer */
@@ -161,5 +190,17 @@ header {
 
 .footer-panel {
   background-color: red;
+  color: white;
+}
+
+
+
+/* Forms */
+.form-panel {
+  background-color: red;
+  color: white;
+}
+
+.form-divider {
   color: white;
 }
