@@ -67,3 +67,46 @@ Compile translations:
 Bring down the application:
 
     make stop
+
+## Discourse Setup
+
+### Overview
+
+Discourse images are built outside the AMS project using the Discourse Docker launcher build process.  See: https://github.com/discourse/discourse_docker
+
+In short, the launcher build process takes the upstream base image and "bootstraps" a bunch of additional, before commiting the final result in the final distributable image - which we use in AMS.
+
+TODO: add link to our Discourse local build repo when it is ready.
+
+There are 2 containers:
+
+1. `discourse` : The Discourse Ruby on Rails app itself, and assorted dependencies.
+2. `discourse-data` : A separate container providing both Postgres and Redis data stores for the Discourse application.  
+
+_Note: We will probably replace the discourse-data container in due time with one of our own - certainly for production.  The Discourse launcher built one is convenient for now in initial development however._
+
+### Makefile commands
+
+Get Discourse running:
+
+    make discourse-install
+
+Start Discourse containers:
+
+    make discourse-start
+
+Create admin user:
+
+    make discourse-create-admin
+
+Open psql shell on the Discourse database:
+
+    make discourse-db-shell
+
+Open a rails shell on the discourse app:
+
+    make discourse-rails-shell
+
+Recreate/Empty the Discourse database:
+
+    make discourse-recreate-db
