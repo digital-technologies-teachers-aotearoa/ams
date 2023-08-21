@@ -41,7 +41,7 @@ docker-compose $COMPOSEFILES run -T --rm --entrypoint="poetry run ./manage.py co
 if [ "$RECREATE_DB" -eq "1" ]
 then
   # Load fixtures
-  docker-compose $COMPOSEFILES run -T --rm --entrypoint="poetry run ./manage.py loaddata membership_options" backend
+  docker-compose $COMPOSEFILES run -T --rm --entrypoint="poetry run ./manage.py loaddata membership_options organisation_types" backend
 
   # Create superuser
   docker-compose $COMPOSEFILES run -T --rm --entrypoint="poetry run ./manage.py createsuperuser --noinput" backend

@@ -14,6 +14,10 @@ from django.utils.translation import gettext_lazy as _
 from relativedeltafield import RelativeDeltaField
 
 
+class OrganisationType(Model):
+    name = CharField(max_length=255, unique=True)
+
+
 class MembershipOptionType(TextChoices):
     INDIVIDUAL = "INDIVIDUAL", _("Individual")
     ORGANISATION = "ORGANISATION", _("Organisation")
