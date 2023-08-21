@@ -4,19 +4,25 @@ from django.conf import settings
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.auth.models import User
 from django.contrib.sites.requests import RequestSite
+from django.db.models import QuerySet
 from django.forms import BoundField
 from django.http import HttpResponseRedirect
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 from django.shortcuts import render
 from django.utils import timezone
-from django_tables2 import SingleTableView
+from django.views.generic.detail import DetailView
+from django_tables2 import SingleTableMixin, SingleTableView
 from registration.models import RegistrationProfile
 
 from ..base.models import EmailConfirmationPage
 from .forms import IndividualRegistrationForm
 from .models import MembershipOption, UserMembership
-from .tables import AdminUserMembershipTable, AdminUserTable
+from .tables import (
+    AdminUserDetailMembershipTable,
+    AdminUserMembershipTable,
+    AdminUserTable,
+)
 
 
 def individual_registration(request: HttpRequest) -> HttpResponse:
@@ -100,3 +106,13 @@ class AdminUserMembershipListView(UserIsAdminMixin, SingleTableView):
     model = UserMembership
     table_class = AdminUserMembershipTable
     template_name = "admin_user_memberships.html"
+
+
+class AdminUserDetailView(UserIsAdminMixin, SingleTableMixin, DetailView):
+    model = User
+    table_class = AdminUserDetailMembershipTable
+    template_name = "admin_user_view.html"
+    context_object_name = "user_detail"
+
+    def get_table_data(self) -> QuerySet:
+        return self.object.user_memberships.all()

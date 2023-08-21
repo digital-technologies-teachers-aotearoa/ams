@@ -79,9 +79,9 @@ class AdminUserMembershipsTests(TestCase):
         # Then
         self.assertEqual(200, response.status_code)
 
-        expected_columns = ["Full Name", "Membership", "Duration", "Status", "Start Date", "Approved Date", "Actions"]
-        columns = [column.header for column in response.context["table"].columns]
-        self.assertListEqual(expected_columns, columns)
+        expected_headings = ["Full Name", "Membership", "Duration", "Status", "Start Date", "Approved Date", "Actions"]
+        headings = [column.header for column in response.context["table"].columns]
+        self.assertListEqual(expected_headings, headings)
 
     def test_should_show_expected_rows(self) -> None:
         # Given
