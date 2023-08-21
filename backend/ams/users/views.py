@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any, Dict, Optional
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -9,6 +9,7 @@ from django.http import HttpResponseRedirect
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 from django.shortcuts import render
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.detail import DetailView
@@ -16,15 +17,15 @@ from django_tables2 import SingleTableMixin, SingleTableView
 from registration.models import RegistrationProfile
 
 from ..base.models import EmailConfirmationPage
-from .forms import IndividualRegistrationForm
+from .forms import IndividualRegistrationForm, OrganisationForm
 from .models import MembershipOption, Organisation, UserMembership
 from .tables import (
-    AdminUserDetailMembershipTable,
     AdminOrganisationTable,
+    AdminUserDetailMembershipTable,
     AdminUserMembershipTable,
     AdminUserTable,
 )
-from .utils import UserIsAdminMixin
+from .utils import UserIsAdminMixin, user_is_admin
 
 
 def individual_registration(request: HttpRequest) -> HttpResponse:
@@ -73,6 +74,37 @@ def individual_registration(request: HttpRequest) -> HttpResponse:
             "form": form,
             "personal_detail_fields": personal_detail_fields,
             "membership_option_field": membership_option_field,
+        },
+    )
+
+
+def create_organisation(request: HttpRequest) -> HttpResponse:
+    if not user_is_admin(request):
+        return HttpResponse(status=403)
+
+    if request.method == "POST":
+        form = OrganisationForm(request.POST)
+        if form.is_valid():
+            form_data = form.cleaned_data
+
+            # Create a new user using their email as the username and send activation email
+            Organisation.objects.create(
+                type=form_data["type"],
+                name=form_data["name"],
+                postal_address=form_data["postal_address"],
+                office_phone=form_data["office_phone"],
+            )
+
+            admin_organisations_url = reverse("admin-organisations")
+            return HttpResponseRedirect(admin_organisations_url + "?organisation_created=true")
+    else:
+        form = OrganisationForm()
+
+    return render(
+        request,
+        "create_organisation.html",
+        {
+            "form": form,
         },
     )
 
@@ -165,3 +197,16 @@ class AdminOrganisationListView(UserIsAdminMixin, SingleTableView):
     model = Organisation
     table_class = AdminOrganisationTable
     template_name = "admin_organisations.html"
+
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context: Dict[str, Any] = super().get_context_data(**kwargs)
+
+        referrer_url = self.request.META.get("HTTP_REFERER")
+
+        if referrer_url:
+            # Show message when returning from creating an organisation
+            admin_create_organisation_url = reverse("admin-create-organisation")
+            if referrer_url.endswith(admin_create_organisation_url) and self.request.GET.get("organisation_created"):
+                context["show_messages"] = [_("Organisation Created")]
+
+        return context

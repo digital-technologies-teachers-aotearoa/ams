@@ -8,7 +8,16 @@
 
 {% block content %}
 
+{% include "show_messages.html" %}
+
 <h1>{% translate "Organisations" %}</h1>
+
+<div style="float: right; text-align:center">
+    <ul style="list-style-type: none; margin: 0; padding: 0">
+        <li><a href="{% url "admin-create-organisation" %}">{% translate "Create New" %}</a></li>
+    </ul>
+</div>
+
 
 {% if table.rows %}
     {% render_table table %}

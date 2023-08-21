@@ -8,13 +8,20 @@ from django.forms import (
     ChoiceField,
     EmailField,
     Form,
+    ModelChoiceField,
+    ModelForm,
     PasswordInput,
     RadioSelect,
 )
 from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy as _
 
-from .models import MembershipOption, MembershipOptionType
+from .models import (
+    MembershipOption,
+    MembershipOptionType,
+    Organisation,
+    OrganisationType,
+)
 
 
 def format_membership_duration_in_months(duration: relativedelta) -> Any:
@@ -63,3 +70,17 @@ class IndividualRegistrationForm(Form):
             self.add_error("confirm_password", _("The two password fields didn't match."))
 
         return cleaned_data
+
+
+class NameModelChoiceField(ModelChoiceField):
+    def label_from_instance(self, obj: Any) -> str:
+        name: str = obj.name
+        return name
+
+
+class OrganisationForm(ModelForm):
+    type = NameModelChoiceField(queryset=OrganisationType.objects.order_by("id"), required=True, empty_label="")
+
+    class Meta:
+        model = Organisation
+        fields = ["name", "type", "postal_address", "office_phone"]

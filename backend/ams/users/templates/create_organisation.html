@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load static wagtailcore_tags i18n localize_url %}
+
+{% block title %}{% translate "Create Organisation" %}{% endblock title %}
+
+{% block body_class %}create-organisation{% endblock %}
+
+{% block content %}
+
+<h1>{% translate "Create Organisation" %}</h1>
+
+<form action="" method="post">
+    {% csrf_token %}
+    <h2>{% translate "Organisation Details" %}</h2>
+
+    <div class="organisation-detail-fields">
+        {% for field in form %}
+            <div class="form-group">
+                <div class="form-label">
+                    {{ field.label_tag }}
+                </div>
+                <div class="form-input">
+                    <!-- TODO: use add_invalid_field_class -->
+                    {{ field }}
+                    {{ field.errors }}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="form-actions">
+        <input class="btn btn-form-cancel" type="button" value="Cancel" onClick="window.location='{{ "users/organisations/" | localize_url }}';">
+        <input class="btn btn-form-submit" type="submit" value="Create">
+    </div>
+</form>
+{% endblock %}
