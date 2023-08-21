@@ -17,9 +17,10 @@ from registration.models import RegistrationProfile
 
 from ..base.models import EmailConfirmationPage
 from .forms import IndividualRegistrationForm
-from .models import MembershipOption, UserMembership
+from .models import MembershipOption, Organisation, UserMembership
 from .tables import (
     AdminUserDetailMembershipTable,
+    AdminOrganisationTable,
     AdminUserMembershipTable,
     AdminUserTable,
 )
@@ -158,3 +159,9 @@ class AdminUserDetailView(UserIsAdminMixin, SingleTableMixin, DetailView):
             context["show_messages"] = [_("Membership Approved")]
 
         return self.render_to_response(context)
+
+
+class AdminOrganisationListView(UserIsAdminMixin, SingleTableView):
+    model = Organisation
+    table_class = AdminOrganisationTable
+    template_name = "admin_organisations.html"

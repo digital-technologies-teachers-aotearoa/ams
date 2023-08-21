@@ -2,6 +2,7 @@ from django.urls import include, path
 
 from .views import (
     AdminUserDetailView,
+    AdminOrganisationListView,
     AdminUserListView,
     AdminUserMembershipListView,
     activate_user,
@@ -12,6 +13,7 @@ urlpatterns = [
     path("list/", AdminUserListView.as_view(), name="admin-user-list"),
     path("view/<int:pk>/", AdminUserDetailView.as_view(), name="admin-user-view"),
     path("memberships/", AdminUserMembershipListView.as_view(), name="admin-user-memberships"),
+    path("organisations/", AdminOrganisationListView.as_view(), name="admin-organisations"),
     path("individual-registration/", individual_registration, name="registration_register"),
     path("activate/<str:activation_key>/", activate_user, name="activate-user"),
     path("", include("registration.auth_urls")),

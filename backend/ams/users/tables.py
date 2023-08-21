@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from django_tables2 import Column, DateColumn, Table, TemplateColumn
 
 from .forms import format_membership_duration_in_months
-from .models import UserMembership
+from .models import Organisation, UserMembership
 
 
 def full_name_or_username(user: User) -> str:
@@ -101,3 +101,18 @@ class AdminUserDetailMembershipTable(Table):
         fields = ("membership", "duration", "status", "start_date", "approved_date")
         order_by = ("membership", "duration", "status", "start_date", "approved_date")
         model = UserMembership
+
+
+class AdminOrganisationTable(Table):
+    name = Column(verbose_name=_("Name"))
+    type = Column(accessor="type__name", verbose_name=_("Type"))
+    postal_address = Column(verbose_name=_("Postal Address"))
+    office_phone = Column(verbose_name=_("Office Phone"))
+    actions = TemplateColumn(
+        verbose_name=_("Actions"), template_name="admin_organisation_actions.html", orderable=False
+    )
+
+    class Meta:
+        fields = ("name", "type", "postal_address", "office_phone")
+        order_by = ("name", "type")
+        model = Organisation
