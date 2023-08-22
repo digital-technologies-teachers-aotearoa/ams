@@ -4,14 +4,18 @@ from dateutil.tz import gettz
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import TestCase
+from django.utils import timezone
 from django.utils.formats import date_format
 
+from ...test.utils import parse_response_table_rows
 from ..models import MembershipOption, MembershipOptionType, UserMembership
 
 
 class AdminUserMembershipsTests(TestCase):
     def setUp(self) -> None:
-        self.user = User.objects.create_user(username="testuser", is_staff=True)
+        self.admin_user = User.objects.create_user(username="testadminuser", is_staff=True)
+
+        self.user = User.objects.create_user(username="testuser", is_staff=False)
         self.user.first_name = "John"
         self.user.last_name = "Smith"
         self.user.email = "user@example.com"
@@ -30,25 +34,32 @@ class AdminUserMembershipsTests(TestCase):
             approved_datetime=datetime(day=1, month=7, year=2023, hour=21, tzinfo=self.time_zone),
         )
 
-    def test_should_not_allow_access_to_non_admin_user(self) -> None:
-        # Given
-        self.user.is_staff = False
-        self.user.save()
+        self.url = "/users/memberships/"
+        self.client.force_login(self.admin_user)
 
+    def test_should_not_allow_get_access_to_non_admin_user(self) -> None:
+        # Given
         self.client.force_login(self.user)
 
         # When
-        response = self.client.get("/users/memberships/")
+        response = self.client.get(self.url)
+
+        # Then
+        self.assertEqual(403, response.status_code)
+
+    def test_should_not_allow_post_access_to_non_admin_user(self) -> None:
+        # Given
+        self.client.force_login(self.user)
+
+        # When
+        response = self.client.post(self.url)
 
         # Then
         self.assertEqual(403, response.status_code)
 
     def test_should_use_expected_templates(self) -> None:
-        # Given
-        self.client.force_login(self.user)
-
         # When
-        response = self.client.get("/users/memberships/")
+        response = self.client.get(self.url)
 
         # Then
         self.assertEqual(200, response.status_code)
@@ -56,11 +67,8 @@ class AdminUserMembershipsTests(TestCase):
         self.assertTemplateUsed(response, "admin_user_membership_actions.html")
 
     def test_should_show_expected_columns(self) -> None:
-        # Given
-        self.client.force_login(self.user)
-
         # When
-        response = self.client.get("/users/memberships/")
+        response = self.client.get(self.url)
 
         # Then
         self.assertEqual(200, response.status_code)
@@ -70,11 +78,8 @@ class AdminUserMembershipsTests(TestCase):
         self.assertListEqual(expected_columns, columns)
 
     def test_should_show_expected_headings(self) -> None:
-        # Given
-        self.client.force_login(self.user)
-
         # When
-        response = self.client.get("/users/memberships/")
+        response = self.client.get(self.url)
 
         # Then
         self.assertEqual(200, response.status_code)
@@ -84,25 +89,20 @@ class AdminUserMembershipsTests(TestCase):
         self.assertListEqual(expected_headings, headings)
 
     def test_should_show_expected_rows(self) -> None:
-        # Given
-        self.client.force_login(self.user)
-
         # When
-        response = self.client.get("/users/memberships/")
+        response = self.client.get(self.url)
 
         # Then
         self.assertEqual(200, response.status_code)
 
-        rows = []
-        for row in response.context["table"].rows:
-            rows.append([cell for cell in row.cells])
+        rows = parse_response_table_rows(response)
 
         expected_rows = [
             [
                 self.user.get_full_name(),
                 self.user_membership.membership_option.name,
                 "1 month",
-                "Approved",
+                "Active",
                 date_format(self.user_membership.created_datetime, format="SHORT_DATE_FORMAT"),
                 date_format(self.user_membership.approved_datetime, format="SHORT_DATE_FORMAT"),
                 "",
@@ -116,17 +116,13 @@ class AdminUserMembershipsTests(TestCase):
         self.user_membership.approved_datetime = None
         self.user_membership.save()
 
-        self.client.force_login(self.user)
-
         # When
-        response = self.client.get("/users/memberships/")
+        response = self.client.get(self.url)
 
         # Then
         self.assertEqual(200, response.status_code)
 
-        rows = []
-        for row in response.context["table"].rows:
-            rows.append([cell for cell in row.cells])
+        rows = parse_response_table_rows(response)
 
         expected_rows = [
             [
@@ -136,8 +132,60 @@ class AdminUserMembershipsTests(TestCase):
                 "Pending",
                 date_format(self.user_membership.created_datetime, format="SHORT_DATE_FORMAT"),
                 "—",
-                "",
+                "Approve",
             ]
         ]
 
         self.assertListEqual(expected_rows, rows)
+
+    def test_should_approve_unapproved_user_membership(self) -> None:
+        # When
+        self.user_membership.approved_datetime = None
+        self.user_membership.save()
+
+        response = self.client.post(
+            self.url, data={"action": "approve_user_membership", "user_membership_id": self.user_membership.id}
+        )
+
+        # Then
+        self.assertEqual(200, response.status_code)
+        self.assertTemplateUsed(response, "admin_user_memberships.html")
+        self.assertTemplateUsed(response, "admin_user_membership_actions.html")
+
+        rows = parse_response_table_rows(response)
+
+        expected_rows = [
+            [
+                self.user.get_full_name(),
+                self.user_membership.membership_option.name,
+                "1 month",
+                "Active",
+                date_format(self.user_membership.created_datetime, format="SHORT_DATE_FORMAT"),
+                date_format(timezone.now().astimezone(self.time_zone), format="SHORT_DATE_FORMAT"),
+                "",
+            ]
+        ]
+        self.assertListEqual(expected_rows, rows)
+
+        expected_messages = ["Membership Approved"]
+        self.assertListEqual(expected_messages, response.context["show_messages"])
+
+    def test_should_not_re_approve_user_membership(self) -> None:
+        # When
+        response = self.client.post(
+            self.url, data={"action": "approve_user_membership", "user_membership_id": self.user_membership.id}
+        )
+
+        # Then
+        self.assertEqual(200, response.status_code)
+        self.assertTemplateUsed(response, "admin_user_memberships.html")
+        self.assertTemplateUsed(response, "admin_user_membership_actions.html")
+
+        self.assertEqual(None, response.context.get("show_messages"))
+
+    def test_should_not_approve_user_membership_with_invalid_id(self) -> None:
+        # When
+        response = self.client.post(self.url, data={"action": "approve_user_membership", "user_membership_id": -1})
+
+        # Then
+        self.assertEqual(400, response.status_code)

@@ -1,6 +1,8 @@
 from django.contrib.auth.models import User
 from django.test import TestCase
 
+from ...test.utils import parse_response_table_rows
+
 
 class AdminUserListTests(TestCase):
     def setUp(self) -> None:
@@ -73,26 +75,8 @@ class AdminUserListTests(TestCase):
         # Then
         self.assertEqual(200, response.status_code)
 
-        rows = []
-        for row in response.context["table"].rows:
-            row_cells = [cell for cell in row.cells]
+        rows = parse_response_table_rows(response)
 
-            # Ignore the actions column
-            row_cells.pop()
-
-            rows.append(row_cells)
-
-        expected_rows = [[self.user.get_full_name(), self.user.email]]
+        expected_rows = [[self.user.get_full_name(), self.user.email, "View"]]
 
         self.assertListEqual(expected_rows, rows)
-
-    def test_should_show_expected_actions(self) -> None:
-        # Given
-        self.client.force_login(self.user)
-
-        # When
-        response = self.client.get("/users/list/")
-
-        actions = list(response.context["table"].rows[0])[-1]
-
-        self.assertRegex(actions, rf"\/users\/view\/{self.user.pk}\/")

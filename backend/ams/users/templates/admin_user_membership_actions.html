@@ -1,0 +1,13 @@
+{% load static i18n %}
+<ul style="list-style-type: none; margin: 0; padding: 0">
+    <li>
+        {% if not record.approved_datetime %}
+            <form method="post" id="approve-membership-form" action="">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="approve_user_membership">
+                <input type="hidden" name="user_membership_id" value="{{ record.pk }}">
+                <a href="javascript:void(0)" onclick="document.getElementById('approve-membership-form').submit()" title="Approve">&#x2713;</a>
+            </form>
+        {% endif %}
+    </li>
+</ul>
