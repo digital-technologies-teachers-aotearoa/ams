@@ -15661,6 +15661,12 @@ header {
 .card-photo {
   border: 2px solid #ffffff;
 }
+.card-photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 
 .card-graphic {
   padding: 40px;
