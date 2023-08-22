@@ -15840,12 +15840,12 @@ header {
   text-decoration: underline;
 }
 
-.btn-form-register {
+.btn-form-submit-hollow {
   background-color: #1a4c54;
   color: #ffffff;
 }
 
-.btn-form-signin {
+.btn-form-submit {
   background-color: #1a4c54;
   color: #ffffff;
 }
@@ -16081,4 +16081,34 @@ header {
 
 .membership-option-organisation:before {
   content: "\f0c0";
+}
+
+.content a {
+  color: #ffffff;
+  text-decoration: underline;
+}
+.content a:hover {
+  color: #ffffff;
+}
+
+.content a[href^="http://"],
+.content a[href^=https],
+.content a.external {
+  padding-right: 13px;
+  padding-right: 0.8125rem;
+  margin-right: 4px;
+  margin-right: 0.25rem;
+  position: relative;
+}
+.content a[href^="http://"]:after,
+.content a[href^=https]:after,
+.content a.external:after {
+  font: var(--fa-font-solid);
+  content: "\f08e";
+  position: absolute;
+  right: 0;
+  top: -2px;
+  top: -0.125rem;
+  font-size: 10px;
+  font-size: 0.625rem;
 }

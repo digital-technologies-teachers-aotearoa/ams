@@ -60,12 +60,14 @@
   }
 }
 
-.btn-form-register {
-  background-color: $page-colour-background;
-  color: $white;
+.btn-form-submit-hollow {
+  background-color: $btn-submit-hollow-colour-background;
+  color: $btn-submit-hollow-colour-text;
 }
 
-.btn-form-signin {
-  background-color: $page-colour-background;
-  color: $white;
+.btn-form-submit {
+  background-color: $btn-submit-colour-background;
+  color: $btn-submit-colour-text;
 }
+
+

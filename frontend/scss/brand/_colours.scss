@@ -64,6 +64,17 @@ $btn-view-colour-background-hover: $brand-cream-light;
 $btn-view-colour-text: $brand-green;
 $btn-view-colour-text-hover: $brand-green;
 
+// Buttons - Forms
+$btn-submit-colour-background: $brand-green; // Inside of the panels
+$btn-submit-colour-background-hover: $brand-green;
+$btn-submit-colour-text: $white;
+$btn-submit-colour-text-hover: $white;
+
+$btn-submit-hollow-colour-background: $brand-green; // Panel edge buttons
+$btn-submit-hollow-colour-background-hover: $brand-green;
+$btn-submit-hollow-colour-text: $white;
+$btn-submit-hollow-colour-text-hover: $white;
+
 // Footer
 $footer-panel-background: $brand-lime;
 
@@ -79,3 +90,7 @@ $membership-option-colour-text: $text-dark;
 $membership-option-colour-text-hover: $text-dark;
 $membership-option-colour-icon: $brand-green;
 $membership-option-colour-icon-hover: $brand-green-light;
+
+// Content - Links 
+$link-text-colour: $white;
+$link-text-colour-hover: $white;
