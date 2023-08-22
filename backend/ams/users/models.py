@@ -9,9 +9,21 @@ from django.db.models import (
     ForeignKey,
     Model,
     TextChoices,
+    TextField,
 )
 from django.utils.translation import gettext_lazy as _
 from relativedeltafield import RelativeDeltaField
+
+
+class OrganisationType(Model):
+    name = CharField(max_length=255, unique=True)
+
+
+class Organisation(Model):
+    name = CharField(max_length=255)
+    type = ForeignKey(OrganisationType, on_delete=CASCADE, related_name="organisations")
+    postal_address = TextField(blank=True)
+    office_phone = CharField(max_length=255, blank=True)
 
 
 class MembershipOptionType(TextChoices):

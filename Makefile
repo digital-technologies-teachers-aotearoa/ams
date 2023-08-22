@@ -18,7 +18,7 @@ developer:
 	./docker_compose exec -T db createdb --username=postgres "$(APPLICATION_DB_NAME)"
 	./docker_compose run -T --rm --entrypoint="poetry install" backend
 	./docker_compose run -T --rm --entrypoint="poetry run ./manage.py migrate" backend
-	./docker_compose run -T --rm --entrypoint="poetry run ./manage.py loaddata membership_options" backend
+	./docker_compose run -T --rm --entrypoint="poetry run ./manage.py loaddata membership_options organisation_types" backend
 	./docker_compose run -T --rm --entrypoint="poetry run ./manage.py createsuperuser --noinput" backend
 
 .PHONY: db-shell

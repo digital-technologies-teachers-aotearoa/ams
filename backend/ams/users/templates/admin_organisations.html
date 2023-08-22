@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load static wagtailcore_tags i18n %}
+{% load render_table from django_tables2 %}
+
+{% block title %}{% translate "Organisations" %}{% endblock title %}
+
+{% block body_class %}admin-organisations{% endblock %}
+
+{% block content %}
+
+{% include "show_messages.html" %}
+
+<h1>{% translate "Organisations" %}</h1>
+
+<div style="float: right; text-align:center">
+    <ul style="list-style-type: none; margin: 0; padding: 0">
+        <li><a href="{% url "admin-create-organisation" %}">{% translate "Create New" %}</a></li>
+    </ul>
+</div>
+
+
+{% if table.rows %}
+    {% render_table table %}
+{% else %}
+    <p>{% translate "There are no organisations in the system" %}</p>
+{% endif %}
+
+{% endblock content %}
