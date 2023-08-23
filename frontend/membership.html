@@ -55,8 +55,26 @@
         Your membership is active (expires in 27 days)
       </p>
       <div class="user-details-status">
-        <p class="user-details-info"><span class="user-details-text">You are logged in as:</span> <span class="user-details-name">Amanda Turnbull</span> <a href="#" class="user-details-logout">Sign out</a> <img class="user-details-image" src=""></p>
+        <p class="user-details-info">
+          <!--
+          <span class="user-details-text">You are logged in as:</span>
+          <span class="user-details-name">Amanda Turnbull</span>
+          <a href="#" class="user-details-logout">Sign out</a>
+          <img class="user-details-image" src="">
+           -->
+          <a class="user-details-login" href="/users/login/?next=/">Log In</a>
+          <a class="user-details-signup" href="/membership/">Sign Up</a>
+        </p>
         <a href="#" class="user-details-lang">English</a>
+        <div class="dropdown">
+          <button class="user-details-admin-btn" type="button" id="adminNavMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          </button>
+          <div class="dropdown-menu dropdown-menu-right" aria-labelledby="adminNavMenuButton">
+            <a class="dropdown-item" href="#">Users</a>
+            <a class="dropdown-item" href="#">Users Memberships</a>
+            <a class="dropdown-item" href="#">Organisations</a>
+          </div>
+        </div>
       </div>
     </div>
   </div>

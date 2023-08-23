@@ -109,3 +109,17 @@
   display: flex;
   align-items: center;
 }
+
+.user-details-admin-btn {
+  @include rem(width, 54px);
+  @include rem(height, 54px);
+  border: 0;
+  text-align: center;
+  line-height: auto;
+
+  &:after {
+    font: var(--fa-font-solid);
+    content: "\f013";
+    font-size: 22px;
+  }
+}
