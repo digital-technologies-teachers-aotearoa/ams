@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static wagtailcore_tags i18n localize_url %}
+{% load static wagtailcore_tags i18n localize_url invalid_field %}
 
 {% block title %}{% translate "Create Organisation" %}{% endblock title %}
 
@@ -7,30 +7,42 @@
 
 {% block content %}
 
-<h1>{% translate "Create Organisation" %}</h1>
-
-<form action="" method="post">
-    {% csrf_token %}
-    <h2>{% translate "Organisation Details" %}</h2>
-
-    <div class="organisation-detail-fields">
-        {% for field in form %}
-            <div class="form-group">
-                <div class="form-label">
-                    {{ field.label_tag }}
-                </div>
-                <div class="form-input">
-                    <!-- TODO: use add_invalid_field_class -->
-                    {{ field }}
-                    {{ field.errors }}
-                </div>
-            </div>
-        {% endfor %}
+<div class="row">
+    <div class="col">
+    <div class="introduction">
+        <h1 class="introduction-heading standard-page">{% translate "Create Organisation" %}</h1>
+        <p class="introduction-content standard-page"></p>
     </div>
-
-    <div class="form-actions">
-        <input class="btn btn-form-cancel" type="button" value="Cancel" onClick="window.location='{{ "users/organisations/" | localize_url }}';">
-        <input class="btn btn-form-submit" type="submit" value="Create">
     </div>
-</form>
+</div>
+
+<div class="row no-gutters">
+<div class="col-lg-9">
+    <!-- TODO: replace form-panel-registration with a generic form-panel class -->
+    <form class="form-panel form-panel-registration" action="" method="post">
+        {% csrf_token %}
+        <h2 class="form-panel-heading">{% translate "Organisation Details" %}</h2>
+
+        <div class="organisation-detail-fields">
+            {% for field in form %}
+                <div class="form-group">
+                    <div class="form-label">
+                        {{ field.label_tag }}
+                    </div>
+                    <div class="form-input">
+                        {{ field | add_invalid_field_class }}
+                        {{ field.errors }}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="form-actions">
+            <input class="btn btn-form-cancel" type="button" value="Cancel" onClick="window.location='{{ "users/organisations/" | localize_url }}';">
+            <input class="btn btn-form-submit" type="submit" value="Create">
+        </div>
+    </form>
+</div>
+</div>
+
 {% endblock %}
