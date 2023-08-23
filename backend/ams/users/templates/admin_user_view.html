@@ -10,23 +10,25 @@
 
 {% include "show_messages.html" %}
 
-<div style="float:left; margin: 10px;">
-    
-    <div style="font-size: 100pt; text-align: center;"> &#x1F464; </div>
-    <h1>
-        {% if user_detail.first_name %}
-            {{user_detail.get_full_name}}
-        {% else %}
-            {{user_detail.username}}
-        {% endif %}
-    </h1>
+<table>
+    <tr>
+        <td style="padding: 10px">
+            <img class="user-details-image" src="" style="width: 128px; height: 128px;">
+            <h1>
+                {% if user_detail.first_name %}
+                    {{user_detail.get_full_name}}
+                {% else %}
+                    {{user_detail.username}}
+                {% endif %}
+            </h1>
 
-    <p><a href="mailto:{{user_detail.email | urlencode}}">{{user_detail.email}}</a></p>
-
-</div>
-
-<h1>{% translate "Memberships" %}</h1>
-
-{% render_table table %}
+            <p><a href="mailto:{{user_detail.email | urlencode}}">{{user_detail.email}}</a></p>
+        </td>
+        <td valign="top">
+            <h1>{% translate "Memberships" %}</h1>
+            {% render_table table %}
+        </td>
+    </tr>
+</table>
 
 {% endblock content %}
