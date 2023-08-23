@@ -6,7 +6,7 @@
                 {% csrf_token %}
                 <input type="hidden" name="action" value="approve_user_membership">
                 <input type="hidden" name="user_membership_id" value="{{ record.pk }}">
-                <a href="javascript:void(0)" onclick="document.getElementById('approve-membership-form').submit()" title="Approve">&#x2713;</a>
+                <a href="javascript:void(0)" onclick="document.getElementById('approve-membership-form').submit()" title="Approve"><i class="fa-solid fa-check"></i></a>
             </form>
         {% endif %}
     </li>
