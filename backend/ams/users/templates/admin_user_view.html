@@ -21,8 +21,9 @@
                     {{user_detail.username}}
                 {% endif %}
             </h1>
-
-            <p><a href="mailto:{{user_detail.email | urlencode}}">{{user_detail.email}}</a></p>
+            <div class="content">
+                <p><a href="mailto:{{user_detail.email | urlencode}}">{{user_detail.email}}</a></p>
+            </div>
         </td>
         <td valign="top">
             <h1>{% translate "Memberships" %}</h1>
