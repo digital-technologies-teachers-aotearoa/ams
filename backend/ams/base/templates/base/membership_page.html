@@ -5,13 +5,17 @@
 
 {% block content %}
 
-<h1>{{ page.heading }}</h1>
 
-<p>{{ page.body|richtext }}</p>
+<h1 class="introduction-heading membership-page">{{ page.heading }}</h1>
+<div class="introduction-content membership-page">
+  <p>{{ page.body|richtext }}</p>
+</div>
 
-<div class="membership-options" style="text-align: center">
-    <a href="{% url "registration_register" %}">{% translate "Individual" %}</a>
-    <a href="#">{% translate "Organisation" %}</a>
+<div class="col-lg-12">
+    <div class="membership-options" style="text-align: center">
+      <a class="membership-option membership-option-individual" href="{% url "registration_register" %}">{% translate "Individual" %}</a>
+      <a class="membership-option membership-option-organisation" href="#">{% translate "Organisation" %}</a>
+    </div>
 </div>
 
 {% endblock content %}
