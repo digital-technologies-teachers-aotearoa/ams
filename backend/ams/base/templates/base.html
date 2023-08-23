@@ -111,27 +111,15 @@
                 <a href="#" class="user-details-lang">English</a>
 
                 {% if user.is_staff %}
-                    <script>
-                        function toggleAdminNavMenu() {
-                            var navMenuDiv = document.getElementById("admin-nav-menu");
-                            if(navMenuDiv) {
-                                navMenuDiv.style.display = navMenuDiv.style.display === "block" ? "none" : "block";
-                            }
-                        }
-
-                    </script>
-
-                    <a href="#" onClick="toggleAdminNavMenu();" style="margin-left: 10px; text-decoration: none;">&#9881;</a>
-
-                    <div id="admin-nav-menu" style="display: none;">
-                        <div style="float: right; text-align:center; border: 2px solid black; margin: 5px; padding: 5px; border-radius: 5px; width:200px">
-                            <ul style="list-style-type: none; margin: 0; padding: 0">
-                                <li><a href="{% url "admin-user-list" %}">{% translate "Users" %}</a></li>
-                                <li><a href="{% url "admin-user-memberships" %}">{% translate "User Memberships" %}</a></li>
-                                <li><a href="{% url "admin-organisations" %}">{% translate "Organisations" %}</a></li>
-                            </ul>
-                        </div>
+                  <div class="dropdown">
+                    <button class="user-details-admin-btn" type="button" id="adminNavMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="adminNavMenuButton" style="">
+                      <a class="dropdown-item" href="{% url "admin-user-list" %}">{% translate "Users" %}</a>
+                      <a class="dropdown-item" href="{% url "admin-user-memberships" %}">{% translate "User Memberships" %}</a>
+                      <a class="dropdown-item" href="{% url "admin-organisations" %}">{% translate "Organisations" %}</a>
                     </div>
+                  </div>
                 {% endif %}
                 </p>
               </div>

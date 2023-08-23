@@ -141,7 +141,7 @@ class UserStatusTests(TestCase):
 
         # When
         response = self.client.get("/")
-        self.assertContains(response, "admin-nav-menu")
+        self.assertContains(response, "user-details-admin-btn")
 
     def test_should_not_include_admin_menu_for_non_admin_user(self) -> None:
         # Given
@@ -152,4 +152,4 @@ class UserStatusTests(TestCase):
 
         # When
         response = self.client.get("/")
-        self.assertNotContains(response, "admin-nav-menu")
+        self.assertNotContains(response, "user-details-admin-btn")
