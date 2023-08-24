@@ -116,6 +116,7 @@
   border: 0;
   text-align: center;
   line-height: auto;
+  background-color: $user-details-colour-background;
 
   &:after {
     font: var(--fa-font-solid);

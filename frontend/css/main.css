@@ -15798,6 +15798,7 @@ header {
   border: 0;
   text-align: center;
   line-height: auto;
+  background-color: #e6e6e6;
 }
 .user-details-admin-btn:after {
   font: var(--fa-font-solid);
@@ -16036,6 +16037,11 @@ header {
   font-weight: 500;
 }
 
+.btn-small {
+  padding: 10px 20px 10px 20px;
+  padding: 0.625rem 1.25rem 0.625rem 1.25rem;
+}
+
 .btn:hover {
   text-decoration: none;
 }
@@ -16097,6 +16103,14 @@ header {
 
 .btn-form-submit {
   background-color: #1a4c54;
+  color: #ffffff;
+}
+
+.btn-table-action {
+  background-color: #1a4c54;
+  color: #ffffff;
+}
+.btn-table-action:hover {
   color: #ffffff;
 }
 
@@ -16285,6 +16299,17 @@ header {
 }
 .table a:hover {
   color: #000;
+}
+
+.table-actions {
+  float: right;
+  margin-bottom: 15px;
+}
+
+th.orderable:after {
+  font: var(--fa-font-solid);
+  content: "\f338";
+  font-size: 16px;
 }
 
 .kitchen-sink-component {

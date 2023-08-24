@@ -6,6 +6,10 @@
   font-weight: 500;
 }
 
+.btn-small {
+  @include rem(padding, 10px 20px 10px 20px);
+}
+
 .btn:hover {
   text-decoration: none;
 }
@@ -68,6 +72,15 @@
 .btn-form-submit {
   background-color: $btn-submit-colour-background;
   color: $btn-submit-colour-text;
+}
+
+.btn-table-action {
+  background-color: $btn-table-action-colour-background;
+  color: $white;
+
+  &:hover {
+    color: $white;
+  }
 }
 
 
