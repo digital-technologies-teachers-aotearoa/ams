@@ -1,11 +1,11 @@
 .membership-option {
   @include rem(padding, 30px 50px 30px 80px);
   @include rem(font-size, 32px);
+  @include rem(margin, 10px);
   position: relative;
   background-color: #eee;
   color: $membership-option-colour-text;
   display: inline-block;
-  margin: 10px;
   
   &:hover {
     color: $membership-option-colour-text-hover;
@@ -16,11 +16,11 @@
 
   &:before {
     font: var(--fa-font-solid);
-    font-size: 22px;
-    left: 30px;
+    @include rem(font-size, 22px);
+    @include rem(left, 30px);
+    @include rem(margin-top, -11px);
     position: absolute;
     top: 50%;
-    margin-top: -11px;
     color: $membership-option-colour-icon;
   }
 

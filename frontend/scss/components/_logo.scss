@@ -8,8 +8,8 @@
 
 .logo-main {
   @include rem(margin-bottom, 10px);
+  @include rem(margin-right, 30px);
   display: inline-block;
-  margin-right: 30px;
 }
 
 .logo-tagline {

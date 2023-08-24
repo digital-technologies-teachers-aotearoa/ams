@@ -46,6 +46,10 @@
   }
 }
 
+.form-control {
+  border: 1px solid $form-colour-border;
+}
+
 .form-label {
   font-size: 18px;
   font-weight: 500;
@@ -76,7 +80,7 @@
 .form-input-short {
   input {
     @include media-breakpoint-up(sm) {
-      max-width: 265px;
+      @include rem(max-width, 265px);
     }
   }
 }
@@ -85,6 +89,12 @@
   position: absolute;
   right: 0;
   bottom: 0;
+}
+
+.form-actions-standard {
+  position: absolute;
+  @include rem(right, 30px);
+  @include rem(bottom, 30px);
 }
 
 .form-actions-signin {
