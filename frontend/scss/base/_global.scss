@@ -1,0 +1,17 @@
+html {
+  background-color: $page-colour-foreground;
+}
+
+main {
+  @include rem(padding, 100px 0 140px 0);
+  background-color: $page-colour-background;
+  color: $brand-lime;
+}
+
+.container {
+  @include rem(max-width, 1324px);
+}
+
+img {
+  max-width: 100%;
+}

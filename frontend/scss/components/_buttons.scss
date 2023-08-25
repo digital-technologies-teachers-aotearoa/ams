@@ -1,0 +1,86 @@
+.btn {
+  @include rem(padding, 20px 30px 20px 30px);
+  @include rem(font-size, 16px);
+  border: 0;
+  display: inline-block;
+  font-weight: 500;
+}
+
+.btn-small {
+  @include rem(padding, 10px 20px 10px 20px);
+}
+
+.btn:hover {
+  text-decoration: none;
+}
+
+.btn-hollow {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background-color: $page-colour-background;
+  color: $white;
+}
+
+.btn-hollow:hover {
+  color: $white;
+}
+
+.btn-view {
+  background-color: $btn-view-colour-background;
+  color: $btn-view-colour-text;
+  float: right;
+}
+
+.btn-view:hover {
+  color: $btn-view-colour-text-hover;
+}
+
+.btn-hollow-footer {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background-color: $footer-colour-background;
+  color: $white;
+}
+
+.btn-hollow-footer:hover {
+  color: $white;
+}
+
+.btn-wrapper {
+  @include media-breakpoint-down(sm) {
+    @include rem(max-width, 520px);
+    margin: 0 auto;
+  }
+}
+
+.btn-form-cancel {
+  background-color: transparent;
+  text-decoration: underline;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.btn-form-submit-hollow {
+  background-color: $btn-submit-hollow-colour-background;
+  color: $btn-submit-hollow-colour-text;
+}
+
+.btn-form-submit {
+  background-color: $btn-submit-colour-background;
+  color: $btn-submit-colour-text;
+}
+
+.btn-table-action {
+  background-color: $btn-table-action-colour-background;
+  color: $white;
+
+  &:hover {
+    color: $white;
+  }
+}
+
+

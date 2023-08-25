@@ -1,0 +1,42 @@
+.membership-option {
+  @include rem(padding, 30px 50px 30px 80px);
+  @include rem(font-size, 32px);
+  @include rem(margin, 10px);
+  position: relative;
+  background-color: #eee;
+  color: $membership-option-colour-text;
+  display: inline-block;
+  
+  &:hover {
+    color: $membership-option-colour-text-hover;
+    &:before {
+      color: $membership-option-colour-icon-hover;
+    }
+  }
+
+  &:before {
+    font: var(--fa-font-solid);
+    @include rem(font-size, 22px);
+    @include rem(left, 30px);
+    @include rem(margin-top, -11px);
+    position: absolute;
+    top: 50%;
+    color: $membership-option-colour-icon;
+  }
+
+  @include media-breakpoint-down(xs) {
+    display: block;
+  }
+}
+
+.membership-option-individual {
+  &:before {
+    content: "\f007";
+  }
+}
+
+.membership-option-organisation {
+  &:before {
+    content: "\f0c0";
+  }
+}

@@ -1,0 +1,220 @@
+.navbar {
+  display: block;
+  @include media-breakpoint-down(md) {
+    clear: both;
+  }
+}
+
+.navbar.collapse {
+  &:not(.show) {
+    @include media-breakpoint-up(lg) {
+      display: block;
+    }
+  }
+}
+
+// Open and close button
+.navbar-toggle {
+  @include rem(padding, 10px);
+  @include rem(line-height, 1px);
+  @include rem(right, 15px);
+  @include rem(top, 15px);
+  position: absolute;
+  background-color: $navbar-toggle-colour-background;
+  color: $navbar-toggle-colour;
+  border: 0;
+  width: 50px;
+  height: 50px;
+  text-align: center;
+  line-height: auto;
+
+  &:after {
+    font: var(--fa-font-solid);
+    content: "\f00d";
+    font-size: 26px;
+  }
+
+  &.collapsed {
+    &:after {
+      font: var(--fa-font-solid);
+      content: "\f0c9";
+      font-size: 26px;
+    }
+  }
+
+  @include media-breakpoint-up(lg) {
+    display: none;
+  }
+}
+
+.navbar-links {
+  list-style: none;
+  padding-left: 0;
+  margin-bottom: 0;
+  @include media-breakpoint-up(lg) {
+    display: flex;
+  }
+}
+
+.navbar-item {
+  border-bottom: 1px solid $navbar-line-colour;
+  position: relative;
+  @include media-breakpoint-up(lg) {
+    @include rem(margin-right, 65px);
+    border-bottom: 0;
+  }
+  &:last-child {
+    border-bottom: 0;
+  }
+}
+
+.navbar-item:last-child {
+  margin-right: 0;
+}
+
+.navbar-link {
+  @include media-breakpoint-up(lg) {
+    border-bottom: 4px solid transparent;
+  }
+  @include rem(padding, 11px 0 11px 0);
+  position: relative;
+  color: $white;
+  text-decoration: none;
+  font-size: 18px;
+  font-weight: 500;
+  display: block;
+}
+
+.navbar-link:hover {
+  @include media-breakpoint-up(lg) {
+    border-bottom: 4px solid $navbar-colour-border-hover;
+  }
+  @include media-breakpoint-down(md) {
+    @include rem(padding, 11px 10px 11px 10px);
+    background-color: $grey-light;
+  }
+  color: $white;
+  text-decoration: none;
+}
+
+.navbar-item.current {
+  .navbar-link {
+    color: $white;
+    text-decoration: none;
+    @include media-breakpoint-up(lg) {
+      border-bottom: 4px solid $navbar-colour-border-current;
+    }
+  }
+}
+
+.navbar-item.has-children {
+  @include media-breakpoint-up(lg) {
+    @include rem(padding-right, 38px);
+  }
+}
+
+.navbar-item:hover {
+  @include media-breakpoint-up(lg) {
+    .navbar-sublinks {
+      display: block !important;
+    }
+  }
+}
+
+.navbar-sublinks-toggle {
+  position: absolute;
+  background-color: transparent;
+  border: 0;
+  right: 0;
+  top: 0;
+  width: 50px;
+  height: 50px;
+  text-align: center;
+  line-height: auto;
+
+  @include media-breakpoint-up(lg) {
+    width: 28px;
+  }
+
+  &:after {
+    font: var(--fa-font-solid);
+    content: "\f077";
+    font-size: 20px;
+    color: $white;
+  }
+
+  &.collapsed {
+    &:after {
+      font: var(--fa-font-solid);
+      content: "\f078";
+      font-size: 20px;
+      color: $white;
+    }
+  }
+
+  @include media-breakpoint-down(md) {
+    &:hover {
+      background-color: $grey-light;
+    }
+  }
+}
+
+.navbar-sublinks {
+  padding-left: 0;
+  margin-left: 0;
+  list-style: none;
+  border-top: 1px solid $navbar-line-colour;
+  @include media-breakpoint-up(lg) {
+    @include rem(min-width, 182px);
+    display: none;
+    border-top: 0;
+    position: absolute;
+    background-color: $navbar-colour-submenu-desktop-background;
+    z-index: 2;
+  }
+}
+
+.navbar-sublink.collapse {
+  &:not(.show) {
+    @include media-breakpoint-up(lg) {
+      display: block;
+    }
+  }
+}
+
+.navbar-subitem {
+  color: $white;
+  border-bottom: 1px solid $navbar-line-colour;
+  @include media-breakpoint-up(lg) {
+    border: 0;
+  }
+}
+
+.navbar-subitem:last-child {
+  border-bottom: 0;
+}
+
+.navbar-sublink {
+  @include rem(padding, 8px 0 8px 30px);
+  display: block;
+  color: $white;
+  font-size: 16px;
+  @include media-breakpoint-up(lg) {
+    @include rem(padding, 14px 20px 14px 20px);
+    color: $text-dark;
+  }
+}
+
+.navbar-sublink:hover {
+  color: $white;
+  text-decoration: none;
+
+  @include media-breakpoint-down(md) {
+    background-color: $grey-light;
+  }
+
+  @include media-breakpoint-up(lg) {
+    color: $text-dark;
+    background-color: $navbar-colour-submenu-desktop-background-hover;
+  }
+}

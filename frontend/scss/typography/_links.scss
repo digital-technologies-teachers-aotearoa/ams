@@ -1,0 +1,27 @@
+.content {
+  a {
+    color: $link-text-colour;
+    text-decoration: underline;
+
+    &:hover {
+      color: $link-text-colour-hover;
+    }
+  }
+}
+
+.content a[href^="http://"],
+.content a[href^="https"],
+.content a.external {
+  @include rem(padding-right, 13px);
+  @include rem(margin-right, 4px);
+  position: relative;
+
+  &:after {
+    font: var(--fa-font-solid);
+    content: "\f08e";
+    position: absolute;
+    right: 0;
+    @include rem(top, -2px);
+    @include rem(font-size, 10px);
+  }
+}

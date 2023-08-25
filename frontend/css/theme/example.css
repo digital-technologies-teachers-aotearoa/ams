@@ -1,0 +1,206 @@
+﻿/* Main */
+main {
+  background-color: #fff;
+}
+
+body {
+  color: black;
+}
+h1 {
+  color: red;
+}
+h2 {
+  color: red;
+}
+h3 {
+  color: red;
+}
+h4 {
+  color: red;
+}
+h5 {
+  color: red;
+}
+
+
+
+/* Header */
+header {
+  background-color: #fff;
+}
+
+
+
+/* Navbar */
+.navbar-toggle {
+  background-color: red;
+  color: white;
+}
+
+.navbar-toggle:hover {
+  background-color: black;
+  color: white;
+}
+
+
+
+.navbar-link {
+  color: red;
+}
+.navbar-link:hover {
+  color: red;
+  border-color: red;
+}
+.navbar-item.current .navbar-link {
+  color: red;
+  border-bottom-color: red;
+}
+.navbar-sublinks-toggle::after {
+  color: red !important;
+}
+
+
+
+/* Submenu */
+@media only screen and (min-width: 992px) {
+  .navbar-sublinks {
+    background-color: red;
+  }
+  .navbar-sublink {
+    color: white;
+  }
+  .navbar-sublink:hover {
+    background-color: black;
+    color: white;
+  }
+}
+
+.navbar-sublink {
+  color: black;
+}
+
+.navbar-sublink:hover {
+  background-color: black;
+  color: white;
+}
+
+
+
+/* Userbar */
+.user-details-bar {
+  background-color: red;
+  color: white;
+}
+
+.user-details-bar a {
+  color: white;
+}
+
+.user-details-bar a:hover {
+  color: white;
+}
+
+.user-details-lang {
+  background-color: black;
+}
+
+
+
+/* Introduction */
+.introduction-heading {
+  color: red;
+}
+
+.introduction-content {
+  color: red;
+}
+
+
+
+/* Cards */
+.card-standard {
+  background-color: black;
+  border-color: red;
+  color: white;
+}
+
+.card-photo {
+  border-color: red;
+}
+
+.card-discussion-title {
+  color: red;
+}
+
+.card-discussion-heading {
+  color: white;
+}
+
+.card-discussion {
+  background-color: red;
+  color: white;
+}
+
+.card-discussion-content {
+  color: white;
+}
+
+
+
+/* Button */
+.btn-hollow {
+  background-color: white;
+  color: red;
+}
+
+.btn-hollow:hover {
+  color: red;
+}
+
+.btn-view {
+  background-color: red;
+  color: white;
+}
+
+.btn-view:hover {
+  color: white;
+}
+
+.btn-hollow-footer {
+  background-color: black;
+}
+
+.btn-form-register {
+  background-color: white;
+  color: black;
+}
+
+
+
+/* Footer */
+.footer-main {
+  background-color: black;
+  color: white;
+}
+
+.footer-copyright {
+  background-color: red;
+  color: white;
+}
+
+.footer-panel {
+  background-color: red;
+  color: white;
+}
+
+
+
+/* Forms */
+.form-panel {
+  background-color: red;
+  color: white;
+}
+
+.form-divider {
+  color: white;
+}

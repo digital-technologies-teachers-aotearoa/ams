@@ -1,0 +1,31 @@
+.table-container {
+  @include rem(padding, 40px);
+  background-color: $brand-lime-faded;
+}
+
+.table,
+.table thead th,
+.table td {
+  border-color: #000;
+}
+
+.table a {
+  color: #000;
+
+  &:hover {
+    color: #000;
+  }
+}
+
+.table-actions {
+  float: right;
+  margin-bottom: 15px;
+}
+
+th.orderable {
+  &:after {
+    font: var(--fa-font-solid);
+    content: "\f338";
+    font-size: 16px;
+  }
+}

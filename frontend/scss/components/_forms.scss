@@ -1,0 +1,149 @@
+.form-panel {
+  background-color: $form-colour-background;
+  color: $text-dark;
+}
+
+.form-panel-signup {
+  @include rem(padding, 30px 30px 30px 30px);
+  @include media-breakpoint-up(md) {
+    @include rem(padding, 52px 36px 63px 65px);
+  }
+}
+
+.form-panel-signup-details {
+  font-size: 24px;
+}
+
+.form-panel-signin {
+  @include rem(margin-bottom, 30px);
+  @include rem(padding, 30px 30px 30px 30px);
+  @include media-breakpoint-up(md) {
+    @include rem(padding, 52px 36px 63px 65px);
+  }
+}
+
+.form-panel-registration {
+  @include rem(padding, 43px 37px 67px 37px);
+  @include media-breakpoint-up(sm) {
+    @include rem(padding, 53px 57px 67px 76px);
+  }
+}
+
+.form-panel-standard {
+  @include rem(padding, 43px 37px 67px 37px);
+  @include media-breakpoint-up(sm) {
+    @include rem(padding, 53px 57px 67px 76px);
+  }
+}
+
+.form-panel-heading {
+  @include rem(margin-bottom, 30px);
+  font-size: 30px;
+  font-weight: 400;
+}
+
+.form-group {
+  @include rem(margin-bottom, 40px);
+  display: flex;
+  flex-wrap: wrap;
+
+  input {
+    @extend .form-control; // extends from vendor bootstrap
+    border: 1px solid $form-colour-border;
+  }
+}
+
+.form-control {
+  border: 1px solid $form-colour-border;
+}
+
+.form-label {
+  font-size: 18px;
+  font-weight: 500;
+  flex-basis: 100%;
+  @include media-breakpoint-up(sm) {
+    @include rem(max-width, 238px);
+    flex-basis: 0;
+    flex-grow: 1;
+  }
+}
+
+.form-input {
+  flex-basis: 100%;
+  @include media-breakpoint-up(sm) {
+    flex-basis: 0;
+    flex-grow: 1;
+  }
+}
+
+.form-radio {
+  flex-basis: 100%;
+  @include media-breakpoint-up(sm) {
+    flex-basis: 0;
+    flex-grow: 1;
+  }
+}
+
+.form-input-short {
+  input {
+    @include media-breakpoint-up(sm) {
+      @include rem(max-width, 265px);
+    }
+  }
+}
+
+.form-actions {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
+
+.form-actions-standard {
+  position: absolute;
+  @include rem(right, 30px);
+  @include rem(bottom, 30px);
+}
+
+.form-actions-signin {
+  display: flex;
+  justify-content: end;
+}
+
+.form-divider {
+  @include rem(margin-bottom, 30px);
+}
+
+.form-membership {
+  @include rem(margin-bottom, 40px);
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.form-membership-description {
+  font-size: 18px;
+  font-weight: 500;
+  flex-basis: 100%;
+  @include media-breakpoint-up(sm) {
+    @include rem(max-width, 238px);
+    flex-basis: 0;
+    flex-grow: 1;
+  }
+}
+
+.registration-membership-fields {
+  flex-basis: 100%;
+  @include media-breakpoint-up(sm) {
+    flex-basis: 0;
+    flex-grow: 1;
+  }
+}
+
+.form-forgot-password {
+  @include rem(padding, 20px 20px 20px 20px);
+  color: $text-dark;
+  text-decoration: underline;
+
+  &:hover {
+    color: $text-dark;
+  }
+}

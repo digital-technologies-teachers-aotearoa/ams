@@ -1,0 +1,126 @@
+.user-details-bar {
+  background-color: $user-details-colour-background;
+}
+
+.user-details-membership {
+  margin: 0;
+  @include media-breakpoint-down(lg) {
+    display: none;
+  }
+}
+
+.user-details-inner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  @include media-breakpoint-down(lg) {
+    justify-content: end;
+  }
+}
+
+.user-details-info {
+  float: right;
+  font-size: 12px;
+  margin: 0;
+}
+
+.user-details-text {
+  @include media-breakpoint-down(sm) {
+    display: none;
+  }
+}
+
+.user-details-name {
+  font-size: 16px;
+  @include media-breakpoint-down(xs) {
+    display: none;
+  }
+}
+
+.user-details-logout {
+  color: $text-dark;
+  font-weight: 500;
+  text-decoration: underline;
+}
+
+.user-details-login {
+  @include rem(padding, 0 10px 0 10px);
+  font-size: 18px;
+  color: $text-dark;
+  border-right: 2px solid $grey-light;
+
+  &:hover {
+    color: $text-dark;
+  }
+}
+
+.user-details-signup {
+  @include rem(padding, 0 10px 0 10px);
+  font-size: 18px;
+  color: $text-dark;
+  &:hover {
+    color: $text-dark;
+  }
+}
+
+.user-details-logout:hover {
+  color: $text-dark;
+}
+
+.user-details-image {
+  width: 46px;
+  height: 46px;
+  background-color: #333;
+  border-radius: 100%;
+  border: 1px solid #333;
+  margin-left: 15px;
+}
+
+.user-details-lang {
+  @include rem(padding, 15px 60px 15px 20px);
+  position: relative;
+  float: right;
+  right: 0;
+  top: 0;
+  color: $text-dark;
+  background-color: $user-details-button-colour-background;
+  font-weight: 500;
+  margin-left: 20px;
+
+  &:after {
+    font: var(--fa-font-solid);
+    content: "\f1de";
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    margin-top: -11px;
+    font-size: 22px;
+  }
+
+}
+
+.user-details-lang:hover {
+  color: $text-dark;
+  text-decoration: none;
+}
+
+.user-details-status {
+  display: flex;
+  align-items: center;
+}
+
+.user-details-admin-btn {
+  @include rem(width, 54px);
+  @include rem(height, 54px);
+  border: 0;
+  text-align: center;
+  line-height: auto;
+  background-color: $user-details-colour-background;
+
+  &:after {
+    font: var(--fa-font-solid);
+    content: "\f013";
+    font-size: 22px;
+  }
+}
