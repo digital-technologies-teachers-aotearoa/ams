@@ -16159,6 +16159,17 @@ header {
   }
 }
 
+.form-panel-standard {
+  padding: 43px 37px 67px 37px;
+  padding: 2.6875rem 2.3125rem 4.1875rem 2.3125rem;
+}
+@media (min-width: 576px) {
+  .form-panel-standard {
+    padding: 53px 57px 67px 76px;
+    padding: 3.3125rem 3.5625rem 4.1875rem 4.75rem;
+  }
+}
+
 .form-panel-heading {
   margin-bottom: 30px;
   margin-bottom: 1.875rem;
