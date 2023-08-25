@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static wagtailcore_tags i18n localize_url invalid_field %}
+{% load static wagtailcore_tags i18n localize_url form_field %}
 
 {% block title %}{% translate "Create Organisation" %}{% endblock title %}
 
@@ -18,8 +18,7 @@
 
 <div class="row no-gutters">
 <div class="col-lg-9">
-    <!-- TODO: replace form-panel-registration with a generic form-panel class -->
-    <form class="form-panel form-panel-registration" action="" method="post">
+    <form class="form-panel form-panel-standard" action="" method="post">
         {% csrf_token %}
         <h2 class="form-panel-heading">{% translate "Organisation Details" %}</h2>
 
@@ -30,7 +29,7 @@
                         {{ field.label_tag }}
                     </div>
                     <div class="form-input">
-                        {{ field | add_invalid_field_class }}
+                        {{ field | add_form_field_classes }}
                         {{ field.errors }}
                     </div>
                 </div>
