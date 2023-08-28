@@ -1,9 +1,9 @@
-{% load menu_tags %}
+{% load menu_tags i18n localize_url %}
 {% if menu_items %}
 	<ul class="navbar-sublinks collapse" id="ddtoggle_{{ parent_page.pk }}">
 	{% for item in menu_items %}
 	    <li class="navbar-subitem {{ item.active_class }}{% if item.has_children_in_menu %} dropdown{% endif %}">
-	        <a href="{{ item.href }}" class="navbar-sublink">{{ item.text }}</a>
+	        <a href="{{ item.href | localize_url }}" class="navbar-sublink">{% translate item.text %}</a>
 	    </li>
 	{% endfor %}
 	</ul>

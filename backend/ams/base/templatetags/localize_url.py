@@ -6,6 +6,11 @@ register = template.Library()
 
 
 def localize_url(url_suffix: str) -> str:
+    if url_suffix.startswith("#") or url_suffix.find(":") != -1:
+        return url_suffix
+
+    url_suffix = url_suffix.removeprefix("/")
+
     current_language = get_language()
     if current_language == settings.LANGUAGE_CODE:
         return f"/{url_suffix}"
