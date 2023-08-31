@@ -86,7 +86,7 @@ class UserStatusTests(TestCase):
         response = self.client.get("/")
 
         # Then
-        self.assertContains(response, f"You are logged in as {self.user.first_name} {self.user.last_name}")
+        self.assertRegex(str(response.content), f"You are logged in as.+ {self.user.first_name} {self.user.last_name}")
 
     def test_should_show_logged_in_nameless_users_username(self) -> None:
         # Given
@@ -100,7 +100,7 @@ class UserStatusTests(TestCase):
         response = self.client.get("/")
 
         # Then
-        self.assertContains(response, f"You are logged in as {self.user.username}")
+        self.assertRegex(str(response.content), f"You are logged in as.+ {self.user.username}")
 
     def test_should_not_show_logged_out_users_name(self) -> None:
         # When
@@ -141,7 +141,7 @@ class UserStatusTests(TestCase):
 
         # When
         response = self.client.get("/")
-        self.assertContains(response, "admin-nav-menu")
+        self.assertContains(response, "user-details-admin-btn")
 
     def test_should_not_include_admin_menu_for_non_admin_user(self) -> None:
         # Given
@@ -152,4 +152,4 @@ class UserStatusTests(TestCase):
 
         # When
         response = self.client.get("/")
-        self.assertNotContains(response, "admin-nav-menu")
+        self.assertNotContains(response, "user-details-admin-btn")

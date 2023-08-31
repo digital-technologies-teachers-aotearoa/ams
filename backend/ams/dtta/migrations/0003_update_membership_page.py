@@ -8,14 +8,14 @@ from django.db import migrations
 def update_membership_page_content(apps: Any, schema_editor: Any) -> None:
     MembershipPage = apps.get_model("base.MembershipPage")
 
-    home_page = MembershipPage.objects.get(slug="membership")
-    home_page.body = (
+    membership_page = MembershipPage.objects.get(slug="membership")
+    membership_page.body = (
         "<p>We would like to encourage you to join DTTA. We cater for all levels and mediums and offer support, "
         "events and resources to all digital technology teachers.</p>"
         "<p>Membership is free for primary and Māori medium kaiako as we grow how we support everyone.</p>"
         "<p>You can sign up either individually or for your organisation.  Please select:</p>"
     )
-    home_page.save()
+    membership_page.save()
 
 
 class Migration(migrations.Migration):

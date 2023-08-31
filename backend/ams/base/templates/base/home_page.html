@@ -5,8 +5,18 @@
 
 {% block content %}
 
-<h1>{{ page.heading }}</h1>
-
-<p>{{ page.body|richtext }}</p>
+<div class="row row-introduction">
+    <div class="col">
+    <div class="introduction">
+        <h1 class="introduction-heading">
+            {{ page.heading }}
+            {% if page.subheading != "" %}
+                </br><span class="introduction-subheading">{{ page.subheading }}</span>
+            {% endif %}
+        </h1>
+        <p class="introduction-content">{{ page.body|richtext }}</p>
+    </div>
+    </div>
+</div>
 
 {% endblock content %}

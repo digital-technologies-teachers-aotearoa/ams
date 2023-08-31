@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static wagtailcore_tags i18n localize_url %}
+{% load static wagtailcore_tags i18n localize_url form_field %}
 
 {% block title %}{% translate "Membership Registration" %}{% endblock title %}
 
@@ -7,50 +7,75 @@
 
 {% block content %}
 
-<h1>{% translate "Membership Registration" %}</h1>
+    <div class="row">
+        <div class="col">
+        <div class="introduction">
+            <h1 class="introduction-heading standard-page">{% translate "Membership Registration" %}</h1>
+            <p class="introduction-content standard-page"></p>
+        </div>
+        </div>
+    </div>
 
-<form action="/users/individual-registration/" method="post">
-    {% csrf_token %}
+    <div class="row no-gutters">
+        <div class="col-lg-9">
 
-    <h2>{% translate "Personal Details" %}</h1>
+            <form class="form-panel form-panel-registration" action="/users/individual-registration/" method="post">
+            {% csrf_token %}
 
-    <div class="registration-personal-detail-fields">
-        {% for field in personal_detail_fields %}
-            <div class="fieldWrapper">
-                <span style="display: inline-block; width: 200px;">{{ field.label_tag }}</span> {{ field }}
-                {{ field.errors }}
-            </div>
-        {% endfor %}
-    </table>
+            <h2 class="form-panel-heading">{% translate "Personal Details" %}</h2>
 
-    <h2>{% translate "Membership" %}</h1>
-
-    <p>{% translate "Sign me up for ..." %}</p>
-
-    <div class="registration-membership-fields">
-            <div class="fieldWrapper">
-                {% for option in membership_option_field %}
-                    <div>
-                        <label for="{{option.id_for_label}}">
-                            {{option.tag}}
-                            <span>
-                                <strong>{{ option.data.value }}</strong>
-                                {{ option.choice_label }}
-                            </span>
-                        </label>
+            <div class="registration-personal-detail-fields">
+                {% for field in personal_detail_fields %}
+                    <div class="form-group">
+                        <div class="form-label">
+                            {{ field.label_tag }}
+                        </div>
+                        <div class="form-input">
+                            {{ field|add_form_field_classes }}
+                            {% if field.name == "email" %}
+                                <small id="emailHelp" class="form-text text-muted">{% translate "You will use your email to log in to the system." %}</small>
+                            {% endif %}
+                            {{ field.errors }}
+                        </div>
                     </div>
-                 {% endfor %}
-                 {{ membership_option_field.errors }}
+                {% endfor %}
             </div>
+
+            <hr class="form-divider"/>
+
+            <h2 class="form-panel-heading">Membership</h2>
+
+            <div class="form-membership">
+                <div class="form-membership-description">
+                    <p>{% translate "Sign me up for ..." %}</p>
+                </div>
+
+                <div class="registration-membership-fields">
+                        {% for option in membership_option_field %}
+                            <div>
+                                <label for="{{option.id_for_label}}">
+                                    {{option.tag}}
+                                    <span>
+                                        <strong>{{ option.data.value }}</strong>
+                                        {{ option.choice_label }}
+                                    </span>
+                                </label>
+                            </div>
+                        {% endfor %}
+                        {{ membership_option_field.errors }}
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <input class="btn btn-form-cancel" type="button" value="Cancel" onclick="window.location='/membership/';">
+                <input class="btn btn-form-submit-hollow" type="submit" value="Register">
+            </div>
+        </form>
+        </div>
+
+        <div class="col-lg-3">
+            <img src="/static/images/photos/form-image.png">
+        </div>
     </div>
-
-    <br/>
-
-    <div>
-        <input type="button" value="Cancel" onClick="window.location='{{ "membership/" | localize_url }}';">
-        <input type="submit" value="Register">
-    </div>
-
-</form>
 
 {% endblock content %}

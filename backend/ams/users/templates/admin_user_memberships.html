@@ -10,7 +10,13 @@
 
 {% include "show_messages.html" %}
 
-<h1>{% translate "User Memberships" %}</h1>
+<div class="row">
+    <div class="col">
+        <div class="introduction">
+            <h1 class="introduction-heading standard-page">{% translate "User Memberships" %}</h1>
+        </div>
+    </div>
+</div>
 
 {% render_table table %}
 
