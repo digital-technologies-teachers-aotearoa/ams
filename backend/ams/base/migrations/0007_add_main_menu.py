@@ -49,12 +49,17 @@ def create_main_menu(apps: Any, schema_editor: Any) -> None:
     membership_page.add_child(instance=about_page)
     membership_page.add_child(instance=policies_page)
 
-    # Populate main menu
     Site = apps.get_model("wagtailcore.Site")
     MainMenu = apps.get_model("wagtailmenus.MainMenu")
     MainMenuItem = apps.get_model("wagtailmenus.MainMenuItem")
 
-    main_menu = MainMenu.objects.create(site=Site.objects.get(), max_levels=2)
+    site = Site.objects.get()
+
+    # If there is already a main menu for this site, delete it
+    MainMenu.objects.filter(site=site).delete()
+
+    # Populate main menu
+    main_menu = MainMenu.objects.create(site=site, max_levels=2)
 
     MainMenuItem.objects.create(menu=main_menu, link_text="Forum", link_url="#", allow_subnav=True, sort_order=0)
     MainMenuItem.objects.create(menu=main_menu, link_text="Resources", link_url="#", allow_subnav=True, sort_order=1)
