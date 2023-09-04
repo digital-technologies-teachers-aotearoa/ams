@@ -65,3 +65,7 @@ start:
 .PHONY: stop
 stop:
 	./docker_compose down
+
+.PHONY: update-theme
+update-theme:
+	./update-theme.bash
