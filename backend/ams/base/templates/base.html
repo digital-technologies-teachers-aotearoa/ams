@@ -1,4 +1,4 @@
-{% load static wagtailcore_tags wagtailuserbar i18n localize_url %}
+{% load static wagtailcore_tags wagtailuserbar i18n localize_url footer %}
 {% load menu_tags %}
 
 <!DOCTYPE html>
@@ -96,8 +96,7 @@
           </div>
         </main>
 
-        {% include "footer.html" %}
-
+        {% footer %}
 
         {% wagtailuserbar %}
 

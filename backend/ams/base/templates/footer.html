@@ -1,16 +1,35 @@
-
+{% load static wagtailcore_tags i18n %}
+{% if footer %}
 <footer>
     <div class="footer-main">
         <div class="container">
         <div class="row">
             <div class="col-lg-4 col-md-6 col-sm-6">
             <div class="footer-address">
+                {% if footer.site_logo_url %}
+                    <img class="footer-logo" src="{{ footer.site_logo_url }}">
+                {% endif %}
+                {% if footer.street_address %}
+                    {{ footer.street_address | richtext }}
+                {% endif %}
+                {% if footer.email_address %}
+                    <a href="mailto:{{ footer.email_address | urlencode }}">{{ footer.email_address }}</a>
+                {% endif %}
             </div>
             </div>
             <div class="col-lg-4 col-md-6 col-sm-6">
             </div>
             <div class="col-lg-4 col-md-6 col-sm-6">
             <div class="footer-panel">
+                {% if footer.callout_text %}
+                    {% if footer.callout_heading %}
+                        <h3 class="footer-panel-heading">{{ footer.callout_heading }}</h3>
+                    {% endif %}
+                    {{ footer.callout_text | richtext }}
+                    {% if footer.callout_link_text %}
+                        <a href="{{ footer.callout_link_url }}" class="btn btn-hollow-footer">{{ footer.callout_link_text }}</a>
+                    {% endif %}
+                {% endif %}
             </div>
             </div>
         </div>
@@ -24,3 +43,4 @@
         </div>
     </div>
 </footer>
+{% endif %}
