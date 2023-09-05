@@ -14,6 +14,10 @@ To run the developer environment you need to install [Docker with the docker com
 
 After this is finished you can run `make start` to bring up application. If successful you should be able to go to http://localhost:1800.
 
+### Stylesheet editing
+
+For instructions on editing the main stylesheet see [frontend/README.md](frontend/README.md).
+
 ### Makefile commands
 
 Run the backend tests:
@@ -47,6 +51,10 @@ Run django migrations:
 Reload the backend server without restarting it:
 
     make backend-reload-server
+
+Update the main theme and styles from the frontend/ folder:
+
+    make update-theme
 
 Bring down the application:
 

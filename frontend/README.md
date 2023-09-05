@@ -1,16 +1,12 @@
-# AMS
+# Stylesheet editing
 
-## Frontend setup
-
-## Basic static HTML & CSS. Using SASS as a CSS preprocessor.
-
-## For a quick set up:
+Basic static HTML & CSS. Using SASS as a CSS preprocessor.
 
 - Use Visual Studio Code as your code editor
-- Install 'Live Sass Compiler' extension
-- Open 'styles.scss' and hit 'Watch Sass' (at bottom of VS Code window)
-- 'Sass' extension is not required, but is useful
+- Open frontend/ folder as a workspace
+- Install 'Live Sass Compiler' extension with this json config:
 
+```
     "liveSassCompile.settings.autoprefix": [
     
     ],
@@ -35,3 +31,7 @@
             "savePath": "/css",
         }
     ]
+```
+
+- Open 'main.scss' and hit 'Watch Sass' (at bottom of VS Code window)
+- 'Sass' extension is not required, but is useful

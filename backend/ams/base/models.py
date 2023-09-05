@@ -1,7 +1,8 @@
-from django.db.models import CharField
+from django.db.models import CharField, Model
 from wagtail.admin.panels import FieldPanel
 from wagtail.fields import RichTextField
-from wagtail.models import Page
+from wagtail.models import Page, TranslatableMixin
+from wagtail.snippets.models import register_snippet
 
 
 class HomePage(Page):
@@ -42,3 +43,15 @@ class GenericPage(Page):
     body = RichTextField(blank=True, default="")
 
     content_panels = Page.content_panels + [FieldPanel("heading"), FieldPanel("body")]
+
+
+@register_snippet
+class Footer(TranslatableMixin, Model):
+    site_logo_url = CharField(max_length=255, blank=True)
+    street_address = RichTextField(blank=True)
+    email_address = CharField(max_length=255, blank=True)
+    middle_panel = RichTextField(blank=True)
+    callout_heading = CharField(max_length=255, blank=True)
+    callout_text = RichTextField(blank=True)
+    callout_link_text = CharField(max_length=255, blank=True)
+    callout_link_url = CharField(max_length=255, blank=True)
