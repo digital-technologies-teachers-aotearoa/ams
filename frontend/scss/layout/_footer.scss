@@ -13,6 +13,29 @@
   a {
     color: $white;
   }
+
+  p {
+    margin-bottom: 0;
+  }
+}
+
+.middle-panel {
+  ul {
+    @include media-breakpoint-up(sm) {
+      @include rem(margin-top, 69px);
+    }
+      padding-left: 0;
+    list-style: none;
+  }
+
+  li {
+    @include rem(margin-bottom, 10px);
+  }
+
+  a {
+    color: $white;
+    font-weight: 500;
+  }
 }
 
 .footer-links {

@@ -18,12 +18,15 @@
             </div>
             </div>
             <div class="col-lg-4 col-md-6 col-sm-6">
+            <div class="middle-panel">
+                {{ footer.middle_panel | richtext }}
+            </div>
             </div>
             <div class="col-lg-4 col-md-6 col-sm-6">
             <div class="footer-panel">
                 {% if footer.callout_text %}
                     {% if footer.callout_heading %}
-                        <h3 class="footer-panel-heading">{{ footer.callout_heading }}</h3>
+                        <h1 class="footer-panel-heading">{{ footer.callout_heading }}</h1>
                     {% endif %}
                     {{ footer.callout_text | richtext }}
                     {% if footer.callout_link_text %}
