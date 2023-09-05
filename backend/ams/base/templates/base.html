@@ -1,6 +1,6 @@
 {% load static wagtailcore_tags wagtailuserbar i18n localize_url footer %}
 {% load menu_tags %}
-
+{% wagtail_site as current_site %}
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -10,7 +10,6 @@
             {% if page.seo_title %}{{ page.seo_title }}{% else %}{{ page.title }}{% endif %}
             {% endblock %}
             {% block title_suffix %}
-            {% wagtail_site as current_site %}
             {% if current_site and current_site.site_name %}- {{ current_site.site_name }}{% endif %}
             {% endblock %}
         </title>
@@ -39,7 +38,9 @@
         <header>
             <div class="header-inner container">
               <!-- TODO: link title should be the website name -->
-              <a href="{{ "" | localize_url }}" class="logo"><img class="logo-main" src="/static/images/logos/logo.png"><img class="logo-tagline" src="/static/images/logos/logo-tagline.png"></a>
+              <a href="{{ "" | localize_url }}" class="logo" {% if current_site and current_site.site_name %} title="{{ current_site.site_name }}"{% endif %}>
+                <img class="logo-main" src="/static/images/logos/logo.png"><img class="logo-tagline" src="/static/images/logos/logo-tagline.png">
+              </a>
               <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#navigation" aria-expanded="false" aria-controls="navigation" aria-label="Toggle navigation"></button>
               {% main_menu %}
             </div>
