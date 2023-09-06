@@ -33,6 +33,7 @@ services:
       - SENTRY_DSN
     volumes:
       - static_data:/src/app/static
+      - media_data:/src/app/media
 
   nginx:
     ports:
@@ -43,6 +44,8 @@ services:
       - .htpasswd:/etc/nginx/.htpasswd
       - /etc/letsencrypt:/etc/letsencrypt
       - static_data:/usr/share/nginx/static:ro
+      - media_data:/usr/share/nginx/media:ro
 
 volumes:
   static_data:
+  media_data:
