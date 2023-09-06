@@ -72,6 +72,12 @@
     background-color: $brand-purple;
   }
 }
+.card-red {
+  .card-icon,
+  .card-arrow {
+    background-color: $brand-red;
+  }
+}
 .card-teal {
   .card-icon,
   .card-arrow {

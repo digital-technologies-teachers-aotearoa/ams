@@ -15993,6 +15993,11 @@ header {
   background-color: #433e5a;
 }
 
+.card-red .card-icon,
+.card-red .card-arrow {
+  background-color: #ff0000;
+}
+
 .card-teal .card-icon,
 .card-teal .card-arrow {
   background-color: #2c8887;
