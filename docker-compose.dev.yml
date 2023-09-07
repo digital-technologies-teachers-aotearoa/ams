@@ -37,6 +37,28 @@ services:
       - PGPASSWORD=$POSTGRES_PASSWORD
       - SENTRY_DSN
 
+  cron:
+    volumes:
+    - ./backend:/src/app
+    environment:
+      - DJANGO_SETTINGS_MODULE=ams.settings
+      - DJANGO_SECRET_KEY
+      - DJANGO_CONFIGURATION
+      - DJANGO_SUPERUSER_USERNAME
+      - DJANGO_SUPERUSER_EMAIL
+      - DJANGO_SUPERUSER_PASSWORD
+      - EMAIL_HOST
+      - EMAIL_HOST_USER
+      - EMAIL_HOST_PASSWORD
+      - APPLICATION_WEB_HOST
+      - APPLICATION_VERSION
+      - APPLICATION_DB_HOST
+      - APPLICATION_DB_NAME
+      - APPLICATION_DB_USER
+      - APPLICATION_DB_PASSWORD
+      - PGPASSWORD=$POSTGRES_PASSWORD
+      - SENTRY_DSN
+
   nginx:
     volumes:
       - ./nginx/nginx-dev.conf:/etc/nginx/conf.d/default.conf

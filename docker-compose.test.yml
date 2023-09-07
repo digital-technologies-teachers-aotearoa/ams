@@ -35,6 +35,27 @@ services:
       - static_data:/src/app/static
       - media_data:/src/app/media
 
+  cron:
+    environment:
+      - DJANGO_SETTINGS_MODULE=ams.settings
+      - DJANGO_SECRET_KEY
+      - DJANGO_CONFIGURATION
+      - EMAIL_HOST
+      - EMAIL_HOST_USER
+      - EMAIL_HOST_PASSWORD
+      - DEFAULT_FROM_EMAIL
+      - APPLICATION_WEB_HOST
+      - APPLICATION_VERSION
+      - APPLICATION_DB_HOST
+      - APPLICATION_DB_NAME
+      - APPLICATION_DB_USER
+      - APPLICATION_DB_PASSWORD
+      - PGPASSWORD=$POSTGRES_PASSWORD
+      - DJANGO_SUPERUSER_USERNAME
+      - DJANGO_SUPERUSER_PASSWORD
+      - DJANGO_SUPERUSER_EMAIL
+      - SENTRY_DSN
+
   nginx:
     ports:
       - 80:80
