@@ -198,7 +198,7 @@ class Common(Configuration):
         },
     }
 
-    WAGTAILSIMPLETRANSLATION_SYNC_PAGE_TREE = False
+    WAGTAILSIMPLETRANSLATION_SYNC_PAGE_TREE = True
 
     # Django registration redux
     # https://django-registration-redux.readthedocs.io/en/latest/quickstart.html
