@@ -1,14 +1,18 @@
+from functools import partial
 from typing import Any, Dict, Optional
 
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.requests import RequestSite
+from django.core.mail import send_mail
+from django.db import transaction
 from django.db.models import QuerySet
 from django.forms import BoundField
 from django.http import HttpResponseRedirect
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 from django.shortcuts import render
+from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -109,11 +113,33 @@ def create_organisation(request: HttpRequest) -> HttpResponse:
     )
 
 
+def notify_staff_of_new_user(request: HttpRequest, new_user: User) -> HttpResponse:
+    # TODO: proper site object?
+    site = RequestSite(request)
+    from_email = settings.DEFAULT_FROM_EMAIL
+
+    staff_users = User.objects.filter(is_staff=True, is_active=True)
+    for user in staff_users:
+        subject = _("New user registration")
+        template = "new_user_email.txt"
+        context = {
+            "user": user,
+            "new_user": new_user,
+            "site": site,
+        }
+
+        message = render_to_string(template, context, request=request)
+
+        send_mail(subject, message, from_email, [user.email])
+
+
 def activate_user(request: HttpRequest, activation_key: str) -> HttpResponse:
     user, activation_successful = RegistrationProfile.objects.activate_user(activation_key, RequestSite(request))
 
     if user:
         if activation_successful:
+            transaction.on_commit(partial(notify_staff_of_new_user, request=request, new_user=user))
+
             email_confirmation_page = EmailConfirmationPage.objects.get(
                 live=True, locale__language_code=settings.LANGUAGE_CODE
             )

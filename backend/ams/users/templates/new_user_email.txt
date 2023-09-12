@@ -1,0 +1,7 @@
+{% load i18n %}{% blocktranslate with first_name=user.first_name site_name=site.name %}Hello {{ first_name }},
+
+A new user has registered for {{ site_name }} and needs approval.
+
+Click the link below to review the user and approve their membership.
+{% endblocktranslate %}
+https://{{ site.domain }}/users/view/{{ new_user.id }}
