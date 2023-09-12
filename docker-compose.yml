@@ -29,6 +29,27 @@ services:
       - APPLICATION_DB_PASSWORD
       - SENTRY_DSN
 
+  cron:
+    user: root
+    image: 'docker.catalyst.net.nz/dtta/ams/backend:${DOCKER_TAG}'
+    entrypoint: ["/src/app/cron-entrypoint.bash"]
+    depends_on:
+      - db
+    environment:
+      - DJANGO_SETTINGS_MODULE=ams.settings
+      - DJANGO_SECRET_KEY
+      - DJANGO_CONFIGURATION
+      - EMAIL_HOST
+      - EMAIL_HOST_USER
+      - EMAIL_HOST_PASSWORD
+      - APPLICATION_WEB_HOST
+      - APPLICATION_VERSION
+      - APPLICATION_DB_HOST
+      - APPLICATION_DB_NAME
+      - APPLICATION_DB_USER
+      - APPLICATION_DB_PASSWORD
+      - SENTRY_DSN
+
   nginx:
     image: docker.catalyst.net.nz/catalyst/nginx:stable-jammy
     ports:

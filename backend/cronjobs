@@ -1,0 +1,3 @@
+PATH=/bin:/usr/bin:/home/user/.local/bin/
+# Clean up expired user registrations daily
+0 1 * * * cd /src/app/ && poetry run /src/app/manage.py cleanupregistration >> /var/log/cron.log 2>&1

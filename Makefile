@@ -60,7 +60,7 @@ format-python:
 
 .PHONY: start
 start:
-	./docker_compose up -d nginx
+	./docker_compose up -d
 
 .PHONY: stop
 stop:
