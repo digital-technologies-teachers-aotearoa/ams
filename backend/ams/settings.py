@@ -208,6 +208,7 @@ class Common(Configuration):
     REGISTRATION_EMAIL_HTML = False
     LOGIN_REDIRECT_URL = "/"
     LOGOUT_REDIRECT_URL = "/"
+    LOGIN_URL = "/users/login/"
 
     # Django tables 2
     # https://django-tables2.readthedocs.io/en/latest/pages/
