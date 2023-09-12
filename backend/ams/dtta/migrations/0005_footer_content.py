@@ -12,7 +12,6 @@ def create_footer(apps: Any, schema_editor: Any) -> None:
     default_locale = Locale.objects.get(pk=1)
 
     Footer.objects.create(
-        site_logo_url="/static/images/logos/logo.png",
         street_address="",
         email_address="",
         middle_panel="",
