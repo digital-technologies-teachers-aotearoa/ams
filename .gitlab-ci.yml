@@ -95,6 +95,8 @@ test backend:
     EMAIL_HOST_PASSWORD:
   script:
     - cd /src/app
+    - poetry run ./manage.py makemigrations --dry-run
+    - poetry run ./manage.py makemigrations --check
     - poetry run pytest
 
 deploy to test:
