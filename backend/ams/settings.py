@@ -2,6 +2,7 @@ from os import environ
 from pathlib import Path
 from typing import Iterable, Optional
 
+import django.conf.locale
 import sentry_sdk
 from configurations import Configuration
 from sentry_sdk.integrations.django import DjangoIntegration
@@ -22,6 +23,9 @@ class Common(Configuration):
             integrations=[DjangoIntegration()],
             send_default_pii=True,
         )
+
+        # Add additional language info not built into django.conf.locale
+        django.conf.locale.LANG_INFO = dict(django.conf.locale.LANG_INFO, **cls.EXTRA_LANG_INFO)
 
     # Build paths inside the project like this: BASE_DIR / 'subdir'.
     BASE_DIR = Path(__file__).resolve().parent.parent
@@ -184,7 +188,17 @@ class Common(Configuration):
         ("en", "English"),
         ("mi", "Maori"),
     ]
-    WAGTAILSIMPLETRANSLATION_SYNC_PAGE_TREE = False
+
+    EXTRA_LANG_INFO = {
+        "mi": {
+            "bidi": False,
+            "code": "mi",
+            "name": "Maori",
+            "name_local": "Māori",
+        },
+    }
+
+    WAGTAILSIMPLETRANSLATION_SYNC_PAGE_TREE = True
 
     # Django registration redux
     # https://django-registration-redux.readthedocs.io/en/latest/quickstart.html
