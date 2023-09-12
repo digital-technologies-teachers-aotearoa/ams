@@ -3,7 +3,7 @@ from typing import Any, Dict, Optional
 
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.contrib.sites.requests import RequestSite
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail
 from django.db import transaction
 from django.db.models import QuerySet
@@ -40,7 +40,7 @@ def individual_registration(request: HttpRequest) -> HttpResponse:
 
             # Create a new user using their email as the username and send activation email
             new_user = RegistrationProfile.objects.create_inactive_user(
-                RequestSite(request),
+                get_current_site(request),
                 send_email=True,
                 username=form_data["email"],
                 email=form_data["email"],
@@ -114,8 +114,7 @@ def create_organisation(request: HttpRequest) -> HttpResponse:
 
 
 def notify_staff_of_new_user(request: HttpRequest, new_user: User) -> HttpResponse:
-    # TODO: proper site object?
-    site = RequestSite(request)
+    site = get_current_site(request)
     from_email = settings.DEFAULT_FROM_EMAIL
 
     staff_users = User.objects.filter(is_staff=True, is_active=True)
@@ -134,7 +133,7 @@ def notify_staff_of_new_user(request: HttpRequest, new_user: User) -> HttpRespon
 
 
 def activate_user(request: HttpRequest, activation_key: str) -> HttpResponse:
-    user, activation_successful = RegistrationProfile.objects.activate_user(activation_key, RequestSite(request))
+    user, activation_successful = RegistrationProfile.objects.activate_user(activation_key, get_current_site(request))
 
     if user:
         if activation_successful:
