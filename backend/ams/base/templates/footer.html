@@ -6,9 +6,7 @@
         <div class="row">
             <div class="col-lg-4 col-md-6 col-sm-6">
             <div class="footer-address">
-                {% if footer.site_logo_url %}
-                    <img class="footer-logo" src="{{ footer.site_logo_url }}">
-                {% endif %}
+                <img class="footer-logo" src="/static/images/logos/logo-footer.png" srcset="/static/images/logos/logo-footer@2x.png 2x, /static/images/logos/logo-footer@3x.png 3x">
                 {% if footer.street_address %}
                     {{ footer.street_address | richtext }}
                 {% endif %}
