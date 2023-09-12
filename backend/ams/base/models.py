@@ -47,7 +47,6 @@ class GenericPage(Page):
 
 @register_snippet
 class Footer(TranslatableMixin, Model):
-    site_logo_url = CharField(max_length=255, blank=True)
     street_address = RichTextField(blank=True)
     email_address = CharField(max_length=255, blank=True)
     middle_panel = RichTextField(blank=True)

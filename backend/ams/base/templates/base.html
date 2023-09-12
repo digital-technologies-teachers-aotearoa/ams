@@ -39,9 +39,8 @@
     <body class="{% block body_class %}{% endblock %}">
         <header>
             <div class="header-inner container">
-              <!-- TODO: link title should be the website name -->
               <a href="{{ "" | localize_url }}" class="logo" {% if current_site and current_site.site_name %} title="{{ current_site.site_name }}"{% endif %}>
-                <img class="logo-main" src="/static/images/logos/logo.png"><img class="logo-tagline" src="/static/images/logos/logo-tagline.png">
+                <img class="logo-main" src="/static/images/logos/top-logo.png" srcset="/static/images/logos/top-logo@2x.png 2x, /static/images/logos/top-logo@3x.png 3x">
               </a>
               <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#navigation" aria-expanded="false" aria-controls="navigation" aria-label="Toggle navigation"></button>
               {% main_menu %}

@@ -37,6 +37,10 @@ backend-migrate:
 backend-make-migrations:
 	./docker_compose run -T --rm --entrypoint="poetry run ./manage.py makemigrations" backend
 
+.PHONY: backend-check-migrations
+backend-check-migrations:
+	./docker_compose run -T --rm --entrypoint="poetry run ./manage.py makemigrations --dry-run" backend
+	./docker_compose run -T --rm --entrypoint="poetry run ./manage.py makemigrations --check" backend
 
 .PHONY: backend-reload-server
 backend-reload-server:
