@@ -11,7 +11,7 @@ from ...test.utils import parse_response_table_rows
 from ..models import MembershipOption, MembershipOptionType, UserMembership
 
 
-class AdminUserListTests(TestCase):
+class AdminUserViewTests(TestCase):
     def setUp(self) -> None:
         self.admin_user = User.objects.create_user(username="testadminuser", is_staff=True)
 
@@ -63,7 +63,7 @@ class AdminUserListTests(TestCase):
 
         # Then
         self.assertEqual(200, response.status_code)
-        self.assertTemplateUsed(response, "admin_user_view.html")
+        self.assertTemplateUsed(response, "user_view.html")
         self.assertTemplateUsed(response, "admin_user_membership_actions.html")
 
     def test_should_show_expected_membership_columns(self) -> None:

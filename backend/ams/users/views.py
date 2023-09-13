@@ -2,6 +2,7 @@ from functools import partial
 from typing import Any, Dict, Optional
 
 from django.conf import settings
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail
@@ -28,6 +29,7 @@ from .tables import (
     AdminUserDetailMembershipTable,
     AdminUserMembershipTable,
     AdminUserTable,
+    UserDetailMembershipTable,
 )
 from .utils import UserIsAdminMixin, user_is_admin
 
@@ -190,11 +192,24 @@ class AdminUserMembershipListView(UserIsAdminMixin, SingleTableView):
         return self.render_to_response(context)
 
 
+class UserDetailView(LoginRequiredMixin, SingleTableMixin, DetailView):
+    model = User
+    table_class = UserDetailMembershipTable
+    template_name = "user_view.html"
+    context_object_name = "user_detail"
+
+    def get_object(self) -> User:
+        return User.objects.get(id=self.request.user.pk)
+
+    def get_table_data(self) -> QuerySet:
+        return self.object.user_memberships.all()
+
+
 class AdminUserDetailView(UserIsAdminMixin, SingleTableMixin, DetailView):
     model = User
-    table_class = AdminUserDetailMembershipTable
-    template_name = "admin_user_view.html"
+    template_name = "user_view.html"
     context_object_name = "user_detail"
+    table_class = AdminUserDetailMembershipTable
 
     def get_table_data(self) -> QuerySet:
         return self.object.user_memberships.all()
