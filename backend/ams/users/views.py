@@ -204,6 +204,12 @@ class UserDetailView(LoginRequiredMixin, SingleTableMixin, DetailView):
     def get_table_data(self) -> QuerySet:
         return self.object.user_memberships.all()
 
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        if user_is_admin(request):
+            # Redirect to admin user view
+            return HttpResponseRedirect(f"/users/view/{request.user.pk}/")
+        return super().get(request, args, kwargs)
+
 
 class AdminUserDetailView(UserIsAdminMixin, SingleTableMixin, DetailView):
     model = User

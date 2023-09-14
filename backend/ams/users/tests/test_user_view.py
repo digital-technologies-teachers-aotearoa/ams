@@ -45,6 +45,19 @@ class UserViewTests(TestCase):
         self.assertEqual(302, response.status_code)
         self.assertEqual("/users/login/?next=/users/current/", response.url)
 
+    def test_should_redirect_admin_to_admin_user_view(self) -> None:
+        # Given
+        self.user.is_staff = True
+        self.user.save()
+        self.client.force_login(self.user)
+
+        # When
+        response = self.client.get(self.url)
+
+        # Then
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(f"/users/view/{self.user.pk}/", response.url)
+
     def test_should_use_expected_templates(self) -> None:
         # When
         response = self.client.get(self.url)
