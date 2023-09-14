@@ -15507,6 +15507,15 @@ main {
   color: #c5ea6c;
 }
 
+main a {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+main a:hover {
+  color: #ffffff;
+}
+
 .container {
   max-width: 1324px;
   max-width: 82.75rem;
@@ -16185,7 +16194,7 @@ header {
 
 .card-red .card-icon,
 .card-red .card-arrow {
-  background-color: #ff0000;
+  background-color: #dc202e;
 }
 
 .card-teal .card-icon,
@@ -16196,6 +16205,16 @@ header {
 .card-blue .card-icon,
 .card-blue .card-arrow {
   background-color: #2574b7;
+}
+
+.card-warm-purple .card-icon,
+.card-warm-purple .card-arrow {
+  background-color: #a0309c;
+}
+
+.card-blueberry .card-icon,
+.card-blueberry .card-arrow {
+  background-color: #5d4dad;
 }
 
 .card-discussion-title {
@@ -16253,6 +16272,7 @@ header {
   border: 0;
   display: inline-block;
   font-weight: 500;
+  text-decoration: none;
 }
 
 .btn-small {
@@ -16527,7 +16547,7 @@ header {
 .table-container {
   padding: 40px;
   padding: 2.5rem;
-  background-color: #e4f7b7;
+  background-color: #ffffff;
 }
 
 .table,
@@ -16538,6 +16558,7 @@ header {
 
 .table a {
   color: #000;
+  text-decoration: none;
 }
 .table a:hover {
   color: #000;
@@ -16571,9 +16592,11 @@ th.orderable:after {
   background-color: #eee;
   color: #333333;
   display: inline-block;
+  text-decoration: none;
 }
 .membership-option:hover {
   color: #333333;
+  text-decoration: none;
 }
 .membership-option:hover:before {
   color: #117175;
@@ -16602,6 +16625,13 @@ th.orderable:after {
 
 .membership-option-organisation:before {
   content: "\f0c0";
+}
+
+.breadcrumb a {
+  color: #000;
+}
+.breadcrumb a:hover {
+  color: #000;
 }
 
 .content a {

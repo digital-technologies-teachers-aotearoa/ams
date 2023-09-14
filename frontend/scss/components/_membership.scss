@@ -6,9 +6,11 @@
   background-color: #eee;
   color: $membership-option-colour-text;
   display: inline-block;
+  text-decoration: none;
   
   &:hover {
     color: $membership-option-colour-text-hover;
+    text-decoration: none;
     &:before {
       color: $membership-option-colour-icon-hover;
     }

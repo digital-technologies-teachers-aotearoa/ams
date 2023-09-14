@@ -8,6 +8,15 @@ main {
   color: $brand-lime;
 }
 
+main a {
+  color: $white;
+  text-decoration: underline;
+}
+
+main a:hover {
+  color: $white;
+}
+
 .container {
   @include rem(max-width, 1324px);
 }
