@@ -72,6 +72,16 @@ class IndividualRegistrationForm(Form):
         return cleaned_data
 
 
+class EditUserProfileForm(ModelForm):
+    username = CharField(label=_("Email"), disabled=True)
+    first_name = CharField(label=_("First Name"), max_length=255)
+    last_name = CharField(label=_("Last Name"), max_length=255)
+
+    class Meta:
+        model = User
+        fields = ["username", "first_name", "last_name"]
+
+
 class NameModelChoiceField(ModelChoiceField):
     def label_from_instance(self, obj: Any) -> str:
         name: str = obj.name

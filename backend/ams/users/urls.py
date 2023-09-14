@@ -8,12 +8,14 @@ from .views import (
     UserDetailView,
     activate_user,
     create_organisation,
+    edit_user_profile,
     individual_registration,
 )
 
 urlpatterns = [
     path("list/", AdminUserListView.as_view(), name="admin-user-list"),
     path("current/", UserDetailView.as_view(), name="current-user-view"),
+    path("edit/<int:pk>/", edit_user_profile, name="edit-user-profile"),
     path("view/<int:pk>/", AdminUserDetailView.as_view(), name="admin-user-view"),
     path("memberships/", AdminUserMembershipListView.as_view(), name="admin-user-memberships"),
     path("organisations/", AdminOrganisationListView.as_view(), name="admin-organisations"),
