@@ -75,4 +75,9 @@ def user_member_info(user: User) -> UserMemberInfo:
     return user._member_info
 
 
+def get_display_name(user: User) -> str:
+    return user.get_full_name()
+
+
 User.member = property(lambda self: user_member_info(self))
+User.get_display_name = property(lambda self: get_display_name(self))
