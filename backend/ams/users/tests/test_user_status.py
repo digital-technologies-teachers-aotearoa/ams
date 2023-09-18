@@ -26,10 +26,12 @@ class UserStatusTests(TestCase):
             name="Membership Option", type=MembershipOptionType.INDIVIDUAL, duration="P1M", cost="1.00"
         )
 
+        start = timezone.localtime()
         self.user_membership = UserMembership.objects.create(
             user=self.user,
             membership_option=membership_option,
-            created_datetime=timezone.now(),
+            start_date=start.date(),
+            created_datetime=start,
             approved_datetime=None,
         )
 

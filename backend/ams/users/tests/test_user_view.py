@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 
 from dateutil.tz import gettz
 from django.conf import settings
@@ -27,8 +27,9 @@ class UserViewTests(TestCase):
         self.user_membership = UserMembership.objects.create(
             user=self.user,
             membership_option=membership_option,
-            created_datetime=datetime(day=1, month=7, year=2023, hour=6, tzinfo=self.time_zone),
-            approved_datetime=datetime(day=1, month=7, year=2023, hour=21, tzinfo=self.time_zone),
+            start_date=date(day=1, month=7, year=2023),
+            created_datetime=datetime(day=1, month=6, year=2023, hour=6, tzinfo=self.time_zone),
+            approved_datetime=datetime(day=1, month=8, year=2023, hour=21, tzinfo=self.time_zone),
         )
 
         self.url = "/users/current/"
@@ -107,7 +108,7 @@ class UserViewTests(TestCase):
                 self.user_membership.membership_option.name,
                 "1 month",
                 "Pending",
-                date_format(self.user_membership.created_datetime, format="SHORT_DATE_FORMAT"),
+                date_format(self.user_membership.start_date, format="SHORT_DATE_FORMAT"),
                 "—",
                 "",
             ]
