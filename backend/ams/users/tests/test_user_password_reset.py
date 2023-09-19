@@ -47,8 +47,6 @@ wish to reset your password, please ignore this message.
 
 To reset your password, please click the following link:
 
-<a rel="noreferrer" href="https://testserver/users/password/reset/confirm/TOKEN">
-  https://testserver/users/password/reset/confirm/TOKEN
-</a>
+https://testserver/users/password/reset/confirm/TOKEN
 """,
         )

@@ -84,6 +84,10 @@
   flex: none;
 }
 
+.user-details-image:hover {
+  cursor: pointer;
+}
+
 .user-details-profile-image {
   width: 128px;
   height: 128px;
@@ -102,7 +106,7 @@
   color: $text-dark;
   background-color: $user-details-button-colour-background;
   font-weight: 500;
-  margin-left: 20px;
+  margin-left: 20px;  
 
   &:after {
     font: var(--fa-font-solid);
@@ -119,6 +123,7 @@
 .user-details-lang:hover {
   color: $text-dark;
   text-decoration: none;
+  cursor: pointer;
 }
 
 .user-details-status {

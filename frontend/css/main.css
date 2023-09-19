@@ -15987,6 +15987,10 @@ header {
   flex: none;
 }
 
+.user-details-image:hover {
+  cursor: pointer;
+}
+
 .user-details-profile-image {
   width: 128px;
   height: 128px;
@@ -16021,6 +16025,7 @@ header {
 .user-details-lang:hover {
   color: #333333;
   text-decoration: none;
+  cursor: pointer;
 }
 
 .user-details-status {
