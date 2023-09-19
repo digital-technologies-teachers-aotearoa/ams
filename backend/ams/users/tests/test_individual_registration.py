@@ -85,7 +85,8 @@ You're almost ready to start enjoying testserver.
 
 Simply click the link below to verify your email address.
 
-http://testserver/users/activate/{activation_key}/""",
+https://testserver/users/activate/{activation_key}/
+""",
             )
 
     def test_blank_form_should_include_expected_values(self) -> None:
