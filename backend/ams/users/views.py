@@ -22,7 +22,7 @@ from django_tables2 import SingleTableMixin, SingleTableView
 from registration.models import RegistrationProfile
 
 from ..base.models import EmailConfirmationPage
-from .forms import IndividualRegistrationForm, OrganisationForm
+from .forms import EditUserProfileForm, IndividualRegistrationForm, OrganisationForm
 from .models import MembershipOption, Organisation, UserMembership
 from .tables import (
     AdminOrganisationTable,
@@ -151,6 +151,35 @@ def activate_user(request: HttpRequest, activation_key: str) -> HttpResponse:
     return HttpResponse(status=401)
 
 
+def edit_user_profile(request: HttpRequest, pk: int) -> HttpResponse:
+    if not (user_is_admin(request) or request.user.is_authenticated and request.user.pk == pk):
+        return HttpResponse(status=401)
+
+    user = User.objects.get(pk=pk)
+
+    if user_is_admin(request):
+        user_view_url = reverse("admin-user-view", kwargs={"pk": pk})
+    else:
+        user_view_url = reverse("current-user-view")
+
+    if request.method == "POST":
+        form = EditUserProfileForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(user_view_url + "?profile_updated=true")
+    else:
+        form = EditUserProfileForm(instance=user)
+
+    return render(
+        request,
+        "edit_user_profile.html",
+        {
+            "user_view_url": user_view_url,
+            "form": form,
+        },
+    )
+
+
 class AdminUserListView(UserIsAdminMixin, SingleTableView):
     model = User
     table_class = AdminUserTable
@@ -192,17 +221,27 @@ class AdminUserMembershipListView(UserIsAdminMixin, SingleTableView):
         return self.render_to_response(context)
 
 
-class UserDetailView(LoginRequiredMixin, SingleTableMixin, DetailView):
+class UserDetailViewBase(SingleTableMixin, DetailView):
     model = User
-    table_class = UserDetailMembershipTable
     template_name = "user_view.html"
     context_object_name = "user_detail"
 
-    def get_object(self) -> User:
-        return User.objects.get(id=self.request.user.pk)
-
     def get_table_data(self) -> QuerySet:
         return self.object.user_memberships.all()
+
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context: Dict[str, Any] = super().get_context_data(**kwargs)
+
+        if self.request.method == "GET" and self.request.GET.get("profile_updated"):
+            context["show_messages"] = [_("Profile Updated")]
+        return context
+
+
+class UserDetailView(LoginRequiredMixin, UserDetailViewBase):
+    table_class = UserDetailMembershipTable
+
+    def get_object(self) -> User:
+        return User.objects.get(id=self.request.user.pk)
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         if user_is_admin(request):
@@ -211,14 +250,8 @@ class UserDetailView(LoginRequiredMixin, SingleTableMixin, DetailView):
         return super().get(request, args, kwargs)
 
 
-class AdminUserDetailView(UserIsAdminMixin, SingleTableMixin, DetailView):
-    model = User
-    template_name = "user_view.html"
-    context_object_name = "user_detail"
+class AdminUserDetailView(UserIsAdminMixin, UserDetailViewBase):
     table_class = AdminUserDetailMembershipTable
-
-    def get_table_data(self) -> QuerySet:
-        return self.object.user_memberships.all()
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         if request.POST.get("action") == "approve_user_membership":

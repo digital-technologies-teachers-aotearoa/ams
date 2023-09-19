@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load static wagtailcore_tags i18n localize_url form_field %}
+
+{% block title %}{% translate "Profile Settings" %}{% endblock title %}
+
+{% block body_class %}edit-user-profile{% endblock %}
+
+{% block content %}
+
+    <div class="row">
+        <div class="col">
+        <div class="introduction">
+            <h1 class="introduction-heading standard-page">{% translate "Profile Settings" %}</h1>
+            <p class="introduction-content standard-page"></p>
+        </div>
+        </div>
+    </div>
+
+    <div class="row no-gutters">
+        <div class="col-lg-9">
+
+            <form class="form-panel form-panel-registration" action="" method="post">
+            {% csrf_token %}
+
+            <h2 class="form-panel-heading">{% translate "Personal Details" %}</h2>
+
+            <div class="registration-personal-detail-fields">
+                {% for field in form %}
+                    <div class="form-group">
+                        <div class="form-label">
+                            {{ field.label_tag }}
+                        </div>
+                        <div class="form-input">
+                            {{ field|add_form_field_classes }}
+                            {{ field.errors }}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <hr class="form-divider"/>
+
+            <div class="form-actions">
+                <input class="btn btn-form-cancel" type="button" value="Cancel" onclick="window.location='{{ user_view_url }}';">
+                <input class="btn btn-form-submit-hollow" type="submit" value="{% translate "Save Changes" %}">
+            </div>
+        </form>
+        </div>
+    </div>
+
+{% endblock content %}
