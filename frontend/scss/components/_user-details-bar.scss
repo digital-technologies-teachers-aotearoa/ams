@@ -68,9 +68,25 @@
   color: $text-dark;
 }
 
+.user-details-image-container {
+  height: 54px;
+  display: flex;
+  align-items: center;
+}
+
 .user-details-image {
   width: 46px;
   height: 46px;
+  background-color: #333;
+  border-radius: 100%;
+  border: 1px solid #333;
+  margin-left: 15px;
+  flex: none;
+}
+
+.user-details-profile-image {
+  width: 128px;
+  height: 128px;
   background-color: #333;
   border-radius: 100%;
   border: 1px solid #333;

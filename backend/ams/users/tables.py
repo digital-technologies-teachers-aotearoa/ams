@@ -56,6 +56,7 @@ class AdminUserMembershipTable(Table):
     )
     start_date = DateColumn(verbose_name=_("Start Date"), accessor="created_datetime", short=True)
     approved_date = DateColumn(verbose_name=_("Approved Date"), accessor="approved_datetime", short=True)
+
     actions = TemplateColumn(
         verbose_name=_("Actions"), template_name="admin_user_membership_actions.html", orderable=False
     )
@@ -75,7 +76,7 @@ class AdminUserMembershipTable(Table):
         model = UserMembership
 
 
-class AdminUserDetailMembershipTable(Table):
+class UserDetailMembershipTable(Table):
     membership = Column(accessor="membership_option__name", verbose_name=_("Membership"))
     duration = Column(accessor="membership_option__duration", verbose_name=_("Duration"))
     status = Column(
@@ -85,11 +86,7 @@ class AdminUserDetailMembershipTable(Table):
     )
     start_date = DateColumn(verbose_name=_("Start Date"), accessor="created_datetime", short=True)
     approved_date = DateColumn(verbose_name=_("Approved Date"), accessor="approved_datetime", short=True)
-
-    # NOTE: this uses the same actions template as AdminUserMembershipTable
-    actions = TemplateColumn(
-        verbose_name=_("Actions"), template_name="admin_user_membership_actions.html", orderable=False
-    )
+    actions = TemplateColumn(verbose_name=_("Actions"), template_name="user_membership_actions.html", orderable=False)
 
     def render_status(self, value: datetime, record: UserMembership) -> Any:
         return membership_status(record)
@@ -101,6 +98,13 @@ class AdminUserDetailMembershipTable(Table):
         fields = ("membership", "duration", "status", "start_date", "approved_date")
         order_by = ("membership", "duration", "status", "start_date", "approved_date")
         model = UserMembership
+
+
+class AdminUserDetailMembershipTable(UserDetailMembershipTable):
+    # NOTE: this uses the same actions template as AdminUserMembershipTable
+    actions = TemplateColumn(
+        verbose_name=_("Actions"), template_name="admin_user_membership_actions.html", orderable=False
+    )
 
 
 class AdminOrganisationTable(Table):
