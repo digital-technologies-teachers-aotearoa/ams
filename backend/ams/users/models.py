@@ -62,11 +62,11 @@ class UserMembership(Model):
         return expiry_date
 
     def status(self) -> Any:
-        if self.approved_datetime is None:
-            return UserMemberStatus.PENDING
-
         if timezone.localdate() >= self.expiry_date():
             return UserMemberStatus.EXPIRED
+
+        if self.approved_datetime is None or self.start_date > timezone.localdate():
+            return UserMemberStatus.PENDING
 
         return UserMemberStatus.ACTIVE
 
@@ -104,7 +104,13 @@ def get_current_membership(user: User) -> Optional[UserMembership]:
     return current_membership
 
 
+def get_latest_membership(user: User) -> Optional[UserMembership]:
+    latest_membership: Optional[UserMembership] = user.user_memberships.order_by("-start_date").first()
+    return latest_membership
+
+
 User.get_current_membership = get_current_membership
+User.get_latest_membership = get_latest_membership
 
 User.member = property(lambda self: user_member_info(self))
 User.display_name = property(lambda self: get_display_name(self))

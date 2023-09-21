@@ -29,7 +29,7 @@ from .forms import (
     IndividualRegistrationForm,
     OrganisationForm,
 )
-from .models import MembershipOption, Organisation, UserMembership
+from .models import MembershipOption, Organisation, UserMembership, UserMemberStatus
 from .tables import (
     AdminOrganisationTable,
     AdminUserDetailMembershipTable,
@@ -316,6 +316,15 @@ class UserDetailViewBase(SingleTableMixin, DetailView):
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context: Dict[str, Any] = super().get_context_data(**kwargs)
+
+        user = context["user_detail"]
+
+        latest_membership = user.get_latest_membership()
+        can_add_membership = False
+        if not latest_membership or latest_membership.status() in [UserMemberStatus.ACTIVE, UserMemberStatus.EXPIRED]:
+            can_add_membership = True
+
+        context["can_add_membership"] = can_add_membership
 
         if self.request.method == "GET" and self.request.GET.get("profile_updated"):
             context["show_messages"] = [_("Profile Updated")]

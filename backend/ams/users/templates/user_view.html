@@ -32,7 +32,9 @@
                 <div class="col-lg-12">
                     <div class="table-container">
                         <div class="table-actions">
-                            <a class="btn btn-small btn-table-action" href="{% url "add-user-membership" user_detail.pk  %}">{% translate "Add Membership" %}</a>
+                            {% if can_add_membership %}
+                                <a class="btn btn-small btn-table-action" href="{% url "add-user-membership" user_detail.pk  %}">{% translate "Add Membership" %}</a>
+                            {% endif %}
                         </div>
                         {% render_table table %}
                     </div>
