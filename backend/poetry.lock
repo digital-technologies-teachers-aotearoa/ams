@@ -1538,6 +1538,25 @@ url = "https://cat-prod-buildproxy.dmz.wgtn.cat-it.co.nz/root/pypi/+simple"
 reference = "package proxy"
 
 [[package]]
+name = "pydiscourse"
+version = "1.6.1"
+description = "\"A Python library for the Discourse API\""
+optional = false
+python-versions = "*"
+files = [
+    {file = "pydiscourse-1.6.1-py2.py3-none-any.whl", hash = "sha256:3040a6f71901a970563881c2a6f6df243cde0fad43673d76071f185d35696edf"},
+    {file = "pydiscourse-1.6.1.tar.gz", hash = "sha256:fc239500670940c783d42df62fa31f89dd709a7be9aa571863411a1e9f9b83eb"},
+]
+
+[package.dependencies]
+requests = ">=2.4.2"
+
+[package.source]
+type = "legacy"
+url = "https://cat-prod-buildproxy.dmz.wgtn.cat-it.co.nz/root/pypi/+simple"
+reference = "package proxy"
+
+[[package]]
 name = "pyflakes"
 version = "3.0.1"
 description = "passive checker of Python programs"
@@ -2232,4 +2251,4 @@ reference = "package proxy"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "fbe4097f94165ce3add9035a671a8c89d3fbd1e89cd346bb690204ba5145cde9"
+content-hash = "a949abb83bef72c515c8d496b9c62e00a2144abc7479edbde5cec3d604fcc188"
