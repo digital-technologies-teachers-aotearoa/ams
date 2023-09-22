@@ -54,7 +54,7 @@ services:
   nginx:
     image: docker.catalyst.net.nz/catalyst/nginx:stable-jammy
     ports:
-      - 1800:80
+      - 80:80
     depends_on:
       - backend
 
