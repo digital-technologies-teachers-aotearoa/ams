@@ -14,6 +14,7 @@ from .views import (
     edit_membership_option,
     edit_user_profile,
     individual_registration,
+    discourse_sso,
 )
 
 urlpatterns = [
@@ -31,4 +32,5 @@ urlpatterns = [
     path("individual-registration/", individual_registration, name="registration_register"),
     path("activate/<str:activation_key>/", activate_user, name="activate-user"),
     path("", include("registration.auth_urls")),
+    path("discourse/sso", discourse_sso, name="discourse-sso"),
 ]

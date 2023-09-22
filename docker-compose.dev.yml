@@ -36,6 +36,8 @@ services:
       - APPLICATION_DB_PASSWORD
       - PGPASSWORD=$POSTGRES_PASSWORD
       - SENTRY_DSN
+      - DISCOURSE_REDIRECT_DOMAIN
+      - DISCOURSE_CONNECT_SECRET
 
   cron:
     volumes:
@@ -81,8 +83,6 @@ services:
       - RUBY_GC_HEAP_INIT_SLOTS=400000
       - RUBY_GC_HEAP_OLDOBJECT_LIMIT_FACTOR=1.5
     command: /sbin/boot
-    ports:
-        - 1801:80
     volumes:
      - discourse_uploads:/var/www/discourse/public/uploads
     depends_on:
