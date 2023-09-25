@@ -1,6 +1,10 @@
+from datetime import timedelta
+
 from django.contrib.sites.requests import RequestSite
 from django.test import RequestFactory, TestCase
+from django.urls import reverse
 from django.utils import timezone
+from django.utils.formats import date_format
 from registration.models import RegistrationProfile
 
 from ..models import MembershipOption, MembershipOptionType, UserMembership
@@ -121,7 +125,46 @@ class UserStatusTests(TestCase):
         # Then
         self.assertContains(response, "Your membership is Pending")
 
-    def test_should_not_show_logged_in_users_approved_membership_status(self) -> None:
+    def test_should_show_logged_in_users_pending_membership_future_start_date(self) -> None:
+        # Given
+        self.user_membership.start_date = timezone.localdate() + timedelta(days=1)
+        self.user_membership.approved_datetime = timezone.now()
+        self.user_membership.save()
+
+        self.client.force_login(self.user)
+
+        # When
+        response = self.client.get("/")
+
+        # Then
+        start_date_string = date_format(self.user_membership.start_date, "DATE_FORMAT")
+        self.assertContains(response, f"Your membership is Pending (starts on {start_date_string})")
+
+    def test_should_show_logged_in_users_pending_membership_future_start_date_after_current_membership_expired(
+        self,
+    ) -> None:
+        # Given
+        self.user_membership.start_date = timezone.localdate() - self.user_membership.membership_option.duration
+        self.user_membership.save()
+
+        new_membership = UserMembership.objects.create(
+            user=self.user_membership.user,
+            membership_option=self.user_membership.membership_option,
+            start_date=timezone.localdate() + timedelta(days=1),
+            approved_datetime=timezone.now(),
+            created_datetime=timezone.now(),
+        )
+
+        self.client.force_login(self.user)
+
+        # When
+        response = self.client.get("/")
+
+        # Then
+        start_date_string = date_format(new_membership.start_date, "DATE_FORMAT")
+        self.assertContains(response, f"Your membership is Pending (starts on {start_date_string})")
+
+    def test_should_show_logged_in_users_active_membership_status(self) -> None:
         # Given
         self.user_membership.approved_datetime = timezone.now()
         self.user_membership.save()
@@ -132,7 +175,63 @@ class UserStatusTests(TestCase):
         response = self.client.get("/")
 
         # Then
-        self.assertNotContains(response, "Your membership is")
+        self.assertContains(response, "Your membership is Active")
+
+    def test_should_show_logged_in_users_expired_membership_status(self) -> None:
+        # Given
+        self.user_membership.approved_datetime = timezone.now()
+        self.user_membership.start_date = timezone.localdate() - self.user_membership.membership_option.duration
+        self.user_membership.save()
+
+        self.client.force_login(self.user)
+
+        # When
+        response = self.client.get("/")
+
+        # Then
+        self.assertContains(response, "Your membership has Expired")
+        self.assertContains(
+            response, '<a href="%s">Extend</a>' % reverse("add-user-membership", kwargs={"pk": self.user.pk})
+        )
+
+    def test_should_show_active_membership_expires_in_days_lte_30_days(self) -> None:
+        # Given
+        self.user_membership.membership_option.duration = "P30D"
+        self.user_membership.membership_option.save()
+
+        self.user_membership.approved_datetime = timezone.now()
+        self.user_membership.start_date = timezone.localdate()
+        self.user_membership.save()
+
+        self.client.force_login(self.user)
+
+        # When
+        response = self.client.get("/")
+
+        # Then
+        self.assertContains(response, "Your membership is Active")
+        self.assertContains(response, "expires in 30 days")
+        self.assertContains(
+            response, '<a href="%s">Extend</a>' % reverse("add-user-membership", kwargs={"pk": self.user.pk})
+        )
+
+    def test_should_not_show_active_membership_expires_in_days_gt_30_days(self) -> None:
+        # Given
+        self.user_membership.membership_option.duration = "P31D"
+        self.user_membership.membership_option.save()
+
+        self.user_membership.approved_datetime = timezone.now()
+        self.user_membership.start_date = timezone.localdate()
+        self.user_membership.save()
+
+        self.client.force_login(self.user)
+
+        # When
+        response = self.client.get("/")
+
+        # Then
+        self.assertContains(response, "Your membership is Active")
+        self.assertNotContains(response, "expires in")
 
     def test_should_include_admin_menu_for_admin_user(self) -> None:
         # Given

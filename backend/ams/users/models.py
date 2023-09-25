@@ -61,6 +61,10 @@ class UserMembership(Model):
         expiry_date: date = self.start_date + self.membership_option.duration
         return expiry_date
 
+    def expires_in_days(self) -> int:
+        expires_in: int = (self.expiry_date() - timezone.localdate()).days
+        return expires_in
+
     def status(self) -> Any:
         if timezone.localdate() >= self.expiry_date():
             return UserMemberStatus.EXPIRED
@@ -73,13 +77,8 @@ class UserMembership(Model):
 
 class UserMemberInfo:
     def __init__(self, user: User) -> None:
-        self.user_membership: Optional[UserMembership] = user.get_current_membership()
-
-    def status(self) -> Any:
-        if not self.user_membership:
-            return UserMemberStatus.NONE
-
-        return self.user_membership.status()
+        self.current_membership: Optional[UserMembership] = user.get_current_membership()
+        self.latest_membership: Optional[UserMembership] = user.get_latest_membership()
 
 
 def user_member_info(user: User) -> UserMemberInfo:
