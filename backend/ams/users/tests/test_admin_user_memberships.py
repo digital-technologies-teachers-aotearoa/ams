@@ -108,7 +108,7 @@ class AdminUserMembershipsTests(TestCase):
                 "Active",
                 date_format(self.user_membership.start_date, format="SHORT_DATE_FORMAT"),
                 date_format(self.user_membership.approved_datetime, format="SHORT_DATE_FORMAT"),
-                "",
+                "Cancel",
             ]
         ]
 
@@ -135,7 +135,7 @@ class AdminUserMembershipsTests(TestCase):
                 "Pending",
                 date_format(self.user_membership.start_date, format="SHORT_DATE_FORMAT"),
                 "—",
-                "Approve",
+                "Approve,Cancel",
             ]
         ]
 
@@ -165,6 +165,35 @@ class AdminUserMembershipsTests(TestCase):
                 "Expired",
                 date_format(self.user_membership.start_date, format="SHORT_DATE_FORMAT"),
                 date_format(self.user_membership.approved_datetime, format="SHORT_DATE_FORMAT"),
+                "Cancel",
+            ]
+        ]
+
+        self.assertListEqual(expected_rows, rows)
+
+    def test_should_show_cancelled_membership_as_cancelled(self) -> None:
+        # Given
+        self.user_membership.cancelled_datetime = timezone.now().astimezone(self.time_zone)
+        self.user_membership.save()
+
+        # When
+        response = self.client.get(self.url)
+
+        # Then
+        self.assertEqual(200, response.status_code)
+
+        rows = parse_response_table_rows(response)
+
+        self.maxDiff = None
+
+        expected_rows = [
+            [
+                self.user.get_full_name(),
+                self.user_membership.membership_option.name,
+                "1 month",
+                "Cancelled",
+                date_format(self.user_membership.start_date, format="SHORT_DATE_FORMAT"),
+                date_format(self.user_membership.approved_datetime, format="SHORT_DATE_FORMAT"),
                 "",
             ]
         ]
@@ -181,6 +210,11 @@ class AdminUserMembershipsTests(TestCase):
         )
 
         # Then
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(f"{self.url}?membership_approved=true", response.url)
+
+        response = self.client.get(response.url)
+
         self.assertEqual(200, response.status_code)
         self.assertTemplateUsed(response, "admin_user_memberships.html")
         self.assertTemplateUsed(response, "admin_user_membership_actions.html")
@@ -195,7 +229,7 @@ class AdminUserMembershipsTests(TestCase):
                 "Active",
                 date_format(self.user_membership.start_date, format="SHORT_DATE_FORMAT"),
                 date_format(timezone.now().astimezone(self.time_zone), format="SHORT_DATE_FORMAT"),
-                "",
+                "Cancel",
             ]
         ]
         self.assertListEqual(expected_rows, rows)
@@ -210,7 +244,11 @@ class AdminUserMembershipsTests(TestCase):
         )
 
         # Then
-        self.assertEqual(200, response.status_code)
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(self.url, response.url)
+
+        response = self.client.get(response.url)
+
         self.assertTemplateUsed(response, "admin_user_memberships.html")
         self.assertTemplateUsed(response, "admin_user_membership_actions.html")
 

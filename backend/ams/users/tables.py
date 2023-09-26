@@ -66,7 +66,15 @@ class AdminUserMembershipTable(Table):
 
     class Meta:
         fields = ("full_name", "membership", "duration", "status", "start_date", "approved_date")
-        order_by = ("full_name", "membership", "duration", "status", "start_date", "approved_date")
+        order_by = (
+            "full_name",
+            "membership",
+            "duration",
+            "status",
+            "start_date",
+            "approved_date",
+            "cancelled_datetime",
+        )
         model = UserMembership
 
 
@@ -90,7 +98,7 @@ class UserDetailMembershipTable(Table):
 
     class Meta:
         fields = ("membership", "duration", "status", "start_date", "approved_date")
-        order_by = ("membership", "duration", "status", "start_date", "approved_date")
+        order_by = ("membership", "duration", "status", "start_date", "approved_date", "cancelled_datetime")
         model = UserMembership
 
 

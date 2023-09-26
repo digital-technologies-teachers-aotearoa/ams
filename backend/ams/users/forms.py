@@ -24,7 +24,6 @@ from .models import (
     MembershipOptionType,
     Organisation,
     OrganisationType,
-    UserMembership,
 )
 
 
@@ -65,8 +64,8 @@ class AddUserMembershipForm(Form):
 
         start_date: date = cleaned_data.get("start_date")
 
-        # Validate that start date doesn't overlap with an existing membership
-        latest_membership = UserMembership.objects.filter(user=self.user).order_by("-start_date").first()
+        # Validate that start date doesn't overlap with an existing non-cancelled membership
+        latest_membership = self.user.get_latest_membership()
         if latest_membership and latest_membership.expiry_date() > start_date:
             raise ValidationError(_("A new membership can not overlap with an existing membership"))
 

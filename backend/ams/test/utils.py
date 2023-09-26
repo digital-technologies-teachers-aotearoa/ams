@@ -11,7 +11,7 @@ def parse_response_table_rows(response: HttpResponse) -> List[List[Any]]:
 
         # Parse the link titles in the action cell
         action_cell = row_cells.pop()
-        action_titles = re.findall(r'<a[^>]*title="(.*?)"[^>]*>', action_cell)
+        action_titles = re.findall(r'<(?:button|a)[^>]*title="(.*?)"[^>]*>', action_cell)
         row_cells.append(",".join(action_titles))
 
         rows.append(row_cells)

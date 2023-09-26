@@ -233,6 +233,58 @@ class UserStatusTests(TestCase):
         self.assertContains(response, "Your membership is Active")
         self.assertNotContains(response, "expires in")
 
+    def test_should_show_membership_has_been_cancelled(self) -> None:
+        # Given
+        self.user_membership.approved_datetime = timezone.now()
+        self.user_membership.start_date = timezone.localdate() - self.user_membership.membership_option.duration
+        self.user_membership.save()
+
+        UserMembership.objects.create(
+            user=self.user_membership.user,
+            membership_option=self.user_membership.membership_option,
+            start_date=timezone.localdate() - timedelta(days=1),
+            created_datetime=timezone.now(),
+            cancelled_datetime=timezone.now(),
+        )
+
+        self.client.force_login(self.user)
+
+        # When
+        response = self.client.get("/")
+
+        # Then
+        self.assertContains(response, "Your membership has been cancelled")
+
+    def test_should_not_show_membership_has_been_cancelled_if_other_latest_membership(self) -> None:
+        # Given
+        self.user_membership.approved_datetime = timezone.now()
+        self.user_membership.start_date = timezone.localdate() - self.user_membership.membership_option.duration
+        self.user_membership.save()
+
+        cancelled_membership = UserMembership.objects.create(
+            user=self.user_membership.user,
+            membership_option=self.user_membership.membership_option,
+            start_date=timezone.localdate() - timedelta(days=1),
+            created_datetime=timezone.now(),
+            cancelled_datetime=timezone.now(),
+        )
+
+        UserMembership.objects.create(
+            user=self.user_membership.user,
+            membership_option=self.user_membership.membership_option,
+            start_date=cancelled_membership.start_date,
+            created_datetime=timezone.now(),
+            cancelled_datetime=None,
+        )
+
+        self.client.force_login(self.user)
+
+        # When
+        response = self.client.get("/")
+
+        # Then
+        self.assertNotContains(response, "Your membership has been cancelled")
+
     def test_should_include_admin_menu_for_admin_user(self) -> None:
         # Given
         self.user.is_staff = True
