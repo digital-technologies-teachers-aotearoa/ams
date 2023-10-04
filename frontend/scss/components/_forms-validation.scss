@@ -1,3 +1,7 @@
+.invalid-feedback {
+  display: block;
+}
+
 .errorlist {
   @extend .invalid-feedback;
   list-style: none;

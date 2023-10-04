@@ -1,3 +1,4 @@
+from datetime import date
 from typing import Any, Dict, List, Tuple
 
 from dateutil.relativedelta import relativedelta
@@ -6,12 +7,14 @@ from django.contrib.auth.password_validation import validate_password
 from django.forms import (
     CharField,
     ChoiceField,
+    DateField,
     EmailField,
     Form,
     ModelChoiceField,
     ModelForm,
     PasswordInput,
     RadioSelect,
+    ValidationError,
 )
 from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy as _
@@ -21,6 +24,7 @@ from .models import (
     MembershipOptionType,
     Organisation,
     OrganisationType,
+    UserMembership,
 )
 
 
@@ -42,6 +46,33 @@ def get_individual_membership_options() -> List[Tuple[str, str]]:
     ]
 
 
+class MembershipOptionRadioSelect(RadioSelect):
+    template_name = "membership_option_radio_select.html"
+
+
+class AddUserMembershipForm(Form):
+    start_date = DateField(label=_("Start Date"))
+    membership_option = ChoiceField(
+        label=_("Membership"), widget=MembershipOptionRadioSelect, choices=get_individual_membership_options
+    )
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        self.user = kwargs.pop("user")
+        super().__init__(*args, **kwargs)
+
+    def clean_start_date(self) -> date:
+        cleaned_data = super().clean()
+
+        start_date: date = cleaned_data.get("start_date")
+
+        # Validate that start date doesn't overlap with an existing membership
+        latest_membership = UserMembership.objects.filter(user=self.user).order_by("-start_date").first()
+        if latest_membership and latest_membership.expiry_date() > start_date:
+            raise ValidationError(_("A new membership can not overlap with an existing membership"))
+
+        return start_date
+
+
 class IndividualRegistrationForm(Form):
     email = EmailField(label=_("Email"))
     confirm_email = CharField(label=_("Confirm Email"))
@@ -49,7 +80,7 @@ class IndividualRegistrationForm(Form):
     last_name = CharField(label=_("Last Name"), max_length=255)
     password = CharField(label=_("Password"), widget=PasswordInput(), validators=[validate_password])
     confirm_password = CharField(label=_("Confirm Password"), widget=PasswordInput())
-    membership_option = ChoiceField(widget=RadioSelect, choices=get_individual_membership_options)
+    membership_option = ChoiceField(widget=MembershipOptionRadioSelect, choices=get_individual_membership_options)
 
     def clean(self) -> Dict[str, Any]:
         cleaned_data: Dict[str, Any] = super().clean()

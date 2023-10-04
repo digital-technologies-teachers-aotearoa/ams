@@ -51,18 +51,8 @@
                 </div>
 
                 <div class="registration-membership-fields">
-                        {% for option in membership_option_field %}
-                            <div>
-                                <label for="{{option.id_for_label}}">
-                                    {{option.tag}}
-                                    <span>
-                                        <strong>{{ option.data.value }}</strong>
-                                        {{ option.choice_label }}
-                                    </span>
-                                </label>
-                            </div>
-                        {% endfor %}
-                        {{ membership_option_field.errors }}
+                    {{membership_option_field}}
+                    {{membership_option_field.errors}}
                 </div>
             </div>
 

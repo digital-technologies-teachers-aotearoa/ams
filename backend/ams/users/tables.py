@@ -18,12 +18,6 @@ def full_name_or_username(user: User) -> str:
     return full_name
 
 
-def membership_status(user_membership: UserMembership) -> Any:
-    if user_membership.approved_datetime:
-        return _("Active")
-    return _("Pending")
-
-
 class AdminUserTable(Table):
     full_name = Column(
         accessor="first_name", order_by=("first_name", "last_name"), verbose_name=_("Full Name"), empty_values=()
@@ -54,7 +48,7 @@ class AdminUserMembershipTable(Table):
         accessor="approved_datetime",
         empty_values=[],
     )
-    start_date = DateColumn(verbose_name=_("Start Date"), accessor="created_datetime", short=True)
+    start_date = DateColumn(verbose_name=_("Start Date"), short=True)
     approved_date = DateColumn(verbose_name=_("Approved Date"), accessor="approved_datetime", short=True)
 
     actions = TemplateColumn(
@@ -65,7 +59,7 @@ class AdminUserMembershipTable(Table):
         return full_name_or_username(record.user)
 
     def render_status(self, value: datetime, record: UserMembership) -> Any:
-        return membership_status(record)
+        return record.status().label
 
     def render_duration(self, value: relativedelta, record: UserMembership) -> Any:
         return format_membership_duration_in_months(value)
@@ -84,12 +78,12 @@ class UserDetailMembershipTable(Table):
         accessor="approved_datetime",
         empty_values=[],
     )
-    start_date = DateColumn(verbose_name=_("Start Date"), accessor="created_datetime", short=True)
+    start_date = DateColumn(verbose_name=_("Start Date"), short=True)
     approved_date = DateColumn(verbose_name=_("Approved Date"), accessor="approved_datetime", short=True)
     actions = TemplateColumn(verbose_name=_("Actions"), template_name="user_membership_actions.html", orderable=False)
 
     def render_status(self, value: datetime, record: UserMembership) -> Any:
-        return membership_status(record)
+        return record.status().label
 
     def render_duration(self, value: relativedelta, record: UserMembership) -> Any:
         return format_membership_duration_in_months(value)

@@ -16,14 +16,20 @@ from django.shortcuts import render
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.formats import date_format
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.detail import DetailView
 from django_tables2 import SingleTableMixin, SingleTableView
 from registration.models import RegistrationProfile
 
 from ..base.models import EmailConfirmationPage
-from .forms import EditUserProfileForm, IndividualRegistrationForm, OrganisationForm
-from .models import MembershipOption, Organisation, UserMembership
+from .forms import (
+    AddUserMembershipForm,
+    EditUserProfileForm,
+    IndividualRegistrationForm,
+    OrganisationForm,
+)
+from .models import MembershipOption, Organisation, UserMembership, UserMemberStatus
 from .tables import (
     AdminOrganisationTable,
     AdminUserDetailMembershipTable,
@@ -53,7 +59,10 @@ def individual_registration(request: HttpRequest) -> HttpResponse:
 
             membership_option = MembershipOption.objects.get(name=form_data["membership_option"])
             UserMembership.objects.create(
-                user=new_user, membership_option=membership_option, created_datetime=timezone.now()
+                user=new_user,
+                membership_option=membership_option,
+                start_date=timezone.localdate(),
+                created_datetime=timezone.localtime(),
             )
 
             return render(
@@ -180,6 +189,82 @@ def edit_user_profile(request: HttpRequest, pk: int) -> HttpResponse:
     )
 
 
+def notify_staff_of_new_user_membership(request: HttpRequest, user_membership: UserMembership) -> HttpResponse:
+    site = get_current_site(request)
+    from_email = settings.DEFAULT_FROM_EMAIL
+
+    staff_users = User.objects.filter(is_staff=True, is_active=True)
+    for user in staff_users:
+        subject = _("New user membership")
+        template = "new_user_membership_email.txt"
+        context = {
+            "user": user,
+            "user_membership": user_membership,
+            "site": site,
+        }
+
+        message = render_to_string(template, context, request=request)
+
+        send_mail(subject, message, from_email, [user.email])
+
+
+def add_user_membership(request: HttpRequest, pk: int) -> HttpResponse:
+    if not (user_is_admin(request) or request.user.is_authenticated and request.user.pk == pk):
+        return HttpResponse(status=401)
+
+    user = User.objects.get(pk=pk)
+    current_membership = user.get_current_membership()
+
+    if user_is_admin(request):
+        user_view_url = reverse("admin-user-view", kwargs={"pk": pk})
+    else:
+        user_view_url = reverse("current-user-view")
+
+    if request.method == "POST":
+        form = AddUserMembershipForm(request.POST, user=user)
+        if form.is_valid():
+            form_data = form.cleaned_data
+
+            start_date = form_data["start_date"]
+            membership_option = MembershipOption.objects.get(name=form_data["membership_option"])
+
+            user_membership = UserMembership.objects.create(
+                user=user,
+                membership_option=membership_option,
+                start_date=start_date,
+                created_datetime=timezone.localtime(),
+            )
+
+            transaction.on_commit(
+                partial(notify_staff_of_new_user_membership, request=request, user_membership=user_membership)
+            )
+
+            return HttpResponseRedirect(user_view_url + "?membership_added=true")
+    else:
+        start_date = timezone.localdate()
+
+        if current_membership:
+            membership_expiry_date = current_membership.expiry_date()
+
+            if membership_expiry_date > timezone.localdate():
+                start_date = membership_expiry_date
+
+        initial_values = {"start_date": date_format(start_date, format=settings.SHORT_DATE_FORMAT)}
+
+        form = AddUserMembershipForm(initial=initial_values, user=user)
+
+    return render(
+        request,
+        "add_user_membership.html",
+        {
+            "user_view_url": user_view_url,
+            "current_membership": current_membership,
+            "user_detail": user,
+            "form": form,
+        },
+    )
+
+
 class AdminUserListView(UserIsAdminMixin, SingleTableView):
     model = User
     table_class = AdminUserTable
@@ -231,6 +316,15 @@ class UserDetailViewBase(SingleTableMixin, DetailView):
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context: Dict[str, Any] = super().get_context_data(**kwargs)
+
+        user = context["user_detail"]
+
+        latest_membership = user.get_latest_membership()
+        can_add_membership = False
+        if not latest_membership or latest_membership.status() in [UserMemberStatus.ACTIVE, UserMemberStatus.EXPIRED]:
+            can_add_membership = True
+
+        context["can_add_membership"] = can_add_membership
 
         if self.request.method == "GET" and self.request.GET.get("profile_updated"):
             context["show_messages"] = [_("Profile Updated")]

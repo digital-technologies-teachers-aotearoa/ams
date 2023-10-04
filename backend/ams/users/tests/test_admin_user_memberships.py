@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import timedelta
 
 from dateutil.tz import gettz
 from django.conf import settings
@@ -27,11 +27,14 @@ class AdminUserMembershipsTests(TestCase):
 
         self.time_zone = gettz(settings.TIME_ZONE)
 
+        start = timezone.localtime() - timedelta(days=7)
+
         self.user_membership = UserMembership.objects.create(
             user=self.user,
             membership_option=membership_option,
-            created_datetime=datetime(day=1, month=7, year=2023, hour=6, tzinfo=self.time_zone),
-            approved_datetime=datetime(day=1, month=7, year=2023, hour=21, tzinfo=self.time_zone),
+            created_datetime=start,
+            start_date=start.date(),
+            approved_datetime=start + timedelta(days=1),
         )
 
         self.url = "/users/memberships/"
@@ -103,7 +106,7 @@ class AdminUserMembershipsTests(TestCase):
                 self.user_membership.membership_option.name,
                 "1 month",
                 "Active",
-                date_format(self.user_membership.created_datetime, format="SHORT_DATE_FORMAT"),
+                date_format(self.user_membership.start_date, format="SHORT_DATE_FORMAT"),
                 date_format(self.user_membership.approved_datetime, format="SHORT_DATE_FORMAT"),
                 "",
             ]
@@ -130,9 +133,39 @@ class AdminUserMembershipsTests(TestCase):
                 self.user_membership.membership_option.name,
                 "1 month",
                 "Pending",
-                date_format(self.user_membership.created_datetime, format="SHORT_DATE_FORMAT"),
+                date_format(self.user_membership.start_date, format="SHORT_DATE_FORMAT"),
                 "—",
                 "Approve",
+            ]
+        ]
+
+        self.assertListEqual(expected_rows, rows)
+
+    def test_should_show_expired_membership_as_expired(self) -> None:
+        # Given
+        self.user_membership.approved_datetime = timezone.now().astimezone(self.time_zone)
+        self.user_membership.start_date = timezone.localdate() - self.user_membership.membership_option.duration
+        self.user_membership.save()
+
+        # When
+        response = self.client.get(self.url)
+
+        # Then
+        self.assertEqual(200, response.status_code)
+
+        rows = parse_response_table_rows(response)
+
+        self.maxDiff = None
+
+        expected_rows = [
+            [
+                self.user.get_full_name(),
+                self.user_membership.membership_option.name,
+                "1 month",
+                "Expired",
+                date_format(self.user_membership.start_date, format="SHORT_DATE_FORMAT"),
+                date_format(self.user_membership.approved_datetime, format="SHORT_DATE_FORMAT"),
+                "",
             ]
         ]
 
@@ -160,7 +193,7 @@ class AdminUserMembershipsTests(TestCase):
                 self.user_membership.membership_option.name,
                 "1 month",
                 "Active",
-                date_format(self.user_membership.created_datetime, format="SHORT_DATE_FORMAT"),
+                date_format(self.user_membership.start_date, format="SHORT_DATE_FORMAT"),
                 date_format(timezone.now().astimezone(self.time_zone), format="SHORT_DATE_FORMAT"),
                 "",
             ]

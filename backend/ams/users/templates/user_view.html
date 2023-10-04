@@ -10,7 +10,7 @@
 
 {% include "show_messages.html" %}
 
-<table>
+<table style="width: 100%">
     <tr>
         <td style="padding: 10px">
             <img class="user-details-profile-image" src="">
@@ -28,7 +28,18 @@
         </td>
         <td valign="top">
             <h1>{% translate "Memberships" %}</h1>
-            {% render_table table %}
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="table-container">
+                        <div class="table-actions">
+                            {% if can_add_membership %}
+                                <a class="btn btn-small btn-table-action" href="{% url "add-user-membership" user_detail.pk  %}">{% translate "Add Membership" %}</a>
+                            {% endif %}
+                        </div>
+                        {% render_table table %}
+                    </div>
+                </div>
+            </div>
         </td>
     </tr>
 </table>

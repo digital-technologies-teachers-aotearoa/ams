@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load static wagtailcore_tags i18n localize_url form_field %}
+
+{% block title %}{% translate "Add a Membership" %}{% endblock title %}
+
+{% block body_class %}add-user-membership{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col">
+        <div class="introduction">
+            <h1 class="introduction-heading standard-page">{% translate "Add a Membership" %}</h1>
+            <div class="introduction-content standard-page" style="max-width: none">
+                {% if user.pk == user_detail.pk %}
+                    {% if current_membership.status == "ACTIVE" %}
+                        {% blocktranslate with display_name=user_detail.display_name membership_name=current_membership.membership_option.name expiry_date=current_membership.expiry_date %}
+                        {{display_name}} your current {{membership_name}} membership is Active and expires on {{expiry_date}}.
+                        Select a new membership to continue using membership features beyond this date.
+                        {% endblocktranslate %}
+                    {% elif current_membership.status == "EXPIRED" %}
+                        {% blocktranslate with display_name=user_detail.display_name expiry_date=current_membership.expiry_date %}
+                        {{display_name}} your last membership expired on on {{expiry_date}}.
+                        Select a new membership to resume using all membership features.
+                        {% endblocktranslate %}
+                    {% endif %}
+                {% else %}
+                {% if current_membership.status == "ACTIVE" %}
+                    {% blocktranslate with display_name=user_detail.display_name membership_name=current_membership.membership_option.name expiry_date=current_membership.expiry_date %}
+                    {{display_name}}'s current {{membership_name}} membership is Active and expires on {{expiry_date}}.
+                    {% endblocktranslate %}
+                {% elif current_membership.status == "EXPIRED" %}
+                    {% blocktranslate with display_name=user.display_name expiry_date=current_membership.expiry_date %}
+                    {{display_name}}'s last membership expired on {{expiry_date}}.
+                    {% endblocktranslate %}
+                {% endif %}
+                {% endif %}
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <div class="row no-gutters">
+        <div class="col-lg-9">
+
+            <form class="form-panel form-panel-registration" action="" method="post">
+            {% csrf_token %}
+
+            {% for field in form %}
+                <div class="form-group">
+                    <div class="form-label">
+                        {{ field.label_tag }}
+                    </div>
+                    <div class="form-input form-input-short">
+                        {{ field|add_form_field_classes }}
+                        {{ field.errors }}
+                    </div>
+                </div>
+            {% endfor %}
+
+            <div class="form-actions">
+                <input class="btn btn-form-cancel" type="button" value="Cancel" onclick="window.location='{{ user_view_url }}';">
+                <input class="btn btn-form-submit-hollow" type="submit" value="{% translate "Add Membership" %}">
+            </div>
+        </form>
+        </div>
+    </div>
+
+{% endblock content %}

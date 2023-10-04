@@ -47,7 +47,7 @@
   display: flex;
   flex-wrap: wrap;
 
-  input {
+  input:not([type=radio]) {
     @extend .form-control; // extends from vendor bootstrap
     border: 1px solid $form-colour-border;
   }

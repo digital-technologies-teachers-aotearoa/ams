@@ -1,9 +1,11 @@
-from typing import Any, Tuple
+from datetime import date
+from typing import Any, Optional
 
 from django.contrib.auth.models import User
 from django.db.models import (
     CASCADE,
     CharField,
+    DateField,
     DateTimeField,
     DecimalField,
     ForeignKey,
@@ -11,6 +13,7 @@ from django.db.models import (
     TextChoices,
     TextField,
 )
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from relativedeltafield import RelativeDeltaField
 
@@ -38,31 +41,45 @@ class MembershipOption(Model):
     cost = DecimalField(max_digits=10, decimal_places=2)
 
 
-class UserMembership(Model):
-    user = ForeignKey(User, on_delete=CASCADE, related_name="user_memberships")
-    membership_option = ForeignKey(MembershipOption, on_delete=CASCADE, related_name="user_memberships")
-    created_datetime = DateTimeField()
-    approved_datetime = DateTimeField(null=True)
-
-
 class UserMemberStatus(TextChoices):
     NONE = "NONE", _("None")
     PENDING = "PENDING", _("Pending")
     ACTIVE = "ACTIVE", _("Active")
+    EXPIRED = "EXPIRED", _("Expired")
+
+
+class UserMembership(Model):
+    user = ForeignKey(User, on_delete=CASCADE, related_name="user_memberships")
+    membership_option = ForeignKey(MembershipOption, on_delete=CASCADE, related_name="user_memberships")
+    start_date = DateField()
+    created_datetime = DateTimeField()
+    approved_datetime = DateTimeField(null=True)
+
+    def expiry_date(self) -> date:
+        # A membership is considered expired once the expiry date is reached
+        # (it is not inclusive of the expiry date)
+        expiry_date: date = self.start_date + self.membership_option.duration
+        return expiry_date
+
+    def status(self) -> Any:
+        if timezone.localdate() >= self.expiry_date():
+            return UserMemberStatus.EXPIRED
+
+        if self.approved_datetime is None or self.start_date > timezone.localdate():
+            return UserMemberStatus.PENDING
+
+        return UserMemberStatus.ACTIVE
 
 
 class UserMemberInfo:
     def __init__(self, user: User) -> None:
-        self.user_membership = UserMembership.objects.filter(user=user).order_by("-created_datetime").first()
+        self.user_membership: Optional[UserMembership] = user.get_current_membership()
 
-    def status(self) -> Tuple[str, Any]:
+    def status(self) -> Any:
         if not self.user_membership:
             return UserMemberStatus.NONE
 
-        if self.user_membership.approved_datetime is None:
-            return UserMemberStatus.PENDING
-
-        return UserMemberStatus.ACTIVE
+        return self.user_membership.status()
 
 
 def user_member_info(user: User) -> UserMemberInfo:
@@ -75,4 +92,25 @@ def user_member_info(user: User) -> UserMemberInfo:
     return user._member_info
 
 
+def get_display_name(user: User) -> str:
+    display_name: str = user.get_full_name()
+    return display_name
+
+
+def get_current_membership(user: User) -> Optional[UserMembership]:
+    current_membership: Optional[UserMembership] = (
+        user.user_memberships.filter(start_date__lte=timezone.localdate()).order_by("-start_date").first()
+    )
+    return current_membership
+
+
+def get_latest_membership(user: User) -> Optional[UserMembership]:
+    latest_membership: Optional[UserMembership] = user.user_memberships.order_by("-start_date").first()
+    return latest_membership
+
+
+User.get_current_membership = get_current_membership
+User.get_latest_membership = get_latest_membership
+
 User.member = property(lambda self: user_member_info(self))
+User.display_name = property(lambda self: get_display_name(self))
