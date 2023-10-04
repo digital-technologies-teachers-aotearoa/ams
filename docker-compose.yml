@@ -31,6 +31,7 @@ services:
 
   cron:
     user: root
+    init: true
     image: 'docker.catalyst.net.nz/dtta/ams/backend:${DOCKER_TAG}'
     entrypoint: ["/src/app/cron-entrypoint.bash"]
     depends_on:
