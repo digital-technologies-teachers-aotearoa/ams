@@ -165,7 +165,7 @@ class AdminUserMembershipsTests(TestCase):
                 "Expired",
                 date_format(self.user_membership.start_date, format="SHORT_DATE_FORMAT"),
                 date_format(self.user_membership.approved_datetime, format="SHORT_DATE_FORMAT"),
-                "Cancel",
+                "",
             ]
         ]
 

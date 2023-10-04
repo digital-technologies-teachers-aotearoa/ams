@@ -214,7 +214,7 @@ class AdminUserViewTests(TestCase):
                 "Expired",
                 date_format(self.user_membership.start_date, format="SHORT_DATE_FORMAT"),
                 date_format(self.user_membership.approved_datetime, format="SHORT_DATE_FORMAT"),
-                "Cancel",
+                "",
             ]
         ]
 
@@ -255,6 +255,20 @@ class AdminUserViewTests(TestCase):
     def test_should_not_cancel_cancelled_user_membership(self) -> None:
         # Given
         self.user_membership.cancelled_datetime = timezone.now()
+        self.user_membership.save()
+
+        # When
+        response = self.client.post(
+            self.url, data={"action": "cancel_user_membership", "user_membership_id": self.user_membership.id}
+        )
+
+        # Then
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(self.url, response.url)
+
+    def test_should_not_cancel_expired_user_membership(self) -> None:
+        # Given
+        self.user_membership.start_date = timezone.localdate() - self.user_membership.membership_option.duration
         self.user_membership.save()
 
         # When

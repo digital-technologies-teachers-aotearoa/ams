@@ -285,7 +285,7 @@ def approve_user_membership(user_membership_id: int) -> HttpResponse:
 def cancel_user_membership(user_membership_id: int) -> HttpResponse:
     user_membership = UserMembership.objects.get(pk=user_membership_id)
 
-    if not user_membership.cancelled_datetime:
+    if not user_membership.cancelled_datetime and not user_membership.is_expired():
         user_membership.cancelled_datetime = timezone.now()
         user_membership.save()
         return True

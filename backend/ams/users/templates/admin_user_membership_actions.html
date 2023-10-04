@@ -12,7 +12,7 @@
             </form>
     </li>
     {% endif %}
-    {% if not record.cancelled_datetime %}
+    {% if not record.cancelled_datetime and not record.is_expired %}
     <li>
         <button class="btn-table" data-toggle="modal" data-target="#cancelMembershipModal"
             onClick="document.forms.cancel_membership_form.elements.user_membership_id.value='{{ record.pk }}';"
