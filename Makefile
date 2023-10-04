@@ -46,6 +46,14 @@ backend-check-migrations:
 backend-reload-server:
 	./docker_compose exec -T backend pkill -HUP gunicorn
 
+.PHONY: translations
+translations:
+	./docker_compose run -T --rm --entrypoint="mkdir locale && poetry run ./manage.py makemessages --locale=mi" backend
+
+.PHONY: compile-translations
+compile-translations:
+	./docker_compose run -T --rm --entrypoint="poetry run ./manage.py compilemessages --locale=mi" backend
+
 .PHONY: test-backend
 test-backend:
 	./docker_compose run -T --rm --entrypoint="poetry run pytest $(TESTS)" backend
