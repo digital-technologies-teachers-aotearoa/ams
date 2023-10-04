@@ -1,13 +1,24 @@
 {% load static i18n %}
-<ul style="list-style-type: none; margin: 0; padding: 0">
+<ul class="table-action-list">
+    {% if not record.approved_datetime and not record.cancelled_datetime %}
     <li>
-        {% if not record.approved_datetime %}
-            <form method="post" id="approve-membership-form" action="">
+            <form method="post" name="approve_membership_form_{{ record.pk }}" action="">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="approve_user_membership">
                 <input type="hidden" name="user_membership_id" value="{{ record.pk }}">
-                <a href="javascript:void(0)" onclick="document.getElementById('approve-membership-form').submit()" title="Approve"><i class="fa-solid fa-check"></i></a>
+                <button class="btn-table" type="submit" title="{% translate "Approve" %}">
+                    <i class="fa-solid fa-check"></i>
+                </button>
             </form>
-        {% endif %}
     </li>
+    {% endif %}
+    {% if not record.cancelled_datetime and not record.is_expired %}
+    <li>
+        <button class="btn-table" data-toggle="modal" data-target="#cancelMembershipModal"
+            onClick="document.forms.cancel_membership_form.elements.user_membership_id.value='{{ record.pk }}';"
+            title="{% translate "Cancel" %}">
+            <i class="fa-solid fa-circle-xmark"></i>
+        </button>
+    </li>
+    {% endif %}
 </ul>

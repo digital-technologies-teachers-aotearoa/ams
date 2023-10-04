@@ -107,7 +107,7 @@ class AdminUserViewTests(TestCase):
                 "Active",
                 date_format(self.user_membership.start_date, format="SHORT_DATE_FORMAT"),
                 date_format(self.user_membership.approved_datetime, format="SHORT_DATE_FORMAT"),
-                "",
+                "Cancel",
             ]
         ]
 
@@ -133,7 +133,7 @@ class AdminUserViewTests(TestCase):
                 "Pending",
                 date_format(self.user_membership.start_date, format="SHORT_DATE_FORMAT"),
                 "—",
-                "Approve",
+                "Approve,Cancel",
             ]
         ]
 
@@ -149,6 +149,11 @@ class AdminUserViewTests(TestCase):
         )
 
         # Then
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(f"{self.url}?membership_approved=true", response.url)
+
+        response = self.client.get(response.url)
+
         self.assertEqual(200, response.status_code)
 
         rows = parse_response_table_rows(response)
@@ -160,7 +165,7 @@ class AdminUserViewTests(TestCase):
                 "Active",
                 date_format(self.user_membership.start_date, format="SHORT_DATE_FORMAT"),
                 date_format(timezone.now().astimezone(self.time_zone), format="SHORT_DATE_FORMAT"),
-                "",
+                "Cancel",
             ]
         ]
 
@@ -176,8 +181,8 @@ class AdminUserViewTests(TestCase):
         )
 
         # Then
-        self.assertEqual(200, response.status_code)
-        self.assertEqual(None, response.context.get("show_messages"))
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(self.url, response.url)
 
     def test_should_not_approve_user_membership_with_invalid_id(self) -> None:
         # When
@@ -207,6 +212,94 @@ class AdminUserViewTests(TestCase):
                 self.user_membership.membership_option.name,
                 "1 month",
                 "Expired",
+                date_format(self.user_membership.start_date, format="SHORT_DATE_FORMAT"),
+                date_format(self.user_membership.approved_datetime, format="SHORT_DATE_FORMAT"),
+                "",
+            ]
+        ]
+
+        self.assertListEqual(expected_rows, rows)
+
+    def test_should_cancel_uncancelled_user_membership(self) -> None:
+        # When
+        response = self.client.post(
+            self.url, data={"action": "cancel_user_membership", "user_membership_id": self.user_membership.id}
+        )
+
+        # Then
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(f"{self.url}?membership_cancelled=true", response.url)
+
+        response = self.client.get(response.url)
+
+        self.assertEqual(200, response.status_code)
+
+        rows = parse_response_table_rows(response)
+
+        expected_rows = [
+            [
+                self.user_membership.membership_option.name,
+                "1 month",
+                "Cancelled",
+                date_format(self.user_membership.start_date, format="SHORT_DATE_FORMAT"),
+                date_format(self.user_membership.approved_datetime, format="SHORT_DATE_FORMAT"),
+                "",
+            ]
+        ]
+
+        self.assertListEqual(expected_rows, rows)
+
+        expected_messages = ["Membership Cancelled"]
+        self.assertListEqual(expected_messages, response.context["show_messages"])
+
+    def test_should_not_cancel_cancelled_user_membership(self) -> None:
+        # Given
+        self.user_membership.cancelled_datetime = timezone.now()
+        self.user_membership.save()
+
+        # When
+        response = self.client.post(
+            self.url, data={"action": "cancel_user_membership", "user_membership_id": self.user_membership.id}
+        )
+
+        # Then
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(self.url, response.url)
+
+    def test_should_not_cancel_expired_user_membership(self) -> None:
+        # Given
+        self.user_membership.start_date = timezone.localdate() - self.user_membership.membership_option.duration
+        self.user_membership.save()
+
+        # When
+        response = self.client.post(
+            self.url, data={"action": "cancel_user_membership", "user_membership_id": self.user_membership.id}
+        )
+
+        # Then
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(self.url, response.url)
+
+    def test_should_show_cancelled_membership_as_cancelled(self) -> None:
+        # Given
+        self.user_membership.cancelled_datetime = timezone.now().astimezone(self.time_zone)
+        self.user_membership.save()
+
+        # When
+        response = self.client.get(self.url)
+
+        # Then
+        self.assertEqual(200, response.status_code)
+
+        rows = parse_response_table_rows(response)
+
+        self.maxDiff = None
+
+        expected_rows = [
+            [
+                self.user_membership.membership_option.name,
+                "1 month",
+                "Cancelled",
                 date_format(self.user_membership.start_date, format="SHORT_DATE_FORMAT"),
                 date_format(self.user_membership.approved_datetime, format="SHORT_DATE_FORMAT"),
                 "",

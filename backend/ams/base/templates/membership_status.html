@@ -13,6 +13,8 @@
     {% blocktranslate with start_date=user.member.latest_membership.start_date %}
         Your membership is Pending (starts on {{start_date}})
     {% endblocktranslate %}
+{% elif user.member.latest_membership_is_cancelled %}
+    {% translate "Your membership has been cancelled" %}
 {% elif user.member.current_membership and user.member.current_membership.status == "EXPIRED" %}
     {% translate "Your membership has Expired" %}
     (<a href="{% url "add-user-membership" user.pk %}">{% translate "Extend" %}</a>)

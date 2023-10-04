@@ -274,7 +274,7 @@ class AdminUserListView(UserIsAdminMixin, SingleTableView):
 def approve_user_membership(user_membership_id: int) -> HttpResponse:
     user_membership = UserMembership.objects.get(pk=user_membership_id)
 
-    if not user_membership.approved_datetime:
+    if not user_membership.approved_datetime and not user_membership.cancelled_datetime:
         user_membership.approved_datetime = timezone.now()
         user_membership.save()
         return True
@@ -282,28 +282,65 @@ def approve_user_membership(user_membership_id: int) -> HttpResponse:
     return False
 
 
-class AdminUserMembershipListView(UserIsAdminMixin, SingleTableView):
+def cancel_user_membership(user_membership_id: int) -> HttpResponse:
+    user_membership = UserMembership.objects.get(pk=user_membership_id)
+
+    if not user_membership.cancelled_datetime and not user_membership.is_expired():
+        user_membership.cancelled_datetime = timezone.now()
+        user_membership.save()
+        return True
+
+    return False
+
+
+class MembershipActionMixin:
+    def membership_post_action(self, request: HttpRequest, redirect_url: str) -> HttpResponse:
+        if request.POST.get("action") == "approve_user_membership":
+            try:
+                user_membership_id = int(request.POST["user_membership_id"])
+                if approve_user_membership(user_membership_id):
+                    redirect_url += "?membership_approved=true"
+
+                return HttpResponseRedirect(redirect_url)
+
+            except Exception:
+                return HttpResponse(status=400)
+
+        elif request.POST.get("action") == "cancel_user_membership":
+            try:
+                user_membership_id = int(request.POST["user_membership_id"])
+                if cancel_user_membership(user_membership_id):
+                    redirect_url += "?membership_cancelled=true"
+
+                return HttpResponseRedirect(redirect_url)
+
+            except Exception:
+                return HttpResponse(status=400)
+
+        return HttpResponse(status=400)
+
+    def membership_action_context(self, request: HttpRequest, context: Dict[str, Any]) -> Dict[str, Any]:
+        if request.method == "GET" and request.GET.get("membership_cancelled"):
+            context["show_messages"] = [_("Membership Cancelled")]
+
+        if request.method == "GET" and request.GET.get("membership_approved"):
+            context["show_messages"] = [_("Membership Approved")]
+
+        return context
+
+
+class AdminUserMembershipListView(UserIsAdminMixin, SingleTableView, MembershipActionMixin):
     model = UserMembership
     table_class = AdminUserMembershipTable
     template_name = "admin_user_memberships.html"
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        if request.POST.get("action") == "approve_user_membership":
-            try:
-                user_membership_id = int(request.POST["user_membership_id"])
-                membership_approved = approve_user_membership(user_membership_id)
-            except Exception:
-                return HttpResponse(status=400)
-        else:
-            return HttpResponse(status=400)
+        redirect_url = reverse("admin-user-memberships")
+        return self.membership_post_action(request, redirect_url)
 
-        self.object_list = self.get_queryset()
-        context = self.get_context_data()
-
-        if membership_approved:
-            context["show_messages"] = [_("Membership Approved")]
-
-        return self.render_to_response(context)
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context: Dict[str, Any] = super().get_context_data(**kwargs)
+        return self.membership_action_context(self.request, context)
 
 
 class UserDetailViewBase(SingleTableMixin, DetailView):
@@ -344,26 +381,17 @@ class UserDetailView(LoginRequiredMixin, UserDetailViewBase):
         return super().get(request, args, kwargs)
 
 
-class AdminUserDetailView(UserIsAdminMixin, UserDetailViewBase):
+class AdminUserDetailView(UserIsAdminMixin, UserDetailViewBase, MembershipActionMixin):
     table_class = AdminUserDetailMembershipTable
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        if request.POST.get("action") == "approve_user_membership":
-            try:
-                user_membership_id = int(request.POST["user_membership_id"])
-                membership_approved = approve_user_membership(user_membership_id)
-            except Exception:
-                return HttpResponse(status=400)
-        else:
-            return HttpResponse(status=400)
-
         self.object = self.get_object()
-        context = self.get_context_data()
+        redirect_url = reverse("admin-user-view", kwargs={"pk": self.object.pk})
+        return self.membership_post_action(request, redirect_url)
 
-        if membership_approved:
-            context["show_messages"] = [_("Membership Approved")]
-
-        return self.render_to_response(context)
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context: Dict[str, Any] = super().get_context_data(**kwargs)
+        return self.membership_action_context(self.request, context)
 
 
 class AdminOrganisationListView(UserIsAdminMixin, SingleTableView):

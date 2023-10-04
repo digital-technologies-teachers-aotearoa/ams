@@ -1,0 +1,22 @@
+
+{% extends "modal.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Cancel Membership" %}{% endblock %}
+
+{% block body %}
+    {% blocktranslate %}
+    Are you sure you want to cancel this membership?
+    The affected user will no longer be able to access membership features through this membership.
+    {% endblocktranslate %}
+{% endblock %}
+
+{% block actions %}
+    <button type="button" class="btn btn-secondary" data-dismiss="modal">{% translate "No" %}</button>
+    <form method="post" name="cancel_membership_form" action="">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="cancel_user_membership">
+        <input type="hidden" name="user_membership_id" value="">
+        <button type="submit" class="btn btn-primary">{% translate "Yes, Cancel" %}</button>
+    </form>
+{% endblock %}
