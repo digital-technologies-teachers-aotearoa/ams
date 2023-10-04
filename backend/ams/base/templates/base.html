@@ -50,8 +50,8 @@
           <div class="user-details-bar">
             <div class="user-details-inner container">
               <p class="user-details-membership">
-                {% if user.is_authenticated and user.member.status == "PENDING" %}
-                    {% translate "Your membership is Pending" %}
+                {% if user.is_authenticated %}
+                  {% include "membership_status.html" %}
                 {% endif %}
               </p>
               <div class="user-details-status">
