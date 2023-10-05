@@ -29,7 +29,8 @@ class EditUserProfileTests(TestCase):
         response = self.client.get(self.url)
 
         # Then
-        self.assertEqual(401, response.status_code)
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(f"/users/login/?next={self.url}", response.url)
 
     def test_should_allow_admin_user(self) -> None:
         # Given

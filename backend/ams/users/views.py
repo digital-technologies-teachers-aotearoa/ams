@@ -2,6 +2,7 @@ from functools import partial
 from typing import Any, Dict, Optional
 
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.contrib.sites.shortcuts import get_current_site
@@ -93,6 +94,7 @@ def individual_registration(request: HttpRequest) -> HttpResponse:
     )
 
 
+@login_required
 def create_organisation(request: HttpRequest) -> HttpResponse:
     if not user_is_admin(request):
         return HttpResponse(status=403)
@@ -160,8 +162,9 @@ def activate_user(request: HttpRequest, activation_key: str) -> HttpResponse:
     return HttpResponse(status=401)
 
 
+@login_required
 def edit_user_profile(request: HttpRequest, pk: int) -> HttpResponse:
-    if not (user_is_admin(request) or request.user.is_authenticated and request.user.pk == pk):
+    if not (user_is_admin(request) or request.user.pk == pk):
         return HttpResponse(status=401)
 
     user = User.objects.get(pk=pk)
@@ -208,8 +211,9 @@ def notify_staff_of_new_user_membership(request: HttpRequest, user_membership: U
         send_mail(subject, message, from_email, [user.email])
 
 
+@login_required
 def add_user_membership(request: HttpRequest, pk: int) -> HttpResponse:
-    if not (user_is_admin(request) or request.user.is_authenticated and request.user.pk == pk):
+    if not (user_is_admin(request) or request.user.pk == pk):
         return HttpResponse(status=401)
 
     user = User.objects.get(pk=pk)
