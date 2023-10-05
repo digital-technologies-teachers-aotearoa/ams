@@ -32,6 +32,7 @@ from .forms import (
 )
 from .models import MembershipOption, Organisation, UserMembership, UserMemberStatus
 from .tables import (
+    AdminMembershipOptionTable,
     AdminOrganisationTable,
     AdminUserDetailMembershipTable,
     AdminUserMembershipTable,
@@ -269,6 +270,12 @@ def add_user_membership(request: HttpRequest, pk: int) -> HttpResponse:
     )
 
 
+@login_required
+def edit_membership_option(request: HttpRequest, pk: int) -> HttpResponse:
+    if not user_is_admin(request):
+        return HttpResponse(status=401)
+
+
 class AdminUserListView(UserIsAdminMixin, SingleTableView):
     model = User
     table_class = AdminUserTable
@@ -345,6 +352,12 @@ class AdminUserMembershipListView(UserIsAdminMixin, SingleTableView, MembershipA
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context: Dict[str, Any] = super().get_context_data(**kwargs)
         return self.membership_action_context(self.request, context)
+
+
+class AdminMembershipOptionListView(UserIsAdminMixin, SingleTableView):
+    model = MembershipOption
+    table_class = AdminMembershipOptionTable
+    template_name = "admin_membership_options.html"
 
 
 class UserDetailViewBase(SingleTableMixin, DetailView):

@@ -1,6 +1,7 @@
 from django.urls import include, path
 
 from .views import (
+    AdminMembershipOptionListView,
     AdminOrganisationListView,
     AdminUserDetailView,
     AdminUserListView,
@@ -9,6 +10,7 @@ from .views import (
     activate_user,
     add_user_membership,
     create_organisation,
+    edit_membership_option,
     edit_user_profile,
     individual_registration,
 )
@@ -20,6 +22,8 @@ urlpatterns = [
     path("view/<int:pk>/", AdminUserDetailView.as_view(), name="admin-user-view"),
     path("add-membership/<int:pk>/", add_user_membership, name="add-user-membership"),
     path("memberships/", AdminUserMembershipListView.as_view(), name="admin-user-memberships"),
+    path("membership-options/", AdminMembershipOptionListView.as_view(), name="admin-membership-options"),
+    path("membership-options/edit/<int:pk>/", edit_membership_option, name="edit-membership-option"),
     path("organisations/", AdminOrganisationListView.as_view(), name="admin-organisations"),
     path("organisations/create/", create_organisation, name="admin-create-organisation"),
     path("individual-registration/", individual_registration, name="registration_register"),
