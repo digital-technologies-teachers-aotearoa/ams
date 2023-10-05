@@ -18,6 +18,9 @@ def add_class_to_widget(widget: Any, class_name: str) -> None:
 
 @register.filter(name="add_form_field_classes")
 def add_form_field_classes(field: BoundField) -> Any:
+    if not field.subwidgets:
+        return field
+
     widget = field.subwidgets[0]
     attrs = field.subwidgets[0].data["attrs"]
 
