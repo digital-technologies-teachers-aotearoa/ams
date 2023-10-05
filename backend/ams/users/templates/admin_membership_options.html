@@ -22,7 +22,7 @@
     <div class="col-lg-12" style="margin-bottom: 0; padding-bottom: 0">
         <div class="table-container">
             <div class="table-actions">
-                <a class="btn btn-small btn-table-action" href="#">{% translate "Add New" %}</a>
+                <a class="btn btn-small btn-table-action" href="{% url "create-membership-option" %}">{% translate "Add New" %}</a>
             </div>
 {% if table.rows %}
     {% render_table table %}

@@ -99,7 +99,7 @@ https://testserver/users/activate/{activation_key}/
         # Then
         expected_choices = [
             ("Primary School", "$10.00 for 6 months"),
-            ("Secondary School", "$20.00 for 12 months"),
+            ("Secondary School", "$20.00 for 1 year"),
         ]
         self.assertListEqual(expected_choices, choices)
 

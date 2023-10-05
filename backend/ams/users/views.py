@@ -28,6 +28,7 @@ from .forms import (
     AddUserMembershipForm,
     EditUserProfileForm,
     IndividualRegistrationForm,
+    MembershipOptionForm,
     OrganisationForm,
 )
 from .models import MembershipOption, Organisation, UserMembership, UserMemberStatus
@@ -271,9 +272,53 @@ def add_user_membership(request: HttpRequest, pk: int) -> HttpResponse:
 
 
 @login_required
+def create_membership_option(request: HttpRequest) -> HttpResponse:
+    if not user_is_admin(request):
+        return HttpResponse(status=401)
+
+    if request.method == "POST":
+        form = MembershipOptionForm(request.POST)
+        if form.is_valid():
+            form.save()
+            membership_options_url = reverse("admin-membership-options")
+            return HttpResponseRedirect(membership_options_url + "?membership_option_created=true")
+    else:
+        form = MembershipOptionForm()
+
+    return render(
+        request,
+        "edit_membership_option.html",
+        {
+            "membership_option": None,
+            "form": form,
+        },
+    )
+
+
+@login_required
 def edit_membership_option(request: HttpRequest, pk: int) -> HttpResponse:
     if not user_is_admin(request):
         return HttpResponse(status=401)
+
+    membership_option = MembershipOption.objects.get(pk=pk)
+
+    if request.method == "POST":
+        form = MembershipOptionForm(request.POST, instance=membership_option)
+        if form.is_valid():
+            form.save()
+            membership_options_url = reverse("admin-membership-options")
+            return HttpResponseRedirect(membership_options_url + "?membership_option_updated=true")
+    else:
+        form = MembershipOptionForm(instance=membership_option)
+
+    return render(
+        request,
+        "edit_membership_option.html",
+        {
+            "membership_option": membership_option,
+            "form": form,
+        },
+    )
 
 
 class AdminUserListView(UserIsAdminMixin, SingleTableView):
@@ -358,6 +403,17 @@ class AdminMembershipOptionListView(UserIsAdminMixin, SingleTableView):
     model = MembershipOption
     table_class = AdminMembershipOptionTable
     template_name = "admin_membership_options.html"
+
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context: Dict[str, Any] = super().get_context_data(**kwargs)
+
+        if self.request.method == "GET" and self.request.GET.get("membership_option_created"):
+            context["show_messages"] = [_("Membership Option Added")]
+
+        if self.request.method == "GET" and self.request.GET.get("membership_option_updated"):
+            context["show_messages"] = [_("Membership Option Saved")]
+
+        return context
 
 
 class UserDetailViewBase(SingleTableMixin, DetailView):
