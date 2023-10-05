@@ -16505,6 +16505,12 @@ header {
     max-width: 16.5625rem;
   }
 }
+@media (min-width: 576px) {
+  .form-input-short select {
+    max-width: 265px;
+    max-width: 16.5625rem;
+  }
+}
 
 .form-actions {
   position: absolute;
@@ -16549,6 +16555,20 @@ header {
     flex-basis: 0;
     flex-grow: 1;
   }
+}
+
+input.membership-duration {
+  display: inline !important;
+  max-width: 80px;
+  max-width: 5rem;
+}
+
+select.membership-duration {
+  display: inline;
+  margin-left: 10px;
+  margin-left: 0.625rem;
+  max-width: 175px;
+  max-width: 10.9375rem;
 }
 
 .registration-membership-fields {
