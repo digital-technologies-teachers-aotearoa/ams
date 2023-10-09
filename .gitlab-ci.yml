@@ -68,7 +68,7 @@ lint backend:
     - cd /src/app/
     - poetry run ./lint-python.bash
 
-test backend:
+test backend (base):
   stage: test
   image:
     name: $CONTAINER_REGISTRY/dtta/ams/backend:${IMAGE_TAG}
@@ -88,6 +88,37 @@ test backend:
     APPLICATION_DB_PASSWORD: ${POSTGRES_PASSWORD}
     APPLICATION_WEB_HOST: localhost
     DJANGO_SETTINGS_MODULE: ams.settings
+    DJANGO_CONFIGURATION: Development
+    DJANGO_SECRET_KEY: test django secret key
+    EMAIL_HOST: localhost
+    EMAIL_HOST_USER: test
+    EMAIL_HOST_PASSWORD:
+  script:
+    - cd /src/app
+    - poetry run ./manage.py makemigrations --dry-run
+    - poetry run ./manage.py makemigrations --check
+    - poetry run pytest
+
+test backend (dtta):
+  stage: test
+  image:
+    name: $CONTAINER_REGISTRY/dtta/ams/backend:${IMAGE_TAG}
+    entrypoint: [""]
+  services:
+    - name: docker.catalyst.net.nz/catalyst/postgres:14
+      alias: db
+  variables:
+    POSTGRES_DB: test_db
+    POSTGRES_USER: test_user
+    POSTGRES_PASSWORD: test password
+    PGPASSWORD: ${POSTGRES_PASSWORD}
+    POSTGRES_HOST: db
+    APPLICATION_DB_HOST: ${POSTGRES_HOST}
+    APPLICATION_DB_NAME: ${POSTGRES_DB}
+    APPLICATION_DB_USER: ${POSTGRES_USER}
+    APPLICATION_DB_PASSWORD: ${POSTGRES_PASSWORD}
+    APPLICATION_WEB_HOST: localhost
+    DJANGO_SETTINGS_MODULE: ams.dtta.settings
     DJANGO_CONFIGURATION: Development
     DJANGO_SECRET_KEY: test django secret key
     EMAIL_HOST: localhost

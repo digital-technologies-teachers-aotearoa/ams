@@ -1,6 +1,6 @@
 from os import environ
 from pathlib import Path
-from typing import Iterable, Optional
+from typing import Any, Dict, Iterable, Optional
 
 import django.conf.locale
 import sentry_sdk
@@ -42,7 +42,6 @@ class Common(Configuration):
     INSTALLED_APPS = [
         "ams.base",
         "ams.users",
-        "ams.dtta",
         "registration",
         "django.contrib.admin",
         "django.contrib.auth",
@@ -142,20 +141,11 @@ class Common(Configuration):
 
     LANGUAGE_CODE = "en"
 
-    TIME_ZONE = "Pacific/Auckland"
-
     USE_I18N = True
 
     USE_TZ = True
 
     USE_L10N = False
-
-    SHORT_DATE_FORMAT = "d/m/Y"
-
-    DATE_INPUT_FORMATS = ["%Y-%m-%d", "%d/%m/%Y"]
-
-    # Translation
-    # https://docs.djangoproject.com/en/4.2/topics/i18n/translation/
 
     LOCALE_PATHS = [BASE_DIR / "locale"]
 
@@ -190,22 +180,11 @@ class Common(Configuration):
     # Wagtail settings
     # https://docs.wagtail.org/en/stable/reference/settings.html
 
-    WAGTAIL_SITE_NAME = "DTTA - Association Management Software"
     WAGTAILADMIN_BASE_URL = environ["APPLICATION_WEB_HOST"] + "/cms"
     WAGTAIL_I18N_ENABLED = True
-    WAGTAIL_CONTENT_LANGUAGES = LANGUAGES = [
-        ("en", "English"),
-        ("mi", "Maori"),
-    ]
+    WAGTAIL_CONTENT_LANGUAGES = LANGUAGES = [("en", "English")]
 
-    EXTRA_LANG_INFO = {
-        "mi": {
-            "bidi": False,
-            "code": "mi",
-            "name": "Maori",
-            "name_local": "Māori",
-        },
-    }
+    EXTRA_LANG_INFO: Dict[str, Any] = {}
 
     WAGTAILSIMPLETRANSLATION_SYNC_PAGE_TREE = True
 
