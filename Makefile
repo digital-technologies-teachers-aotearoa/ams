@@ -96,7 +96,11 @@ discourse-build-app: discourse-start
 	./docker_compose exec -T discourse git config --global --add safe.directory /var/www/discourse
 	./docker_compose exec -T discourse chown -R discourse:www-data /shared/uploads
 	./docker_compose exec -T --workdir '/var/www/discourse' discourse bundle exec rake db:migrate
-	./docker_compose exec -T --workdir '/var/www/discourse' discourse bundle exec rails runner "SiteSetting.set('content_security_policy_script_src', 'localhost:1801')"
+	./docker_compose exec -T --workdir '/var/www/discourse' discourse bundle exec rails runner "SiteSetting.set('content_security_policy_script_src', '${DISCOURSE_HOSTNAME}')"
+	./docker_compose exec -T --workdir '/var/www/discourse' discourse bundle exec rails runner "SiteSetting.set('discourse_connect_allowed_redirect_domains', '${APPLICATION_WEB_HOST}')"
+	./docker_compose exec -T --workdir '/var/www/discourse' discourse bundle exec rails runner "SiteSetting.set('discourse_connect_url', 'http://${APPLICATION_WEB_HOST}/users/discourse/sso')"
+	./docker_compose exec -T --workdir '/var/www/discourse' discourse bundle exec rails runner "SiteSetting.set('discourse_connect_secret', '${DISCOURSE_CONNECT_SECRET}')"
+	./docker_compose exec -T --workdir '/var/www/discourse' discourse bundle exec rails runner "SiteSetting.set('enable_discourse_connect', true)"
 
 .PHONY: discourse-migrate
 discourse-migrate:
