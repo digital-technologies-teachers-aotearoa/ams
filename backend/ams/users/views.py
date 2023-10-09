@@ -1,4 +1,5 @@
 from functools import partial
+from os import environ
 from typing import Any, Dict, Optional
 
 from django.conf import settings
@@ -21,8 +22,7 @@ from django.utils.formats import date_format
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.detail import DetailView
 from django_tables2 import SingleTableMixin, SingleTableView
-from os import environ
-from pydiscourse.sso import sso_validate, sso_redirect_url
+from pydiscourse.sso import sso_redirect_url, sso_validate
 from registration.models import RegistrationProfile
 
 from ..base.models import EmailConfirmationPage
@@ -322,12 +322,13 @@ def edit_membership_option(request: HttpRequest, pk: int) -> HttpResponse:
         },
     )
 
+
 @login_required
 def discourse_sso(request: HttpRequest) -> HttpResponse:
     secret = environ.get("DISCOURSE_CONNECT_SECRET")
 
-    payload = request.GET.get('sso')
-    signature = request.GET.get('sig')
+    payload = request.GET.get("sso")
+    signature = request.GET.get("sig")
 
     nonce = sso_validate(payload, signature, secret)
 

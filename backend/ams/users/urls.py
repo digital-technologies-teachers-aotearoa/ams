@@ -11,10 +11,10 @@ from .views import (
     add_user_membership,
     create_membership_option,
     create_organisation,
+    discourse_sso,
     edit_membership_option,
     edit_user_profile,
     individual_registration,
-    discourse_sso,
 )
 
 urlpatterns = [
