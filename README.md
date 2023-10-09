@@ -85,19 +85,31 @@ There are 2 containers:
 
 _Note: We will probably replace the discourse-data container in due time with one of our own - certainly for production.  The Discourse launcher built one is convenient for now in initial development however._
 
-### Makefile commands
+### Getting started
+
+To run Discourse locall you must pull the docker image from Harbor
+
+1. Get added to the dtta project docker repo at https://harbor.catalyst.net.nz/
+
+1. Log into docker.catalyst.net.nz with your harbor username and CLI secret: `docker login docker.catalyst.net.nz`
 
 Get Discourse running:
 
     make discourse-install
 
-Start Discourse containers:
-
-    make discourse-start
-
 Create admin user:
 
     make discourse-create-admin
+
+### Makefile commands
+
+Start Discourse containers only:
+
+    make discourse-start
+
+Run migrations
+
+    make discourse-migrate
 
 Open psql shell on the Discourse database:
 
