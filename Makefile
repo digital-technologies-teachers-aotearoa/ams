@@ -1,5 +1,6 @@
 MAKEFLAGS := --warn-undefined-variables
 .SHELLFLAGS := -o nounset -c
+.NOTPARALLEL:
 
 # Add .env to environment
 include .env
