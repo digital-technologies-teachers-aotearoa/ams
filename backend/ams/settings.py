@@ -180,6 +180,7 @@ class Common(Configuration):
     # Wagtail settings
     # https://docs.wagtail.org/en/stable/reference/settings.html
 
+    WAGTAIL_SITE_NAME = "Association Management Software"
     WAGTAILADMIN_BASE_URL = environ["APPLICATION_WEB_HOST"] + "/cms"
     WAGTAIL_I18N_ENABLED = True
     WAGTAIL_CONTENT_LANGUAGES = LANGUAGES = [("en", "English")]

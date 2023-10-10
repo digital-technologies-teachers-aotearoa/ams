@@ -12,8 +12,6 @@ class DTTACommon(Common):
 
     DATE_INPUT_FORMATS = ["%Y-%m-%d", "%d/%m/%Y"]
 
-    WAGTAIL_SITE_NAME = "DTTA - Association Management Software"
-
     WAGTAIL_CONTENT_LANGUAGES = LANGUAGES = [
         ("en", "English"),
         ("mi", "Maori"),
