@@ -56,6 +56,14 @@ Update the main theme and styles from the frontend/ folder:
 
     make update-theme
 
+Make translations:
+
+    make translations
+
+Compile translations:
+
+    make compile-translations
+
 Bring down the application:
 
     make stop
