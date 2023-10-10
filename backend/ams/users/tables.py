@@ -6,8 +6,8 @@ from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
 from django_tables2 import Column, DateColumn, Table, TemplateColumn
 
-from .forms import format_membership_duration_in_months
-from .models import Organisation, UserMembership
+from .forms import format_membership_duration
+from .models import MembershipOption, Organisation, UserMembership
 
 
 def full_name_or_username(user: User) -> str:
@@ -62,7 +62,7 @@ class AdminUserMembershipTable(Table):
         return record.status().label
 
     def render_duration(self, value: relativedelta, record: UserMembership) -> Any:
-        return format_membership_duration_in_months(value)
+        return format_membership_duration(value)
 
     class Meta:
         fields = ("full_name", "membership", "duration", "status", "start_date", "approved_date")
@@ -94,7 +94,7 @@ class UserDetailMembershipTable(Table):
         return record.status().label
 
     def render_duration(self, value: relativedelta, record: UserMembership) -> Any:
-        return format_membership_duration_in_months(value)
+        return format_membership_duration(value)
 
     class Meta:
         fields = ("membership", "duration", "status", "start_date", "approved_date")
@@ -107,6 +107,24 @@ class AdminUserDetailMembershipTable(UserDetailMembershipTable):
     actions = TemplateColumn(
         verbose_name=_("Actions"), template_name="admin_user_membership_actions.html", orderable=False
     )
+
+
+class AdminMembershipOptionTable(Table):
+    name = Column(verbose_name=_("Name"))
+    type = Column(verbose_name=_("Type"))
+    duration = Column(verbose_name=_("Duration"))
+    cost = Column(verbose_name=_("Cost"))
+    actions = TemplateColumn(
+        verbose_name=_("Actions"), template_name="admin_membership_option_actions.html", orderable=False
+    )
+
+    def render_duration(self, value: relativedelta, record: MembershipOption) -> Any:
+        return format_membership_duration(value)
+
+    class Meta:
+        fields = ("name", "type", "duration", "cost")
+        order_by = ("name", "type")
+        model = MembershipOption
 
 
 class AdminOrganisationTable(Table):

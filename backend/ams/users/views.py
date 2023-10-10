@@ -2,6 +2,7 @@ from functools import partial
 from typing import Any, Dict, Optional
 
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.contrib.sites.shortcuts import get_current_site
@@ -27,10 +28,12 @@ from .forms import (
     AddUserMembershipForm,
     EditUserProfileForm,
     IndividualRegistrationForm,
+    MembershipOptionForm,
     OrganisationForm,
 )
 from .models import MembershipOption, Organisation, UserMembership, UserMemberStatus
 from .tables import (
+    AdminMembershipOptionTable,
     AdminOrganisationTable,
     AdminUserDetailMembershipTable,
     AdminUserMembershipTable,
@@ -93,6 +96,7 @@ def individual_registration(request: HttpRequest) -> HttpResponse:
     )
 
 
+@login_required
 def create_organisation(request: HttpRequest) -> HttpResponse:
     if not user_is_admin(request):
         return HttpResponse(status=403)
@@ -160,8 +164,9 @@ def activate_user(request: HttpRequest, activation_key: str) -> HttpResponse:
     return HttpResponse(status=401)
 
 
+@login_required
 def edit_user_profile(request: HttpRequest, pk: int) -> HttpResponse:
-    if not (user_is_admin(request) or request.user.is_authenticated and request.user.pk == pk):
+    if not (user_is_admin(request) or request.user.pk == pk):
         return HttpResponse(status=401)
 
     user = User.objects.get(pk=pk)
@@ -208,8 +213,9 @@ def notify_staff_of_new_user_membership(request: HttpRequest, user_membership: U
         send_mail(subject, message, from_email, [user.email])
 
 
+@login_required
 def add_user_membership(request: HttpRequest, pk: int) -> HttpResponse:
-    if not (user_is_admin(request) or request.user.is_authenticated and request.user.pk == pk):
+    if not (user_is_admin(request) or request.user.pk == pk):
         return HttpResponse(status=401)
 
     user = User.objects.get(pk=pk)
@@ -260,6 +266,56 @@ def add_user_membership(request: HttpRequest, pk: int) -> HttpResponse:
             "user_view_url": user_view_url,
             "current_membership": current_membership,
             "user_detail": user,
+            "form": form,
+        },
+    )
+
+
+@login_required
+def create_membership_option(request: HttpRequest) -> HttpResponse:
+    if not user_is_admin(request):
+        return HttpResponse(status=401)
+
+    if request.method == "POST":
+        form = MembershipOptionForm(request.POST)
+        if form.is_valid():
+            form.save()
+            membership_options_url = reverse("admin-membership-options")
+            return HttpResponseRedirect(membership_options_url + "?membership_option_created=true")
+    else:
+        form = MembershipOptionForm()
+
+    return render(
+        request,
+        "edit_membership_option.html",
+        {
+            "membership_option": None,
+            "form": form,
+        },
+    )
+
+
+@login_required
+def edit_membership_option(request: HttpRequest, pk: int) -> HttpResponse:
+    if not user_is_admin(request):
+        return HttpResponse(status=401)
+
+    membership_option = MembershipOption.objects.get(pk=pk)
+
+    if request.method == "POST":
+        form = MembershipOptionForm(request.POST, instance=membership_option)
+        if form.is_valid():
+            form.save()
+            membership_options_url = reverse("admin-membership-options")
+            return HttpResponseRedirect(membership_options_url + "?membership_option_updated=true")
+    else:
+        form = MembershipOptionForm(instance=membership_option)
+
+    return render(
+        request,
+        "edit_membership_option.html",
+        {
+            "membership_option": membership_option,
             "form": form,
         },
     )
@@ -341,6 +397,23 @@ class AdminUserMembershipListView(UserIsAdminMixin, SingleTableView, MembershipA
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context: Dict[str, Any] = super().get_context_data(**kwargs)
         return self.membership_action_context(self.request, context)
+
+
+class AdminMembershipOptionListView(UserIsAdminMixin, SingleTableView):
+    model = MembershipOption
+    table_class = AdminMembershipOptionTable
+    template_name = "admin_membership_options.html"
+
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context: Dict[str, Any] = super().get_context_data(**kwargs)
+
+        if self.request.method == "GET" and self.request.GET.get("membership_option_created"):
+            context["show_messages"] = [_("Membership Option Added")]
+
+        if self.request.method == "GET" and self.request.GET.get("membership_option_updated"):
+            context["show_messages"] = [_("Membership Option Saved")]
+
+        return context
 
 
 class UserDetailViewBase(SingleTableMixin, DetailView):

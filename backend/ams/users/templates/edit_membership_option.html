@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load static wagtailcore_tags i18n localize_url form_field %}
+
+{% block title %}{% translate "Membership Option Settings" %}{% endblock title %}
+
+{% block body_class %}edit-membership-option{% endblock %}
+
+{% block content %}
+
+    <div class="row">
+        <div class="col">
+        <div class="introduction">
+            <h1 class="introduction-heading standard-page">{% translate "Membership Option Settings" %}</h1>
+            <p class="introduction-content standard-page"></p>
+        </div>
+        </div>
+    </div>
+
+    <div class="row no-gutters">
+        <div class="col-lg-9">
+            <form class="form-panel form-panel-standard" action="" method="post">
+            {% csrf_token %}
+
+            <div class="membership-option-fields">
+                {% for field in form %}
+                    <div class="form-group">
+                        <div class="form-label">
+                            {{ field.label_tag }}
+                        </div>
+                        <div class="form-input form-input-short">
+                            {{ field | add_form_field_classes }}
+                            {{ field.errors }}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <hr class="form-divider"/>
+
+            <div class="form-actions">
+                <input class="btn btn-form-cancel" type="button" value="Cancel" onclick="window.location='{% url "admin-membership-options" %}';">
+                <input class="btn btn-form-submit-hollow" type="submit" value="{% if membership_option %}{% translate "Save" %}{% else %}{% translate "Add" %}{% endif %}">
+            </div>
+        </form>
+        </div>
+    </div>
+
+{% endblock content %}

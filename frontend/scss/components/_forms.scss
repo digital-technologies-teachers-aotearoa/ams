@@ -90,6 +90,11 @@
       @include rem(max-width, 265px);
     }
   }
+  select {
+    @include media-breakpoint-up(sm) {
+      @include rem(max-width, 265px);
+    }
+  }
 }
 
 .form-actions {
@@ -128,6 +133,17 @@
     flex-basis: 0;
     flex-grow: 1;
   }
+}
+
+input.membership-duration {
+  display: inline !important;
+  @include rem(max-width, 80px);
+}
+
+select.membership-duration {
+  display: inline;
+  @include rem(margin-left, 10px);
+  @include rem(max-width, 175px);
 }
 
 .registration-membership-fields {

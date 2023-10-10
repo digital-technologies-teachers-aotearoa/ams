@@ -1,5 +1,5 @@
 from datetime import date
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth.models import User
@@ -8,12 +8,18 @@ from django.forms import (
     CharField,
     ChoiceField,
     DateField,
+    DecimalField,
     EmailField,
     Form,
+    IntegerField,
     ModelChoiceField,
     ModelForm,
+    MultiValueField,
+    MultiWidget,
     PasswordInput,
     RadioSelect,
+    Select,
+    TextInput,
     ValidationError,
 )
 from django.utils.text import format_lazy
@@ -27,19 +33,45 @@ from .models import (
 )
 
 
-def format_membership_duration_in_months(duration: relativedelta) -> Any:
-    # NOTE: assumes duration measured in months and/or years
-    months_count = duration.months + duration.years * 12
-    months_unit = _("month") if months_count == 1 else _("months")
+def decompose_membership_duration(duration: relativedelta) -> Tuple[int, str]:
+    # Assumes duration can be represented as an integer number of either days, months, weeks or years
+    if duration.years and duration.months == 0 and duration.days == 0:
+        return duration.years, "years"
+    elif duration.months and duration.days == 0:
+        return duration.months, "months"
+    elif duration.days % 7 == 0:
+        return duration.days // 7, "weeks"
+    return duration.days, "days"
 
-    return format_lazy("{} {}", months_count, months_unit)
+
+def compose_membership_duration(num: int, unit: str) -> Optional[relativedelta]:
+    if unit == "days":
+        return relativedelta(days=num)
+    elif unit == "weeks":
+        return relativedelta(days=num * 7)
+    elif unit == "months":
+        return relativedelta(months=num)
+    elif unit == "years":
+        return relativedelta(years=num)
+    return None
+
+
+def format_membership_duration(duration: relativedelta) -> Any:
+    count, unit = decompose_membership_duration(duration)
+
+    if count == 1 and unit.endswith("s"):
+        unit = unit[:-1]
+
+    translated_unit = _(unit)
+
+    return format_lazy("{} {}", count, translated_unit)
 
 
 def get_individual_membership_options() -> List[Tuple[str, str]]:
     return [
         (
             option.name,
-            format_lazy("${} {} {}", option.cost, _("for"), format_membership_duration_in_months(option.duration)),
+            format_lazy("${} {} {}", option.cost, _("for"), format_membership_duration(option.duration)),
         )
         for option in MembershipOption.objects.filter(type=MembershipOptionType.INDIVIDUAL).order_by("id")
     ]
@@ -124,3 +156,52 @@ class OrganisationForm(ModelForm):
     class Meta:
         model = Organisation
         fields = ["name", "type", "postal_address", "office_phone"]
+
+
+class MembershipDurationWidget(MultiWidget):
+    def __init__(self, choices: List[Tuple[str, str]], attrs: Optional[Dict[str, Any]] = None) -> None:
+        widgets = (
+            TextInput(attrs=attrs),
+            Select(attrs=attrs, choices=choices),
+        )
+        super().__init__(widgets, attrs)
+
+    def decompress(self, value: Optional[relativedelta]) -> List[Any]:
+        if value:
+            unit, count = decompose_membership_duration(value)
+            return [unit, count]
+        return [None, None]
+
+
+class MembershipDurationField(MultiValueField):
+    choices = [("days", _("Days")), ("weeks", _("Weeks")), ("months", _("Months")), ("years", _("Years"))]
+
+    def __init__(self, *args: Any, **kwargs: Any):
+        fields = (
+            IntegerField(min_value=1),
+            ChoiceField(choices=self.choices),
+        )
+        super().__init__(fields, *args, **kwargs)
+        self.widget = MembershipDurationWidget(choices=self.choices, attrs={"class": "membership-duration"})
+
+    def compress(self, data_list: List[Any]) -> Optional[relativedelta]:
+        if data_list:
+            num, unit = data_list
+            if num is not None and unit:
+                num = int(num)
+                return compose_membership_duration(num, unit)
+        return None
+
+
+class MembershipOptionForm(ModelForm):
+    name = CharField(label=_("Name"), max_length=255)
+    type = ChoiceField(
+        label=_("Type"),
+        choices=[(MembershipOptionType.INDIVIDUAL.value, MembershipOptionType.INDIVIDUAL.label)],  # type: ignore
+    )
+    duration = MembershipDurationField(label=_("Duration"))
+    cost = DecimalField(label=_("Cost"))
+
+    class Meta:
+        model = MembershipOption
+        fields = ["name", "type", "duration", "cost"]
