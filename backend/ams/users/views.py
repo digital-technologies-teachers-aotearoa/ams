@@ -325,16 +325,25 @@ def edit_membership_option(request: HttpRequest, pk: int) -> HttpResponse:
 
 @login_required
 def discourse_sso(request: HttpRequest) -> HttpResponse:
-    secret = environ.get("DISCOURSE_CONNECT_SECRET")
+    # check that user has a valid membership
+    user = User.objects.get(pk=request.user.id)
+    latest_membership = user.get_latest_membership()
+    if latest_membership and latest_membership.status() == "ACTIVE" or user.is_staff:
+        # Active member - they can see the forum
+        secret = environ.get("DISCOURSE_CONNECT_SECRET")
 
-    payload = request.GET.get("sso")
-    signature = request.GET.get("sig")
+        payload = request.GET.get("sso")
+        signature = request.GET.get("sig")
 
-    nonce = sso_validate(payload, signature, secret)
+        nonce = sso_validate(payload, signature, secret)
+        redirect_url = sso_redirect_url(nonce, secret, request.user.email, request.user.id, request.user.username)
+        return HttpResponseRedirect(environ.get("DISCOURSE_REDIRECT_DOMAIN") + redirect_url)
 
-    url = sso_redirect_url(nonce, secret, request.user.email, request.user.id, request.user.username)
+    else:
+        # Not active member - give them a redirect
+        redirect_url = reverse("current-user-view") + "?requires_membership=true"
 
-    return HttpResponseRedirect(environ.get("DISCOURSE_REDIRECT_DOMAIN") + url)
+        return HttpResponseRedirect(redirect_url)
 
 
 class AdminUserListView(UserIsAdminMixin, SingleTableView):
@@ -454,6 +463,9 @@ class UserDetailViewBase(SingleTableMixin, DetailView):
 
         if self.request.method == "GET" and self.request.GET.get("profile_updated"):
             context["show_messages"] = [_("Profile Updated")]
+
+        if self.request.method == "GET" and self.request.GET.get("requires_membership"):
+            context["show_messages"] = [_("You must have an active membership to view this feature.")]
         return context
 
 
