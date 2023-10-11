@@ -102,6 +102,7 @@ discourse-build-app: discourse-start
 	./docker_compose exec -T --workdir '/var/www/discourse' discourse bundle exec rails runner "SiteSetting.set('discourse_connect_url', 'http://${APPLICATION_WEB_HOST}/users/discourse/sso')"
 	./docker_compose exec -T --workdir '/var/www/discourse' discourse bundle exec rails runner "SiteSetting.set('discourse_connect_secret', '${DISCOURSE_CONNECT_SECRET}')"
 	./docker_compose exec -T --workdir '/var/www/discourse' discourse bundle exec rails runner "SiteSetting.set('enable_discourse_connect', true)"
+	./docker_compose exec -T --workdir '/var/www/discourse' discourse bundle exec rails runner "SiteSetting.set('logout_redirect', 'http://${APPLICATION_WEB_HOST}/users/logout')"
 
 .PHONY: discourse-migrate
 discourse-migrate:
