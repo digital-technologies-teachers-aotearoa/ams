@@ -1,5 +1,4 @@
 from functools import partial
-from os import environ
 from typing import Any, Dict, Optional
 
 from django.conf import settings
@@ -22,7 +21,6 @@ from django.utils.formats import date_format
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.detail import DetailView
 from django_tables2 import SingleTableMixin, SingleTableView
-from pydiscourse.sso import sso_redirect_url, sso_validate
 from registration.models import RegistrationProfile
 
 from ..base.models import EmailConfirmationPage
@@ -321,29 +319,6 @@ def edit_membership_option(request: HttpRequest, pk: int) -> HttpResponse:
             "form": form,
         },
     )
-
-
-@login_required
-def discourse_sso(request: HttpRequest) -> HttpResponse:
-    # check that user has a valid membership
-    user = User.objects.get(pk=request.user.id)
-    latest_membership = user.get_latest_membership()
-    if latest_membership and latest_membership.status() == "ACTIVE" or user.is_staff:
-        # Active member - they can see the forum
-        secret = environ.get("DISCOURSE_CONNECT_SECRET")
-
-        payload = request.GET.get("sso")
-        signature = request.GET.get("sig")
-
-        nonce = sso_validate(payload, signature, secret)
-        redirect_url = sso_redirect_url(nonce, secret, request.user.email, request.user.id, request.user.username)
-        return HttpResponseRedirect(environ.get("DISCOURSE_REDIRECT_DOMAIN") + redirect_url)
-
-    else:
-        # Not active member - give them a redirect
-        redirect_url = reverse("current-user-view") + "?requires_membership=true"
-
-        return HttpResponseRedirect(redirect_url)
 
 
 class AdminUserListView(UserIsAdminMixin, SingleTableView):

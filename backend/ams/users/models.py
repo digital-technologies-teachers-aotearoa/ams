@@ -90,6 +90,11 @@ class UserMemberInfo:
         self.current_membership: Optional[UserMembership] = user.get_current_membership()
         self.latest_membership: Optional[UserMembership] = user.get_latest_membership()
 
+    def status(self) -> Any:
+        if self.current_membership:
+            return self.current_membership.status()
+        return UserMemberStatus.NONE
+
     def latest_membership_is_cancelled(self) -> Optional[UserMembership]:
         # Only return if the membership with the maximum start datetime is cancelled and it is the only one
         latest_cancelled_membership: Optional[UserMembership] = (
