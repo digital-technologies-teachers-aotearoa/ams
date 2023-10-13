@@ -13,7 +13,7 @@ services:
   backend:
     user: '0:0' # This is due to shared docker volume permissions.
     environment:
-      - DJANGO_SETTINGS_MODULE=ams.settings
+      - DJANGO_SETTINGS_MODULE
       - DJANGO_SECRET_KEY
       - DJANGO_CONFIGURATION
       - EMAIL_HOST
@@ -37,7 +37,7 @@ services:
 
   cron:
     environment:
-      - DJANGO_SETTINGS_MODULE=ams.settings
+      - DJANGO_SETTINGS_MODULE
       - DJANGO_SECRET_KEY
       - DJANGO_CONFIGURATION
       - EMAIL_HOST
