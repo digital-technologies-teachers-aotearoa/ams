@@ -1,5 +1,6 @@
 MAKEFLAGS := --warn-undefined-variables
 .SHELLFLAGS := -o nounset -c
+.NOTPARALLEL:
 
 # Add .env to environment
 include .env
@@ -81,3 +82,61 @@ stop:
 .PHONY: update-theme
 update-theme:
 	./update-theme.bash
+
+# Discourse related targets
+.PHONY: discourse-install
+discourse-install: discourse-set-db-permisions discourse-build-app
+
+.PHONY: discourse-set-db-permision
+discourse-set-db-permisions: discourse-start-only-data
+	./docker_compose exec -T --user postgres discourse-data psql -c "alter user discourse with password '${DISCOURSE_DB_PASSWORD}'"
+	./docker_compose exec -T --user postgres discourse-data psql -d discourse -c "grant all privileges on database discourse to discourse"
+
+.PHONY: discourse-build-app
+discourse-build-app: discourse-start
+	./docker_compose exec -T discourse git config --global --add safe.directory /var/www/discourse
+	./docker_compose exec -T discourse chown -R discourse:www-data /shared/uploads
+	./docker_compose exec -T --workdir '/var/www/discourse' discourse bundle exec rake db:migrate
+	./docker_compose exec -T --workdir '/var/www/discourse' discourse bundle exec rails runner "SiteSetting.set('content_security_policy_script_src', '${DISCOURSE_HOSTNAME}')"
+	./docker_compose exec -T --workdir '/var/www/discourse' discourse bundle exec rails runner "SiteSetting.set('discourse_connect_allowed_redirect_domains', '${APPLICATION_WEB_HOST}')"
+	./docker_compose exec -T --workdir '/var/www/discourse' discourse bundle exec rails runner "SiteSetting.set('discourse_connect_url', 'http://${APPLICATION_WEB_HOST}/users/discourse/sso')"
+	./docker_compose exec -T --workdir '/var/www/discourse' discourse bundle exec rails runner "SiteSetting.set('discourse_connect_secret', '${DISCOURSE_CONNECT_SECRET}')"
+	./docker_compose exec -T --workdir '/var/www/discourse' discourse bundle exec rails runner "SiteSetting.set('enable_discourse_connect', true)"
+	./docker_compose exec -T --workdir '/var/www/discourse' discourse bundle exec rails runner "SiteSetting.set('logout_redirect', 'http://${APPLICATION_WEB_HOST}/users/logout')"
+
+.PHONY: discourse-migrate
+discourse-migrate:
+	./docker_compose up -d discourse --no-recreate
+	./docker_compose exec -T --workdir '/var/www/discourse' discourse bundle exec rake db:migrate
+
+.PHONY: discourse-recreate-db
+discourse-recreate-db: discourse-start-only-data
+	./docker_compose exec -T --user postgres discourse-data dropdb --if-exists --username=postgres "discourse"
+	./docker_compose exec -T --user postgres discourse-data createdb --username=postgres "discourse"
+
+.PHONY: discourse-create-admin
+discourse-create-admin: discourse-start
+	./docker_compose exec -e SHELL=bash discourse rake admin:create
+	
+.PHONY: discourse-start
+discourse-start:
+	./docker_compose up -d discourse
+
+.PHONY: discourse-start-only-data
+discourse-start-only-data:
+	./docker_compose stop discourse
+	./docker_compose up -d discourse-data --no-recreate
+
+.PHONY: discourse-stop
+discourse-stop:
+	./docker_compose stop discourse discourse-data
+
+.PHONY: discourse-rails-shell
+discourse-rails-shell:
+	./docker_compose up -d discourse
+	./docker_compose exec -e SHELL=bash --workdir '/var/www/discourse' discourse bundle exec rails c
+
+.PHONY: discourse-db-shell
+discourse-db-shell:
+	./docker_compose up -d discourse-data
+	./docker_compose exec -e SHELL=bash --user postgres discourse-data psql -d discourse --username=postgres
