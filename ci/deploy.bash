@@ -3,12 +3,8 @@
 # Configure compose files for the environment.
 COMPOSEFILES="-f ../docker-compose.yml -f ../docker-compose.test.yml"
 
-# Import Environment vars
-ENVFILE="../.env"
-if [ -f $ENVFILE ]
-then
-  export $(cat $ENVFILE | xargs)
-fi
+# Import .env vars
+eval $(../export-env.bash)
 
 RECREATE_DB="${RECREATE_DB:-0}"
 
@@ -46,6 +42,9 @@ then
   # Create superuser
   docker-compose $COMPOSEFILES run -T --rm --entrypoint="poetry run ./manage.py createsuperuser --noinput" backend
 fi
+
+# Update discourse configuration
+bash "./configure_discourse.bash"
 
 # Bring up the rest of the stack
 docker-compose $COMPOSEFILES up -d
