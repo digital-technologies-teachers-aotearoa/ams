@@ -60,7 +60,7 @@ class ForumSingleSignOnTests(TestCase):
         )
 
         payload_query_string = sso_payload(environ["DISCOURSE_CONNECT_SECRET"], nonce="nonce")
-        self.url = "/forum/sso/?" + payload_query_string
+        self.url = "/forum/sso?" + payload_query_string
         self.client.force_login(self.user)
 
     def test_should_require_logged_in_user(self) -> None:
