@@ -26,7 +26,15 @@ def forum_sso_login_callback(request: HttpRequest) -> HttpResponse:
         signature = request.GET.get("sig")
 
         nonce = sso_validate(payload, signature, secret)
-        redirect_url = sso_redirect_url(nonce, secret, request.user.email, request.user.id, request.user.username)
+
+        # TODO: maybe replace with an editable forum username or change how we approach usernames
+        # as discourse displays the username on posts. Our usernames are currently email addresses
+        username = request.user.username
+        name = request.user.display_name
+        external_id = request.user.id
+
+        redirect_url = sso_redirect_url(nonce, secret, request.user.email, external_id, username, name=name)
+
         return HttpResponseRedirect(environ["DISCOURSE_REDIRECT_DOMAIN"] + redirect_url)
 
     else:
