@@ -81,7 +81,7 @@
                       </div>
                     </div>
                   {% else %}
-                    <a href="{% url "auth_login" %}?next={{ request.path | urlencode}}" class="user-details-login">{% translate "Log In" %}</a>
+                    <a href="{% url "auth_login" %}?link=true&next={{ request.path | urlencode}}" class="user-details-login">{% translate "Log In" %}</a>
                     <a href="{{ "membership/" | localize_url }}" class="user-details-signup">{% translate "Sign Up" %}</a>
                 {% endif %}
                 </p>

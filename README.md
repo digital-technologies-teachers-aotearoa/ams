@@ -10,9 +10,17 @@ To run the developer environment you need to install [Docker with the docker com
 
 1. Copy `.env.example` to `.env` and customize it to your liking.
 
+1. Edit your /etc/hosts file and add additional aliases `ams.local` and `discourse.local` for 127.0.0.1. E.g:
+
+```
+127.0.0.1       localhost ams.local discourse.local
+```
+
 1. Create the development environment by running `make developer`.
 
-After this is finished you can run `make start` to bring up application. If successful you should be able to go to http://localhost:1800.
+After this is finished you can run `make start` to bring up application. If successful you should be able to go to http://ams.local.
+
+To setup the forum see the [Discourse setup](#discourse-setup) instructions.
 
 ### Stylesheet editing
 
@@ -68,7 +76,7 @@ Bring down the application:
 
     make stop
 
-## Discourse Setup
+## Discourse setup
 
 ### Overview
 

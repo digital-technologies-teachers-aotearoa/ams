@@ -1,5 +1,4 @@
 from functools import partial
-from os import environ
 from typing import Any, Dict, Optional
 
 from django.conf import settings
@@ -22,7 +21,6 @@ from django.utils.formats import date_format
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.detail import DetailView
 from django_tables2 import SingleTableMixin, SingleTableView
-from pydiscourse.sso import sso_redirect_url, sso_validate
 from registration.models import RegistrationProfile
 
 from ..base.models import EmailConfirmationPage
@@ -323,20 +321,6 @@ def edit_membership_option(request: HttpRequest, pk: int) -> HttpResponse:
     )
 
 
-@login_required
-def discourse_sso(request: HttpRequest) -> HttpResponse:
-    secret = environ.get("DISCOURSE_CONNECT_SECRET")
-
-    payload = request.GET.get("sso")
-    signature = request.GET.get("sig")
-
-    nonce = sso_validate(payload, signature, secret)
-
-    url = sso_redirect_url(nonce, secret, request.user.email, request.user.id, request.user.username)
-
-    return HttpResponseRedirect(environ.get("DISCOURSE_REDIRECT_DOMAIN") + url)
-
-
 class AdminUserListView(UserIsAdminMixin, SingleTableView):
     model = User
     table_class = AdminUserTable
@@ -454,6 +438,9 @@ class UserDetailViewBase(SingleTableMixin, DetailView):
 
         if self.request.method == "GET" and self.request.GET.get("profile_updated"):
             context["show_messages"] = [_("Profile Updated")]
+
+        if self.request.method == "GET" and self.request.GET.get("requires_membership"):
+            context["show_messages"] = [_("You must have an active membership to view this feature.")]
         return context
 
 
