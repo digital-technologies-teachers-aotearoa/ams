@@ -88,7 +88,7 @@ class EditMembershipOptionTests(TestCase):
 
         response = self.client.get(response.url)
 
-        expected_messages = ["Membership Option Saved"]
+        expected_messages = [{"value": "Membership Option Saved", "type": "success"}]
         self.assertEqual(expected_messages, response.context.get("show_messages"))
 
     def test_submitting_blank_form_should_return_expected_errors(self) -> None:

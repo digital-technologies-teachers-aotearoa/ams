@@ -88,7 +88,7 @@ class ForumSingleSignOnTests(TestCase):
 
         response = self.client.get(response.url)
 
-        expected_messages = ["You must have an active membership to view this feature."]
+        expected_messages = [{"value": "You must have an active membership to view this feature.", "type": "error"}]
         self.assertEqual(expected_messages, response.context.get("show_messages"))
 
     def test_should_allow_user_with_active_membership(self) -> None:

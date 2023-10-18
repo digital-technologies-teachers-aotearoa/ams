@@ -99,7 +99,7 @@ class EditUserProfileTests(TestCase):
 
         response = self.client.get(response.url)
 
-        expected_messages = ["Profile Updated"]
+        expected_messages = [{"value": "Profile Updated", "type": "success"}]
         self.assertEqual(expected_messages, response.context.get("show_messages"))
 
     def test_should_not_update_username(self) -> None:

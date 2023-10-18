@@ -40,7 +40,7 @@ from .tables import (
     AdminUserTable,
     UserDetailMembershipTable,
 )
-from .utils import UserIsAdminMixin, user_is_admin
+from .utils import UserIsAdminMixin, user_is_admin, user_message
 
 
 def individual_registration(request: HttpRequest) -> HttpResponse:
@@ -377,10 +377,10 @@ class MembershipActionMixin:
 
     def membership_action_context(self, request: HttpRequest, context: Dict[str, Any]) -> Dict[str, Any]:
         if request.method == "GET" and request.GET.get("membership_cancelled"):
-            context["show_messages"] = [_("Membership Cancelled")]
+            context["show_messages"] = [user_message(_("Membership Cancelled"))]
 
         if request.method == "GET" and request.GET.get("membership_approved"):
-            context["show_messages"] = [_("Membership Approved")]
+            context["show_messages"] = [user_message(_("Membership Approved"))]
 
         return context
 
@@ -408,10 +408,10 @@ class AdminMembershipOptionListView(UserIsAdminMixin, SingleTableView):
         context: Dict[str, Any] = super().get_context_data(**kwargs)
 
         if self.request.method == "GET" and self.request.GET.get("membership_option_created"):
-            context["show_messages"] = [_("Membership Option Added")]
+            context["show_messages"] = [user_message(_("Membership Option Added"))]
 
         if self.request.method == "GET" and self.request.GET.get("membership_option_updated"):
-            context["show_messages"] = [_("Membership Option Saved")]
+            context["show_messages"] = [user_message(_("Membership Option Saved"))]
 
         return context
 
@@ -436,11 +436,15 @@ class UserDetailViewBase(SingleTableMixin, DetailView):
 
         context["can_add_membership"] = can_add_membership
 
-        if self.request.method == "GET" and self.request.GET.get("profile_updated"):
-            context["show_messages"] = [_("Profile Updated")]
+        if self.request.method == "GET":
+            if self.request.GET.get("profile_updated"):
+                context["show_messages"] = [user_message(_("Profile Updated"))]
 
-        if self.request.method == "GET" and self.request.GET.get("requires_membership"):
-            context["show_messages"] = [_("You must have an active membership to view this feature.")]
+            if self.request.GET.get("requires_membership"):
+                context["show_messages"] = [
+                    user_message(_("You must have an active membership to view this feature."), "error")
+                ]
+
         return context
 
 
@@ -484,6 +488,6 @@ class AdminOrganisationListView(UserIsAdminMixin, SingleTableView):
             # Show message when returning from creating an organisation
             admin_create_organisation_url = reverse("admin-create-organisation")
             if referrer_url.endswith(admin_create_organisation_url) and self.request.GET.get("organisation_created"):
-                context["show_messages"] = [_("Organisation Created")]
+                context["show_messages"] = [user_message(_("Organisation Created"))]
 
         return context

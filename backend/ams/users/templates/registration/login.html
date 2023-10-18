@@ -6,7 +6,7 @@
 {% block content %}
 
 {% if next and not request.GET.link %}
-  <div class="alert alert-success" role="alert">
+  <div class="alert alert-danger" role="alert">
     {% translate "You must be logged in to view this feature." %}
   </div>
 {% endif %}

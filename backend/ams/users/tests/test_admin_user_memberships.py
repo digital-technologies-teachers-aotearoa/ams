@@ -234,7 +234,7 @@ class AdminUserMembershipsTests(TestCase):
         ]
         self.assertListEqual(expected_rows, rows)
 
-        expected_messages = ["Membership Approved"]
+        expected_messages = [{"value": "Membership Approved", "type": "success"}]
         self.assertListEqual(expected_messages, response.context["show_messages"])
 
     def test_should_not_re_approve_user_membership(self) -> None:
