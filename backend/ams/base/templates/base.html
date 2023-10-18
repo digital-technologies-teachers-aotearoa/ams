@@ -71,7 +71,7 @@
                     <div class="dropdown">
                       <a id="userAccountButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="{% translate "My Account" %}">
                           <div class="user-details-image-container">
-                            <img class="user-details-image" src="">
+                              <img class="user-details-image" src="{% if user.profile.image %}/media/{{user.profile.image}}{% endif %}">
                           </div>
                       </a>
                       <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userAccountButton">
