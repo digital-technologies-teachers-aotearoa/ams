@@ -1,14 +1,60 @@
 from os import environ
+from typing import Any, Dict, Optional
 
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 from django.urls import reverse
+from pydiscourse import DiscourseClient
 from pydiscourse.sso import sso_redirect_url, sso_validate
 
-from ..users.models import UserMemberStatus
+from ..users.models import UserMemberStatus, UserProfile
 from ..users.utils import user_is_admin
+
+
+def forum_sync_user_profile(user: User) -> Optional[Dict[str, Any]]:
+    discourse_api_key = environ.get("DISCOURSE_API_KEY")
+    if not discourse_api_key:
+        return None
+
+    client = DiscourseClient(
+        "http://discourse", api_username=environ["DISCOURSE_API_USERNAME"], api_key=discourse_api_key
+    )
+
+    user.refresh_from_db()
+
+    # TODO: maybe replace with an editable forum username or change how we approach usernames
+    # as discourse displays the username on posts. Our usernames are currently email addresses
+    username = user.username
+    name = user.display_name
+    avatar_url = None
+
+    try:
+        user_image_path = user.profile.image
+        if user_image_path:
+            if settings.DEBUG:
+                proto = "http"
+            else:
+                proto = "https"
+
+            web_host = environ["APPLICATION_WEB_HOST"]
+            avatar_url = f"{proto}://{web_host}/media/{user_image_path}"
+
+    except UserProfile.DoesNotExist:
+        pass
+
+    response: Dict[str, Any] = client.sync_sso(
+        sso_secret=environ["DISCOURSE_CONNECT_SECRET"],
+        name=name,
+        username=username,
+        email=user.email,
+        external_id=user.id,
+        avatar_url=avatar_url,
+    )
+    return response
 
 
 @login_required

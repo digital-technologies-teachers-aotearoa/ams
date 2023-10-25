@@ -9,7 +9,7 @@ from django.test import TestCase, override_settings
 from PIL import Image
 
 
-@override_settings(MEDIA_ROOT=tempfile.gettempdir())
+@override_settings(MEDIA_ROOT=tempfile.gettempdir(), DISCOURSE_API_KEY=None)
 class UpdateUserProfileImageTests(TestCase):
     def setUp(self) -> None:
         self.user = User.objects.create_user(username="testuser", is_staff=False)

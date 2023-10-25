@@ -25,6 +25,7 @@ from django_tables2 import SingleTableMixin, SingleTableView
 from registration.models import RegistrationProfile
 
 from ..base.models import EmailConfirmationPage
+from ..forum.views import forum_sync_user_profile
 from .forms import (
     AddUserMembershipForm,
     EditUserProfileForm,
@@ -495,6 +496,8 @@ class UserDetailViewBase(SingleTableMixin, DetailView):
 
                 user_profile.image = image_file_path
                 user_profile.save()
+
+                forum_sync_user_profile(user)
 
                 return HttpResponseRedirect(user_view_url)
             else:
