@@ -92,7 +92,7 @@ test backend (base):
     DISCOURSE_API_KEY:
     DISCOURSE_API_USERNAME:
     DJANGO_SETTINGS_MODULE: ams.settings
-    DJANGO_CONFIGURATION: Development
+    DJANGO_CONFIGURATION: Test
     DJANGO_SECRET_KEY: test django secret key
     EMAIL_HOST: localhost
     EMAIL_HOST_USER: test
@@ -101,7 +101,7 @@ test backend (base):
     - cd /src/app
     - poetry run ./manage.py makemigrations --dry-run
     - poetry run ./manage.py makemigrations --check
-    - poetry run pytest
+    - poetry run pytest --ds=ams.settings
 
 test backend (dtta):
   stage: test
@@ -127,7 +127,7 @@ test backend (dtta):
     DISCOURSE_API_KEY:
     DISCOURSE_API_USERNAME:
     DJANGO_SETTINGS_MODULE: ams.dtta.settings
-    DJANGO_CONFIGURATION: Development
+    DJANGO_CONFIGURATION: Test
     DJANGO_SECRET_KEY: test django secret key
     EMAIL_HOST: localhost
     EMAIL_HOST_USER: test
@@ -136,7 +136,7 @@ test backend (dtta):
     - cd /src/app
     - poetry run ./manage.py makemigrations --dry-run
     - poetry run ./manage.py makemigrations --check
-    - poetry run pytest
+    - poetry run pytest --ds=ams.dtta.settings
 
 deploy to test:
   stage: deploy
