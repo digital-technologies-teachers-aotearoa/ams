@@ -189,6 +189,9 @@ def edit_user_profile(request: HttpRequest, pk: int) -> HttpResponse:
         form = EditUserProfileForm(request.POST, instance=user)
         if form.is_valid():
             form.save()
+
+            forum_sync_user_profile(user)
+
             return HttpResponseRedirect(user_view_url + "?profile_updated=true")
     else:
         form = EditUserProfileForm(instance=user)

@@ -2,6 +2,8 @@ import os
 import random
 import tempfile
 from filecmp import cmp
+from os import environ
+from unittest.mock import Mock, patch
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -9,7 +11,7 @@ from django.test import TestCase, override_settings
 from PIL import Image
 
 
-@override_settings(MEDIA_ROOT=tempfile.gettempdir(), DISCOURSE_API_KEY=None)
+@override_settings(MEDIA_ROOT=tempfile.gettempdir())
 class UpdateUserProfileImageTests(TestCase):
     def setUp(self) -> None:
         self.user = User.objects.create_user(username="testuser", is_staff=False)
@@ -41,6 +43,33 @@ class UpdateUserProfileImageTests(TestCase):
         uploaded_image_path = f"{settings.MEDIA_ROOT}/{self.user.profile.image}"
         self.assertTrue(os.path.exists(uploaded_image_path))
         self.assertTrue(cmp(self.image_path, uploaded_image_path, shallow=False))
+
+    @override_settings(DISCOURSE_API_KEY="API-KEY")
+    @patch("pydiscourse.DiscourseClient.sync_sso")
+    def test_should_sync_user_profile_update_to_forum(self, mock_sync_sso: Mock) -> None:
+        # When
+        image_file_handle = open(self.image_path, "rb")
+        response = self.client.post(
+            self.url, {"action": "upload_profile_image", "profile_image_file": image_file_handle}
+        )
+
+        # Then
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(self.url, response.url)
+
+        self.user.refresh_from_db()
+
+        web_host = environ["APPLICATION_WEB_HOST"]
+        avatar_url = f"https://{web_host}/{settings.MEDIA_URL}{self.user.profile.image}"
+
+        mock_sync_sso.assert_called_with(
+            sso_secret=settings.DISCOURSE_CONNECT_SECRET,
+            name=self.user.display_name,
+            username=self.user.username,
+            email=self.user.email,
+            external_id=self.user.id,
+            avatar_url=avatar_url,
+        )
 
     def test_admin_can_update_users_image(self) -> None:
         # When

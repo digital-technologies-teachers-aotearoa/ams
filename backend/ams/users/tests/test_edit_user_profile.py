@@ -1,7 +1,9 @@
 from typing import Any, Dict
+from unittest.mock import Mock, patch
 
+from django.conf import settings
 from django.contrib.auth.models import User
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 from ..forms import EditUserProfileForm
 
@@ -88,6 +90,26 @@ class EditUserProfileTests(TestCase):
 
         self.assertEqual(self.user.first_name, self.form_values["first_name"])
         self.assertEqual(self.user.last_name, self.form_values["last_name"])
+
+    @override_settings(DISCOURSE_API_KEY="API-KEY")
+    @patch("pydiscourse.DiscourseClient.sync_sso")
+    def test_should_sync_user_profile_update_to_forum(self, mock_sync_sso: Mock) -> None:
+        # When
+        response = self.client.post(self.url, self.form_values)
+
+        # Then
+        self.assertEqual(302, response.status_code)
+
+        self.user.refresh_from_db()
+
+        mock_sync_sso.assert_called_with(
+            sso_secret=settings.DISCOURSE_CONNECT_SECRET,
+            name=self.user.display_name,
+            username=self.user.username,
+            email=self.user.email,
+            external_id=self.user.id,
+            avatar_url=None,
+        )
 
     def test_should_show_profile_updated_message(self) -> None:
         # When
