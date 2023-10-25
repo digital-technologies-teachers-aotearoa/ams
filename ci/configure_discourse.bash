@@ -32,4 +32,5 @@ discourse_setting "SiteSetting.set('discourse_connect_secret', '${DISCOURSE_CONN
 discourse_setting "SiteSetting.set('enable_discourse_connect', true)"
 discourse_setting "SiteSetting.set('auth_overrides_name', true)"
 discourse_setting "SiteSetting.set('auth_overrides_username', true)"
+discourse_setting "SiteSetting.set('discourse_connect_overrides_avatar', true)"
 discourse_setting "SiteSetting.set('logout_redirect', 'http://${APPLICATION_WEB_HOST}/users/logout')"
