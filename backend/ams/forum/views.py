@@ -16,12 +16,12 @@ from ..users.utils import user_is_admin
 
 
 def forum_sync_user_profile(user: User) -> Optional[Dict[str, Any]]:
-    discourse_api_key = environ.get("DISCOURSE_API_KEY")
+    discourse_api_key = settings.DISCOURSE_API_KEY
     if not discourse_api_key:
         return None
 
     client = DiscourseClient(
-        "http://discourse", api_username=environ["DISCOURSE_API_USERNAME"], api_key=discourse_api_key
+        "http://discourse", api_username=settings.DISCOURSE_API_USERNAME, api_key=discourse_api_key
     )
 
     user.refresh_from_db()
@@ -47,7 +47,7 @@ def forum_sync_user_profile(user: User) -> Optional[Dict[str, Any]]:
         pass
 
     response: Dict[str, Any] = client.sync_sso(
-        sso_secret=environ["DISCOURSE_CONNECT_SECRET"],
+        sso_secret=settings.DISCOURSE_CONNECT_SECRET,
         name=name,
         username=username,
         email=user.email,
@@ -59,14 +59,14 @@ def forum_sync_user_profile(user: User) -> Optional[Dict[str, Any]]:
 
 @login_required
 def forum_sso_login_redirect(request: HttpRequest) -> HttpResponse:
-    return HttpResponseRedirect(environ["DISCOURSE_REDIRECT_DOMAIN"] + "/session/sso?return_path=/")
+    return HttpResponseRedirect(settings.DISCOURSE_REDIRECT_DOMAIN + "/session/sso?return_path=/")
 
 
 @login_required
 def forum_sso_login_callback(request: HttpRequest) -> HttpResponse:
     if user_is_admin(request) or request.user.member.status() == UserMemberStatus.ACTIVE:
         # Active member - they can see the forum
-        secret = environ["DISCOURSE_CONNECT_SECRET"]
+        secret = settings.DISCOURSE_CONNECT_SECRET
 
         payload = request.GET.get("sso")
         signature = request.GET.get("sig")
@@ -81,7 +81,7 @@ def forum_sso_login_callback(request: HttpRequest) -> HttpResponse:
 
         redirect_url = sso_redirect_url(nonce, secret, request.user.email, external_id, username, name=name)
 
-        return HttpResponseRedirect(environ["DISCOURSE_REDIRECT_DOMAIN"] + redirect_url)
+        return HttpResponseRedirect(settings.DISCOURSE_REDIRECT_DOMAIN + redirect_url)
 
     else:
         # Not active member - give them a redirect

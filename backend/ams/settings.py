@@ -119,6 +119,12 @@ class Common(Configuration):
         }
     }
 
+    # Discourse integration
+    DISCOURSE_API_KEY = environ["DISCOURSE_API_KEY"]
+    DISCOURSE_API_USERNAME = environ["DISCOURSE_API_USERNAME"]
+    DISCOURSE_REDIRECT_DOMAIN = environ["DISCOURSE_REDIRECT_DOMAIN"]
+    DISCOURSE_CONNECT_SECRET = environ["DISCOURSE_CONNECT_SECRET"]
+
     # Password validation
     # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 

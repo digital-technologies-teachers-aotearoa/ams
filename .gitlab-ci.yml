@@ -89,6 +89,8 @@ test backend (base):
     APPLICATION_WEB_HOST: localhost
     DISCOURSE_REDIRECT_DOMAIN: http://discourse.test
     DISCOURSE_CONNECT_SECRET: discourse test secret
+    DISCOURSE_API_KEY:
+    DISCOURSE_API_USERNAME:
     DJANGO_SETTINGS_MODULE: ams.settings
     DJANGO_CONFIGURATION: Development
     DJANGO_SECRET_KEY: test django secret key
@@ -122,6 +124,8 @@ test backend (dtta):
     APPLICATION_WEB_HOST: localhost
     DISCOURSE_REDIRECT_DOMAIN: http://discourse.test
     DISCOURSE_CONNECT_SECRET: discourse test secret
+    DISCOURSE_API_KEY:
+    DISCOURSE_API_USERNAME:
     DJANGO_SETTINGS_MODULE: ams.dtta.settings
     DJANGO_CONFIGURATION: Development
     DJANGO_SECRET_KEY: test django secret key
