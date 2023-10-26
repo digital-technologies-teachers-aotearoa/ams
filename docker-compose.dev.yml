@@ -38,6 +38,8 @@ services:
       - SENTRY_DSN
       - DISCOURSE_REDIRECT_DOMAIN
       - DISCOURSE_CONNECT_SECRET
+      - DISCOURSE_API_USERNAME
+      - DISCOURSE_API_KEY
 
   cron:
     volumes:
@@ -60,6 +62,10 @@ services:
       - APPLICATION_DB_PASSWORD
       - PGPASSWORD=$POSTGRES_PASSWORD
       - SENTRY_DSN
+      - DISCOURSE_REDIRECT_DOMAIN
+      - DISCOURSE_CONNECT_SECRET
+      - DISCOURSE_API_USERNAME
+      - DISCOURSE_API_KEY
 
   nginx:
     volumes:

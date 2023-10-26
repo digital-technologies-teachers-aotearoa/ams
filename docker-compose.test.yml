@@ -31,6 +31,10 @@ services:
       - DJANGO_SUPERUSER_PASSWORD
       - DJANGO_SUPERUSER_EMAIL
       - SENTRY_DSN
+      - DISCOURSE_REDIRECT_DOMAIN
+      - DISCOURSE_CONNECT_SECRET
+      - DISCOURSE_API_USERNAME
+      - DISCOURSE_API_KEY
     volumes:
       - static_data:/src/app/static
       - media_data:/src/app/media
@@ -55,6 +59,10 @@ services:
       - DJANGO_SUPERUSER_PASSWORD
       - DJANGO_SUPERUSER_EMAIL
       - SENTRY_DSN
+      - DISCOURSE_REDIRECT_DOMAIN
+      - DISCOURSE_CONNECT_SECRET
+      - DISCOURSE_API_USERNAME
+      - DISCOURSE_API_KEY
 
   nginx:
     ports:
