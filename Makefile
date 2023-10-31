@@ -104,6 +104,7 @@ discourse-build-app: discourse-start
 	./docker_compose exec -T --workdir '/var/www/discourse' discourse bundle exec rails runner "SiteSetting.set('enable_discourse_connect', true)"
 	./docker_compose exec -T --workdir '/var/www/discourse' discourse bundle exec rails runner "SiteSetting.set('auth_overrides_name', true)"
 	./docker_compose exec -T --workdir '/var/www/discourse' discourse bundle exec rails runner "SiteSetting.set('auth_overrides_username', true)"
+	./docker_compose exec -T --workdir '/var/www/discourse' discourse bundle exec rails runner "SiteSetting.set('discourse_connect_overrides_avatar', true)"
 	./docker_compose exec -T --workdir '/var/www/discourse' discourse bundle exec rails runner "SiteSetting.set('logout_redirect', 'http://${APPLICATION_WEB_HOST}/users/logout')"
 
 .PHONY: discourse-migrate

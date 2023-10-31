@@ -28,6 +28,10 @@ services:
       - APPLICATION_DB_USER
       - APPLICATION_DB_PASSWORD
       - SENTRY_DSN
+      - DISCOURSE_REDIRECT_DOMAIN
+      - DISCOURSE_CONNECT_SECRET
+      - DISCOURSE_API_USERNAME
+      - DISCOURSE_API_KEY
 
   cron:
     user: root
@@ -50,6 +54,10 @@ services:
       - APPLICATION_DB_USER
       - APPLICATION_DB_PASSWORD
       - SENTRY_DSN
+      - DISCOURSE_REDIRECT_DOMAIN
+      - DISCOURSE_CONNECT_SECRET
+      - DISCOURSE_API_USERNAME
+      - DISCOURSE_API_KEY
 
   nginx:
     image: docker.catalyst.net.nz/catalyst/nginx:stable-jammy
@@ -58,5 +66,36 @@ services:
     depends_on:
       - backend
 
+  discourse:
+    image: 'docker.catalyst.net.nz/dtta/discourse/discourse:latest'
+    environment:
+      - DISCOURSE_HOSTNAME
+      - DISCOURSE_DB_HOST=discourse-data
+      - DISCOURSE_REDIS_HOST=discourse-data
+      - DISCOURSE_DB_PASSWORD
+      - DISCOURSE_SMTP_ADDRESS=$EMAIL_HOST
+      - DISCOURSE_SMTP_USER_NAME=$EMAIL_HOST_USER
+      - DISCOURSE_SMTP_PASSWORD=$EMAIL_HOST_PASSWORD
+      - DISCOURSE_DEVELOPER_EMAILS=$DJANGO_SUPERUSER_EMAIL
+      - RAILS_ENV=production
+      - UNICORN_WORKERS=3
+      - UNICORN_SIDEKIQS=1
+      - RUBY_GC_HEAP_GROWTH_MAX_SLOTS=40000
+      - RUBY_GC_HEAP_INIT_SLOTS=400000
+      - RUBY_GC_HEAP_OLDOBJECT_LIMIT_FACTOR=1.5
+    command: /sbin/boot
+    volumes:
+    - discourse_uploads:/var/www/discourse/public/uploads
+    depends_on:
+      - discourse-data
+
+  discourse-data:
+    image: 'docker.catalyst.net.nz/dtta/discourse/discourse-data:latest'
+    command: /sbin/boot
+    volumes:
+      - discourse_data:/shared
+
 volumes:
   postgres_data:
+  discourse_uploads:
+  discourse_data:
