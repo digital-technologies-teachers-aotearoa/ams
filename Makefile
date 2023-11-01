@@ -99,6 +99,7 @@ discourse-build-app: discourse-start
 	./docker_compose exec -T --workdir '/var/www/discourse' discourse bundle exec rake db:migrate
 	./docker_compose exec -T --workdir '/var/www/discourse' discourse bundle exec rails runner "SiteSetting.set('content_security_policy_script_src', '${DISCOURSE_HOSTNAME}')"
 	./docker_compose exec -T --workdir '/var/www/discourse' discourse bundle exec rails runner "SiteSetting.set('discourse_connect_allowed_redirect_domains', '${APPLICATION_WEB_HOST}')"
+	./docker_compose exec -T --workdir '/var/www/discourse' discourse bundle exec rails runner "SiteSetting.set('allowed_internal_hosts', '${APPLICATION_WEB_HOST}')"
 	./docker_compose exec -T --workdir '/var/www/discourse' discourse bundle exec rails runner "SiteSetting.set('discourse_connect_url', 'http://${APPLICATION_WEB_HOST}/forum/sso')"
 	./docker_compose exec -T --workdir '/var/www/discourse' discourse bundle exec rails runner "SiteSetting.set('discourse_connect_secret', '${DISCOURSE_CONNECT_SECRET}')"
 	./docker_compose exec -T --workdir '/var/www/discourse' discourse bundle exec rails runner "SiteSetting.set('enable_discourse_connect', true)"

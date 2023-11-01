@@ -1,5 +1,9 @@
 {% if show_messages %}
     {% for message in show_messages %}
-    <div class="alert alert-success" role="alert">{{ message }}</div>
+        {% if message.type == "error" %}
+            <div class="alert alert-danger" role="alert">{{ message.value }}</div>
+        {% else %}
+            <div class="alert alert-success" role="alert">{{ message.value }}</div>
+        {% endif %}
     {% endfor %}
 {% endif %}

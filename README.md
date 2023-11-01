@@ -101,6 +101,11 @@ To run Discourse locall you must pull the docker image from Harbor
 
 1. Log into docker.catalyst.net.nz with your harbor username and CLI secret: `docker login docker.catalyst.net.nz`
 
+### API
+
+To complete the setup you need to configure DISCOURSE_API_KEY and DISCOURSE_API_USERNAME to enable syncing user changes such as name, email, profile image to Discourse.
+You can create an API key interface using an account with admin access at http://discourse.local/admin/api/keys
+
 Get Discourse running:
 
     make discourse-install

@@ -10,12 +10,18 @@ from django.db.models import (
     DecimalField,
     ForeignKey,
     Model,
+    OneToOneField,
     TextChoices,
     TextField,
 )
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from relativedeltafield import RelativeDeltaField
+
+
+class UserProfile(Model):
+    user = OneToOneField(User, on_delete=CASCADE, primary_key=True, related_name="profile")
+    image = CharField(blank=True)
 
 
 class OrganisationType(Model):

@@ -119,6 +119,12 @@ class Common(Configuration):
         }
     }
 
+    # Discourse integration
+    DISCOURSE_API_KEY = environ.get("DISCOURSE_API_KEY")
+    DISCOURSE_API_USERNAME = environ.get("DISCOURSE_API_USERNAME")
+    DISCOURSE_REDIRECT_DOMAIN = environ["DISCOURSE_REDIRECT_DOMAIN"]
+    DISCOURSE_CONNECT_SECRET = environ["DISCOURSE_CONNECT_SECRET"]
+
     # Password validation
     # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
@@ -168,7 +174,7 @@ class Common(Configuration):
     # TODO: need solution production solution for user uploaded files
 
     MEDIA_URL = "media/"
-    MEDIA_ROOT = BASE_DIR / "media"
+    MEDIA_ROOT: Optional[Path] = BASE_DIR / "media"
 
     # Email
     # https://docs.djangoproject.com/en/4.2/topics/email/
@@ -216,6 +222,11 @@ class Common(Configuration):
 class Development(Common):
     DEBUG = True
     CSRF_TRUSTED_ORIGINS = ["http://" + environ["APPLICATION_WEB_HOST"] + ":1800"]
+
+
+class Test(Development):
+    MEDIA_ROOT = None
+    DISCOURSE_API_KEY = None
 
 
 class Testing(Common):

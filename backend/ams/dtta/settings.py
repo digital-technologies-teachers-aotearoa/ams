@@ -32,6 +32,11 @@ class Development(DTTACommon):
     CSRF_TRUSTED_ORIGINS = ["http://" + environ["APPLICATION_WEB_HOST"] + ":1800"]
 
 
+class Test(Development):
+    MEDIA_ROOT = None
+    DISCOURSE_API_KEY = None
+
+
 class Testing(DTTACommon):
     DEBUG = False
     CSRF_TRUSTED_ORIGINS = ["https://" + environ["APPLICATION_WEB_HOST"]]

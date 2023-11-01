@@ -1,6 +1,6 @@
-from os import environ
 from urllib.parse import quote
 
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.utils import timezone
@@ -38,7 +38,7 @@ class ForumRedirectTests(TestCase):
 
         # Then
         self.assertEqual(302, response.status_code)
-        self.assertEqual(environ["DISCOURSE_REDIRECT_DOMAIN"] + "/session/sso?return_path=/", response.url)
+        self.assertEqual(settings.DISCOURSE_REDIRECT_DOMAIN + "/session/sso?return_path=/", response.url)
 
 
 class ForumSingleSignOnTests(TestCase):
@@ -59,7 +59,7 @@ class ForumSingleSignOnTests(TestCase):
             approved_datetime=start,
         )
 
-        payload_query_string = sso_payload(environ["DISCOURSE_CONNECT_SECRET"], nonce="nonce")
+        payload_query_string = sso_payload(settings.DISCOURSE_CONNECT_SECRET, nonce="nonce")
         self.url = "/forum/sso?" + payload_query_string
         self.client.force_login(self.user)
 
@@ -88,7 +88,7 @@ class ForumSingleSignOnTests(TestCase):
 
         response = self.client.get(response.url)
 
-        expected_messages = ["You must have an active membership to view this feature."]
+        expected_messages = [{"value": "You must have an active membership to view this feature.", "type": "error"}]
         self.assertEqual(expected_messages, response.context.get("show_messages"))
 
     def test_should_allow_user_with_active_membership(self) -> None:
@@ -96,7 +96,7 @@ class ForumSingleSignOnTests(TestCase):
         response = self.client.get(self.url)
 
         # Then
-        expected_url_prefix = environ["DISCOURSE_REDIRECT_DOMAIN"] + "/session/sso_login"
+        expected_url_prefix = settings.DISCOURSE_REDIRECT_DOMAIN + "/session/sso_login"
         self.assertEqual(302, response.status_code)
         self.assertTrue(response.url.startswith(expected_url_prefix), response.url)
 
@@ -110,6 +110,6 @@ class ForumSingleSignOnTests(TestCase):
         response = self.client.get(self.url)
 
         # Then
-        expected_url_prefix = environ["DISCOURSE_REDIRECT_DOMAIN"] + "/session/sso_login"
+        expected_url_prefix = settings.DISCOURSE_REDIRECT_DOMAIN + "/session/sso_login"
         self.assertEqual(302, response.status_code)
         self.assertTrue(response.url.startswith(expected_url_prefix))

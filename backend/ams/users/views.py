@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.files.storage import default_storage
 from django.core.mail import send_mail
 from django.db import transaction
 from django.db.models import QuerySet
@@ -24,14 +25,22 @@ from django_tables2 import SingleTableMixin, SingleTableView
 from registration.models import RegistrationProfile
 
 from ..base.models import EmailConfirmationPage
+from ..forum.views import forum_sync_user_profile
 from .forms import (
     AddUserMembershipForm,
     EditUserProfileForm,
     IndividualRegistrationForm,
     MembershipOptionForm,
     OrganisationForm,
+    UploadProfileImageForm,
 )
-from .models import MembershipOption, Organisation, UserMembership, UserMemberStatus
+from .models import (
+    MembershipOption,
+    Organisation,
+    UserMembership,
+    UserMemberStatus,
+    UserProfile,
+)
 from .tables import (
     AdminMembershipOptionTable,
     AdminOrganisationTable,
@@ -40,7 +49,7 @@ from .tables import (
     AdminUserTable,
     UserDetailMembershipTable,
 )
-from .utils import UserIsAdminMixin, user_is_admin
+from .utils import UserIsAdminMixin, user_is_admin, user_message
 
 
 def individual_registration(request: HttpRequest) -> HttpResponse:
@@ -180,6 +189,9 @@ def edit_user_profile(request: HttpRequest, pk: int) -> HttpResponse:
         form = EditUserProfileForm(request.POST, instance=user)
         if form.is_valid():
             form.save()
+
+            forum_sync_user_profile(user)
+
             return HttpResponseRedirect(user_view_url + "?profile_updated=true")
     else:
         form = EditUserProfileForm(instance=user)
@@ -377,10 +389,10 @@ class MembershipActionMixin:
 
     def membership_action_context(self, request: HttpRequest, context: Dict[str, Any]) -> Dict[str, Any]:
         if request.method == "GET" and request.GET.get("membership_cancelled"):
-            context["show_messages"] = [_("Membership Cancelled")]
+            context["show_messages"] = [user_message(_("Membership Cancelled"))]
 
         if request.method == "GET" and request.GET.get("membership_approved"):
-            context["show_messages"] = [_("Membership Approved")]
+            context["show_messages"] = [user_message(_("Membership Approved"))]
 
         return context
 
@@ -408,10 +420,10 @@ class AdminMembershipOptionListView(UserIsAdminMixin, SingleTableView):
         context: Dict[str, Any] = super().get_context_data(**kwargs)
 
         if self.request.method == "GET" and self.request.GET.get("membership_option_created"):
-            context["show_messages"] = [_("Membership Option Added")]
+            context["show_messages"] = [user_message(_("Membership Option Added"))]
 
         if self.request.method == "GET" and self.request.GET.get("membership_option_updated"):
-            context["show_messages"] = [_("Membership Option Saved")]
+            context["show_messages"] = [user_message(_("Membership Option Saved"))]
 
         return context
 
@@ -436,12 +448,65 @@ class UserDetailViewBase(SingleTableMixin, DetailView):
 
         context["can_add_membership"] = can_add_membership
 
-        if self.request.method == "GET" and self.request.GET.get("profile_updated"):
-            context["show_messages"] = [_("Profile Updated")]
+        if self.request.method == "GET":
+            if self.request.GET.get("profile_updated"):
+                context["show_messages"] = [user_message(_("Profile Updated"))]
 
-        if self.request.method == "GET" and self.request.GET.get("requires_membership"):
-            context["show_messages"] = [_("You must have an active membership to view this feature.")]
+            if self.request.GET.get("requires_membership"):
+                context["show_messages"] = [
+                    user_message(_("You must have an active membership to view this feature."), "error")
+                ]
+
+            if self.request.GET.get("invalid_profile_image"):
+                context["show_messages"] = [
+                    user_message(
+                        _("Your profile image must be valid JPG, PNG or GIF not exceeding 1MB in size."), "error"
+                    )
+                ]
+
         return context
+
+    def user_post_action(self, request: HttpRequest, user_view_url: str, user: User) -> Optional[HttpResponse]:
+        if request.POST.get("action") == "upload_profile_image":
+            form = UploadProfileImageForm(request.POST, request.FILES)
+            if form.is_valid():
+                form_data = form.cleaned_data
+
+                try:
+                    user_profile = user.profile
+                except UserProfile.DoesNotExist:
+                    user_profile = UserProfile(user=user)
+                    user_profile.save()
+
+                # If user has an existing profile image, delete it
+                if user_profile.image != "" and default_storage.exists(user_profile.image):
+                    default_storage.delete(user_profile.image)
+
+                profile_image_file = form_data["profile_image_file"]
+
+                image_file_extensions = {
+                    "image/jpeg": "jpg",
+                    "image/png": "png",
+                    "image/gif": "gif",
+                }
+
+                # Save to MEDIA_ROOT directory
+                timestamp = int(timezone.now().timestamp())
+                extension = image_file_extensions[profile_image_file.content_type]
+                image_file_path = f"user/profiles/user_{user.pk}_{timestamp}.{extension}"
+
+                default_storage.save(image_file_path, profile_image_file)
+
+                user_profile.image = image_file_path
+                user_profile.save()
+
+                forum_sync_user_profile(user)
+
+                return HttpResponseRedirect(user_view_url)
+            else:
+                return HttpResponseRedirect(user_view_url + "?invalid_profile_image=true")
+
+        return None
 
 
 class UserDetailView(LoginRequiredMixin, UserDetailViewBase):
@@ -456,6 +521,15 @@ class UserDetailView(LoginRequiredMixin, UserDetailViewBase):
             return HttpResponseRedirect(f"/users/view/{request.user.pk}/")
         return super().get(request, args, kwargs)
 
+    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        self.object = self.get_object()
+
+        response = self.user_post_action(request, reverse("current-user-view"), self.request.user)
+        if response:
+            return response
+
+        return HttpResponse(status=400)
+
 
 class AdminUserDetailView(UserIsAdminMixin, UserDetailViewBase, MembershipActionMixin):
     table_class = AdminUserDetailMembershipTable
@@ -463,6 +537,11 @@ class AdminUserDetailView(UserIsAdminMixin, UserDetailViewBase, MembershipAction
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         self.object = self.get_object()
         redirect_url = reverse("admin-user-view", kwargs={"pk": self.object.pk})
+
+        response = self.user_post_action(request, redirect_url, self.object)
+        if response:
+            return response
+
         return self.membership_post_action(request, redirect_url)
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
@@ -484,6 +563,6 @@ class AdminOrganisationListView(UserIsAdminMixin, SingleTableView):
             # Show message when returning from creating an organisation
             admin_create_organisation_url = reverse("admin-create-organisation")
             if referrer_url.endswith(admin_create_organisation_url) and self.request.GET.get("organisation_created"):
-                context["show_messages"] = [_("Organisation Created")]
+                context["show_messages"] = [user_message(_("Organisation Created"))]
 
         return context

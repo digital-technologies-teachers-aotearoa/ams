@@ -4,6 +4,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
+from django.core.files.uploadedfile import UploadedFile
 from django.forms import (
     CharField,
     ChoiceField,
@@ -11,6 +12,7 @@ from django.forms import (
     DecimalField,
     EmailField,
     Form,
+    ImageField,
     IntegerField,
     ModelChoiceField,
     ModelForm,
@@ -205,3 +207,18 @@ class MembershipOptionForm(ModelForm):
     class Meta:
         model = MembershipOption
         fields = ["name", "type", "duration", "cost"]
+
+
+class UploadProfileImageForm(Form):
+    profile_image_file = ImageField()
+
+    def clean_profile_image_file(self) -> UploadedFile:
+        profile_image_file = self.cleaned_data["profile_image_file"]
+
+        if profile_image_file.content_type not in ["image/jpeg", "image/png", "image/gif"]:
+            raise ValidationError("Image should be valid JPG, PNG or GIF.")
+
+        if profile_image_file.size > 1048576:
+            raise ValidationError("Image should not exceed 1MB in size.")
+
+        return profile_image_file
