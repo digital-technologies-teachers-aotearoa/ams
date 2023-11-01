@@ -60,7 +60,7 @@ class UpdateUserProfileImageTests(TestCase):
         self.user.refresh_from_db()
 
         web_host = environ["APPLICATION_WEB_HOST"]
-        avatar_url = f"https://{web_host}/{settings.MEDIA_URL}{self.user.profile.image}"
+        avatar_url = f"https://{web_host}{settings.MEDIA_URL}{self.user.profile.image}"
 
         mock_sync_sso.assert_called_with(
             sso_secret=settings.DISCOURSE_CONNECT_SECRET,

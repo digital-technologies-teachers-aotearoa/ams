@@ -41,7 +41,7 @@ def forum_sync_user_profile(user: User) -> Optional[Dict[str, Any]]:
                 proto = "https"
 
             web_host = environ["APPLICATION_WEB_HOST"]
-            avatar_url = f"{proto}://{web_host}/{settings.MEDIA_URL}{user_image_path}"
+            avatar_url = f"{proto}://{web_host}{settings.MEDIA_URL}{user_image_path}"
 
     except UserProfile.DoesNotExist:
         pass
