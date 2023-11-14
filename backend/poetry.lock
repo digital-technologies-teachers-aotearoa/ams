@@ -2316,4 +2316,4 @@ reference = "package proxy"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "a949abb83bef72c515c8d496b9c62e00a2144abc7479edbde5cec3d604fcc188"
+content-hash = "ff82b0be69027817989bc3d898d34bf5b52840b39e0d1f21d8b9c314739a8d0a"
