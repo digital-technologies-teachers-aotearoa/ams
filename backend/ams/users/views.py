@@ -21,11 +21,13 @@ from django.utils import timezone
 from django.utils.formats import date_format
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.detail import DetailView
+from django_filters.views import FilterView
 from django_tables2 import SingleTableMixin, SingleTableView
 from registration.models import RegistrationProfile
 
 from ..base.models import EmailConfirmationPage
 from ..forum.views import forum_sync_user_profile
+from .filters import UserMembershipFilter
 from .forms import (
     AddUserMembershipForm,
     EditUserProfileForm,
@@ -397,10 +399,11 @@ class MembershipActionMixin:
         return context
 
 
-class AdminUserMembershipListView(UserIsAdminMixin, SingleTableView, MembershipActionMixin):
+class AdminUserMembershipListView(UserIsAdminMixin, SingleTableMixin, FilterView, MembershipActionMixin):
     model = UserMembership
     table_class = AdminUserMembershipTable
     template_name = "admin_user_memberships.html"
+    filterset_class = UserMembershipFilter
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         redirect_url = reverse("admin-user-memberships")

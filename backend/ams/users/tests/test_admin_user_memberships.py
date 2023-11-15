@@ -1,5 +1,4 @@
-from datetime import timedelta
-
+from dateutil.relativedelta import relativedelta
 from dateutil.tz import gettz
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -27,14 +26,14 @@ class AdminUserMembershipsTests(TestCase):
 
         self.time_zone = gettz(settings.TIME_ZONE)
 
-        start = timezone.localtime() - timedelta(days=7)
+        start = timezone.localtime() - relativedelta(days=7)
 
         self.user_membership = UserMembership.objects.create(
             user=self.user,
             membership_option=membership_option,
             created_datetime=start,
             start_date=start.date(),
-            approved_datetime=start + timedelta(days=1),
+            approved_datetime=start + relativedelta(days=1),
         )
 
         self.url = "/users/memberships/"
@@ -260,3 +259,138 @@ class AdminUserMembershipsTests(TestCase):
 
         # Then
         self.assertEqual(400, response.status_code)
+
+
+class AdminUserMembershipStatusFilterTests(TestCase):
+    def setUp(self) -> None:
+        self.admin_user = User.objects.create_user(username="testadminuser", is_staff=True)
+
+        self.user = User.objects.create_user(username="testuser", is_staff=False)
+        self.user.first_name = "John"
+        self.user.last_name = "Smith"
+        self.user.email = "user@example.com"
+        self.user.save()
+
+        membership_option = MembershipOption.objects.create(
+            name="Membership Option", type=MembershipOptionType.INDIVIDUAL, duration="P1M", cost="1.00"
+        )
+
+        self.time_zone = gettz(settings.TIME_ZONE)
+
+        start = timezone.localtime() - relativedelta(days=7)
+
+        self.active_membership = UserMembership.objects.create(
+            user=self.user,
+            membership_option=membership_option,
+            created_datetime=start,
+            start_date=start.date(),
+            approved_datetime=start + relativedelta(days=1),
+        )
+
+        self.pending_membership = UserMembership.objects.create(
+            user=self.user,
+            membership_option=membership_option,
+            created_datetime=start,
+            start_date=start.date(),
+            approved_datetime=None,
+        )
+
+        self.cancelled_membership = UserMembership.objects.create(
+            user=self.user,
+            membership_option=membership_option,
+            created_datetime=start,
+            start_date=start.date(),
+            approved_datetime=start + relativedelta(days=1),
+            cancelled_datetime=start + relativedelta(days=2),
+        )
+
+        expired_start_date = timezone.localtime() - relativedelta(years=1)
+
+        self.expired_membership = UserMembership.objects.create(
+            user=self.user,
+            membership_option=membership_option,
+            created_datetime=expired_start_date,
+            start_date=expired_start_date,
+            approved_datetime=start + relativedelta(days=1),
+        )
+
+        self.url = "/users/memberships/"
+        self.client.force_login(self.admin_user)
+
+    def test_should_filter_by_active_status(self) -> None:
+        # When
+        response = self.client.get(f"{self.url}?status=active")
+
+        # Then
+        self.assertEqual(200, response.status_code)
+
+        rows = parse_response_table_rows(response)
+
+        statuses = [row[3] for row in rows]
+        expected_statuses = ["Active"]
+
+        self.assertCountEqual(expected_statuses, statuses)
+
+    def test_should_filter_by_pending_status(self) -> None:
+        # When
+        response = self.client.get(f"{self.url}?status=pending")
+
+        # Then
+        self.assertEqual(200, response.status_code)
+
+        rows = parse_response_table_rows(response)
+
+        statuses = [row[3] for row in rows]
+        expected_statuses = ["Pending"]
+
+        self.assertCountEqual(expected_statuses, statuses)
+
+    def test_should_filter_by_expired_status(self) -> None:
+        # When
+        response = self.client.get(f"{self.url}?status=expired")
+
+        # Then
+        self.assertEqual(200, response.status_code)
+
+        rows = parse_response_table_rows(response)
+
+        statuses = [row[3] for row in rows]
+        expected_statuses = ["Expired"]
+
+        self.assertCountEqual(expected_statuses, statuses)
+
+    def test_should_filter_by_cancelled_status(self) -> None:
+        # When
+        response = self.client.get(f"{self.url}?status=cancelled")
+
+        # Then
+        self.assertEqual(200, response.status_code)
+
+        rows = parse_response_table_rows(response)
+
+        statuses = [row[3] for row in rows]
+        expected_statuses = ["Cancelled"]
+
+        self.assertCountEqual(expected_statuses, statuses)
+
+    def test_should_not_filter_by_status_when_blank(self) -> None:
+        # When
+        response = self.client.get(f"{self.url}?status=")
+
+        # Then
+        self.assertEqual(200, response.status_code)
+
+        rows = parse_response_table_rows(response)
+
+        statuses = [row[3] for row in rows]
+        expected_statuses = ["Active", "Pending", "Expired", "Cancelled"]
+
+        self.assertCountEqual(expected_statuses, statuses)
+
+    def test_should_show_error_if_filter_status_is_invalid(self) -> None:
+        # When
+        response = self.client.get(f"{self.url}?status=invalid")
+
+        # Then
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, "Select a valid choice. invalid is not one of the available choices.")
