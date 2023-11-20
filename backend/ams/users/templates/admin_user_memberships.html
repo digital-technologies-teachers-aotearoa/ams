@@ -18,6 +18,22 @@
     </div>
 </div>
 
+{% if filter %}
+<div style="display: flex; justify-content: flex-end">
+    <span>
+       <form id="filter_form" method="get" action="{{ request.path }}">
+           {{ filter.form }}
+       </form>
+    </span>
+
+    <script>
+    $('#filter_form').find('select').change(function() {
+        $('#filter_form').submit();
+    });
+    </script>
+</div>
+{% endif %}
+
 {% render_table table %}
 
 {% include "cancel_membership_modal.html" with modal_id="cancelMembershipModal" %}
