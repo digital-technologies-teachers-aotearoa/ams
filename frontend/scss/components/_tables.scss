@@ -44,3 +44,19 @@ th.orderable {
 .table-action-list li, .table-action-list form {
   display: inline;
 }
+
+ul.pagination {
+  float: right;
+  display: flex;
+  padding-left: 0;
+  list-style: none;
+
+  li {
+    margin-left: 10px;
+    text-transform: capitalize;
+  }
+
+  a {
+    color: #000;
+  }
+}
