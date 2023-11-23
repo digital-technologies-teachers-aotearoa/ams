@@ -23,14 +23,20 @@ class AdminUserTable(Table):
         accessor="first_name", order_by=("first_name", "last_name"), verbose_name=_("Full Name"), empty_values=()
     )
     email = Column(verbose_name=_("Email"))
+    active = Column(accessor="is_active", verbose_name=_("Active"))
     actions = TemplateColumn(verbose_name=_("Actions"), template_name="admin_user_actions.html", orderable=False)
 
     def render_full_name(self, value: str, record: User) -> str:
         return full_name_or_username(record)
 
+    def render_active(self, value: bool, record: User) -> Any:
+        if value:
+            return _("Active")
+        return _("Not Active")
+
     class Meta:
         fields = ("full_name", "email")
-        order_by = ("full_name", "email")
+        order_by = ("full_name", "email", "active")
         model = User
 
 
