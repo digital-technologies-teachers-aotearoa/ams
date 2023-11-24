@@ -136,13 +136,15 @@ class AdminMembershipOptionTable(Table):
 class AdminOrganisationTable(Table):
     name = Column(verbose_name=_("Name"))
     type = Column(accessor="type__name", verbose_name=_("Type"))
-    postal_address = Column(verbose_name=_("Postal Address"))
-    telephone = Column(verbose_name=_("Office Phone"))
+    telephone = Column(verbose_name=_("Telephone"))
+    email = Column(verbose_name=_("Email"))
+    contact_name = Column(verbose_name=_("Contact Name"))
+    city = Column(verbose_name=_("City"))
     actions = TemplateColumn(
         verbose_name=_("Actions"), template_name="admin_organisation_actions.html", orderable=False
     )
 
     class Meta:
-        fields = ("name", "type", "postal_address", "telephone")
+        fields = ("name", "type", "telephone", "email", "contact_name", "city")
         order_by = ("name", "type")
         model = Organisation
