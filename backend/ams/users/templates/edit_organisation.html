@@ -1,16 +1,22 @@
 {% extends "base.html" %}
 {% load static wagtailcore_tags i18n localize_url form_field %}
 
-{% block title %}{% translate "Create Organisation" %}{% endblock title %}
+{% block title %}{% if organisation %}{% translate "Edit Organisation" %}{% else %}{% translate "Create Organisation" %}{% endif %}{% endblock title %}
 
-{% block body_class %}create-organisation{% endblock %}
+{% block body_class %}edit-organisation{% endblock %}
 
 {% block content %}
 
 <div class="row">
     <div class="col">
     <div class="introduction">
-        <h1 class="introduction-heading standard-page">{% translate "Create Organisation" %}</h1>
+        <h1 class="introduction-heading standard-page">
+            {% if organisation %}
+                {% translate "Edit Organisation" %}
+            {% else %}
+                {% translate "Create Organisation" %}
+            {% endif %}
+        </h1>
         <p class="introduction-content standard-page"></p>
     </div>
     </div>
@@ -38,7 +44,7 @@
 
         <div class="form-actions">
             <input class="btn btn-form-cancel" type="button" value="Cancel" onClick="window.location='{{ "users/organisations/" | localize_url }}';">
-            <input class="btn btn-form-submit" type="submit" value="Create">
+            <input class="btn btn-form-submit" type="submit" value="{% if organisation %}{% translate "Save" %}{% else %}{% translate "Create" %}{% endif %}">
         </div>
     </form>
 </div>

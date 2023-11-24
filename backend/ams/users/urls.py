@@ -12,6 +12,7 @@ from .views import (
     create_membership_option,
     create_organisation,
     edit_membership_option,
+    edit_organisation,
     edit_user_profile,
     individual_registration,
 )
@@ -28,6 +29,7 @@ urlpatterns = [
     path("membership-options/edit/<int:pk>/", edit_membership_option, name="edit-membership-option"),
     path("organisations/", AdminOrganisationListView.as_view(), name="admin-organisations"),
     path("organisations/create/", create_organisation, name="admin-create-organisation"),
+    path("organisations/edit/<int:pk>/", edit_organisation, name="admin-edit-organisation"),
     path("individual-registration/", individual_registration, name="registration_register"),
     path("activate/<str:activation_key>/", activate_user, name="activate-user"),
     path("", include("registration.auth_urls")),
