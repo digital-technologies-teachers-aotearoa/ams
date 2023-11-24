@@ -31,8 +31,14 @@ class OrganisationType(Model):
 class Organisation(Model):
     name = CharField(max_length=255)
     type = ForeignKey(OrganisationType, on_delete=CASCADE, related_name="organisations")
+    telephone = CharField(max_length=255)
+    email = CharField(max_length=255)
+    contact_name = CharField(max_length=255)
+    street_address = CharField(max_length=255)
+    suburb = CharField(max_length=255, blank=True)
+    city = CharField(max_length=255)
+    postal_code = CharField(max_length=255)
     postal_address = TextField(blank=True)
-    office_phone = CharField(max_length=255, blank=True)
 
 
 class MembershipOptionType(TextChoices):

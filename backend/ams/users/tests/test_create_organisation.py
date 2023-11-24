@@ -17,8 +17,14 @@ class CreateOrganisationFormTests(TestCase):
         self.form_values = {
             "type": self.organisation_types[0].id,
             "name": "Any Organisation",
-            "office_phone": "555-12345",
-            "postal_address": "123 Main Street\nCapital City",
+            "telephone": "555-12345",
+            "contact_name": "John Smith",
+            "email": "john@example.com",
+            "street_address": "123 Main Street",
+            "suburb_name": "",
+            "city": "Capital City",
+            "postal_code": "8080",
+            "postal_address": "PO BOX 1234\nCapital City 8082",
         }
 
         self.user = User.objects.create_user(username="testadminuser", is_staff=True)
@@ -69,7 +75,21 @@ class CreateOrganisationFormTests(TestCase):
         self.assertEqual(organisation.name, self.form_values["name"])
         self.assertEqual(organisation.type.id, self.form_values["type"])
         self.assertEqual(organisation.postal_address, self.form_values["postal_address"])
-        self.assertEqual(organisation.office_phone, self.form_values["office_phone"])
+        self.assertEqual(organisation.telephone, self.form_values["telephone"])
+
+    def test_should_validate_email(self) -> None:
+        # Given
+        self.form_values["email"] = "invalid"
+
+        # When
+        response = self.client.post(self.url, self.form_values)
+
+        # Then
+        expected_errors = {
+            "email": ["Enter a valid email address."],
+        }
+
+        self.assertDictEqual(expected_errors, response.context["form"].errors)
 
     def test_blank_form_should_include_expected_values(self) -> None:
         # Given
@@ -97,6 +117,12 @@ class CreateOrganisationFormTests(TestCase):
         expected_errors = {
             "name": ["This field is required."],
             "type": ["This field is required."],
+            "telephone": ["This field is required."],
+            "email": ["This field is required."],
+            "contact_name": ["This field is required."],
+            "street_address": ["This field is required."],
+            "city": ["This field is required."],
+            "postal_code": ["This field is required."],
         }
 
         self.assertEqual(form_valid, False)

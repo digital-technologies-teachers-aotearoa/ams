@@ -122,7 +122,7 @@ def create_organisation(request: HttpRequest) -> HttpResponse:
                 type=form_data["type"],
                 name=form_data["name"],
                 postal_address=form_data["postal_address"],
-                office_phone=form_data["office_phone"],
+                telephone=form_data["telephone"],
             )
 
             admin_organisations_url = reverse("admin-organisations")

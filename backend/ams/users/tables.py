@@ -137,12 +137,12 @@ class AdminOrganisationTable(Table):
     name = Column(verbose_name=_("Name"))
     type = Column(accessor="type__name", verbose_name=_("Type"))
     postal_address = Column(verbose_name=_("Postal Address"))
-    office_phone = Column(verbose_name=_("Office Phone"))
+    telephone = Column(verbose_name=_("Office Phone"))
     actions = TemplateColumn(
         verbose_name=_("Actions"), template_name="admin_organisation_actions.html", orderable=False
     )
 
     class Meta:
-        fields = ("name", "type", "postal_address", "office_phone")
+        fields = ("name", "type", "postal_address", "telephone")
         order_by = ("name", "type")
         model = Organisation

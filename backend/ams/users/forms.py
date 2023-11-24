@@ -159,10 +159,22 @@ class NameModelChoiceField(ModelChoiceField):
 
 class OrganisationForm(ModelForm):
     type = NameModelChoiceField(queryset=OrganisationType.objects.order_by("id"), required=True, empty_label="")
+    email = EmailField(label=_("Email"))
 
     class Meta:
         model = Organisation
-        fields = ["name", "type", "postal_address", "office_phone"]
+        fields = [
+            "name",
+            "type",
+            "telephone",
+            "email",
+            "contact_name",
+            "street_address",
+            "suburb",
+            "city",
+            "postal_code",
+            "postal_address",
+        ]
 
 
 class MembershipDurationWidget(MultiWidget):

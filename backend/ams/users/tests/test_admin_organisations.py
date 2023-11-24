@@ -14,7 +14,7 @@ class AdminOrganisationListTests(TestCase):
             name="Some School",
             type=organisation_type,
             postal_address="123 Main Street\nCapital City",
-            office_phone="555-12345",
+            telephone="555-12345",
         )
 
         self.url = "/users/organisations/"
@@ -50,7 +50,7 @@ class AdminOrganisationListTests(TestCase):
         # Then
         self.assertEqual(200, response.status_code)
 
-        expected_columns = ["name", "type", "postal_address", "office_phone", "actions"]
+        expected_columns = ["name", "type", "postal_address", "telephone", "actions"]
         columns = [column.name for column in response.context["table"].columns]
         self.assertListEqual(expected_columns, columns)
 
@@ -81,7 +81,7 @@ class AdminOrganisationListTests(TestCase):
                 self.organisation.name,
                 self.organisation.type.name,
                 self.organisation.postal_address,
-                self.organisation.office_phone,
+                self.organisation.telephone,
                 "",
             ]
         ]
