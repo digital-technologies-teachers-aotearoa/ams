@@ -12,7 +12,6 @@ from django.db.models import (
     Model,
     OneToOneField,
     TextChoices,
-    TextField,
 )
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -34,11 +33,13 @@ class Organisation(Model):
     telephone = CharField(max_length=255)
     email = CharField(max_length=255)
     contact_name = CharField(max_length=255)
-    street_address = CharField(max_length=255)
-    suburb = CharField(max_length=255, blank=True)
-    city = CharField(max_length=255)
+    postal_address = CharField(max_length=255)
+    postal_suburb = CharField(max_length=255, blank=True)
+    postal_city = CharField(max_length=255)
     postal_code = CharField(max_length=255)
-    postal_address = TextField(blank=True)
+    street_address = CharField(max_length=255, blank=True)
+    suburb = CharField(max_length=255, blank=True)
+    city = CharField(max_length=255, blank=True)
 
 
 class MembershipOptionType(TextChoices):

@@ -21,10 +21,12 @@ class CreateOrganisationFormTests(TestCase):
             "contact_name": "John Smith",
             "email": "john@example.com",
             "street_address": "123 Main Street",
-            "suburb": "",
+            "suburb": "Some Suburb",
             "city": "Capital City",
+            "postal_address": "PO BOX 1234",
+            "postal_suburb": "Some Suburb",
+            "postal_city": "Capital City",
             "postal_code": "8080",
-            "postal_address": "PO BOX 1234\nCapital City 8082",
         }
 
         self.user = User.objects.create_user(username="testadminuser", is_staff=True)
@@ -126,8 +128,8 @@ class CreateOrganisationFormTests(TestCase):
             "telephone": ["This field is required."],
             "email": ["This field is required."],
             "contact_name": ["This field is required."],
-            "street_address": ["This field is required."],
-            "city": ["This field is required."],
+            "postal_address": ["This field is required."],
+            "postal_city": ["This field is required."],
             "postal_code": ["This field is required."],
         }
 

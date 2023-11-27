@@ -7,6 +7,12 @@
 
 {% block content %}
 
+<style>
+    .form-group {
+        margin-bottom: 1em;
+    }
+</style>
+
 <div class="row">
     <div class="col">
     <div class="introduction">
@@ -28,19 +34,24 @@
         {% csrf_token %}
         <h2 class="form-panel-heading">{% translate "Organisation Details" %}</h2>
 
-        <div class="organisation-detail-fields">
-            {% for field in form %}
-                <div class="form-group">
-                    <div class="form-label">
-                        {{ field.label_tag }}
-                    </div>
-                    <div class="form-input form-input-short">
-                        {{ field | add_form_field_classes }}
-                        {{ field.errors }}
-                    </div>
+        {% for field in form %}
+
+            {% if field.name == "postal_address" %}
+                <h2 class="form-panel-heading">{% translate "Postal Address" %}</h2>
+            {% elif field.name == "street_address" %}
+                <h2 class="form-panel-heading">{% translate "Street Address" %}</h2>
+            {% endif %}
+
+            <div class="form-group">
+                <div class="form-label">
+                    {{ field.label_tag }}
                 </div>
-            {% endfor %}
-        </div>
+                <div class="form-input form-input-short">
+                    {{ field | add_form_field_classes }}
+                    {{ field.errors }}
+                </div>
+            </div>
+        {% endfor %}
 
         <div class="form-actions">
             <input class="btn btn-form-cancel" type="button" value="Cancel" onClick="window.location='{{ "users/organisations/" | localize_url }}';">

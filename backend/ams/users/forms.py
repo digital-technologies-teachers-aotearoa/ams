@@ -169,11 +169,13 @@ class OrganisationForm(ModelForm):
             "telephone",
             "email",
             "contact_name",
+            "postal_address",
+            "postal_suburb",
+            "postal_city",
+            "postal_code",
             "street_address",
             "suburb",
             "city",
-            "postal_code",
-            "postal_address",
         ]
 
 

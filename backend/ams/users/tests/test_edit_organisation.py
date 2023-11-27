@@ -21,10 +21,12 @@ class EditOrganisationFormTests(TestCase):
             contact_name="John Smith",
             email="john@example.com",
             street_address="123 Main Street",
-            suburb="",
+            suburb="Some Suburb",
             city="Capital City",
+            postal_address="PO BOX 1234",
+            postal_suburb="Some Suburb",
+            postal_city="Capital City",
             postal_code="8080",
-            postal_address="PO BOX 1234\nCapital City 8082",
         )
 
         self.form_values = {
@@ -34,10 +36,12 @@ class EditOrganisationFormTests(TestCase):
             "contact_name": "Jane Smith",
             "email": "jane@example.com",
             "street_address": "124 Main Street",
-            "suburb": "Some Suburb",
+            "suburb": "Other Suburb",
             "city": "Other City",
+            "postal_address": "PO BOX 12345",
+            "postal_suburb": "Other Suburb",
+            "postal_city": "Other City",
             "postal_code": "8081",
-            "postal_address": "PO BOX 12345\nOther City 8083",
         }
 
         self.user = User.objects.create_user(username="testadminuser", is_staff=True)
@@ -139,8 +143,8 @@ class EditOrganisationFormTests(TestCase):
             "telephone": ["This field is required."],
             "email": ["This field is required."],
             "contact_name": ["This field is required."],
-            "street_address": ["This field is required."],
-            "city": ["This field is required."],
+            "postal_address": ["This field is required."],
+            "postal_city": ["This field is required."],
             "postal_code": ["This field is required."],
         }
 

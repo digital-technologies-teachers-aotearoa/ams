@@ -26,7 +26,7 @@
 
         <div class="form-group">
             <div class="form-label">
-                <label for="id_type">{% translate "Type" %}:</label>
+                <label>{% translate "Type" %}:</label>
             </div>
             <div class="form-input form-input-short">
                 {{ organisation.type.name }}
@@ -35,7 +35,7 @@
     
         <div class="form-group">
             <div class="form-label">
-                <label for="id_telephone">{% translate "Telephone" %}:</label>
+                <label>{% translate "Telephone" %}:</label>
             </div>
             <div class="form-input form-input-short">
                 {{ organisation.telephone }}
@@ -44,7 +44,7 @@
     
         <div class="form-group">
             <div class="form-label">
-                <label for="id_email">{% translate "Email" %}:</label>
+                <label>{% translate "Email" %}:</label>
             </div>
             <div class="form-input form-input-short">
                 {{ organisation.email }}
@@ -53,7 +53,7 @@
 
         <div class="form-group">
             <div class="form-label">
-                <label for="id_email">{% translate "Contact Name" %}:</label>
+                <label>{% translate "Contact Name" %}:</label>
             </div>
             <div class="form-input form-input-short">
                 {{ organisation.contact_name }}
@@ -62,15 +62,27 @@
 
         <div class="form-group">
             <div class="form-label">
-                <label for="id_email">{% translate "Address" %}:</label>
+                <label>{% translate "Postal Address" %}:</label>
             </div>
             <div class="form-input form-input-short">
-                {{ organisation.street_address }}
-                <br>{{ organisation.suburb }}
-                <br>{{ organisation.city }}, {{ organisation.postal_code }}
+                {{ organisation.postal_address }}
+                {% if organisation.postal_suburb %}<br>{{ organisation.postal_suburb }}{% endif %}
+                <br>{{ organisation.postal_city }}, {{ organisation.postal_code }}
             </div>
         </div>
 
+        <div class="form-group">
+            <div class="form-label">
+                <label>{% translate "Street Address" %}:</label>
+            </div>
+            <div class="form-input form-input-short">
+                {% if organisation.street_address %}
+                    {{ organisation.street_address }}
+                    {% if organisation.suburb %}<br>{{ organisation.suburb }}{% endif %}
+                    <br>{{ organisation.city }}
+                {% endif %}
+            </div>
+        </div>
     </form>
 </div>
 

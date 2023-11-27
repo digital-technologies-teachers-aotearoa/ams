@@ -31,6 +31,23 @@ class Migration(migrations.Migration):
             field=models.CharField(default="", max_length=255),
             preserve_default=False,
         ),
+        migrations.AlterField(
+            model_name="organisation",
+            name="postal_address",
+            field=models.CharField(max_length=255),
+        ),
+        migrations.AddField(
+            model_name="organisation",
+            name="postal_city",
+            field=models.CharField(default="", max_length=255),
+            preserve_default=False,
+        ),
+        migrations.AddField(
+            model_name="organisation",
+            name="postal_suburb",
+            field=models.CharField(blank=True, max_length=255),
+            preserve_default=False,
+        ),
         migrations.AddField(
             model_name="organisation",
             name="postal_code",
@@ -40,7 +57,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="organisation",
             name="street_address",
-            field=models.CharField(default="", max_length=255),
+            field=models.CharField(blank=True, max_length=255),
             preserve_default=False,
         ),
         migrations.AddField(
@@ -51,7 +68,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="organisation",
             name="city",
-            field=models.CharField(default="", max_length=255),
+            field=models.CharField(blank=True, max_length=255),
             preserve_default=False,
         ),
     ]
