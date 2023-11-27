@@ -592,6 +592,6 @@ class AdminOrganisationListView(UserIsAdminMixin, SingleTableView):
                 context["show_messages"] = [user_message(_("Organisation Created"))]
 
             if referrer_url.find("/organisations/edit/") != -1 and self.request.GET.get("organisation_updated"):
-                context["show_messages"] = [user_message(_("Organisation Updated"))]
+                context["show_messages"] = [user_message(_("Organisation Saved"))]
 
         return context
