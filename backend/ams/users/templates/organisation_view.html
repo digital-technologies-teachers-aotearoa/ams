@@ -9,82 +9,51 @@
 {% block content %}
 
 <style>
-    .form-group {
+    label {
+        font-weight: bold;
         margin-bottom: 0;
     }
 </style>
 
-<h1 class="introduction-heading standard-page">{{ organisation.name }}</h1>
+{% include "show_messages.html" %}
 
-<div class="col-lg-9">   
-    <form class="form-panel form-panel-standard">
-        <div class="table-actions">            
-            <a class="btn btn-small btn-table-action" href="{% url "admin-edit-organisation" organisation.pk %}">{% translate "Edit" %}</a>
-        </div>
+<table style="width: 100%">
+    <tr>
+        <td style="padding: 10px">
 
-        <h2 class="form-panel-heading">{% translate "Organisation Details" %}</h2>
+            <h1>{{ organisation.name }}</h1>
 
-        <div class="form-group">
-            <div class="form-label">
-                <label>{% translate "Type" %}:</label>
-            </div>
-            <div class="form-input form-input-short">
-                {{ organisation.type.name }}
-            </div>
-        </div>
-    
-        <div class="form-group">
-            <div class="form-label">
-                <label>{% translate "Telephone" %}:</label>
-            </div>
-            <div class="form-input form-input-short">
-                {{ organisation.telephone }}
-            </div>
-        </div>
-    
-        <div class="form-group">
-            <div class="form-label">
-                <label>{% translate "Email" %}:</label>
-            </div>
-            <div class="form-input form-input-short">
-                {{ organisation.email }}
-            </div>
-        </div>
+            <div class="content">
+                <p><label>{% translate "Type" %}:</label>
+                <br>{{ organisation.type.name }}</p>
 
-        <div class="form-group">
-            <div class="form-label">
-                <label>{% translate "Contact Name" %}:</label>
-            </div>
-            <div class="form-input form-input-short">
-                {{ organisation.contact_name }}
-            </div>
-        </div>
+                <p><label>{% translate "Telephone" %}:</label>
+                <br>{{ organisation.telephone }}</p>
 
-        <div class="form-group">
-            <div class="form-label">
-                <label>{% translate "Postal Address" %}:</label>
-            </div>
-            <div class="form-input form-input-short">
-                {{ organisation.postal_address }}
-                {% if organisation.postal_suburb %}<br>{{ organisation.postal_suburb }}{% endif %}
-                <br>{{ organisation.postal_city }}, {{ organisation.postal_code }}
-            </div>
-        </div>
+                <p><label>{% translate "Email" %}:</label>
+                <br><a href="mailto:{{organisation.email | urlencode}}">{{organisation.email}}</a></p>
 
-        <div class="form-group">
-            <div class="form-label">
-                <label>{% translate "Street Address" %}:</label>
-            </div>
-            <div class="form-input form-input-short">
-                {% if organisation.street_address %}
-                    {{ organisation.street_address }}
-                    {% if organisation.suburb %}<br>{{ organisation.suburb }}{% endif %}
-                    <br>{{ organisation.city }}
-                {% endif %}
-            </div>
-        </div>
-    </form>
-</div>
+                <p><label>{% translate "Contact Name" %}:</label>
+                <br>{{ organisation.contact_name }}</p>
 
+                <p><label>{% translate "Postal Address" %}:</label>
+                <br>{{ organisation.postal_address }}
+                    {% if organisation.postal_suburb %}<br>{{ organisation.postal_suburb }}{% endif %}
+                    <br>{{ organisation.postal_city }}, {{ organisation.postal_code }}
+                </p>
+
+                <p><label>{% translate "Street Address" %}:</label>
+                <br>{{ organisation.street_address }}
+                {% if organisation.suburb %}<br>{{ organisation.suburb }}{% endif %}
+                <br>{{ organisation.city }}
+                </p>
+   
+                <p><a href="{% url "admin-edit-organisation" organisation.pk %}">{% translate "Edit Organisation" %}</a></p>
+            </div>
+        </td>
+        <td valign="top">
+        </td>
+    </tr>
+</table>
 
 {% endblock content %}
