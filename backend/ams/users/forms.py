@@ -177,6 +177,20 @@ class OrganisationForm(ModelForm):
             "suburb",
             "city",
         ]
+        labels = {
+            "name": _("Name"),
+            "type": _("Type"),
+            "telephone": _("Telephone"),
+            "email": _("Email"),
+            "contact_name": _("Contact Name"),
+            "postal_address": _("Postal Address"),
+            "postal_suburb": _("Suburb"),
+            "postal_city": _("City"),
+            "postal_code": _("Postal Code"),
+            "street_address": _("Postal Address"),
+            "suburb": _("Suburb"),
+            "city": _("City"),
+        }
 
 
 class MembershipDurationWidget(MultiWidget):
