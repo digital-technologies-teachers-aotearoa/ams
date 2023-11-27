@@ -87,7 +87,7 @@ class AdminOrganisationListTests(TestCase):
                 self.organisation.email,
                 self.organisation.contact_name,
                 self.organisation.city,
-                "Edit",
+                "View,Edit",
             ]
         ]
 

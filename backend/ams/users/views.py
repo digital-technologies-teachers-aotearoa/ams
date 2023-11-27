@@ -157,6 +157,11 @@ def edit_organisation(request: HttpRequest, pk: int) -> HttpResponse:
     )
 
 
+class OrganisationDetailView(UserIsAdminMixin, DetailView):
+    model = Organisation
+    template_name = "organisation_view.html"
+
+
 def notify_staff_of_new_user(request: HttpRequest, new_user: User) -> HttpResponse:
     site = get_current_site(request)
     from_email = settings.DEFAULT_FROM_EMAIL

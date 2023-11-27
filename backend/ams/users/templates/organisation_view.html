@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% load static wagtailcore_tags i18n %}
+{% load render_table from django_tables2 %}
+
+{% block title %}{{ organisation.name }}{% endblock title %}
+
+{% block body_class %}organisation-view{% endblock %}
+
+{% block content %}
+
+<style>
+    .form-group {
+        margin-bottom: 0;
+    }
+</style>
+
+<h1 class="introduction-heading standard-page">{{ organisation.name }}</h1>
+
+<div class="col-lg-9">   
+    <form class="form-panel form-panel-standard">
+        <div class="table-actions">            
+            <a class="btn btn-small btn-table-action" href="{% url "admin-edit-organisation" organisation.pk %}">{% translate "Edit" %}</a>
+        </div>
+
+        <h2 class="form-panel-heading">{% translate "Organisation Details" %}</h2>
+
+        <div class="form-group">
+            <div class="form-label">
+                <label for="id_type">{% translate "Type" %}:</label>
+            </div>
+            <div class="form-input form-input-short">
+                {{ organisation.type.name }}
+            </div>
+        </div>
+    
+        <div class="form-group">
+            <div class="form-label">
+                <label for="id_telephone">{% translate "Telephone" %}:</label>
+            </div>
+            <div class="form-input form-input-short">
+                {{ organisation.telephone }}
+            </div>
+        </div>
+    
+        <div class="form-group">
+            <div class="form-label">
+                <label for="id_email">{% translate "Email" %}:</label>
+            </div>
+            <div class="form-input form-input-short">
+                {{ organisation.email }}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="form-label">
+                <label for="id_email">{% translate "Contact Name" %}:</label>
+            </div>
+            <div class="form-input form-input-short">
+                {{ organisation.contact_name }}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="form-label">
+                <label for="id_email">{% translate "Address" %}:</label>
+            </div>
+            <div class="form-input form-input-short">
+                {{ organisation.street_address }}
+                <br>{{ organisation.suburb }}
+                <br>{{ organisation.city }}, {{ organisation.postal_code }}
+            </div>
+        </div>
+
+    </form>
+</div>
+
+
+{% endblock content %}
