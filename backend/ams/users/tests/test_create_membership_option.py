@@ -60,8 +60,24 @@ class CreateMembershipOptionTests(TestCase):
         self.assertFormError(response, "form", "cost", "This field is required.")
         self.assertTemplateUsed(response, "edit_membership_option.html")
 
-    def test_should_create_membership_option(self) -> None:
+    def test_should_create_individual_membership_option(self) -> None:
         # When
+        self.form_values["type"] = MembershipOptionType.INDIVIDUAL
+        response = self.client.post(self.url, self.form_values)
+
+        # Then
+        self.assertEqual(302, response.status_code)
+
+        membership_option = MembershipOption.objects.get(name=self.form_values["name"])
+
+        self.assertEqual(membership_option.name, self.form_values["name"])
+        self.assertEqual(membership_option.type, self.form_values["type"])
+        self.assertEqual(membership_option.duration, relativedelta(days=int(self.form_values["duration_0"])))
+        self.assertEqual(membership_option.cost, Decimal(self.form_values["cost"]))
+
+    def test_should_create_organisation_membership_option(self) -> None:
+        # When
+        self.form_values["type"] = MembershipOptionType.ORGANISATION
         response = self.client.post(self.url, self.form_values)
 
         # Then

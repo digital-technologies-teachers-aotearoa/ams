@@ -69,14 +69,19 @@ def format_membership_duration(duration: relativedelta) -> Any:
     return format_lazy("{} {}", count, translated_unit)
 
 
-def get_individual_membership_options() -> List[Tuple[str, str]]:
+def get_membership_options(option_type: Any) -> List[Tuple[str, str]]:
+    membership_options = MembershipOption.objects.filter(type=option_type).order_by("id")
     return [
         (
             option.name,
             format_lazy("${} {} {}", option.cost, _("for"), format_membership_duration(option.duration)),
         )
-        for option in MembershipOption.objects.filter(type=MembershipOptionType.INDIVIDUAL).order_by("id")
+        for option in membership_options
     ]
+
+
+def get_individual_membership_options() -> List[Tuple[str, str]]:
+    return get_membership_options(option_type=MembershipOptionType.INDIVIDUAL)
 
 
 class MembershipOptionRadioSelect(RadioSelect):
@@ -199,7 +204,10 @@ class MembershipOptionForm(ModelForm):
     name = CharField(label=_("Name"), max_length=255)
     type = ChoiceField(
         label=_("Type"),
-        choices=[(MembershipOptionType.INDIVIDUAL.value, MembershipOptionType.INDIVIDUAL.label)],  # type: ignore
+        choices=[
+            (MembershipOptionType.INDIVIDUAL.value, MembershipOptionType.INDIVIDUAL.label),  # type: ignore
+            (MembershipOptionType.ORGANISATION.value, MembershipOptionType.ORGANISATION.label),  # type: ignore
+        ],
     )
     duration = MembershipDurationField(label=_("Duration"))
     cost = DecimalField(label=_("Cost"))
