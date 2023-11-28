@@ -35,7 +35,7 @@ class Common(Configuration):
 
     DEBUG = False
 
-    ALLOWED_HOSTS: Iterable[str] = ["backend", environ["APPLICATION_WEB_HOST"]]
+    ALLOWED_HOSTS: Iterable[str] = ["backend", environ["DISCOURSE_HOSTNAME"], environ["APPLICATION_WEB_HOST"]]
 
     # Application definition
 
