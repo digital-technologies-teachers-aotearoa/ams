@@ -47,7 +47,7 @@
           </span>
           <h2>{% translate "Forums" %}</h2>
           <p>{% translate "Lorem ipsum dolor velum ptat duis inum eras a vas consequat inum. Lorem ipsum dolor velum ptat duis inum eras." %}</p>
-          <a href="{{ "#" | localize_url }}" title="{% translate "Forums" %}">
+          <a href="{{ "/forum/" | localize_url }}" title="{% translate "Forums" %}">
             <button class="card-arrow" title="{% translate "Forums" %}">
                 <img src="/static/images/icons/arrow-copy-3.png" srcset="/static/images/icons/arrow-copy-3@2x.png 2x, /static/images/icons/arrow-copy-3@3x.png 3x">
             </button>
@@ -60,6 +60,44 @@
         <img src="/static/images/graphics/koru.png" srcset="/static/images/graphics/koru@2x.png 2x, /static/images/graphics/koru@3x.png 3x">
       </div>
     </div>
+    <div class="col-lg-4 col-md-6">
+      <div class="card card-photo">
+        <img src="/static/images/photos/image.png" srcset="/static/images/photos/image@2x.png 2x, /static/images/photos/image@3x.png 3x">
+      </div>
+    </div>
+    <div class="col-lg-4 col-md-6">
+      <div class="card card-standard card-teal">
+        <div class="card-content">
+          <span class="card-icon">
+            <img src="/static/images/icons/resources.png">
+          </span>
+          <h2>{% translate "Resources" %}</h2>
+          <p>{% translate "Lorem ipsum dolor velum ptat duis inum eras a vas consequat inum. Lorem ipsum dolor velum ptat duis inum eras." %}</p>          
+          <a href="https://www.dthm4kaiako.ac.nz/resources/" title="{% translate "Resources" %}">
+          <button class="card-arrow">
+            <img src="/static/images/icons/arrow-copy-3.png" srcset="/static/images/icons/arrow-copy-3@2x.png 2x, /static/images/icons/arrow-copy-3@3x.png 3x">
+          </button>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4 col-md-6">
+      <div class="card card-standard card-blueberry">
+        <div class="card-content">
+          <span class="card-icon">
+            <img src="/static/images/icons/events.png">
+          </span>
+          <h2>{% translate "Events" %}</h2>
+          <p>Lorem ipsum dolor velum ptat duis inum eras a vas consequat inum. Lorem ipsum dolor velum ptat duis inum. eras a vas consequat inum.</p>
+          <a href="https://www.dthm4kaiako.ac.nz/events/" title="{% translate "Events" %}">
+          <button class="card-arrow">
+            <img src="/static/images/icons/arrow-copy-3.png" srcset="/static/images/icons/arrow-copy-3@2x.png 2x, /static/images/icons/arrow-copy-3@3x.png 3x">
+          </button>
+        </a>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 {% endblock content %}
