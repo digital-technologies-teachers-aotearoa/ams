@@ -43,7 +43,9 @@ class Organisation(Model):
 
 
 class OrganisationMember(Model):
-    user = ForeignKey(User, on_delete=CASCADE, related_name="organisation_members")
+    user = ForeignKey(User, null=True, on_delete=CASCADE, related_name="organisation_members")
+    invite_email = CharField(max_length=255, blank=True)
+    invite_token = CharField(max_length=255, unique=True)
     organisation = ForeignKey(Organisation, on_delete=CASCADE, related_name="organisation_members")
     created_datetime = DateTimeField()
     accepted_datetime = DateTimeField(null=True)

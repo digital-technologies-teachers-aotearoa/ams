@@ -141,6 +141,25 @@ class IndividualRegistrationForm(Form):
         return cleaned_data
 
 
+class OrganisationUserRegistrationForm(Form):
+    email = EmailField(label=_("Email"), disabled=True)
+    first_name = CharField(label=_("First Name"), max_length=255)
+    last_name = CharField(label=_("Last Name"), max_length=255)
+    password = CharField(label=_("Password"), widget=PasswordInput(), validators=[validate_password])
+    confirm_password = CharField(label=_("Confirm Password"), widget=PasswordInput())
+
+    def clean(self) -> Dict[str, Any]:
+        cleaned_data: Dict[str, Any] = super().clean()
+
+        password = cleaned_data.get("password")
+        confirm_password = cleaned_data.get("confirm_password")
+
+        if password and password != confirm_password:
+            self.add_error("confirm_password", _("The two password fields didn't match."))
+
+        return cleaned_data
+
+
 class EditUserProfileForm(ModelForm):
     username = CharField(label=_("Email"), disabled=True)
     first_name = CharField(label=_("First Name"), max_length=255)
@@ -191,6 +210,22 @@ class OrganisationForm(ModelForm):
             "suburb": _("Suburb"),
             "city": _("City"),
         }
+
+
+class InviteOrganisationMemberForm(Form):
+    email = EmailField(label=_("Email"))
+
+    def __init__(self, organisation: Organisation, *args: Any, **kwargs: Any) -> None:
+        self.organisation = organisation
+        super().__init__(*args, **kwargs)
+
+    def clean_email(self) -> str:
+        email: str = self.cleaned_data["email"]
+
+        if self.organisation.organisation_members.filter(user__email=email).exists():
+            raise ValidationError(_("A user with this email is already a member of this organisation."))
+
+        return email
 
 
 class MembershipDurationWidget(MultiWidget):
@@ -252,9 +287,9 @@ class UploadProfileImageForm(Form):
         profile_image_file = self.cleaned_data["profile_image_file"]
 
         if profile_image_file.content_type not in ["image/jpeg", "image/png", "image/gif"]:
-            raise ValidationError("Image should be valid JPG, PNG or GIF.")
+            raise ValidationError(_("Image should be valid JPG, PNG or GIF."))
 
         if profile_image_file.size > 1048576:
-            raise ValidationError("Image should not exceed 1MB in size.")
+            raise ValidationError(_("Image should not exceed 1MB in size."))
 
         return profile_image_file

@@ -16,6 +16,8 @@ class Migration(migrations.Migration):
             name="OrganisationMember",
             fields=[
                 ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("invite_email", models.CharField(max_length=255, blank=True)),
+                ("invite_token", models.CharField(max_length=255, unique=True)),
                 ("created_datetime", models.DateTimeField()),
                 ("accepted_datetime", models.DateTimeField(null=True)),
                 (
@@ -32,6 +34,7 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="organisation_members",
                         to=settings.AUTH_USER_MODEL,
+                        null=True,
                     ),
                 ),
             ],

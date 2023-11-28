@@ -3,6 +3,7 @@ from typing import Any
 
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth.models import User
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django_tables2 import Column, DateColumn, Table, TemplateColumn
 
@@ -155,34 +156,33 @@ class OrganisationMemberTable(Table):
         verbose_name=_("Name"),
         accessor="user__first_name",
         order_by=("user__first_name", "user__last_name"),
-        empty_values=[],
     )
-    email = Column(verbose_name=_("Email"), accessor="user__email")
+    email = Column(verbose_name=_("Email"), accessor="invite_email")
     status = Column(
         verbose_name=_("Status"),
         accessor="accepted_datetime",
         empty_values=[],
     )
-    start_date = Column(
-        verbose_name=_("Start Date"),
+    join_date = Column(
+        verbose_name=_("Join Date"),
         accessor="accepted_datetime",
-        empty_values=[],
     )
 
+    def render_email(self, value: str, record: OrganisationMember) -> Any:
+        # Show user's current email if there is a user, otherwise show the invite email
+        if record.user:
+            return record.user.email
+        return value
+
     def render_status(self, value: datetime, record: OrganisationMember) -> Any:
-        print(value)
-        print(record)
-        if value:
+        if value and record.user.is_active:
             return _("Active")
         return _("Invited")
 
-    def render_start_date(self, value: datetime, record: OrganisationMember) -> Any:
-        if value:
-            # TODO: convert time zone ?
-            return value.date()
-        return ""
+    def render_join_date(self, value: datetime, record: OrganisationMember) -> Any:
+        return timezone.localtime(value).date()
 
     class Meta:
-        fields = ("name", "email", "status", "start_date")
+        fields = ("name", "email", "status", "join_date")
         order_by = ("email",)
         model = OrganisationMember
