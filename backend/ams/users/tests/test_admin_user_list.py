@@ -47,7 +47,7 @@ class AdminUserListTests(TestCase):
         # Then
         self.assertEqual(200, response.status_code)
 
-        expected_columns = ["full_name", "email", "actions"]
+        expected_columns = ["full_name", "email", "active", "actions"]
         columns = [column.name for column in response.context["table"].columns]
         self.assertListEqual(expected_columns, columns)
 
@@ -61,13 +61,17 @@ class AdminUserListTests(TestCase):
         # Then
         self.assertEqual(200, response.status_code)
 
-        expected_columns = ["Full Name", "Email", "Actions"]
+        expected_columns = ["Full Name", "Email", "Active", "Actions"]
         columns = [column.header for column in response.context["table"].columns]
         self.assertListEqual(expected_columns, columns)
 
     def test_should_show_expected_rows(self) -> None:
         # Given
         self.client.force_login(self.user)
+
+        inactive_user = User.objects.create_user(
+            username="inactiveuser", first_name="Zack", email="zack@example.com", is_active=False
+        )
 
         # When
         response = self.client.get("/users/list/")
@@ -77,6 +81,9 @@ class AdminUserListTests(TestCase):
 
         rows = parse_response_table_rows(response)
 
-        expected_rows = [[self.user.get_full_name(), self.user.email, "View"]]
+        expected_rows = [
+            [self.user.get_full_name(), self.user.email, "Active", "View,Edit"],
+            [inactive_user.get_full_name(), inactive_user.email, "Not Active", "View,Edit"],
+        ]
 
         self.assertListEqual(expected_rows, rows)
