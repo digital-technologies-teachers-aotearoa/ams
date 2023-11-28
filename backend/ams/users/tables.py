@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from django_tables2 import Column, DateColumn, Table, TemplateColumn
 
 from .forms import format_membership_duration
-from .models import MembershipOption, Organisation, UserMembership
+from .models import MembershipOption, Organisation, OrganisationMember, UserMembership
 
 
 def full_name_or_username(user: User) -> str:
@@ -148,3 +148,41 @@ class AdminOrganisationTable(Table):
         fields = ("name", "type", "telephone", "email", "contact_name", "city")
         order_by = ("name", "type")
         model = Organisation
+
+
+class OrganisationMemberTable(Table):
+    name = Column(
+        verbose_name=_("Name"),
+        accessor="user__first_name",
+        order_by=("user__first_name", "user__last_name"),
+        empty_values=[],
+    )
+    email = Column(verbose_name=_("Email"), accessor="user__email")
+    status = Column(
+        verbose_name=_("Status"),
+        accessor="accepted_datetime",
+        empty_values=[],
+    )
+    start_date = Column(
+        verbose_name=_("Start Date"),
+        accessor="accepted_datetime",
+        empty_values=[],
+    )
+
+    def render_status(self, value: datetime, record: OrganisationMember) -> Any:
+        print(value)
+        print(record)
+        if value:
+            return _("Active")
+        return _("Invited")
+
+    def render_start_date(self, value: datetime, record: OrganisationMember) -> Any:
+        if value:
+            # TODO: convert time zone ?
+            return value.date()
+        return ""
+
+    class Meta:
+        fields = ("name", "email", "status", "start_date")
+        order_by = ("email",)
+        model = OrganisationMember
