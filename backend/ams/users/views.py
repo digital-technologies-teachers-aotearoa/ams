@@ -115,16 +115,7 @@ def create_organisation(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         form = OrganisationForm(request.POST)
         if form.is_valid():
-            form_data = form.cleaned_data
-
-            # Create a new user using their email as the username and send activation email
-            Organisation.objects.create(
-                type=form_data["type"],
-                name=form_data["name"],
-                postal_address=form_data["postal_address"],
-                office_phone=form_data["office_phone"],
-            )
-
+            form.save()
             admin_organisations_url = reverse("admin-organisations")
             return HttpResponseRedirect(admin_organisations_url + "?organisation_created=true")
     else:
@@ -132,11 +123,43 @@ def create_organisation(request: HttpRequest) -> HttpResponse:
 
     return render(
         request,
-        "create_organisation.html",
+        "edit_organisation.html",
         {
             "form": form,
         },
     )
+
+
+@login_required
+def edit_organisation(request: HttpRequest, pk: int) -> HttpResponse:
+    if not user_is_admin(request):
+        return HttpResponse(status=403)
+
+    organisation = Organisation.objects.get(pk=pk)
+
+    if request.method == "POST":
+        form = OrganisationForm(request.POST, instance=organisation)
+        if form.is_valid():
+            form.save()
+
+            admin_organisations_url = reverse("admin-organisations")
+            return HttpResponseRedirect(admin_organisations_url + "?organisation_updated=true")
+    else:
+        form = OrganisationForm(instance=organisation)
+
+    return render(
+        request,
+        "edit_organisation.html",
+        {
+            "organisation": organisation,
+            "form": form,
+        },
+    )
+
+
+class OrganisationDetailView(UserIsAdminMixin, DetailView):
+    model = Organisation
+    template_name = "organisation_view.html"
 
 
 def notify_staff_of_new_user(request: HttpRequest, new_user: User) -> HttpResponse:
@@ -567,5 +590,8 @@ class AdminOrganisationListView(UserIsAdminMixin, SingleTableView):
             admin_create_organisation_url = reverse("admin-create-organisation")
             if referrer_url.endswith(admin_create_organisation_url) and self.request.GET.get("organisation_created"):
                 context["show_messages"] = [user_message(_("Organisation Created"))]
+
+            if referrer_url.find("/organisations/edit/") != -1 and self.request.GET.get("organisation_updated"):
+                context["show_messages"] = [user_message(_("Organisation Saved"))]
 
         return context

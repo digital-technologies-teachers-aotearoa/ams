@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load static wagtailcore_tags i18n %}
+{% load render_table from django_tables2 %}
+
+{% block title %}{{ organisation.name }}{% endblock title %}
+
+{% block body_class %}organisation-view{% endblock %}
+
+{% block content %}
+
+<style>
+    label {
+        font-weight: bold;
+        margin-bottom: 0;
+    }
+</style>
+
+{% include "show_messages.html" %}
+
+<table style="width: 100%">
+    <tr>
+        <td style="padding: 10px">
+
+            <h1>{{ organisation.name }}</h1>
+
+            <div class="content">
+                <p><label>{% translate "Type" %}:</label>
+                <br>{{ organisation.type.name }}</p>
+
+                <p><label>{% translate "Telephone" %}:</label>
+                <br>{{ organisation.telephone }}</p>
+
+                <p><label>{% translate "Email" %}:</label>
+                <br><a href="mailto:{{organisation.email | urlencode}}">{{organisation.email}}</a></p>
+
+                <p><label>{% translate "Contact Name" %}:</label>
+                <br>{{ organisation.contact_name }}</p>
+
+                <p><label>{% translate "Postal Address" %}:</label>
+                <br>{{ organisation.postal_address }}
+                    {% if organisation.postal_suburb %}<br>{{ organisation.postal_suburb }}{% endif %}
+                    <br>{{ organisation.postal_city }}, {{ organisation.postal_code }}
+                </p>
+
+                <p><label>{% translate "Street Address" %}:</label>
+                <br>{{ organisation.street_address }}
+                {% if organisation.suburb %}<br>{{ organisation.suburb }}{% endif %}
+                <br>{{ organisation.city }}
+                </p>
+   
+                <p><a href="{% url "admin-edit-organisation" organisation.pk %}">{% translate "Edit Organisation" %}</a></p>
+            </div>
+        </td>
+        <td valign="top">
+        </td>
+    </tr>
+</table>
+
+{% endblock content %}

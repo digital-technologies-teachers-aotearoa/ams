@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.test import TestCase
 
+from ...test.utils import parse_response_table_rows
 from ..models import Organisation, OrganisationType
 
 
@@ -13,8 +14,12 @@ class AdminOrganisationListTests(TestCase):
         self.organisation = Organisation.objects.create(
             name="Some School",
             type=organisation_type,
-            postal_address="123 Main Street\nCapital City",
-            office_phone="555-12345",
+            telephone="555-12345",
+            email="john@example.com",
+            contact_name="John Smith",
+            street_address="123 Main Street",
+            city="Capital City",
+            postal_code="8080",
         )
 
         self.url = "/users/organisations/"
@@ -50,7 +55,7 @@ class AdminOrganisationListTests(TestCase):
         # Then
         self.assertEqual(200, response.status_code)
 
-        expected_columns = ["name", "type", "postal_address", "office_phone", "actions"]
+        expected_columns = ["name", "type", "telephone", "email", "contact_name", "city", "actions"]
         columns = [column.name for column in response.context["table"].columns]
         self.assertListEqual(expected_columns, columns)
 
@@ -61,7 +66,7 @@ class AdminOrganisationListTests(TestCase):
         # Then
         self.assertEqual(200, response.status_code)
 
-        expected_columns = ["Name", "Type", "Postal Address", "Office Phone", "Actions"]
+        expected_columns = ["Name", "Type", "Telephone", "Email", "Contact Name", "City", "Actions"]
         columns = [column.header for column in response.context["table"].columns]
         self.assertListEqual(expected_columns, columns)
 
@@ -72,17 +77,17 @@ class AdminOrganisationListTests(TestCase):
         # Then
         self.assertEqual(200, response.status_code)
 
-        rows = []
-        for row in response.context["table"].rows:
-            rows.append([cell for cell in row.cells])
+        rows = parse_response_table_rows(response)
 
         expected_rows = [
             [
                 self.organisation.name,
                 self.organisation.type.name,
-                self.organisation.postal_address,
-                self.organisation.office_phone,
-                "",
+                self.organisation.telephone,
+                self.organisation.email,
+                self.organisation.contact_name,
+                self.organisation.city,
+                "View,Edit",
             ]
         ]
 
