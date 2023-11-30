@@ -181,7 +181,23 @@ class OrganisationDetailView(UserIsAdminMixin, SingleTableMixin, DetailView):
             if referrer_url.find("/organisations/invite/") != -1 and self.request.GET.get("invite_sent"):
                 context["show_messages"] = [user_message(_("Invite Sent"))]
 
+            elif referrer_url.find("/organisations/view/") != -1 and self.request.GET.get("member_removed"):
+                context["show_messages"] = [user_message(_("Organisation Member Removed"))]
+
         return context
+
+    def post(self, request: HttpRequest, pk: int, *args: Any, **kwargs: Any) -> HttpResponse:
+        if request.POST.get("action") == "remove_organisation_member":
+            organisation = Organisation.objects.get(pk=pk)
+            organisation_member_id = int(request.POST["organisation_member_id"])
+
+            organisation_member = OrganisationMember.objects.get(pk=organisation_member_id, organisation=organisation)
+            organisation_member.delete()
+
+            redirect_url = reverse("view-organisation", kwargs={"pk": pk}) + "?member_removed=true"
+            return HttpResponseRedirect(redirect_url)
+
+        return HttpResponse(status=400)
 
 
 def invite_user_to_organisation(

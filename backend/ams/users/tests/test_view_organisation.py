@@ -99,7 +99,7 @@ class ViewOrganisationFormTests(TestCase):
                 date_format(
                     timezone.localtime(self.organisation_member.accepted_datetime).date(), format="SHORT_DATE_FORMAT"
                 ),
-                "",
+                "Remove",
             ]
         ]
 
@@ -124,8 +124,21 @@ class ViewOrganisationFormTests(TestCase):
                 self.organisation_member.user.email,
                 "Invited",
                 "—",
-                "",
+                "Remove",
             ]
         ]
 
         self.assertListEqual(expected_rows, rows)
+
+    def test_remove_organisation_member(self) -> None:
+        # When
+        response = self.client.post(
+            self.url, {"action": "remove_organisation_member", "organisation_member_id": self.organisation_member.pk}
+        )
+
+        # Then
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(f"{self.url}?member_removed=true", response.url)
+
+        with self.assertRaises(OrganisationMember.DoesNotExist):
+            self.organisation_member.refresh_from_db()
