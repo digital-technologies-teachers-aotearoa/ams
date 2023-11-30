@@ -309,13 +309,13 @@ def accept_organisation_user_invite(request: HttpRequest, invite_token: str) -> 
         user__isnull=False,
     ).first()
 
+    if not organisation_member:
+        return HttpResponse(status=400)
+
     if organisation_member.user != request.user:
         # If logged in as a different user send them back to the login screen
         next = reverse("accept-organisation-user-invite", kwargs={"invite_token": invite_token})
         return redirect_to_login(next)
-
-    if not organisation_member:
-        return HttpResponse(status=400)
 
     if not organisation_member.accepted_datetime:
         organisation_member.accepted_datetime = timezone.localtime()
