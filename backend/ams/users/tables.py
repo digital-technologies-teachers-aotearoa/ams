@@ -3,7 +3,6 @@ from typing import Any
 
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth.models import User
-from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django_tables2 import Column, DateColumn, Table, TemplateColumn
 
@@ -163,10 +162,13 @@ class OrganisationMemberTable(Table):
         accessor="accepted_datetime",
         empty_values=[],
     )
-    join_date = Column(
-        verbose_name=_("Join Date"),
-        accessor="accepted_datetime",
+    join_date = DateColumn(verbose_name=_("Join Date"), accessor="accepted_datetime", short=True)
+    actions = TemplateColumn(
+        verbose_name=_("Actions"), template_name="organisation_member_actions.html", orderable=False
     )
+
+    def render_name(self, value: str, record: UserMembership) -> str:
+        return full_name_or_username(record.user)
 
     def render_email(self, value: str, record: OrganisationMember) -> Any:
         # Show user's current email if there is a user, otherwise show the invite email
@@ -178,9 +180,6 @@ class OrganisationMemberTable(Table):
         if value and record.user.is_active:
             return _("Active")
         return _("Invited")
-
-    def render_join_date(self, value: datetime, record: OrganisationMember) -> Any:
-        return timezone.localtime(value).date()
 
     class Meta:
         fields = ("name", "email", "status", "join_date")
