@@ -5,7 +5,7 @@ from uuid import uuid4
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
 from django.contrib.auth.views import redirect_to_login
 from django.contrib.sites.shortcuts import get_current_site
@@ -137,9 +137,23 @@ def create_organisation(request: HttpRequest) -> HttpResponse:
     )
 
 
+def user_is_organisation_admin(user: User, organisation_id: int) -> bool:
+    if not user.is_active:
+        return False
+
+    if user.is_staff:
+        return True
+
+    is_organisation_admin: bool = OrganisationMember.objects.filter(
+        user=user, user__is_active=True, accepted_datetime__isnull=False, organisation_id=organisation_id, is_admin=True
+    ).exists()
+
+    return is_organisation_admin
+
+
 @login_required
 def edit_organisation(request: HttpRequest, pk: int) -> HttpResponse:
-    if not user_is_admin(request):
+    if not user_is_admin(request) and not user_is_organisation_admin(request.user, pk):
         return HttpResponse(status=403)
 
     organisation = Organisation.objects.get(pk=pk)
@@ -164,13 +178,23 @@ def edit_organisation(request: HttpRequest, pk: int) -> HttpResponse:
     )
 
 
-class OrganisationDetailView(UserIsAdminMixin, SingleTableMixin, DetailView):
+class UserIsOrganisationAdminMixin(UserPassesTestMixin):
+    def test_func(self) -> bool:
+        # Only valid for organisation urls with pk in url
+        if not self.request.path.startswith("/users/organisations/") or not self.kwargs.get("pk"):
+            return False
+
+        organisation_id = self.kwargs.get("pk")
+        return user_is_organisation_admin(self.request.user, organisation_id)
+
+
+class OrganisationDetailView(UserIsOrganisationAdminMixin, SingleTableMixin, DetailView):
     model = Organisation
     template_name = "organisation_view.html"
     table_class = OrganisationMemberTable
 
     def get_table_data(self) -> QuerySet:
-        return self.object.organisation_members.all()
+        return self.object.organisation_members.select_related("user").all()
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context: Dict[str, Any] = super().get_context_data(**kwargs)
@@ -181,21 +205,62 @@ class OrganisationDetailView(UserIsAdminMixin, SingleTableMixin, DetailView):
             if referrer_url.find("/organisations/invite/") != -1 and self.request.GET.get("invite_sent"):
                 context["show_messages"] = [user_message(_("Invite Sent"))]
 
-            elif referrer_url.find("/organisations/view/") != -1 and self.request.GET.get("member_removed"):
-                context["show_messages"] = [user_message(_("Organisation Member Removed"))]
+            elif referrer_url.find("/organisations/view/") != -1:
+                if self.request.GET.get("member_removed"):
+                    context["show_messages"] = [user_message(_("Organisation Member Removed"))]
+                elif self.request.GET.get("made_admin"):
+                    context["show_messages"] = [user_message(_("Admin Role Added"))]
+                elif self.request.GET.get("revoked_admin"):
+                    context["show_messages"] = [user_message(_("Admin Role Revoked"))]
 
         return context
 
     def post(self, request: HttpRequest, pk: int, *args: Any, **kwargs: Any) -> HttpResponse:
+        organisation = Organisation.objects.get(pk=pk)
+
         if request.POST.get("action") == "remove_organisation_member":
-            organisation = Organisation.objects.get(pk=pk)
-            organisation_member_id = int(request.POST["organisation_member_id"])
+            try:
+                organisation_member_id = int(request.POST["organisation_member_id"])
 
-            organisation_member = OrganisationMember.objects.get(pk=organisation_member_id, organisation=organisation)
-            organisation_member.delete()
+                organisation_member = OrganisationMember.objects.get(
+                    pk=organisation_member_id, organisation=organisation
+                )
+                organisation_member.delete()
 
-            redirect_url = reverse("view-organisation", kwargs={"pk": pk}) + "?member_removed=true"
-            return HttpResponseRedirect(redirect_url)
+                redirect_url = reverse("view-organisation", kwargs={"pk": pk}) + "?member_removed=true"
+                return HttpResponseRedirect(redirect_url)
+            except Exception:
+                return HttpResponse(status=400)
+
+        elif request.POST.get("action") == "make_organisation_admin":
+            try:
+                organisation_member_id = int(request.POST["organisation_member_id"])
+                organisation_member = OrganisationMember.objects.get(
+                    pk=organisation_member_id, organisation=organisation
+                )
+
+                if organisation_member.is_active():
+                    organisation_member.is_admin = True
+                    organisation_member.save()
+
+                    redirect_url = reverse("view-organisation", kwargs={"pk": pk}) + "?made_admin=true"
+                    return HttpResponseRedirect(redirect_url)
+            except Exception:
+                return HttpResponse(status=400)
+
+        elif request.POST.get("action") == "revoke_organisation_admin":
+            try:
+                organisation_member_id = int(request.POST["organisation_member_id"])
+                organisation_member = OrganisationMember.objects.get(
+                    pk=organisation_member_id, organisation=organisation
+                )
+                organisation_member.is_admin = False
+                organisation_member.save()
+
+                redirect_url = reverse("view-organisation", kwargs={"pk": pk}) + "?revoked_admin=true"
+                return HttpResponseRedirect(redirect_url)
+            except Exception:
+                return HttpResponse(status=400)
 
         return HttpResponse(status=400)
 
@@ -242,7 +307,7 @@ def invite_email_to_organisation(
 
 @login_required
 def invite_organisation_member(request: HttpRequest, pk: int) -> HttpResponse:
-    if not user_is_admin(request):
+    if not user_is_admin(request) and not user_is_organisation_admin(request.user, pk):
         return HttpResponse(status=403)
 
     organisation = Organisation.objects.get(pk=pk)

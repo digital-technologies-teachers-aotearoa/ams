@@ -163,6 +163,7 @@ class OrganisationMemberTable(Table):
         empty_values=[],
     )
     join_date = DateColumn(verbose_name=_("Join Date"), accessor="accepted_datetime", short=True)
+    role = Column(verbose_name=_("Role"), accessor="is_admin", order_by=("is_admin", "-accepted_datetime"))
     actions = TemplateColumn(
         verbose_name=_("Actions"), template_name="organisation_member_actions.html", orderable=False
     )
@@ -177,11 +178,18 @@ class OrganisationMemberTable(Table):
         return value
 
     def render_status(self, value: datetime, record: OrganisationMember) -> Any:
-        if value and record.user.is_active:
+        if record.is_active():
             return _("Active")
         return _("Invited")
 
+    def render_role(self, value: bool, record: OrganisationMember) -> Any:
+        if value:
+            return _("Admin")
+        if record.is_active():
+            return _("Member")
+        return ""
+
     class Meta:
-        fields = ("name", "email", "status", "join_date")
+        fields = ("name", "email", "status", "join_date", "role")
         order_by = ("email",)
         model = OrganisationMember

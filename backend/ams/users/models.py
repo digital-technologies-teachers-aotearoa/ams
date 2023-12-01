@@ -4,6 +4,7 @@ from typing import Any, Optional
 from django.contrib.auth.models import User
 from django.db.models import (
     CASCADE,
+    BooleanField,
     CharField,
     DateField,
     DateTimeField,
@@ -49,6 +50,12 @@ class OrganisationMember(Model):
     organisation = ForeignKey(Organisation, on_delete=CASCADE, related_name="organisation_members")
     created_datetime = DateTimeField()
     accepted_datetime = DateTimeField(null=True)
+    is_admin = BooleanField(default=False)
+
+    def is_active(self) -> bool:
+        # Check the user has accepted the invite and verified their email
+        active: bool = self.accepted_datetime and self.user and self.user.is_active
+        return active
 
     class Meta:
         unique_together = (("user", "organisation"),)
