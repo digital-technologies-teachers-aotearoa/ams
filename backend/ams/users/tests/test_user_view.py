@@ -8,7 +8,14 @@ from django.utils import timezone
 from django.utils.formats import date_format
 
 from ...test.utils import parse_response_table_rows
-from ..models import MembershipOption, MembershipOptionType, UserMembership
+from ..models import (
+    MembershipOption,
+    MembershipOptionType,
+    Organisation,
+    OrganisationMember,
+    OrganisationType,
+    UserMembership,
+)
 
 
 class UserViewTests(TestCase):
@@ -33,6 +40,23 @@ class UserViewTests(TestCase):
             start_date=start.date(),
             created_datetime=start,
             approved_datetime=start,
+        )
+
+        self.organisation = Organisation.objects.create(
+            type=OrganisationType.objects.create(name="Primary School"),
+            name="Any Organisation",
+            telephone="555-12345",
+            contact_name="John Smith",
+            email="john@example.com",
+            street_address="123 Main Street",
+            suburb="",
+            city="Capital City",
+            postal_code="8080",
+            postal_address="PO BOX 1234\nCapital City 8082",
+        )
+
+        self.organisation_member = OrganisationMember.objects.create(
+            user=self.user, organisation=self.organisation, created_datetime=start, accepted_datetime=start
         )
 
         self.url = "/users/current/"
@@ -117,9 +141,9 @@ class UserViewTests(TestCase):
         # Then
         self.assertEqual(200, response.status_code)
 
-        expected_membership_columns = ["membership", "duration", "status", "start_date", "approved_date", "actions"]
-        columns = [column.name for column in response.context["table"].columns]
-        self.assertListEqual(expected_membership_columns, columns)
+        expected_columns = ["membership", "duration", "status", "start_date", "approved_date", "actions"]
+        columns = [column.name for column in response.context["tables"][0].columns]
+        self.assertListEqual(expected_columns, columns)
 
     def test_should_show_expected_membership_headings(self) -> None:
         # When
@@ -128,9 +152,9 @@ class UserViewTests(TestCase):
         # Then
         self.assertEqual(200, response.status_code)
 
-        expected_membership_headings = ["Membership", "Duration", "Status", "Start Date", "Approved Date", "Actions"]
-        headings = [column.header for column in response.context["table"].columns]
-        self.assertListEqual(expected_membership_headings, headings)
+        expected_headings = ["Membership", "Duration", "Status", "Start Date", "Approved Date", "Actions"]
+        headings = [column.header for column in response.context["tables"][0].columns]
+        self.assertListEqual(expected_headings, headings)
 
     def test_should_not_show_approve_membership_action(self) -> None:
         # Given
@@ -143,7 +167,7 @@ class UserViewTests(TestCase):
         # Then
         self.assertEqual(200, response.status_code)
 
-        rows = parse_response_table_rows(response)
+        rows = parse_response_table_rows(response, 0)
 
         expected_rows = [
             [
@@ -153,6 +177,78 @@ class UserViewTests(TestCase):
                 date_format(self.user_membership.start_date, format="SHORT_DATE_FORMAT"),
                 "—",
                 "",
+            ]
+        ]
+
+        self.assertListEqual(expected_rows, rows)
+
+    def test_should_show_expected_organisation_members_columns(self) -> None:
+        # When
+        response = self.client.get(self.url)
+
+        # Then
+        self.assertEqual(200, response.status_code)
+
+        expected_columns = ["organisation", "status", "join_date", "role", "actions"]
+        columns = [column.name for column in response.context["tables"][1].columns]
+        self.assertListEqual(expected_columns, columns)
+
+    def test_should_show_expected_organisation_members_headings(self) -> None:
+        # When
+        response = self.client.get(self.url)
+
+        # Then
+        self.assertEqual(200, response.status_code)
+
+        expected_headings = ["Organisation", "Status", "Join Date", "Role", "Actions"]
+        headings = [column.header for column in response.context["tables"][1].columns]
+        self.assertListEqual(expected_headings, headings)
+
+    def test_should_show_expected_user_organisation_members(self) -> None:
+        # When
+        response = self.client.get(self.url)
+
+        # Then
+        self.assertEqual(200, response.status_code)
+
+        rows = parse_response_table_rows(response, 1)
+
+        self.maxDiff = None
+
+        expected_rows = [
+            [
+                self.organisation_member.organisation.name,
+                "Active",
+                date_format(self.organisation_member.accepted_datetime, format="SHORT_DATE_FORMAT"),
+                "Member",
+                "",
+            ]
+        ]
+
+        self.assertListEqual(expected_rows, rows)
+
+    def test_should_show_expected_user_organisation_member_actions_if_admin(self) -> None:
+        # Given
+        self.organisation_member.is_admin = True
+        self.organisation_member.save()
+
+        # When
+        response = self.client.get(self.url)
+
+        # Then
+        self.assertEqual(200, response.status_code)
+
+        rows = parse_response_table_rows(response, 1)
+
+        self.maxDiff = None
+
+        expected_rows = [
+            [
+                self.organisation_member.organisation.name,
+                "Active",
+                date_format(self.organisation_member.accepted_datetime, format="SHORT_DATE_FORMAT"),
+                "Admin",
+                "View",
             ]
         ]
 

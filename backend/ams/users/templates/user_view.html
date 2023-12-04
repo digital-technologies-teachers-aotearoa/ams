@@ -12,7 +12,7 @@
 
 <table style="width: 100%">
     <tr>
-        <td style="padding: 10px">
+        <td valign="top" style="padding: 10px">
             <img class="user-details-profile-image" src="{% if user_detail.profile.image %}/media/{{user_detail.profile.image}}{% endif %}">
             <h1>
                 {% if user_detail.first_name %}
@@ -44,7 +44,19 @@
                                 <a class="btn btn-small btn-table-action" href="{% url "add-user-membership" user_detail.pk  %}">{% translate "Add Membership" %}</a>
                             {% endif %}
                         </div>
-                        {% render_table table %}
+                        {% render_table tables.0 %}
+                    </div>
+                </div>
+            </div>
+
+            <br>
+            <h1>{% translate "Organisations" %}</h1>
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="table-container">
+                        <div class="table-actions">
+                        </div>
+                        {% render_table tables.1 %}
                     </div>
                 </div>
             </div>
