@@ -11,7 +11,7 @@ from django.urls import reverse
 from pydiscourse import DiscourseClient
 from pydiscourse.sso import sso_redirect_url, sso_validate
 
-from ..users.models import UserMemberStatus, UserProfile
+from ..users.models import MembershipStatus, UserProfile
 from ..users.utils import user_is_admin
 
 
@@ -64,7 +64,7 @@ def forum_sso_login_redirect(request: HttpRequest) -> HttpResponse:
 
 @login_required
 def forum_sso_login_callback(request: HttpRequest) -> HttpResponse:
-    if user_is_admin(request) or request.user.member.status() == UserMemberStatus.ACTIVE:
+    if user_is_admin(request) or request.user.member.status() == MembershipStatus.ACTIVE:
         # Active member - they can see the forum
         secret = settings.DISCOURSE_CONNECT_SECRET
 
