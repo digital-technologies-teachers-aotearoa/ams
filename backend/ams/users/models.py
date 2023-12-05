@@ -150,24 +150,25 @@ class UserMembership(Model):
 class UserMemberInfo:
     def __init__(self, user: User) -> None:
         self.user = user
-        self.current_membership: Optional[UserMembership] = user.get_current_membership()
-        self.latest_membership: Optional[UserMembership] = user.get_latest_membership()
+        self.current_user_membership: Optional[UserMembership] = user.get_current_user_membership()
+        self.latest_user_membership: Optional[UserMembership] = user.get_latest_user_membership()
 
     def status(self) -> Any:
-        if self.current_membership:
-            return self.current_membership.status()
+        if self.current_user_membership:
+            return self.current_user_membership.status()
         return MembershipStatus.NONE
 
-    def latest_membership_is_cancelled(self) -> Optional[UserMembership]:
+    def latest_user_membership_is_cancelled(self) -> Optional[UserMembership]:
         # Only return if the membership with the maximum start datetime is cancelled and it is the only one
-        latest_cancelled_membership: Optional[UserMembership] = (
+        latest_cancelled_user_membership: Optional[UserMembership] = (
             self.user.user_memberships.filter(cancelled_datetime__isnull=False).order_by("-start_date").first()
         )
 
-        if latest_cancelled_membership and (
-            not self.latest_membership or self.latest_membership.start_date < latest_cancelled_membership.start_date
+        if latest_cancelled_user_membership and (
+            not self.latest_user_membership
+            or self.latest_user_membership.start_date < latest_cancelled_user_membership.start_date
         ):
-            return latest_cancelled_membership
+            return latest_cancelled_user_membership
 
         return None
 
@@ -187,24 +188,24 @@ def get_display_name(user: User) -> str:
     return display_name
 
 
-def get_current_membership(user: User) -> Optional[UserMembership]:
-    current_membership: Optional[UserMembership] = (
+def get_current_user_membership(user: User) -> Optional[UserMembership]:
+    current_user_membership: Optional[UserMembership] = (
         user.user_memberships.filter(cancelled_datetime__isnull=True, start_date__lte=timezone.localdate())
         .order_by("-start_date")
         .first()
     )
-    return current_membership
+    return current_user_membership
 
 
-def get_latest_membership(user: User) -> Optional[UserMembership]:
-    latest_membership: Optional[UserMembership] = (
+def get_latest_user_membership(user: User) -> Optional[UserMembership]:
+    latest_user_membership: Optional[UserMembership] = (
         user.user_memberships.filter(cancelled_datetime__isnull=True).order_by("-start_date").first()
     )
-    return latest_membership
+    return latest_user_membership
 
 
-User.get_current_membership = get_current_membership
-User.get_latest_membership = get_latest_membership
+User.get_current_user_membership = get_current_user_membership
+User.get_latest_user_membership = get_latest_user_membership
 
 User.member = property(lambda self: user_member_info(self))
 User.display_name = property(lambda self: get_display_name(self))

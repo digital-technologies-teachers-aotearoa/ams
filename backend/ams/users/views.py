@@ -571,7 +571,7 @@ def add_user_membership(request: HttpRequest, pk: int) -> HttpResponse:
         return HttpResponse(status=401)
 
     user = User.objects.get(pk=pk)
-    current_membership = user.get_current_membership()
+    current_membership = user.get_current_user_membership()
 
     if user_is_admin(request):
         user_view_url = reverse("admin-user-view", kwargs={"pk": pk})
@@ -846,7 +846,7 @@ class UserDetailViewBase(MultiTableMixin, DetailView):
 
         user = context["user_detail"]
 
-        latest_membership = user.get_latest_membership()
+        latest_membership = user.get_latest_user_membership()
         can_add_membership = False
         if not latest_membership or latest_membership.status() in [MembershipStatus.ACTIVE, MembershipStatus.EXPIRED]:
             can_add_membership = True

@@ -1,21 +1,21 @@
 {% load i18n %}
-{% if user.member.current_membership and user.member.current_membership.status == "ACTIVE" %}
+{% if user.member.current_user_membership and user.member.current_user_membership.status == "ACTIVE" %}
     {% translate "Your membership is Active" %}
-    {% if user.member.current_membership.expires_in_days <= 30 %}
-        {% blocktranslate with expires_in=user.member.current_membership.expires_in_days %}
+    {% if user.member.current_user_membership.expires_in_days <= 30 %}
+        {% blocktranslate with expires_in=user.member.current_user_membership.expires_in_days %}
             (expires in {{expires_in}} days
         {% endblocktranslate %}
         <a href="{% url "add-user-membership" user.pk %}">{% translate "Extend" %}</a>)
     {% endif %}
-{% elif user.member.current_membership and user.member.current_membership.status == "PENDING" %}
+{% elif user.member.current_user_membership and user.member.current_user_membership.status == "PENDING" %}
     {% translate "Your membership is Pending" %}
-{% elif user.member.latest_membership and user.member.latest_membership != user.member.current_membership and user.member.latest_membership.approved_datetime %}
-    {% blocktranslate with start_date=user.member.latest_membership.start_date %}
+{% elif user.member.latest_user_membership and user.member.latest_user_membership != user.member.current_user_membership and user.member.latest_user_membership.approved_datetime %}
+    {% blocktranslate with start_date=user.member.latest_user_membership.start_date %}
         Your membership is Pending (starts on {{start_date}})
     {% endblocktranslate %}
-{% elif user.member.latest_membership_is_cancelled %}
+{% elif user.member.latest_user_membership_is_cancelled %}
     {% translate "Your membership has been cancelled" %}
-{% elif user.member.current_membership and user.member.current_membership.status == "EXPIRED" %}
+{% elif user.member.current_user_membership and user.member.current_user_membership.status == "EXPIRED" %}
     {% translate "Your membership has Expired" %}
     (<a href="{% url "add-user-membership" user.pk %}">{% translate "Extend" %}</a>)
 {% endif %}
