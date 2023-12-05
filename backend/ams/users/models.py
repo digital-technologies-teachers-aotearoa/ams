@@ -1,7 +1,9 @@
 from datetime import date
 from typing import Any, Optional
 
+from django.conf import settings
 from django.contrib.auth.models import User
+from django.db import connection
 from django.db.models import (
     CASCADE,
     BooleanField,
@@ -152,8 +154,52 @@ class UserMemberInfo:
         self.user = user
         self.current_user_membership: Optional[UserMembership] = user.get_current_user_membership()
         self.latest_user_membership: Optional[UserMembership] = user.get_latest_user_membership()
+        self.has_active_organisation_membership: bool = self.check_has_organisation_with_active_membership()
+
+    def check_has_organisation_with_active_membership(self) -> bool:
+        if not self.user.is_active:
+            return False
+
+        # A user may belong to multiple organisations. If any have active memberships, return true
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT EXISTS(
+                    SELECT 1
+                    FROM users_organisationmember AS org_member
+                    JOIN users_organisationmembership AS org_membership
+                      ON org_membership.organisation_id = org_member.organisation_id
+                    JOIN users_membershipoption
+                      ON users_membershipoption.id = org_membership.membership_option_id
+
+                    -- user is an active member of organisation
+
+                    WHERE org_member.user_id = %(user_id)s
+                      AND org_member.accepted_datetime <= CURRENT_TIMESTAMP
+
+                      -- the organisation has an active membership
+
+                      AND (org_membership.start_date AT TIME ZONE %(time_zone)s)::timestamptz <= CURRENT_TIMESTAMP
+                      AND (org_membership.start_date AT TIME ZONE %(time_zone)s)::timestamptz
+                          + users_membershipoption.duration > CURRENT_TIMESTAMP
+                      AND org_membership.cancelled_datetime IS NULL
+                ) AS active
+                """,
+                {
+                    "user_id": self.user.pk,
+                    "time_zone": settings.TIME_ZONE,
+                },
+            )
+            (active,) = cursor.fetchone()
+
+        if active:
+            return True
+        return False
 
     def status(self) -> Any:
+        if self.has_active_organisation_membership:
+            return MembershipStatus.ACTIVE
+
         if self.current_user_membership:
             return self.current_user_membership.status()
         return MembershipStatus.NONE

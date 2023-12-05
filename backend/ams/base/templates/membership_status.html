@@ -1,7 +1,7 @@
 {% load i18n %}
-{% if user.member.current_user_membership and user.member.current_user_membership.status == "ACTIVE" %}
+{% if user.member.status == "ACTIVE" %}
     {% translate "Your membership is Active" %}
-    {% if user.member.current_user_membership.expires_in_days <= 30 %}
+    {% if user.member.current_user_membership and user.member.current_user_membership.status == "ACTIVE" and user.member.current_user_membership.expires_in_days <= 30 %}
         {% blocktranslate with expires_in=user.member.current_user_membership.expires_in_days %}
             (expires in {{expires_in}} days
         {% endblocktranslate %}
