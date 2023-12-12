@@ -12,7 +12,6 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.files.storage import default_storage
 from django.core.mail import send_mail
 from django.db import transaction
-from django.db.models import QuerySet
 from django.forms import BoundField
 from django.http import HttpResponseRedirect
 from django.http.request import HttpRequest
@@ -55,11 +54,13 @@ from .tables import (
     AdminMembershipOptionTable,
     AdminOrganisationTable,
     AdminUserDetailMembershipTable,
+    AdminUserDetailOrganisationMemberTable,
     AdminUserMembershipTable,
     AdminUserTable,
     OrganisationMembershipTable,
     OrganisationMemberTable,
     UserDetailMembershipTable,
+    UserDetailOrganisationMemberTable,
 )
 from .utils import UserIsAdminMixin, user_is_admin, user_message
 
@@ -835,13 +836,10 @@ class AdminMembershipOptionListView(UserIsAdminMixin, SingleTableView):
         return context
 
 
-class UserDetailViewBase(SingleTableMixin, DetailView):
+class UserDetailViewBase(MultiTableMixin, DetailView):
     model = User
     template_name = "user_view.html"
     context_object_name = "user_detail"
-
-    def get_table_data(self) -> QuerySet:
-        return self.object.user_memberships.all()
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context: Dict[str, Any] = super().get_context_data(**kwargs)
@@ -917,7 +915,11 @@ class UserDetailViewBase(SingleTableMixin, DetailView):
 
 
 class UserDetailView(LoginRequiredMixin, UserDetailViewBase):
-    table_class = UserDetailMembershipTable
+    def get_tables(self) -> List[Table]:
+        return [
+            UserDetailMembershipTable(self.object.user_memberships.all()),
+            UserDetailOrganisationMemberTable(self.object.organisation_members.select_related("user").all()),
+        ]
 
     def get_object(self) -> User:
         return User.objects.get(id=self.request.user.pk)
@@ -939,7 +941,11 @@ class UserDetailView(LoginRequiredMixin, UserDetailViewBase):
 
 
 class AdminUserDetailView(UserIsAdminMixin, UserDetailViewBase, MembershipActionMixin):
-    table_class = AdminUserDetailMembershipTable
+    def get_tables(self) -> List[Table]:
+        return [
+            AdminUserDetailMembershipTable(self.object.user_memberships.all()),
+            AdminUserDetailOrganisationMemberTable(self.object.organisation_members.select_related("user").all()),
+        ]
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         self.object = self.get_object()

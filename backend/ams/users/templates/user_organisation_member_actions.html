@@ -1,0 +1,6 @@
+{% load static i18n %}
+<ul class="table-action-list">
+    {% if record.is_admin %}
+        <a href="{% url "view-organisation" record.organisation.pk %}" title="{% translate "View" %}"><i class="fa-solid fa-eye"></i></a>
+    {% endif %}
+</ul>

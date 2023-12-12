@@ -8,7 +8,14 @@ from django.utils import timezone
 from django.utils.formats import date_format
 
 from ...test.utils import parse_response_table_rows
-from ..models import MembershipOption, MembershipOptionType, UserMembership
+from ..models import (
+    MembershipOption,
+    MembershipOptionType,
+    Organisation,
+    OrganisationMember,
+    OrganisationType,
+    UserMembership,
+)
 
 
 class AdminUserViewTests(TestCase):
@@ -35,6 +42,23 @@ class AdminUserViewTests(TestCase):
             created_datetime=start,
             start_date=start.date(),
             approved_datetime=start + timedelta(days=1),
+        )
+
+        self.organisation = Organisation.objects.create(
+            type=OrganisationType.objects.create(name="Primary School"),
+            name="Any Organisation",
+            telephone="555-12345",
+            contact_name="John Smith",
+            email="john@example.com",
+            street_address="123 Main Street",
+            suburb="",
+            city="Capital City",
+            postal_code="8080",
+            postal_address="PO BOX 1234\nCapital City 8082",
+        )
+
+        self.organisation_member = OrganisationMember.objects.create(
+            user=self.user, organisation=self.organisation, created_datetime=start, accepted_datetime=start
         )
 
         self.url = f"/users/view/{self.user.pk}/"
@@ -76,9 +100,9 @@ class AdminUserViewTests(TestCase):
         # Then
         self.assertEqual(200, response.status_code)
 
-        expected_membership_columns = ["membership", "duration", "status", "start_date", "approved_date", "actions"]
-        columns = [column.name for column in response.context["table"].columns]
-        self.assertListEqual(expected_membership_columns, columns)
+        expected_columns = ["membership", "duration", "status", "start_date", "approved_date", "actions"]
+        columns = [column.name for column in response.context["tables"][0].columns]
+        self.assertListEqual(expected_columns, columns)
 
     def test_should_show_expected_membership_headings(self) -> None:
         # When
@@ -87,9 +111,9 @@ class AdminUserViewTests(TestCase):
         # Then
         self.assertEqual(200, response.status_code)
 
-        expected_membership_headings = ["Membership", "Duration", "Status", "Start Date", "Approved Date", "Actions"]
-        headings = [column.header for column in response.context["table"].columns]
-        self.assertListEqual(expected_membership_headings, headings)
+        expected_headings = ["Membership", "Duration", "Status", "Start Date", "Approved Date", "Actions"]
+        headings = [column.header for column in response.context["tables"][0].columns]
+        self.assertListEqual(expected_headings, headings)
 
     def test_should_show_expected_rows(self) -> None:
         # When
@@ -98,7 +122,7 @@ class AdminUserViewTests(TestCase):
         # Then
         self.assertEqual(200, response.status_code)
 
-        rows = parse_response_table_rows(response)
+        rows = parse_response_table_rows(response, 0)
 
         expected_rows = [
             [
@@ -124,7 +148,7 @@ class AdminUserViewTests(TestCase):
         # Then
         self.assertEqual(200, response.status_code)
 
-        rows = parse_response_table_rows(response)
+        rows = parse_response_table_rows(response, 0)
 
         expected_rows = [
             [
@@ -203,7 +227,7 @@ class AdminUserViewTests(TestCase):
         # Then
         self.assertEqual(200, response.status_code)
 
-        rows = parse_response_table_rows(response)
+        rows = parse_response_table_rows(response, 0)
 
         self.maxDiff = None
 
@@ -234,7 +258,7 @@ class AdminUserViewTests(TestCase):
 
         self.assertEqual(200, response.status_code)
 
-        rows = parse_response_table_rows(response)
+        rows = parse_response_table_rows(response, 0)
 
         expected_rows = [
             [
@@ -291,7 +315,7 @@ class AdminUserViewTests(TestCase):
         # Then
         self.assertEqual(200, response.status_code)
 
-        rows = parse_response_table_rows(response)
+        rows = parse_response_table_rows(response, 0)
 
         self.maxDiff = None
 
@@ -303,6 +327,51 @@ class AdminUserViewTests(TestCase):
                 date_format(self.user_membership.start_date, format="SHORT_DATE_FORMAT"),
                 date_format(self.user_membership.approved_datetime, format="SHORT_DATE_FORMAT"),
                 "",
+            ]
+        ]
+
+        self.assertListEqual(expected_rows, rows)
+
+    def test_should_show_expected_organisation_members_columns(self) -> None:
+        # When
+        response = self.client.get(self.url)
+
+        # Then
+        self.assertEqual(200, response.status_code)
+
+        expected_columns = ["organisation", "status", "join_date", "role", "actions"]
+        columns = [column.name for column in response.context["tables"][1].columns]
+        self.assertListEqual(expected_columns, columns)
+
+    def test_should_show_expected_organisation_members_headings(self) -> None:
+        # When
+        response = self.client.get(self.url)
+
+        # Then
+        self.assertEqual(200, response.status_code)
+
+        expected_headings = ["Organisation", "Status", "Join Date", "Role", "Actions"]
+        headings = [column.header for column in response.context["tables"][1].columns]
+        self.assertListEqual(expected_headings, headings)
+
+    def test_should_show_expected_user_organisation_members(self) -> None:
+        # When
+        response = self.client.get(self.url)
+
+        # Then
+        self.assertEqual(200, response.status_code)
+
+        rows = parse_response_table_rows(response, 1)
+
+        self.maxDiff = None
+
+        expected_rows = [
+            [
+                self.organisation_member.organisation.name,
+                "Active",
+                date_format(self.organisation_member.accepted_datetime, format="SHORT_DATE_FORMAT"),
+                "Member",
+                "View",
             ]
         ]
 

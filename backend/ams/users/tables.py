@@ -199,6 +199,42 @@ class OrganisationMemberTable(Table):
         model = OrganisationMember
 
 
+class UserDetailOrganisationMemberTable(Table):
+    organisation = Column(
+        verbose_name=_("Organisation"),
+        accessor="organisation__name",
+    )
+    status = Column(verbose_name=_("Status"), accessor="accepted_datetime", empty_values=[], orderable=False)
+    join_date = DateColumn(verbose_name=_("Join Date"), accessor="accepted_datetime", short=True)
+    role = Column(verbose_name=_("Role"), accessor="is_admin", order_by=("is_admin", "-accepted_datetime"))
+    actions = TemplateColumn(
+        verbose_name=_("Actions"), template_name="user_organisation_member_actions.html", orderable=False
+    )
+
+    def render_status(self, value: datetime, record: OrganisationMember) -> Any:
+        if record.is_active():
+            return _("Active")
+        return _("Invited")
+
+    def render_role(self, value: bool, record: OrganisationMember) -> Any:
+        if value:
+            return _("Admin")
+        if record.is_active():
+            return _("Member")
+        return ""
+
+    class Meta:
+        fields = ("organisation", "status", "join_date", "role")
+        order_by = ("organisation",)
+        model = OrganisationMember
+
+
+class AdminUserDetailOrganisationMemberTable(UserDetailOrganisationMemberTable):
+    actions = TemplateColumn(
+        verbose_name=_("Actions"), template_name="admin_user_organisation_member_actions.html", orderable=False
+    )
+
+
 class OrganisationMembershipTable(Table):
     membership = Column(accessor="membership_option__name", verbose_name=_("Membership"))
     duration = Column(accessor="membership_option__duration", verbose_name=_("Duration"))
