@@ -84,6 +84,10 @@ def get_individual_membership_options() -> List[Tuple[str, str]]:
     return get_membership_options(option_type=MembershipOptionType.INDIVIDUAL)
 
 
+def get_organisation_membership_options() -> List[Tuple[str, str]]:
+    return get_membership_options(option_type=MembershipOptionType.ORGANISATION)
+
+
 class MembershipOptionRadioSelect(RadioSelect):
     template_name = "membership_option_radio_select.html"
 
@@ -105,6 +109,33 @@ class AddUserMembershipForm(Form):
 
         # Validate that start date doesn't overlap with an existing non-cancelled membership
         latest_membership = self.user.get_latest_membership()
+        if latest_membership and latest_membership.expiry_date() > start_date:
+            raise ValidationError(_("A new membership can not overlap with an existing membership"))
+
+        return start_date
+
+
+class AddOrganisationMembershipForm(Form):
+    start_date = DateField(label=_("Start Date"))
+    membership_option = ChoiceField(
+        label=_("Membership"), widget=MembershipOptionRadioSelect, choices=get_organisation_membership_options
+    )
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        self.organisation = kwargs.pop("organisation")
+        super().__init__(*args, **kwargs)
+
+    def clean_start_date(self) -> date:
+        cleaned_data = super().clean()
+
+        start_date: date = cleaned_data.get("start_date")
+
+        # Validate that start date doesn't overlap with an existing non-cancelled membership
+        latest_membership = (
+            self.organisation.organisation_memberships.filter(cancelled_datetime__isnull=True)
+            .order_by("-start_date")
+            .first()
+        )
         if latest_membership and latest_membership.expiry_date() > start_date:
             raise ValidationError(_("A new membership can not overlap with an existing membership"))
 

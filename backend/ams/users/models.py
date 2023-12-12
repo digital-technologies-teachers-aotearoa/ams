@@ -73,12 +73,43 @@ class MembershipOption(Model):
     cost = DecimalField(max_digits=10, decimal_places=2)
 
 
-class UserMemberStatus(TextChoices):
+class MembershipStatus(TextChoices):
     NONE = "NONE", _("None")
     PENDING = "PENDING", _("Pending")
     ACTIVE = "ACTIVE", _("Active")
     EXPIRED = "EXPIRED", _("Expired")
     CANCELLED = "CANCELLED", _("Cancelled")
+
+
+class OrganisationMembership(Model):
+    organisation = ForeignKey(Organisation, on_delete=CASCADE, related_name="organisation_memberships")
+    membership_option = ForeignKey(MembershipOption, on_delete=CASCADE, related_name="organisation_memberships")
+    start_date = DateField()
+    created_datetime = DateTimeField()
+    cancelled_datetime = DateTimeField(null=True)
+
+    def expiry_date(self) -> date:
+        # A membership is considered expired once the expiry date is reached
+        # (it is not inclusive of the expiry date)
+        expiry_date: date = self.start_date + self.membership_option.duration
+        return expiry_date
+
+    def is_expired(self) -> bool:
+        is_expired: bool = timezone.localdate() >= self.expiry_date()
+        return is_expired
+
+    def expires_in_days(self) -> int:
+        expires_in: int = (self.expiry_date() - timezone.localdate()).days
+        return expires_in
+
+    def status(self) -> Any:
+        if self.cancelled_datetime:
+            return MembershipStatus.CANCELLED
+
+        if self.is_expired():
+            return MembershipStatus.EXPIRED
+
+        return MembershipStatus.ACTIVE
 
 
 class UserMembership(Model):
@@ -105,15 +136,15 @@ class UserMembership(Model):
 
     def status(self) -> Any:
         if self.cancelled_datetime:
-            return UserMemberStatus.CANCELLED
+            return MembershipStatus.CANCELLED
 
         if self.is_expired():
-            return UserMemberStatus.EXPIRED
+            return MembershipStatus.EXPIRED
 
         if self.approved_datetime is None or self.start_date > timezone.localdate():
-            return UserMemberStatus.PENDING
+            return MembershipStatus.PENDING
 
-        return UserMemberStatus.ACTIVE
+        return MembershipStatus.ACTIVE
 
 
 class UserMemberInfo:
@@ -125,7 +156,7 @@ class UserMemberInfo:
     def status(self) -> Any:
         if self.current_membership:
             return self.current_membership.status()
-        return UserMemberStatus.NONE
+        return MembershipStatus.NONE
 
     def latest_membership_is_cancelled(self) -> Optional[UserMembership]:
         # Only return if the membership with the maximum start datetime is cancelled and it is the only one

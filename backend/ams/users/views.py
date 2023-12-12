@@ -1,6 +1,6 @@
 from functools import partial
 from hashlib import sha256
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 from uuid import uuid4
 
 from django.conf import settings
@@ -25,13 +25,14 @@ from django.utils.formats import date_format
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.detail import DetailView
 from django_filters.views import FilterView
-from django_tables2 import SingleTableMixin, SingleTableView
+from django_tables2 import MultiTableMixin, SingleTableMixin, SingleTableView, Table
 from registration.models import RegistrationProfile
 
 from ..base.models import EmailConfirmationPage
 from ..forum.views import forum_sync_user_profile
 from .filters import UserMembershipFilter
 from .forms import (
+    AddOrganisationMembershipForm,
     AddUserMembershipForm,
     EditUserProfileForm,
     IndividualRegistrationForm,
@@ -43,10 +44,11 @@ from .forms import (
 )
 from .models import (
     MembershipOption,
+    MembershipStatus,
     Organisation,
     OrganisationMember,
+    OrganisationMembership,
     UserMembership,
-    UserMemberStatus,
     UserProfile,
 )
 from .tables import (
@@ -55,6 +57,7 @@ from .tables import (
     AdminUserDetailMembershipTable,
     AdminUserMembershipTable,
     AdminUserTable,
+    OrganisationMembershipTable,
     OrganisationMemberTable,
     UserDetailMembershipTable,
 )
@@ -188,13 +191,15 @@ class UserIsOrganisationAdminMixin(UserPassesTestMixin):
         return user_is_organisation_admin(self.request.user, organisation_id)
 
 
-class OrganisationDetailView(UserIsOrganisationAdminMixin, SingleTableMixin, DetailView):
+class OrganisationDetailView(UserIsOrganisationAdminMixin, MultiTableMixin, DetailView):
     model = Organisation
     template_name = "organisation_view.html"
-    table_class = OrganisationMemberTable
 
-    def get_table_data(self) -> QuerySet:
-        return self.object.organisation_members.select_related("user").all()
+    def get_tables(self) -> List[Table]:
+        return [
+            OrganisationMemberTable(self.object.organisation_members.select_related("user").all()),
+            OrganisationMembershipTable(self.object.organisation_memberships.select_related("membership_option").all()),
+        ]
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context: Dict[str, Any] = super().get_context_data(**kwargs)
@@ -212,6 +217,10 @@ class OrganisationDetailView(UserIsOrganisationAdminMixin, SingleTableMixin, Det
                     context["show_messages"] = [user_message(_("Admin Role Added"))]
                 elif self.request.GET.get("revoked_admin"):
                     context["show_messages"] = [user_message(_("Admin Role Revoked"))]
+
+            elif referrer_url.find("/organisations/add-membership/") != -1:
+                if self.request.GET.get("membership_added"):
+                    context["show_messages"] = [user_message(_("Membership Added"))]
 
         return context
 
@@ -534,6 +543,27 @@ def notify_staff_of_new_user_membership(request: HttpRequest, user_membership: U
         send_mail(subject, message, from_email, [user.email])
 
 
+def notify_staff_of_new_organisation_membership(
+    request: HttpRequest, organisation_membership: OrganisationMembership
+) -> HttpResponse:
+    site = get_current_site(request)
+    from_email = settings.DEFAULT_FROM_EMAIL
+
+    staff_users = User.objects.filter(is_staff=True, is_active=True)
+    for user in staff_users:
+        subject = _("New organisation membership")
+        template = "new_organisation_membership_email.txt"
+        context = {
+            "user": user,
+            "organisation": organisation_membership.organisation,
+            "site": site,
+        }
+
+        message = render_to_string(template, context, request=request)
+
+        send_mail(subject, message, from_email, [user.email])
+
+
 @login_required
 def add_user_membership(request: HttpRequest, pk: int) -> HttpResponse:
     if not (user_is_admin(request) or request.user.pk == pk):
@@ -588,6 +618,73 @@ def add_user_membership(request: HttpRequest, pk: int) -> HttpResponse:
             "current_membership": current_membership,
             "user_detail": user,
             "form": form,
+        },
+    )
+
+
+@login_required
+def add_organisation_membership(request: HttpRequest, pk: int) -> HttpResponse:
+    if not (user_is_admin(request) or user_is_organisation_admin(request.user, pk)):
+        return HttpResponse(status=401)
+
+    organisation = Organisation.objects.get(pk=pk)
+
+    current_membership = (
+        organisation.organisation_memberships.filter(
+            cancelled_datetime__isnull=True, start_date__lte=timezone.localdate()
+        )
+        .order_by("-start_date")
+        .first()
+    )
+
+    latest_membership = organisation.organisation_memberships.order_by("-start_date").first()
+
+    if request.method == "POST":
+        form = AddOrganisationMembershipForm(request.POST, organisation=organisation)
+        if form.is_valid():
+            form_data = form.cleaned_data
+
+            start_date = form_data["start_date"]
+            membership_option = MembershipOption.objects.get(name=form_data["membership_option"])
+
+            organisation_membership = OrganisationMembership.objects.create(
+                organisation=organisation,
+                membership_option=membership_option,
+                start_date=start_date,
+                created_datetime=timezone.localtime(),
+            )
+
+            transaction.on_commit(
+                partial(
+                    notify_staff_of_new_organisation_membership,
+                    request=request,
+                    organisation_membership=organisation_membership,
+                )
+            )
+
+            view_organisation_url = reverse("view-organisation", kwargs={"pk": pk})
+            return HttpResponseRedirect(view_organisation_url + "?membership_added=true")
+    else:
+        start_date = timezone.localdate()
+
+        if current_membership and current_membership.status() == MembershipStatus.ACTIVE:
+            membership_expiry_date = current_membership.expiry_date()
+
+            if membership_expiry_date > timezone.localdate():
+                start_date = membership_expiry_date
+
+        initial_values = {"start_date": date_format(start_date, format=settings.SHORT_DATE_FORMAT)}
+
+        form = AddOrganisationMembershipForm(initial=initial_values, organisation=organisation)
+
+    return render(
+        request,
+        "add_organisation_membership.html",
+        {
+            "form": form,
+            "organisation": organisation,
+            "current_membership": current_membership,
+            "latest_membership": latest_membership,
         },
     )
 
@@ -753,7 +850,7 @@ class UserDetailViewBase(SingleTableMixin, DetailView):
 
         latest_membership = user.get_latest_membership()
         can_add_membership = False
-        if not latest_membership or latest_membership.status() in [UserMemberStatus.ACTIVE, UserMemberStatus.EXPIRED]:
+        if not latest_membership or latest_membership.status() in [MembershipStatus.ACTIVE, MembershipStatus.EXPIRED]:
             can_add_membership = True
 
         context["can_add_membership"] = can_add_membership

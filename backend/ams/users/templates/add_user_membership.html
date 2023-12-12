@@ -19,7 +19,7 @@
                         {% endblocktranslate %}
                     {% elif current_membership.status == "EXPIRED" %}
                         {% blocktranslate with display_name=user_detail.display_name expiry_date=current_membership.expiry_date %}
-                        {{display_name}} your last membership expired on on {{expiry_date}}.
+                        {{display_name}} your last membership expired on {{expiry_date}}.
                         Select a new membership to resume using all membership features.
                         {% endblocktranslate %}
                     {% endif %}

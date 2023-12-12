@@ -1,13 +1,21 @@
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any
 
 from dateutil.relativedelta import relativedelta
+from django.conf import settings
 from django.contrib.auth.models import User
+from django.utils.formats import date_format
 from django.utils.translation import gettext_lazy as _
 from django_tables2 import Column, DateColumn, Table, TemplateColumn
 
 from .forms import format_membership_duration
-from .models import MembershipOption, Organisation, OrganisationMember, UserMembership
+from .models import (
+    MembershipOption,
+    Organisation,
+    OrganisationMember,
+    OrganisationMembership,
+    UserMembership,
+)
 
 
 def full_name_or_username(user: User) -> str:
@@ -157,11 +165,7 @@ class OrganisationMemberTable(Table):
         order_by=("user__first_name", "user__last_name"),
     )
     email = Column(verbose_name=_("Email"), accessor="invite_email")
-    status = Column(
-        verbose_name=_("Status"),
-        accessor="accepted_datetime",
-        empty_values=[],
-    )
+    status = Column(verbose_name=_("Status"), accessor="accepted_datetime", empty_values=[], orderable=False)
     join_date = DateColumn(verbose_name=_("Join Date"), accessor="accepted_datetime", short=True)
     role = Column(verbose_name=_("Role"), accessor="is_admin", order_by=("is_admin", "-accepted_datetime"))
     actions = TemplateColumn(
@@ -193,3 +197,28 @@ class OrganisationMemberTable(Table):
         fields = ("name", "email", "status", "join_date", "role")
         order_by = ("email",)
         model = OrganisationMember
+
+
+class OrganisationMembershipTable(Table):
+    membership = Column(accessor="membership_option__name", verbose_name=_("Membership"))
+    duration = Column(accessor="membership_option__duration", verbose_name=_("Duration"))
+    status = Column(verbose_name=_("Status"), accessor="start_date", empty_values=[], orderable=False)
+    start_date = DateColumn(verbose_name=_("Start Date"), short=True)
+    expiry_date = DateColumn(verbose_name=_("Expires Date"), accessor="start_date", short=True, orderable=False)
+    actions = TemplateColumn(
+        verbose_name=_("Actions"), template_name="organisation_membership_actions.html", orderable=False
+    )
+
+    def render_status(self, value: date, record: OrganisationMembership) -> Any:
+        return record.status().label
+
+    def render_expiry_date(self, value: date, record: OrganisationMembership) -> Any:
+        return date_format(record.expiry_date(), format=settings.SHORT_DATE_FORMAT)
+
+    def render_duration(self, value: relativedelta, record: OrganisationMembership) -> Any:
+        return format_membership_duration(value)
+
+    class Meta:
+        fields = ("membership", "duration", "status", "start_date")
+        order_by = ("membership", "duration", "status", "start_date", "expiry_date")
+        model = OrganisationMembership

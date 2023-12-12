@@ -19,7 +19,7 @@
 
 <table style="width: 100%">
     <tr>
-        <td style="padding: 10px">
+        <td valign="top" style="padding: 10px">
 
             <h1>{{ organisation.name }}</h1>
 
@@ -59,7 +59,20 @@
                         <div class="table-actions">
                             <a class="btn btn-small btn-table-action" href="{% url "invite-organisation-member" organisation.pk %}">{% translate "Invite Member" %}</a>                            
                         </div>
-                        {% render_table table %}
+                        {% render_table tables.0 %}
+                    </div>
+                </div>
+            </div>
+
+            <br>
+            <h1>{% translate "Memberships" %}</h1>
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="table-container">
+                        <div class="table-actions">
+                            <a class="btn btn-small btn-table-action" href="{% url "add-organisation-membership" organisation.pk %}">{% translate "Add Membership" %}</a>
+                        </div>
+                        {% render_table tables.1 %}
                     </div>
                 </div>
             </div>
