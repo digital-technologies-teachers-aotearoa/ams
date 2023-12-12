@@ -25,7 +25,7 @@ class UserViewTests(TestCase):
             name="Membership Option", type=MembershipOptionType.INDIVIDUAL, duration="P1M", cost="1.00"
         )
 
-        start = timezone.localtime() - membership_option.duration + timedelta(days=1)
+        start = timezone.localtime() - membership_option.duration + timedelta(days=7)
 
         self.user_membership = UserMembership.objects.create(
             user=self.user,

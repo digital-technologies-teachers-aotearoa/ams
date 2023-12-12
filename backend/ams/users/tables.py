@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from django_tables2 import Column, DateColumn, Table, TemplateColumn
 
 from .forms import format_membership_duration
-from .models import MembershipOption, Organisation, UserMembership
+from .models import MembershipOption, Organisation, OrganisationMember, UserMembership
 
 
 def full_name_or_username(user: User) -> str:
@@ -148,3 +148,40 @@ class AdminOrganisationTable(Table):
         fields = ("name", "type", "telephone", "email", "contact_name", "city")
         order_by = ("name", "type")
         model = Organisation
+
+
+class OrganisationMemberTable(Table):
+    name = Column(
+        verbose_name=_("Name"),
+        accessor="user__first_name",
+        order_by=("user__first_name", "user__last_name"),
+    )
+    email = Column(verbose_name=_("Email"), accessor="invite_email")
+    status = Column(
+        verbose_name=_("Status"),
+        accessor="accepted_datetime",
+        empty_values=[],
+    )
+    join_date = DateColumn(verbose_name=_("Join Date"), accessor="accepted_datetime", short=True)
+    actions = TemplateColumn(
+        verbose_name=_("Actions"), template_name="organisation_member_actions.html", orderable=False
+    )
+
+    def render_name(self, value: str, record: UserMembership) -> str:
+        return full_name_or_username(record.user)
+
+    def render_email(self, value: str, record: OrganisationMember) -> Any:
+        # Show user's current email if there is a user, otherwise show the invite email
+        if record.user:
+            return record.user.email
+        return value
+
+    def render_status(self, value: datetime, record: OrganisationMember) -> Any:
+        if value and record.user.is_active:
+            return _("Active")
+        return _("Invited")
+
+    class Meta:
+        fields = ("name", "email", "status", "join_date")
+        order_by = ("email",)
+        model = OrganisationMember

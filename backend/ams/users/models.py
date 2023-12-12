@@ -42,6 +42,18 @@ class Organisation(Model):
     city = CharField(max_length=255, blank=True)
 
 
+class OrganisationMember(Model):
+    user = ForeignKey(User, null=True, on_delete=CASCADE, related_name="organisation_members")
+    invite_email = CharField(max_length=255, blank=True)
+    invite_token = CharField(max_length=255, unique=True)
+    organisation = ForeignKey(Organisation, on_delete=CASCADE, related_name="organisation_members")
+    created_datetime = DateTimeField()
+    accepted_datetime = DateTimeField(null=True)
+
+    class Meta:
+        unique_together = (("user", "organisation"),)
+
+
 class MembershipOptionType(TextChoices):
     INDIVIDUAL = "INDIVIDUAL", _("Individual")
     ORGANISATION = "ORGANISATION", _("Organisation")

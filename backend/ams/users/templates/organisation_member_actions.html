@@ -1,0 +1,12 @@
+{% load static i18n %}
+<ul class="table-action-list">
+    <li>
+        <li>
+            <button class="btn-table" data-toggle="modal" data-target="#removeOrganisationMemberModal"
+                onClick="$('#modal_organisation_member_email').html('{% if record.user %}{{ record.user.email }}{% else %}{{ record.invite_email }}{% endif %}'); $('#modal_organisation_member_id').val('{{ record.pk }}');"
+                title="{% translate "Remove" %}">
+                <i class="fa-solid fa-circle-xmark"></i>
+            </button>
+        </li>
+    </li>
+</ul>

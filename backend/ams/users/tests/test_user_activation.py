@@ -2,7 +2,10 @@ from django.contrib.auth.models import User
 from django.contrib.sites.requests import RequestSite
 from django.core import mail
 from django.test import RequestFactory, TestCase
+from django.utils import timezone
 from registration.models import RegistrationProfile
+
+from ..models import MembershipOption, MembershipOptionType, UserMembership
 
 
 class UserActivationTests(TestCase):
@@ -35,9 +38,19 @@ class UserActivationTests(TestCase):
         self.assertEqual(True, self.user.is_active)
         self.assertTemplateUsed(response, "base/email_confirmation_page.html")
 
-    def test_valid_activation_sends_notification_email_to_staff(self) -> None:
+    def test_valid_activation_for_user_with_user_membership_sends_notification_email_to_staff(self) -> None:
         # Given
         activation_key = self.registration_profile.activation_key
+
+        membership_option = MembershipOption.objects.create(
+            name="Membership Option", type=MembershipOptionType.INDIVIDUAL, duration="P1M", cost="1.00"
+        )
+        UserMembership.objects.create(
+            user=self.user,
+            membership_option=membership_option,
+            created_datetime=timezone.localtime(),
+            start_date=timezone.localtime().date(),
+        )
 
         User.objects.create_user(
             first_name="Inactive Staff",
@@ -46,6 +59,7 @@ class UserActivationTests(TestCase):
             is_active=False,
             email="user@example.com",
         )
+
         User.objects.create_user(
             first_name="Not Staff", username="not_staff", is_staff=False, is_active=True, email="user@example.com"
         )
@@ -74,6 +88,34 @@ Click the link below to review the user and approve their membership.
 https://testserver/users/view/{self.user.id}
 """,
         )
+
+    def test_valid_activation_for_user_without_user_membership_does_not_notify_staff(self) -> None:
+        # Given
+        activation_key = self.registration_profile.activation_key
+
+        User.objects.create_user(
+            first_name="Inactive Staff",
+            username="inactive_staff",
+            is_staff=True,
+            is_active=False,
+            email="user@example.com",
+        )
+
+        User.objects.create_user(
+            first_name="Not Staff", username="not_staff", is_staff=False, is_active=True, email="user@example.com"
+        )
+
+        User.objects.create_user(
+            first_name="John", username="staff", is_staff=True, is_active=True, email="user@example.com"
+        )
+
+        # When
+        with self.captureOnCommitCallbacks(execute=True):
+            response = self.client.get(f"/users/activate/{activation_key}/")
+
+        # Then
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(len(mail.outbox), 0)
 
     def test_reusing_activation_key_with_active_user_redirects_to_home_page(self) -> None:
         # Given

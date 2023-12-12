@@ -1,0 +1,7 @@
+{% load i18n %}{% blocktranslate with first_name=user.first_name organisation_name=organisation.name site_name=site.name %}Hello {{ first_name }},
+
+You have been invited to join the organisation {{ organisation_name }} in {{ site_name }}.
+
+Click the link below to accept the invitation.
+{% endblocktranslate %}
+https://{{ site.domain }}/users/accept-invite/{{ invite_token }}/

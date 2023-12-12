@@ -8,6 +8,7 @@ from .views import (
     AdminUserMembershipListView,
     OrganisationDetailView,
     UserDetailView,
+    accept_organisation_user_invite,
     activate_user,
     add_user_membership,
     create_membership_option,
@@ -16,6 +17,8 @@ from .views import (
     edit_organisation,
     edit_user_profile,
     individual_registration,
+    invite_organisation_member,
+    register_organisation_member,
 )
 
 urlpatterns = [
@@ -32,6 +35,9 @@ urlpatterns = [
     path("organisations/create/", create_organisation, name="admin-create-organisation"),
     path("organisations/edit/<int:pk>/", edit_organisation, name="admin-edit-organisation"),
     path("organisations/view/<int:pk>/", OrganisationDetailView.as_view(), name="view-organisation"),
+    path("organisations/invite/<int:pk>/", invite_organisation_member, name="invite-organisation-member"),
+    path("accept-invite/<str:invite_token>/", accept_organisation_user_invite, name="accept-organisation-user-invite"),
+    path("register-member/<str:invite_token>/", register_organisation_member, name="register-organisation-member"),
     path("individual-registration/", individual_registration, name="registration_register"),
     path("activate/<str:activation_key>/", activate_user, name="activate-user"),
     path("", include("registration.auth_urls")),

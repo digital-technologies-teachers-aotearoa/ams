@@ -1,10 +1,13 @@
 from functools import partial
+from hashlib import sha256
 from typing import Any, Dict, Optional
+from uuid import uuid4
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
+from django.contrib.auth.views import redirect_to_login
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.files.storage import default_storage
 from django.core.mail import send_mail
@@ -32,13 +35,16 @@ from .forms import (
     AddUserMembershipForm,
     EditUserProfileForm,
     IndividualRegistrationForm,
+    InviteOrganisationMemberForm,
     MembershipOptionForm,
     OrganisationForm,
+    OrganisationUserRegistrationForm,
     UploadProfileImageForm,
 )
 from .models import (
     MembershipOption,
     Organisation,
+    OrganisationMember,
     UserMembership,
     UserMemberStatus,
     UserProfile,
@@ -49,6 +55,7 @@ from .tables import (
     AdminUserDetailMembershipTable,
     AdminUserMembershipTable,
     AdminUserTable,
+    OrganisationMemberTable,
     UserDetailMembershipTable,
 )
 from .utils import UserIsAdminMixin, user_is_admin, user_message
@@ -157,12 +164,223 @@ def edit_organisation(request: HttpRequest, pk: int) -> HttpResponse:
     )
 
 
-class OrganisationDetailView(UserIsAdminMixin, DetailView):
+class OrganisationDetailView(UserIsAdminMixin, SingleTableMixin, DetailView):
     model = Organisation
     template_name = "organisation_view.html"
+    table_class = OrganisationMemberTable
+
+    def get_table_data(self) -> QuerySet:
+        return self.object.organisation_members.all()
+
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context: Dict[str, Any] = super().get_context_data(**kwargs)
+
+        referrer_url = self.request.META.get("HTTP_REFERER")
+
+        if referrer_url:
+            if referrer_url.find("/organisations/invite/") != -1 and self.request.GET.get("invite_sent"):
+                context["show_messages"] = [user_message(_("Invite Sent"))]
+
+            elif referrer_url.find("/organisations/view/") != -1 and self.request.GET.get("member_removed"):
+                context["show_messages"] = [user_message(_("Organisation Member Removed"))]
+
+        return context
+
+    def post(self, request: HttpRequest, pk: int, *args: Any, **kwargs: Any) -> HttpResponse:
+        if request.POST.get("action") == "remove_organisation_member":
+            organisation = Organisation.objects.get(pk=pk)
+            organisation_member_id = int(request.POST["organisation_member_id"])
+
+            organisation_member = OrganisationMember.objects.get(pk=organisation_member_id, organisation=organisation)
+            organisation_member.delete()
+
+            redirect_url = reverse("view-organisation", kwargs={"pk": pk}) + "?member_removed=true"
+            return HttpResponseRedirect(redirect_url)
+
+        return HttpResponse(status=400)
 
 
-def notify_staff_of_new_user(request: HttpRequest, new_user: User) -> HttpResponse:
+def invite_user_to_organisation(
+    request: HttpRequest, user: User, organisation: Organisation, invite_token: str
+) -> None:
+    site = get_current_site(request)
+    from_email = settings.DEFAULT_FROM_EMAIL
+
+    subject = _("You are invited to join %(organisation_name)s") % {"organisation_name": organisation.name}
+    template = "invite_user_to_organisation.txt"
+    context = {
+        "site": site,
+        "user": user,
+        "organisation": organisation,
+        "invite_token": invite_token,
+    }
+
+    message = render_to_string(template, context, request=request)
+
+    send_mail(subject, message, from_email, [user.email])
+
+
+def invite_email_to_organisation(
+    request: HttpRequest, email: str, organisation: Organisation, invite_token: str
+) -> None:
+    site = get_current_site(request)
+    from_email = settings.DEFAULT_FROM_EMAIL
+
+    subject = _("You are invited to join %(organisation_name)s") % {"organisation_name": organisation.name}
+    template = "invite_email_to_organisation.txt"
+    context = {
+        "site": site,
+        "email": email,
+        "organisation": organisation,
+        "invite_token": invite_token,
+    }
+
+    message = render_to_string(template, context, request=request)
+
+    send_mail(subject, message, from_email, [email])
+
+
+@login_required
+def invite_organisation_member(request: HttpRequest, pk: int) -> HttpResponse:
+    if not user_is_admin(request):
+        return HttpResponse(status=403)
+
+    organisation = Organisation.objects.get(pk=pk)
+
+    if request.method == "POST":
+        form = InviteOrganisationMemberForm(organisation, request.POST)
+        if form.is_valid():
+            form_data = form.cleaned_data
+            email = form_data["email"]
+
+            user: Optional[User] = User.objects.filter(email=email).first()
+
+            invite_token = sha256(str(uuid4()).encode()).hexdigest()
+
+            if user:
+                transaction.on_commit(
+                    partial(
+                        invite_user_to_organisation,
+                        request=request,
+                        user=user,
+                        organisation=organisation,
+                        invite_token=invite_token,
+                    )
+                )
+            else:
+                transaction.on_commit(
+                    partial(
+                        invite_email_to_organisation,
+                        request=request,
+                        email=email,
+                        organisation=organisation,
+                        invite_token=invite_token,
+                    )
+                )
+
+            OrganisationMember.objects.create(
+                user=user,
+                invite_email=email,
+                invite_token=invite_token,
+                organisation=organisation,
+                created_datetime=timezone.localtime(),
+            )
+
+            view_organisation_url = reverse("view-organisation", kwargs={"pk": organisation.pk})
+            return HttpResponseRedirect(view_organisation_url + "?invite_sent=true")
+
+    else:
+        form = InviteOrganisationMemberForm(organisation)
+
+    return render(
+        request,
+        "invite_organisation_member.html",
+        {
+            "organisation": organisation,
+            "form": form,
+        },
+    )
+
+
+@login_required
+def accept_organisation_user_invite(request: HttpRequest, invite_token: str) -> HttpResponse:
+    organisation_member = OrganisationMember.objects.filter(
+        invite_token=invite_token,
+        user__isnull=False,
+    ).first()
+
+    if not organisation_member:
+        return HttpResponse(status=400)
+
+    if organisation_member.user != request.user:
+        # If logged in as a different user send them back to the login screen
+        next = reverse("accept-organisation-user-invite", kwargs={"invite_token": invite_token})
+        return redirect_to_login(next)
+
+    if not organisation_member.accepted_datetime:
+        organisation_member.accepted_datetime = timezone.localtime()
+        organisation_member.save()
+
+    organisation = organisation_member.organisation
+
+    return render(
+        request,
+        "organisation_invite_accepted.html",
+        {
+            "organisation": organisation,
+        },
+    )
+
+
+def register_organisation_member(request: HttpRequest, invite_token: str) -> HttpResponse:
+    organisation_member = OrganisationMember.objects.filter(
+        invite_token=invite_token, user__isnull=True, accepted_datetime__isnull=True
+    ).first()
+
+    if not organisation_member:
+        return HttpResponse(status=400)
+
+    if request.method == "POST":
+        form = OrganisationUserRegistrationForm(request.POST, initial={"email": organisation_member.invite_email})
+
+        if form.is_valid():
+            form_data = form.cleaned_data
+
+            new_user = RegistrationProfile.objects.create_inactive_user(
+                get_current_site(request),
+                send_email=True,
+                username=organisation_member.invite_email,
+                email=organisation_member.invite_email,
+                first_name=form_data["first_name"],
+                last_name=form_data["last_name"],
+                password=form_data["password"],
+            )
+
+            organisation_member.user = new_user
+            organisation_member.accepted_datetime = timezone.localtime()
+            organisation_member.save()
+
+            return render(
+                request,
+                "individual_registration_pending.html",
+                status=201,
+            )
+    else:
+        form = OrganisationUserRegistrationForm(initial={"email": organisation_member.invite_email})
+
+    organisation = organisation_member.organisation
+
+    return render(
+        request,
+        "organisation_user_registration.html",
+        {
+            "form": form,
+            "organisation": organisation,
+        },
+    )
+
+
+def notify_staff_of_new_user_with_membership(request: HttpRequest, new_user: User) -> HttpResponse:
     site = get_current_site(request)
     from_email = settings.DEFAULT_FROM_EMAIL
 
@@ -186,7 +404,8 @@ def activate_user(request: HttpRequest, activation_key: str) -> HttpResponse:
 
     if user:
         if activation_successful:
-            transaction.on_commit(partial(notify_staff_of_new_user, request=request, new_user=user))
+            if user.user_memberships.exists():
+                transaction.on_commit(partial(notify_staff_of_new_user_with_membership, request=request, new_user=user))
 
             email_confirmation_page = EmailConfirmationPage.objects.get(
                 live=True, locale__language_code=settings.LANGUAGE_CODE
