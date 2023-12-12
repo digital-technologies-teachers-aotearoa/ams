@@ -2,9 +2,10 @@ from typing import Any, Dict
 
 from django.contrib.auth.models import User
 from django.test import TestCase
+from django.utils import timezone
 
 from ..forms import OrganisationForm
-from ..models import Organisation, OrganisationType
+from ..models import Organisation, OrganisationMember, OrganisationType
 
 
 class EditOrganisationFormTests(TestCase):
@@ -61,6 +62,29 @@ class EditOrganisationFormTests(TestCase):
 
         # Then
         self.assertEqual(403, response.status_code)
+
+    def test_should_allow_access_to_organisation_admin_user(self) -> None:
+        # Given
+        self.user.is_staff = False
+        self.user.save()
+
+        OrganisationMember.objects.create(
+            user=self.user,
+            organisation=self.organisation,
+            invite_email=self.user.email,
+            invite_token="token",
+            created_datetime=timezone.localtime(),
+            accepted_datetime=timezone.localtime(),
+            is_admin=True,
+        )
+
+        self.client.force_login(self.user)
+
+        # When
+        response = self.client.get(self.url)
+
+        # Then
+        self.assertEqual(200, response.status_code)
 
     def test_get_endpoint(self) -> None:
         # When

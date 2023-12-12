@@ -8,5 +8,29 @@
                 <i class="fa-solid fa-circle-xmark"></i>
             </button>
         </li>
+        {% if not record.is_admin and record.is_active %}
+        <li>
+            <form method="post" name="make_organisation_admin_form_{{ record.pk }}" action="">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="make_organisation_admin">
+                <input type="hidden" name="organisation_member_id" value="{{ record.pk }}">
+                <button class="btn-table" type="submit" title="{% translate "Make an Admin" %}">
+                    <i class="fa-solid fa-arrow-up"></i>
+                </button>
+            </form>
+        </li>
+        {% endif %}
+        {% if record.is_admin %}
+        <li>
+            <form method="post" name="revoke_organisation_admin_form_{{ record.pk }}" action="">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="revoke_organisation_admin">
+                <input type="hidden" name="organisation_member_id" value="{{ record.pk }}">
+                <button class="btn-table" type="submit" title="{% translate "Revoke Admin Status" %}">
+                    <i class="fa-solid fa-arrow-down"></i>
+                </button>
+            </form>
+        </li>        
+        {% endif %}
     </li>
 </ul>

@@ -52,6 +52,22 @@ class ViewOrganisationFormTests(TestCase):
         # Then
         self.assertEqual(403, response.status_code)
 
+    def test_should_allow_access_to_organisation_admin_user(self) -> None:
+        # Given
+        self.user.is_staff = False
+        self.user.save()
+
+        self.organisation_member.is_admin = True
+        self.organisation_member.save()
+
+        self.client.force_login(self.user)
+
+        # When
+        response = self.client.get(self.url)
+
+        # Then
+        self.assertEqual(200, response.status_code)
+
     def test_get_endpoint(self) -> None:
         # When
         response = self.client.get(self.url)
@@ -67,7 +83,7 @@ class ViewOrganisationFormTests(TestCase):
         # Then
         self.assertEqual(200, response.status_code)
 
-        expected_membership_columns = ["name", "email", "status", "join_date", "actions"]
+        expected_membership_columns = ["name", "email", "status", "join_date", "role", "actions"]
         columns = [column.name for column in response.context["table"].columns]
         self.assertListEqual(expected_membership_columns, columns)
 
@@ -78,7 +94,7 @@ class ViewOrganisationFormTests(TestCase):
         # Then
         self.assertEqual(200, response.status_code)
 
-        expected_membership_headings = ["Name", "Email", "Status", "Join Date", "Actions"]
+        expected_membership_headings = ["Name", "Email", "Status", "Join Date", "Role", "Actions"]
         headings = [column.header for column in response.context["table"].columns]
         self.assertListEqual(expected_membership_headings, headings)
 
@@ -99,7 +115,36 @@ class ViewOrganisationFormTests(TestCase):
                 date_format(
                     timezone.localtime(self.organisation_member.accepted_datetime).date(), format="SHORT_DATE_FORMAT"
                 ),
-                "Remove",
+                "Member",
+                "Remove,Make an Admin",
+            ]
+        ]
+
+        self.assertListEqual(expected_rows, rows)
+
+    def test_should_show_expected_row_for_organisation_admin(self) -> None:
+        # Given
+        self.organisation_member.is_admin = True
+        self.organisation_member.save()
+
+        # When
+        response = self.client.get(self.url)
+
+        # Then
+        self.assertEqual(200, response.status_code)
+
+        rows = parse_response_table_rows(response)
+
+        expected_rows = [
+            [
+                self.organisation_member.user.get_full_name(),
+                self.organisation_member.user.email,
+                "Active",
+                date_format(
+                    timezone.localtime(self.organisation_member.accepted_datetime).date(), format="SHORT_DATE_FORMAT"
+                ),
+                "Admin",
+                "Remove,Revoke Admin Status",
             ]
         ]
 
@@ -124,13 +169,14 @@ class ViewOrganisationFormTests(TestCase):
                 self.organisation_member.user.email,
                 "Invited",
                 "—",
+                "",
                 "Remove",
             ]
         ]
 
         self.assertListEqual(expected_rows, rows)
 
-    def test_remove_organisation_member(self) -> None:
+    def test_should_remove_organisation_member(self) -> None:
         # When
         response = self.client.post(
             self.url, {"action": "remove_organisation_member", "organisation_member_id": self.organisation_member.pk}
@@ -142,3 +188,76 @@ class ViewOrganisationFormTests(TestCase):
 
         with self.assertRaises(OrganisationMember.DoesNotExist):
             self.organisation_member.refresh_from_db()
+
+    def test_should_make_organisation_member_admin(self) -> None:
+        # When
+        response = self.client.post(
+            self.url, {"action": "make_organisation_admin", "organisation_member_id": self.organisation_member.pk}
+        )
+
+        # Then
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(f"{self.url}?made_admin=true", response.url)
+
+        self.organisation_member.refresh_from_db()
+        self.assertEqual(self.organisation_member.is_admin, True)
+
+    def test_should_not_make_non_active_member_organisation_admin(self) -> None:
+        # Given
+        self.organisation_member.accepted_datetime = None
+        self.organisation_member.save()
+
+        # When
+        response = self.client.post(
+            self.url, {"action": "make_organisation_admin", "organisation_member_id": self.organisation_member.pk}
+        )
+
+        # Then
+        self.assertEqual(400, response.status_code)
+
+        self.organisation_member.refresh_from_db()
+        self.assertEqual(self.organisation_member.is_admin, False)
+
+    def test_should_not_make_different_organisation_member_organisation_admin(self) -> None:
+        # Given
+        self.organisation_member.organisation = Organisation.objects.create(
+            type=OrganisationType.objects.get(),
+            name="Other Organisation",
+            telephone="555-54321",
+            contact_name="Jane Smith",
+            email="jane@example.com",
+            street_address="124 Main Street",
+            suburb="",
+            city="Capital City",
+            postal_code="8080",
+            postal_address="PO BOX 12345\nCapital City 8082",
+        )
+        self.organisation_member.save()
+
+        # When
+        response = self.client.post(
+            self.url, {"action": "make_organisation_admin", "organisation_member_id": self.organisation_member.pk}
+        )
+
+        # Then
+        self.assertEqual(400, response.status_code)
+
+        self.organisation_member.refresh_from_db()
+        self.assertEqual(self.organisation_member.is_admin, False)
+
+    def test_should_revoke_organisation_member_admin(self) -> None:
+        # Given
+        self.organisation_member.is_admin = True
+        self.organisation_member.save()
+
+        # When
+        response = self.client.post(
+            self.url, {"action": "revoke_organisation_admin", "organisation_member_id": self.organisation_member.pk}
+        )
+
+        # Then
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(f"{self.url}?revoked_admin=true", response.url)
+
+        self.organisation_member.refresh_from_db()
+        self.assertEqual(self.organisation_member.is_admin, False)
