@@ -1,5 +1,6 @@
 from datetime import timedelta
 
+from dateutil.relativedelta import relativedelta
 from django.contrib.sites.requests import RequestSite
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
@@ -7,7 +8,15 @@ from django.utils import timezone
 from django.utils.formats import date_format
 from registration.models import RegistrationProfile
 
-from ..models import MembershipOption, MembershipOptionType, UserMembership
+from ..models import (
+    MembershipOption,
+    MembershipOptionType,
+    Organisation,
+    OrganisationMember,
+    OrganisationMembership,
+    OrganisationType,
+    UserMembership,
+)
 
 
 class UserStatusTests(TestCase):
@@ -168,6 +177,49 @@ class UserStatusTests(TestCase):
         # Given
         self.user_membership.approved_datetime = timezone.now()
         self.user_membership.save()
+
+        self.client.force_login(self.user)
+
+        # When
+        response = self.client.get("/")
+
+        # Then
+        self.assertContains(response, "Your membership is Active")
+
+    def test_should_show_logged_in_users_active_organisation_membership_status(self) -> None:
+        # Given
+        organisation = Organisation.objects.create(
+            type=OrganisationType.objects.create(name="Primary School"),
+            name="Any Organisation",
+            telephone="555-12345",
+            contact_name="John Smith",
+            email="john@example.com",
+            street_address="123 Main Street",
+            suburb="",
+            city="Capital City",
+            postal_code="8080",
+            postal_address="PO BOX 1234\nCapital City 8082",
+        )
+
+        organisation_membership_option = MembershipOption.objects.create(
+            name="Organisation Membership Option", type=MembershipOptionType.ORGANISATION, duration="P1M", cost="1.00"
+        )
+
+        start = timezone.localtime() - relativedelta(days=7)
+
+        OrganisationMembership.objects.create(
+            organisation=organisation,
+            membership_option=organisation_membership_option,
+            created_datetime=start,
+            start_date=start.date(),
+        )
+
+        OrganisationMember.objects.create(
+            user=self.user,
+            organisation=organisation,
+            created_datetime=start,
+            accepted_datetime=start,
+        )
 
         self.client.force_login(self.user)
 
