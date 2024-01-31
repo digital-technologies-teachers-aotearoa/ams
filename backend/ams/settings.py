@@ -126,6 +126,12 @@ class Common(Configuration):
     DISCOURSE_REDIRECT_DOMAIN = environ["DISCOURSE_REDIRECT_DOMAIN"]
     DISCOURSE_CONNECT_SECRET = environ["DISCOURSE_CONNECT_SECRET"]
 
+    # Billing service (optional)
+    BILLING_SERVICE_CLASS = environ.get("BILLING_SERVICE_CLASS")
+    XERO_TENANT_ID = environ.get("XERO_TENANT_ID")
+    XERO_CLIENT_ID = environ.get("XERO_CLIENT_ID")
+    XERO_CLIENT_SECRET = environ.get("XERO_CLIENT_SECRET")
+
     # Password validation
     # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
@@ -228,6 +234,7 @@ class Development(Common):
 class Test(Development):
     MEDIA_ROOT = None
     DISCOURSE_API_KEY = None
+    BILLING_SERVICE_CLASS = None
 
 
 class Testing(Common):

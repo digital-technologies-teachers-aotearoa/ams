@@ -4,7 +4,7 @@ from ..settings import Common
 
 
 class DTTACommon(Common):
-    INSTALLED_APPS = Common.INSTALLED_APPS + ["ams.dtta"]
+    INSTALLED_APPS = Common.INSTALLED_APPS + ["ams.dtta", "ams.xero"]
 
     TIME_ZONE = "Pacific/Auckland"
 
@@ -35,6 +35,7 @@ class Development(DTTACommon):
 class Test(Development):
     MEDIA_ROOT = None
     DISCOURSE_API_KEY = None
+    BILLING_SERVICE_CLASS = None
 
 
 class Testing(DTTACommon):

@@ -1,0 +1,121 @@
+import json
+from typing import Any, Dict, Optional
+
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
+from django.http.response import HttpResponse
+from xero_python.accounting import AccountingApi, Contact, Contacts
+from xero_python.api_client import ApiClient
+from xero_python.api_client.configuration import Configuration
+from xero_python.api_client.oauth2 import OAuth2Token
+from xero_python.api_client.serializer import serialize
+
+from ams.billing.models import Account
+from ams.billing.service import BillingService
+from ams.users.models import Organisation
+
+from .models import XeroContact
+
+
+class XeroBillingService(BillingService):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+
+        self.xero_token: Optional[str] = None
+
+        self.api_client = ApiClient(
+            Configuration(
+                debug=True,
+                oauth2_token=OAuth2Token(
+                    client_id=settings.XERO_CLIENT_ID,
+                    client_secret=settings.XERO_CLIENT_SECRET,
+                ),
+            ),
+            pool_threads=1,
+            oauth2_token_getter=self.get_xero_token,
+            oauth2_token_saver=self.set_xero_token,
+        )
+
+    def get_xero_token(self) -> Optional[str]:
+        return self.xero_token
+
+    def set_xero_token(self, token: str) -> None:
+        self.xero_token = token
+
+    def _debug_response(self, data: Any) -> HttpResponse:
+        return HttpResponse(json.dumps(serialize(data)), content_type="application/json")
+
+    def _get_authentication_token(self) -> None:
+        self.api_client.get_client_credentials_token()
+
+    def _create_xero_contact(self, contact_params: Dict[str, Any]) -> str:
+        api_instance = AccountingApi(self.api_client)
+
+        contact = Contact(**contact_params)
+        contacts = Contacts(contacts=[contact])
+
+        api_response = api_instance.create_contacts(settings.XERO_TENANT_ID, contacts)
+
+        contact_id: str = api_response.contacts[0].contact_id
+        return contact_id
+
+    def _update_xero_contact(self, contact_id: str, contact_params: Dict[str, Any]) -> None:
+        api_instance = AccountingApi(self.api_client)
+
+        contact = Contact(**contact_params)
+        contacts = Contacts(contacts=[contact])
+
+        api_instance.update_contact(settings.XERO_TENANT_ID, contact_id, contacts)
+
+    # NOTE: The name in xero needs to be unique so we combined a name with Account.id primary key
+    # For this reason it is important to not to change the Account.id sequence without considering
+    # the implications to external systems
+    def _xero_contact_name(self, account_id: int, name: str) -> str:
+        return f"{name} ({account_id})"
+
+    def update_user_billing_details(self, user: User) -> None:
+        contact_details = {
+            "name": self._xero_contact_name(user.account.pk, user.get_full_name()),
+            "account_number": str(user.account.id),
+            "email_address": user.email,
+        }
+
+        return self.update_account_billing_details(user.account, contact_details)
+
+    def update_organisation_billing_details(self, organisation: Organisation) -> None:
+        contact_details = {
+            "name": self._xero_contact_name(organisation.account.pk, organisation.name),
+            "account_number": str(organisation.account.id),
+            "email_address": organisation.email,
+        }
+
+        return self.update_account_billing_details(organisation.account, contact_details)
+
+    def update_account_billing_details(self, account: Account, contact_details: Dict[str, Any]) -> None:
+        contact_id: Optional[str] = None
+
+        try:
+            contact_id = account.xero_contact.contact_id
+        except ObjectDoesNotExist:
+            pass
+
+        self._get_authentication_token()
+
+        if contact_id:
+            self._update_xero_contact(contact_id, contact_details)
+        else:
+            contact_id = self._create_xero_contact(contact_details)
+
+            XeroContact.objects.create(account=account, contact_id=contact_id)
+
+
+class MockXeroBillingService(XeroBillingService):
+    def _get_authentication_token(self) -> None:
+        return
+
+    def _create_xero_contact(self, contact_params: Dict[str, Any]) -> str:
+        return "mock-xero-contact-id"
+
+    def _update_xero_contact(self, contact_id: str, contact_params: Dict[str, Any]) -> None:
+        return

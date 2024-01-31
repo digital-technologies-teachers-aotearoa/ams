@@ -20,7 +20,10 @@ To run the developer environment you need to install [Docker with the docker com
 
 After this is finished you can run `make start` to bring up application. If successful you should be able to go to http://ams.local.
 
-To setup the forum see the [Discourse setup](#discourse-setup) instructions.
+Additional setup instructions:
+
+1. [Discourse setup](#discourse-setup) instructions.
+1. [Billing service setup](#billing-service-setup) instructions.
 
 ### Stylesheet editing
 
@@ -32,9 +35,9 @@ Run the backend tests:
 
     make test-backend
 
-Run the backend tests, reusing an existing test database (faster):
+Run the backend tests with dtta settings:
 
-    make test-backend-reuse-db
+    make test-dtta-backend
 
 Python lint check:
 
@@ -135,3 +138,8 @@ Open a rails shell on the discourse app:
 Recreate/Empty the Discourse database:
 
     make discourse-recreate-db
+
+## Billing service setup
+
+To use Xero as your billing service set `BILLING_SERVICE_CLASS` to `ams.xero.service.XeroBillingService`
+in your `.env` file as well as the XERO prefixed variables.
