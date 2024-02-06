@@ -43,6 +43,7 @@ class Common(Configuration):
         "ams.base",
         "ams.users",
         "ams.forum",
+        "ams.billing",
         "registration",
         "django.contrib.admin",
         "django.contrib.auth",
