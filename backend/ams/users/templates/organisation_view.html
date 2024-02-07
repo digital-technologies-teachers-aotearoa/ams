@@ -24,6 +24,9 @@
             <h1>{{ organisation.name }}</h1>
 
             <div class="content">
+                <p><label>{% translate "Account Number" %}:</label>
+                <br>{{ organisation.account.pk }}</p>
+
                 <p><label>{% translate "Type" %}:</label>
                 <br>{{ organisation.type.name }}</p>
 
