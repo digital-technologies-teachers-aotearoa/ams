@@ -1,5 +1,6 @@
 from functools import partial
 from hashlib import sha256
+from sys import stderr
 from typing import Any, Dict, List, Optional
 from uuid import uuid4
 
@@ -28,6 +29,7 @@ from django_tables2 import MultiTableMixin, SingleTableMixin, SingleTableView, T
 from registration.models import RegistrationProfile
 
 from ams.billing.models import Account
+from ams.billing.service import get_billing_service
 
 from ..base.models import EmailConfirmationPage
 from ..forum.views import forum_sync_user_profile
@@ -574,6 +576,17 @@ def notify_staff_of_new_organisation_membership(
         send_mail(subject, message, from_email, [user.email])
 
 
+add_membership_billing_error_message = user_message(
+    _(
+        "The billing contact could not be created. "
+        "The membership could not be added. "
+        "Please try to add the membership again. "
+        "If this message reappears please contact the site administrator."
+    ),
+    message_type="error",
+)
+
+
 @login_required
 def add_user_membership(request: HttpRequest, pk: int) -> HttpResponse:
     if not (user_is_admin(request) or request.user.pk == pk):
@@ -587,26 +600,38 @@ def add_user_membership(request: HttpRequest, pk: int) -> HttpResponse:
     else:
         user_view_url = reverse("current-user-view")
 
+    billing_service_exception: Optional[Exception] = None
+
     if request.method == "POST":
         form = AddUserMembershipForm(request.POST, user=user)
+
         if form.is_valid():
-            form_data = form.cleaned_data
+            billing_service = get_billing_service()
+            if billing_service:
+                try:
+                    billing_service.update_user_billing_details(user)
+                except Exception as e:
+                    print(f"Error updating user {user.pk} billing details: {e}", file=stderr)
+                    billing_service_exception = e
 
-            start_date = form_data["start_date"]
-            membership_option = MembershipOption.objects.get(name=form_data["membership_option"])
+            if not billing_service_exception:
+                form_data = form.cleaned_data
 
-            user_membership = UserMembership.objects.create(
-                user=user,
-                membership_option=membership_option,
-                start_date=start_date,
-                created_datetime=timezone.localtime(),
-            )
+                start_date = form_data["start_date"]
+                membership_option = MembershipOption.objects.get(name=form_data["membership_option"])
 
-            transaction.on_commit(
-                partial(notify_staff_of_new_user_membership, request=request, user_membership=user_membership)
-            )
+                user_membership = UserMembership.objects.create(
+                    user=user,
+                    membership_option=membership_option,
+                    start_date=start_date,
+                    created_datetime=timezone.localtime(),
+                )
 
-            return HttpResponseRedirect(user_view_url + "?membership_added=true")
+                transaction.on_commit(
+                    partial(notify_staff_of_new_user_membership, request=request, user_membership=user_membership)
+                )
+
+                return HttpResponseRedirect(user_view_url + "?membership_added=true")
     else:
         start_date = timezone.localdate()
 
@@ -620,6 +645,10 @@ def add_user_membership(request: HttpRequest, pk: int) -> HttpResponse:
 
         form = AddUserMembershipForm(initial=initial_values, user=user)
 
+    messages: List[Dict[str, Any]] = []
+    if billing_service_exception:
+        messages.append(add_membership_billing_error_message)
+
     return render(
         request,
         "add_user_membership.html",
@@ -628,6 +657,7 @@ def add_user_membership(request: HttpRequest, pk: int) -> HttpResponse:
             "current_membership": current_membership,
             "user_detail": user,
             "form": form,
+            "show_messages": messages,
         },
     )
 
@@ -649,31 +679,42 @@ def add_organisation_membership(request: HttpRequest, pk: int) -> HttpResponse:
 
     latest_membership = organisation.organisation_memberships.order_by("-start_date").first()
 
+    billing_service_exception: Optional[Exception] = None
+
     if request.method == "POST":
         form = AddOrganisationMembershipForm(request.POST, organisation=organisation)
         if form.is_valid():
-            form_data = form.cleaned_data
+            billing_service = get_billing_service()
+            if billing_service:
+                try:
+                    billing_service.update_organisation_billing_details(organisation)
+                except Exception as e:
+                    print(f"Error updating organisation {organisation.pk} billing details: {e}", file=stderr)
+                    billing_service_exception = e
 
-            start_date = form_data["start_date"]
-            membership_option = MembershipOption.objects.get(name=form_data["membership_option"])
+            if not billing_service_exception:
+                form_data = form.cleaned_data
 
-            organisation_membership = OrganisationMembership.objects.create(
-                organisation=organisation,
-                membership_option=membership_option,
-                start_date=start_date,
-                created_datetime=timezone.localtime(),
-            )
+                start_date = form_data["start_date"]
+                membership_option = MembershipOption.objects.get(name=form_data["membership_option"])
 
-            transaction.on_commit(
-                partial(
-                    notify_staff_of_new_organisation_membership,
-                    request=request,
-                    organisation_membership=organisation_membership,
+                organisation_membership = OrganisationMembership.objects.create(
+                    organisation=organisation,
+                    membership_option=membership_option,
+                    start_date=start_date,
+                    created_datetime=timezone.localtime(),
                 )
-            )
 
-            view_organisation_url = reverse("view-organisation", kwargs={"pk": pk})
-            return HttpResponseRedirect(view_organisation_url + "?membership_added=true")
+                transaction.on_commit(
+                    partial(
+                        notify_staff_of_new_organisation_membership,
+                        request=request,
+                        organisation_membership=organisation_membership,
+                    )
+                )
+
+                view_organisation_url = reverse("view-organisation", kwargs={"pk": pk})
+                return HttpResponseRedirect(view_organisation_url + "?membership_added=true")
     else:
         start_date = timezone.localdate()
 
@@ -687,6 +728,10 @@ def add_organisation_membership(request: HttpRequest, pk: int) -> HttpResponse:
 
         form = AddOrganisationMembershipForm(initial=initial_values, organisation=organisation)
 
+    messages: List[Dict[str, Any]] = []
+    if billing_service_exception:
+        messages.append(add_membership_billing_error_message)
+
     return render(
         request,
         "add_organisation_membership.html",
@@ -695,6 +740,7 @@ def add_organisation_membership(request: HttpRequest, pk: int) -> HttpResponse:
             "organisation": organisation,
             "current_membership": current_membership,
             "latest_membership": latest_membership,
+            "show_messages": messages,
         },
     )
 

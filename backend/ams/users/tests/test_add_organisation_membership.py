@@ -1,10 +1,11 @@
 from datetime import timedelta
+from unittest.mock import Mock, patch
 
 from dateutil.tz import gettz
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import mail
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.utils import timezone
 from django.utils.formats import date_format
 
@@ -248,3 +249,58 @@ Click the link below to review the organisation.
 https://testserver/organisations/view/{self.organisation.pk}
 """,
             )
+
+    @override_settings(BILLING_SERVICE_CLASS="ams.billing.service.NullBillingService")
+    @patch("ams.billing.service.NullBillingService.update_organisation_billing_details")
+    def test_should_update_organisation_billing_details(self, mock_update_organisation_billing_details: Mock) -> None:
+        # Given
+        start_date = self.organisation_membership.start_date + self.organisation_membership.membership_option.duration
+
+        membership_option = MembershipOption.objects.get(name="Second Membership Option")
+
+        form_values = {
+            "start_date": date_format(start_date, format=settings.SHORT_DATE_FORMAT),
+            "membership_option": membership_option.name,
+        }
+
+        # When
+        response = self.client.post(self.url, form_values)
+        self.assertEqual(302, response.status_code)
+
+        # Then
+        mock_update_organisation_billing_details.assert_called_with(self.organisation)
+
+    @override_settings(BILLING_SERVICE_CLASS="ams.billing.service.NullBillingService")
+    @patch("ams.billing.service.NullBillingService.update_organisation_billing_details")
+    def test_should_show_message_when_error_updating_billing_details(
+        self, mock_update_organisation_billing_details: Mock
+    ) -> None:
+        # Given
+        mock_update_organisation_billing_details.side_effect = Exception("any exception")
+
+        start_date = self.organisation_membership.start_date + self.organisation_membership.membership_option.duration
+
+        membership_option = MembershipOption.objects.get(name="Second Membership Option")
+
+        form_values = {
+            "start_date": date_format(start_date, format=settings.SHORT_DATE_FORMAT),
+            "membership_option": membership_option.name,
+        }
+
+        # When
+        response = self.client.post(self.url, form_values)
+        self.assertEqual(200, response.status_code)
+
+        # Then
+        expected_messages = [
+            {
+                "value": (
+                    "The billing contact could not be created. "
+                    "The membership could not be added. "
+                    "Please try to add the membership again. "
+                    "If this message reappears please contact the site administrator."
+                ),
+                "type": "error",
+            }
+        ]
+        self.assertEqual(expected_messages, response.context.get("show_messages"))

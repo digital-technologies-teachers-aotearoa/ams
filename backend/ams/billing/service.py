@@ -15,6 +15,14 @@ class BillingService:
         raise NotImplementedError
 
 
+class NullBillingService:
+    def update_user_billing_details(self, user: User) -> None:
+        return
+
+    def update_organisation_billing_details(self, organisation: Organisation) -> None:
+        return
+
+
 def get_billing_service() -> Optional[BillingService]:
     if settings.BILLING_SERVICE_CLASS:
         service_class = import_string(settings.BILLING_SERVICE_CLASS)
