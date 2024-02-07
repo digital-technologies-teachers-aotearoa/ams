@@ -27,6 +27,8 @@ from django_filters.views import FilterView
 from django_tables2 import MultiTableMixin, SingleTableMixin, SingleTableView, Table
 from registration.models import RegistrationProfile
 
+from ams.billing.models import Account
+
 from ..base.models import EmailConfirmationPage
 from ..forum.views import forum_sync_user_profile
 from .filters import UserMembershipFilter
@@ -82,6 +84,8 @@ def individual_registration(request: HttpRequest) -> HttpResponse:
                 password=form_data["password"],
             )
 
+            Account.objects.create(user=new_user)
+
             membership_option = MembershipOption.objects.get(name=form_data["membership_option"])
             UserMembership.objects.create(
                 user=new_user,
@@ -126,7 +130,10 @@ def create_organisation(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         form = OrganisationForm(request.POST)
         if form.is_valid():
-            form.save()
+            organisation: Organisation = form.save()
+
+            Account.objects.create(organisation=organisation)
+
             admin_organisations_url = reverse("admin-organisations")
             return HttpResponseRedirect(admin_organisations_url + "?organisation_created=true")
     else:
@@ -430,6 +437,8 @@ def register_organisation_member(request: HttpRequest, invite_token: str) -> Htt
                 last_name=form_data["last_name"],
                 password=form_data["password"],
             )
+
+            Account.objects.create(user=new_user)
 
             organisation_member.user = new_user
             organisation_member.accepted_datetime = timezone.localtime()

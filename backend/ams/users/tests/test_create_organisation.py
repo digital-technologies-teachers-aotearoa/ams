@@ -74,16 +74,20 @@ class CreateOrganisationFormTests(TestCase):
 
         organisation = Organisation.objects.get(name=self.form_values["name"])
 
-        self.assertEqual(organisation.name, self.form_values["name"])
-        self.assertEqual(organisation.type.id, self.form_values["type"])
-        self.assertEqual(organisation.telephone, self.form_values["telephone"])
-        self.assertEqual(organisation.contact_name, self.form_values["contact_name"])
-        self.assertEqual(organisation.email, self.form_values["email"])
-        self.assertEqual(organisation.street_address, self.form_values["street_address"])
-        self.assertEqual(organisation.suburb, self.form_values["suburb"])
-        self.assertEqual(organisation.city, self.form_values["city"])
-        self.assertEqual(organisation.postal_code, self.form_values["postal_code"])
-        self.assertEqual(organisation.postal_address, self.form_values["postal_address"])
+        with self.subTest("created expected organisation"):
+            self.assertEqual(organisation.name, self.form_values["name"])
+            self.assertEqual(organisation.type.id, self.form_values["type"])
+            self.assertEqual(organisation.telephone, self.form_values["telephone"])
+            self.assertEqual(organisation.contact_name, self.form_values["contact_name"])
+            self.assertEqual(organisation.email, self.form_values["email"])
+            self.assertEqual(organisation.street_address, self.form_values["street_address"])
+            self.assertEqual(organisation.suburb, self.form_values["suburb"])
+            self.assertEqual(organisation.city, self.form_values["city"])
+            self.assertEqual(organisation.postal_code, self.form_values["postal_code"])
+            self.assertEqual(organisation.postal_address, self.form_values["postal_address"])
+
+        with self.subTest("created organisation billing account"):
+            self.assertIsNotNone(organisation.account, None)
 
     def test_should_validate_email(self) -> None:
         # Given
