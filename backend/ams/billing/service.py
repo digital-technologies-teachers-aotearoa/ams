@@ -1,10 +1,13 @@
-from typing import Optional
+from datetime import datetime
+from typing import Any, Dict, List, Optional
 
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.utils.module_loading import import_string
 
 from ams.users.models import Organisation
+
+from .models import Account
 
 
 class BillingService:
@@ -14,12 +17,22 @@ class BillingService:
     def update_organisation_billing_details(self, organisation: Organisation) -> None:
         raise NotImplementedError
 
+    def create_invoice(
+        self, account: Account, date: datetime, due_date: datetime, line_items: List[Dict[str, Any]]
+    ) -> None:
+        raise NotImplementedError
+
 
 class NullBillingService:
     def update_user_billing_details(self, user: User) -> None:
         return
 
     def update_organisation_billing_details(self, organisation: Organisation) -> None:
+        return
+
+    def create_invoice(
+        self, account: Account, date: datetime, due_date: datetime, line_items: List[Dict[str, Any]]
+    ) -> None:
         return
 
 

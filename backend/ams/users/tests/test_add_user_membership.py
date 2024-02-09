@@ -1,6 +1,8 @@
 from datetime import timedelta
+from decimal import Decimal
 from unittest.mock import Mock, patch
 
+from dateutil.relativedelta import relativedelta
 from dateutil.tz import gettz
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -9,7 +11,10 @@ from django.test import TestCase, override_settings
 from django.utils import timezone
 from django.utils.formats import date_format
 
-from ..models import MembershipOption, MembershipOptionType, UserMembership
+from ams.billing.models import Account
+from ams.test.utils import any_membership_option, any_user, any_user_membership
+
+from ..models import MembershipOption, UserMembership
 
 
 class AddUserMembershipTests(TestCase):
@@ -18,29 +23,17 @@ class AddUserMembershipTests(TestCase):
             username="testadminuser", first_name="Admin", email="user@example.com", is_staff=True
         )
 
-        self.user = User.objects.create_user(username="testuser", is_staff=False)
-        self.user.first_name = "John"
-        self.user.last_name = "Smith"
-        self.user.email = "user@example.com"
-        self.user.save()
+        self.user = any_user()
+        Account.objects.create(user=self.user)
 
         self.time_zone = gettz(settings.TIME_ZONE)
 
-        membership_option = MembershipOption.objects.create(
-            name="First Membership Option", type=MembershipOptionType.INDIVIDUAL, duration="P1M", cost="1.00"
-        )
-        MembershipOption.objects.create(
-            name="Second Membership Option", type=MembershipOptionType.INDIVIDUAL, duration="P2M", cost="2.00"
-        )
+        membership_option = any_membership_option(name="First Membership Option", duration="P1M", cost="1.00")
+        any_membership_option(name="Second Membership Option", duration="P2M", cost="2.00")
 
-        start = timezone.localtime() - timedelta(days=7)
-
-        self.user_membership = UserMembership.objects.create(
+        self.user_membership = any_user_membership(
             user=self.user,
             membership_option=membership_option,
-            created_datetime=start,
-            start_date=start.date(),
-            approved_datetime=start + timedelta(days=1),
         )
 
         self.url = f"/users/add-membership/{self.user.pk}/"
@@ -202,17 +195,26 @@ https://testserver/users/view/{user_membership.user.id}
 """,
             )
 
-    @override_settings(BILLING_SERVICE_CLASS="ams.billing.service.NullBillingService")
+
+@override_settings(BILLING_SERVICE_CLASS="ams.billing.service.NullBillingService")
+class AddUserMembershipBillingTests(TestCase):
+    def setUp(self) -> None:
+        self.user = any_user()
+        Account.objects.create(user=self.user)
+
+        self.user_membership = any_user_membership(user=self.user)
+
+        self.url = f"/users/add-membership/{self.user.pk}/"
+        self.client.force_login(self.user)
+
     @patch("ams.billing.service.NullBillingService.update_user_billing_details")
     def test_should_update_user_billing_details(self, mock_update_user_billing_details: Mock) -> None:
         # Given
         start_date = self.user_membership.start_date + self.user_membership.membership_option.duration
 
-        membership_option = MembershipOption.objects.get(name="Second Membership Option")
-
         form_values = {
             "start_date": date_format(start_date, format=settings.SHORT_DATE_FORMAT),
-            "membership_option": membership_option.name,
+            "membership_option": self.user_membership.membership_option.name,
         }
 
         # When
@@ -222,7 +224,6 @@ https://testserver/users/view/{user_membership.user.id}
         # Then
         mock_update_user_billing_details.assert_called_with(self.user)
 
-    @override_settings(BILLING_SERVICE_CLASS="ams.billing.service.NullBillingService")
     @patch("ams.billing.service.NullBillingService.update_user_billing_details")
     def test_should_show_message_when_error_updating_billing_details(
         self, mock_update_user_billing_details: Mock
@@ -232,11 +233,9 @@ https://testserver/users/view/{user_membership.user.id}
 
         start_date = self.user_membership.start_date + self.user_membership.membership_option.duration
 
-        membership_option = MembershipOption.objects.get(name="Second Membership Option")
-
         form_values = {
             "start_date": date_format(start_date, format=settings.SHORT_DATE_FORMAT),
-            "membership_option": membership_option.name,
+            "membership_option": self.user_membership.membership_option.name,
         }
 
         # When
@@ -248,6 +247,69 @@ https://testserver/users/view/{user_membership.user.id}
             {
                 "value": (
                     "The billing contact could not be created. "
+                    "The membership could not be added. "
+                    "Please try to add the membership again. "
+                    "If this message reappears please contact the site administrator."
+                ),
+                "type": "error",
+            }
+        ]
+        self.assertEqual(expected_messages, response.context.get("show_messages"))
+
+    @patch("ams.billing.service.NullBillingService.create_invoice")
+    def test_should_create_invoice(self, mock_create_invoice: Mock) -> None:
+        # Given
+        start_date = self.user_membership.start_date + self.user_membership.membership_option.duration
+
+        membership_option = self.user_membership.membership_option
+
+        form_values = {
+            "start_date": date_format(start_date, format=settings.SHORT_DATE_FORMAT),
+            "membership_option": membership_option.name,
+        }
+
+        # When
+        response = self.client.post(self.url, form_values)
+        self.assertEqual(302, response.status_code)
+
+        # Then
+        expected_line_items = [
+            {
+                "description": f"{membership_option.name} ${membership_option.cost} for 1 month",
+                "unit_amount": Decimal(membership_option.cost),
+                "quantity": 1,
+            }
+        ]
+
+        date = mock_create_invoice.call_args.args[1]
+        due_date = mock_create_invoice.call_args.args[2]
+
+        self.assertEqual(timezone.localtime().date(), date.date())
+        self.assertEqual(date + relativedelta(months=1), due_date)
+
+        mock_create_invoice.assert_called_with(self.user.account, date, due_date, expected_line_items)
+
+    @patch("ams.billing.service.NullBillingService.create_invoice")
+    def test_should_show_message_when_error_creating_invoice(self, mock_create_invoice: Mock) -> None:
+        # Given
+        mock_create_invoice.side_effect = Exception("any exception")
+
+        start_date = self.user_membership.start_date + self.user_membership.membership_option.duration
+
+        form_values = {
+            "start_date": date_format(start_date, format=settings.SHORT_DATE_FORMAT),
+            "membership_option": self.user_membership.membership_option.name,
+        }
+
+        # When
+        response = self.client.post(self.url, form_values)
+        self.assertEqual(200, response.status_code)
+
+        # Then
+        expected_messages = [
+            {
+                "value": (
+                    "The invoice could not be created. "
                     "The membership could not be added. "
                     "Please try to add the membership again. "
                     "If this message reappears please contact the site administrator."

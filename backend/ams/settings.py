@@ -131,6 +131,9 @@ class Common(Configuration):
     XERO_TENANT_ID = environ.get("XERO_TENANT_ID")
     XERO_CLIENT_ID = environ.get("XERO_CLIENT_ID")
     XERO_CLIENT_SECRET = environ.get("XERO_CLIENT_SECRET")
+    XERO_ACCOUNT_CODE = environ.get("XERO_ACCOUNT_CODE")
+    XERO_AMOUNT_TYPE = environ.get("XERO_AMOUNT_TYPE")
+    XERO_CURRENCY_CODE = environ.get("XERO_CURRENCY_CODE")
 
     # Password validation
     # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

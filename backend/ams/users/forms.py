@@ -1,4 +1,5 @@
 from datetime import date
+from decimal import Decimal
 from typing import Any, Dict, List, Optional, Tuple
 
 from dateutil.relativedelta import relativedelta
@@ -69,12 +70,24 @@ def format_membership_duration(duration: relativedelta) -> Any:
     return format_lazy("{} {}", count, translated_unit)
 
 
+def format_membership_option_cost_and_duration(cost: Decimal, duration: relativedelta) -> Any:
+    return format_lazy("${} {} {}", cost, _("for"), format_membership_duration(duration))
+
+
+def format_membership_option_description(membership_option: MembershipOption) -> Any:
+    return format_lazy(
+        "{} {}",
+        membership_option.name,
+        format_membership_option_cost_and_duration(membership_option.cost, membership_option.duration),
+    )
+
+
 def get_membership_options(option_type: Any) -> List[Tuple[str, str]]:
     membership_options = MembershipOption.objects.filter(type=option_type).order_by("id")
     return [
         (
             option.name,
-            format_lazy("${} {} {}", option.cost, _("for"), format_membership_duration(option.duration)),
+            format_membership_option_cost_and_duration(option.cost, option.duration),
         )
         for option in membership_options
     ]
