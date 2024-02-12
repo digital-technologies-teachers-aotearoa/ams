@@ -6,6 +6,7 @@ from dateutil.relativedelta import relativedelta
 from dateutil.tz import gettz
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
 from django.core import mail
 from django.test import TestCase, override_settings
 from django.utils import timezone
@@ -199,6 +200,8 @@ class AddOrganisationMembershipTests(TestCase):
 
     def test_should_create_expected_membership(self) -> None:
         # Given
+        site = Site.objects.get()
+
         start_date = self.organisation_membership.start_date + self.organisation_membership.membership_option.duration
 
         membership_option = MembershipOption.objects.get(name="Second Membership Option")
@@ -235,7 +238,7 @@ class AddOrganisationMembershipTests(TestCase):
 
 Click the link below to review the organisation.
 
-https://testserver/organisations/view/{self.organisation.pk}
+https://{site.domain}/organisations/view/{self.organisation.pk}
 """,
             )
 

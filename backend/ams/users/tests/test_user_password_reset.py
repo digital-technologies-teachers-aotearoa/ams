@@ -1,6 +1,7 @@
 import re
 
-from django.contrib.sites.requests import RequestSite
+from django.contrib.sites.models import Site
+from django.contrib.sites.shortcuts import get_current_site
 from django.core import mail
 from django.test import RequestFactory, TestCase
 from registration.models import RegistrationProfile
@@ -11,7 +12,7 @@ class UserPasswordResetTests(TestCase):
         request = RequestFactory().get("/")
 
         self.user = RegistrationProfile.objects.create_inactive_user(
-            RequestSite(request),
+            get_current_site(request),
             send_email=False,
             username="user@example.com",
             email="user@example.com",
@@ -23,6 +24,8 @@ class UserPasswordResetTests(TestCase):
         self.user.save()
 
     def test_password_reset_sends_expected_email(self) -> None:
+        site = Site.objects.get()
+
         # When
         with self.captureOnCommitCallbacks(execute=True):
             response = self.client.post("/users/password/reset/", {"email": self.user.email})
@@ -31,7 +34,7 @@ class UserPasswordResetTests(TestCase):
         self.assertEqual(302, response.status_code)
         self.assertEqual(response.url, "/users/password/reset/done/")
         self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(mail.outbox[0].subject, "Password reset on testserver")
+        self.assertEqual(mail.outbox[0].subject, f"Password reset on {site.name}")
 
         body = mail.outbox[0].body
         body = re.sub(r"/confirm/[A-za-z0-9-/]+", "/confirm/TOKEN", body, count=2)
@@ -42,11 +45,11 @@ class UserPasswordResetTests(TestCase):
             f"""Hello {self.user.first_name},
 
 You are receiving this email because you (or someone pretending to be you)
-requested that your password be reset on testserver. If you do not
+requested that your password be reset on {site.name}. If you do not
 wish to reset your password, please ignore this message.
 
 To reset your password, please click the following link:
 
-https://testserver/users/password/reset/confirm/TOKEN
+https://{site.domain}/users/password/reset/confirm/TOKEN
 """,
         )
