@@ -12,7 +12,7 @@ from django.test import TestCase, override_settings
 from django.utils import timezone
 from django.utils.formats import date_format
 
-from ams.billing.models import Account
+from ams.billing.models import Account, Invoice
 from ams.test.utils import any_membership_option, any_organisation, any_user
 
 from ..models import (
@@ -243,7 +243,7 @@ https://{site.domain}/organisations/view/{self.organisation.pk}
             )
 
 
-@override_settings(BILLING_SERVICE_CLASS="ams.billing.service.NullBillingService")
+@override_settings(BILLING_SERVICE_CLASS="ams.billing.service.MockBillingService")
 class AddOrganisationMembershipBillingTests(TestCase):
     def setUp(self) -> None:
         self.user = any_user()
@@ -277,7 +277,7 @@ class AddOrganisationMembershipBillingTests(TestCase):
         self.url = f"/users/organisations/add-membership/{self.organisation.pk}/"
         self.client.force_login(self.user)
 
-    @patch("ams.billing.service.NullBillingService.update_organisation_billing_details")
+    @patch("ams.billing.service.MockBillingService.update_organisation_billing_details")
     def test_should_update_organisation_billing_details(self, mock_update_organisation_billing_details: Mock) -> None:
         # Given
         start_date = self.organisation_membership.start_date + self.organisation_membership.membership_option.duration
@@ -294,7 +294,7 @@ class AddOrganisationMembershipBillingTests(TestCase):
         # Then
         mock_update_organisation_billing_details.assert_called_with(self.organisation)
 
-    @patch("ams.billing.service.NullBillingService.update_organisation_billing_details")
+    @patch("ams.billing.service.MockBillingService.update_organisation_billing_details")
     def test_should_show_message_when_error_updating_billing_details(
         self, mock_update_organisation_billing_details: Mock
     ) -> None:
@@ -326,9 +326,12 @@ class AddOrganisationMembershipBillingTests(TestCase):
         ]
         self.assertEqual(expected_messages, response.context.get("show_messages"))
 
-    @patch("ams.billing.service.NullBillingService.create_invoice")
+    @patch("ams.billing.service.MockBillingService.create_invoice")
     def test_should_create_invoice(self, mock_create_invoice: Mock) -> None:
         # Given
+        invoice_number = "mock-invoice-number"
+        mock_create_invoice.return_value = invoice_number
+
         start_date = self.organisation_membership.start_date + self.organisation_membership.membership_option.duration
 
         membership_option = self.organisation_membership.membership_option
@@ -351,15 +354,27 @@ class AddOrganisationMembershipBillingTests(TestCase):
             }
         ]
 
-        date = mock_create_invoice.call_args.args[1]
+        issue_date = mock_create_invoice.call_args.args[1]
         due_date = mock_create_invoice.call_args.args[2]
 
-        self.assertEqual(timezone.localtime().date(), date.date())
-        self.assertEqual(date + relativedelta(months=1), due_date)
+        with self.subTest("should use expected issue date and due date"):
+            self.assertEqual(timezone.localtime().date(), issue_date.date())
+            self.assertEqual(issue_date + relativedelta(months=1), due_date)
 
-        mock_create_invoice.assert_called_with(self.organisation.account, date, due_date, expected_line_items)
+        with self.subTest("should call create_invoice with expected values"):
+            mock_create_invoice.assert_called_with(self.organisation.account, issue_date, due_date, expected_line_items)
 
-    @patch("ams.billing.service.NullBillingService.create_invoice")
+        with self.subTest("should create expected invoice record"):
+            invoice = Invoice.objects.get()
+
+            self.assertEqual(invoice.invoice_number, invoice_number)
+            self.assertEqual(invoice.account, self.organisation.account)
+            self.assertEqual(invoice.issue_date, issue_date.date())
+            self.assertEqual(invoice.due_date, due_date.date())
+            self.assertEqual(invoice.amount, Decimal(membership_option.cost))
+            self.assertEqual(invoice.paid, Decimal("0"))
+
+    @patch("ams.billing.service.MockBillingService.create_invoice")
     def test_should_show_message_when_error_creating_invoice(self, mock_create_invoice: Mock) -> None:
         # Given
         mock_create_invoice.side_effect = Exception("any exception")

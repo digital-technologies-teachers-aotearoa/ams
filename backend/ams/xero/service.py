@@ -80,7 +80,7 @@ class XeroBillingService(BillingService):
 
     def _create_xero_invoice(
         self, contact_id: str, invoice_details: Dict[str, Any], line_item_details: List[Dict[str, Any]]
-    ) -> None:
+    ) -> str:
         api_instance = AccountingApi(self.api_client)
 
         contact = Contact(contact_id=contact_id)
@@ -90,7 +90,10 @@ class XeroBillingService(BillingService):
         invoice = Invoice(contact=contact, line_items=line_items, **invoice_details)
         invoices = Invoices(invoices=[invoice])
 
-        api_instance.create_invoices(settings.XERO_TENANT_ID, invoices)
+        api_response = api_instance.create_invoices(settings.XERO_TENANT_ID, invoices)
+
+        invoice_number: str = api_response.invoices[0].invoice_number
+        return invoice_number
 
     # NOTE: The name in xero needs to be unique so we combined a name with Account.id primary key
     # For this reason it is important to not to change the Account.id sequence without considering
@@ -135,7 +138,7 @@ class XeroBillingService(BillingService):
 
     def create_invoice(
         self, account: Account, date: datetime, due_date: datetime, line_items: List[Dict[str, Any]]
-    ) -> None:
+    ) -> str:
         contact_id = account.xero_contact.contact_id
 
         if not settings.XERO_ACCOUNT_CODE:
@@ -173,7 +176,7 @@ class XeroBillingService(BillingService):
             "line_amount_types": amount_type,
         }
 
-        self._create_xero_invoice(contact_id, invoice_details, line_items)
+        return self._create_xero_invoice(contact_id, invoice_details, line_items)
 
 
 class MockXeroBillingService(XeroBillingService):
@@ -188,5 +191,5 @@ class MockXeroBillingService(XeroBillingService):
 
     def _create_xero_invoice(
         self, contact_id: str, invoice_details: Dict[str, Any], line_item_details: List[Dict[str, Any]]
-    ) -> None:
-        return
+    ) -> str:
+        return "mock-invoice-number"

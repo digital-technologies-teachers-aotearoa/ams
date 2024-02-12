@@ -116,6 +116,9 @@ class XeroBillingServiceTests(TestCase):
     @patch("ams.xero.service.MockXeroBillingService._create_xero_invoice")
     def test_should_call_create_xero_invoice_with_expected_details(self, mock__create_xero_invoice: Mock) -> None:
         # Given
+        invoice_number = "mock-invoice-number"
+        mock__create_xero_invoice.return_value = invoice_number
+
         account = self.user.account
         contact_id = "fake-existing-contact-id"
         XeroContact.objects.create(account=account, contact_id=contact_id)
@@ -124,7 +127,7 @@ class XeroBillingServiceTests(TestCase):
         due_date = date + relativedelta(months=1)
 
         # When
-        self.billing_service.create_invoice(account, date, due_date, line_items)
+        returned_invoice_number = self.billing_service.create_invoice(account, date, due_date, line_items)
 
         # Then
         expected_invoice_details = {
@@ -146,3 +149,4 @@ class XeroBillingServiceTests(TestCase):
             for line_item in line_items
         ]
         mock__create_xero_invoice.assert_called_with(contact_id, expected_invoice_details, expected_line_item_details)
+        self.assertEqual(returned_invoice_number, invoice_number)

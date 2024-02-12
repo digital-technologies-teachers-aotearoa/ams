@@ -19,11 +19,11 @@ class BillingService:
 
     def create_invoice(
         self, account: Account, date: datetime, due_date: datetime, line_items: List[Dict[str, Any]]
-    ) -> None:
+    ) -> str:
         raise NotImplementedError
 
 
-class NullBillingService:
+class MockBillingService:
     def update_user_billing_details(self, user: User) -> None:
         return
 
@@ -32,8 +32,8 @@ class NullBillingService:
 
     def create_invoice(
         self, account: Account, date: datetime, due_date: datetime, line_items: List[Dict[str, Any]]
-    ) -> None:
-        return
+    ) -> str:
+        return "mock-invoice-number"
 
 
 def get_billing_service() -> Optional[BillingService]:
