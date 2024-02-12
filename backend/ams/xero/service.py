@@ -36,7 +36,7 @@ class XeroBillingService(BillingService):
 
         self.api_client = ApiClient(
             Configuration(
-                debug=True,
+                debug=settings.DEBUG,
                 oauth2_token=OAuth2Token(
                     client_id=settings.XERO_CLIENT_ID,
                     client_secret=settings.XERO_CLIENT_SECRET,
