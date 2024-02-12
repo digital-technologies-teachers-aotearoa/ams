@@ -22,6 +22,7 @@ from wagtail import urls as wagtail_urls
 from wagtail.admin import urls as wagtailadmin_urls
 from wagtail.documents import urls as wagtaildocs_urls
 
+from ams.billing.urls import urlpatterns as billing_urlpatterns
 from ams.forum.urls import urlpatterns as forum_urlpatterns
 from ams.users.urls import urlpatterns as users_urlpatterns
 
@@ -45,6 +46,7 @@ if settings.DEBUG:
 urlpatterns += i18n_patterns(
     path("forum/", include(forum_urlpatterns)),
     path("users/", include(users_urlpatterns)),
+    path("billing/", include(billing_urlpatterns)),
     path("", include(wagtail_urls)),
     prefix_default_language=False,
 )

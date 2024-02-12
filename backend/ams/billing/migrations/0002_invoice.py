@@ -19,6 +19,7 @@ class Migration(migrations.Migration):
                 ("due_date", models.DateField()),
                 ("amount", models.DecimalField(decimal_places=2, max_digits=10)),
                 ("paid", models.DecimalField(decimal_places=2, max_digits=10)),
+                ("due", models.DecimalField(decimal_places=2, max_digits=10)),
                 (
                     "account",
                     models.ForeignKey(

@@ -57,6 +57,7 @@ def create_membership_option_invoice(account: Account, membership_option: Member
             issue_date=issue_date.date(),
             due_date=due_date.date(),
             amount=membership_option.cost,
+            due=membership_option.cost,
             paid=0,
         )
 

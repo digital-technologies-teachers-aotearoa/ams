@@ -34,3 +34,4 @@ class Invoice(Model):
     due_date = DateField()
     amount = DecimalField(max_digits=10, decimal_places=2)
     paid = DecimalField(max_digits=10, decimal_places=2)
+    due = DecimalField(max_digits=10, decimal_places=2)
