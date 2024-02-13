@@ -1,4 +1,4 @@
-from sys import stderr
+import logging
 
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
@@ -8,6 +8,8 @@ from ams.users.models import MembershipOption
 
 from .models import Account
 from .service import get_billing_service
+
+logger = logging.getLogger(__name__)
 
 
 class BillingException(Exception):
@@ -34,7 +36,7 @@ def create_membership_option_invoice(account: Account, membership_option: Member
             billing_service.update_organisation_billing_details(account.organisation)
 
     except Exception as e:
-        print(f"Error updating account {account.pk} billing details: {e}", file=stderr)
+        logger.error(f"Error updating account {account.pk} billing details: {e}")
         raise BillingDetailUpdateException(e)
 
     try:
@@ -52,5 +54,5 @@ def create_membership_option_invoice(account: Account, membership_option: Member
         billing_service.create_invoice(account, issue_date, due_date, invoice_line_items)
 
     except Exception as e:
-        print(f"Error creating invoice for account {account.pk}: {e}", file=stderr)
+        logger.error(f"Error creating invoice for account {account.pk}: {e}")
         raise BillingInvoiceException(e)
