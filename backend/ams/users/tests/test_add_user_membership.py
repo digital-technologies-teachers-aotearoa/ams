@@ -12,7 +12,7 @@ from django.test import TestCase, override_settings
 from django.utils import timezone
 from django.utils.formats import date_format
 
-from ams.billing.models import Account, Invoice
+from ams.billing.models import Account
 from ams.test.utils import any_membership_option, any_user, any_user_membership
 
 from ..models import MembershipOption, UserMembership
@@ -296,16 +296,6 @@ class AddUserMembershipBillingTests(TestCase):
 
         with self.subTest("should call create_invoice with expected values"):
             mock_create_invoice.assert_called_with(self.user.account, issue_date, due_date, expected_line_items)
-
-        with self.subTest("should create expected invoice record"):
-            invoice = Invoice.objects.get()
-
-            self.assertEqual(invoice.invoice_number, invoice_number)
-            self.assertEqual(invoice.account, self.user.account)
-            self.assertEqual(invoice.issue_date, issue_date.date())
-            self.assertEqual(invoice.due_date, due_date.date())
-            self.assertEqual(invoice.amount, Decimal(membership_option.cost))
-            self.assertEqual(invoice.paid, Decimal("0"))
 
     @patch("ams.billing.service.MockBillingService.create_invoice")
     def test_should_show_message_when_error_creating_invoice(self, mock_create_invoice: Mock) -> None:

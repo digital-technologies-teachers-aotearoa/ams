@@ -6,22 +6,15 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.http.response import HttpResponse
-from xero_python.accounting import (
-    AccountingApi,
-    Contact,
-    Contacts,
-    CurrencyCode,
-    Invoice,
-    Invoices,
-    LineAmountTypes,
-    LineItem,
-)
+from xero_python.accounting import AccountingApi, Contact, Contacts, CurrencyCode
+from xero_python.accounting import Invoice as AccountingInvoice
+from xero_python.accounting import Invoices, LineAmountTypes, LineItem
 from xero_python.api_client import ApiClient
 from xero_python.api_client.configuration import Configuration
 from xero_python.api_client.oauth2 import OAuth2Token
 from xero_python.api_client.serializer import serialize
 
-from ams.billing.models import Account
+from ams.billing.models import Account, Invoice
 from ams.billing.service import BillingService
 from ams.users.models import Organisation
 
@@ -80,20 +73,20 @@ class XeroBillingService(BillingService):
 
     def _create_xero_invoice(
         self, contact_id: str, invoice_details: Dict[str, Any], line_item_details: List[Dict[str, Any]]
-    ) -> str:
+    ) -> AccountingInvoice:
         api_instance = AccountingApi(self.api_client)
 
         contact = Contact(contact_id=contact_id)
 
         line_items = [LineItem(**item_details) for item_details in line_item_details]
 
-        invoice = Invoice(contact=contact, line_items=line_items, **invoice_details)
+        invoice = AccountingInvoice(contact=contact, line_items=line_items, **invoice_details)
         invoices = Invoices(invoices=[invoice])
 
         api_response = api_instance.create_invoices(settings.XERO_TENANT_ID, invoices)
 
-        invoice_number: str = api_response.invoices[0].invoice_number
-        return invoice_number
+        response_invoice: Invoice = api_response.invoices[0]
+        return response_invoice
 
     # NOTE: The name in xero needs to be unique so we combined a name with Account.id primary key
     # For this reason it is important to not to change the Account.id sequence without considering
@@ -138,7 +131,7 @@ class XeroBillingService(BillingService):
 
     def create_invoice(
         self, account: Account, date: datetime, due_date: datetime, line_items: List[Dict[str, Any]]
-    ) -> str:
+    ) -> None:
         contact_id = account.xero_contact.contact_id
 
         if not settings.XERO_ACCOUNT_CODE:
@@ -176,7 +169,17 @@ class XeroBillingService(BillingService):
             "line_amount_types": amount_type,
         }
 
-        return self._create_xero_invoice(contact_id, invoice_details, line_items)
+        invoice = self._create_xero_invoice(contact_id, invoice_details, line_items)
+
+        Invoice.objects.create(
+            account=account,
+            invoice_number=invoice.invoice_number,
+            issue_date=invoice.date,
+            due_date=invoice.due_date,
+            amount=invoice.total,
+            due=invoice.amount_due,
+            paid=invoice.amount_paid,
+        )
 
 
 class MockXeroBillingService(XeroBillingService):
@@ -191,5 +194,17 @@ class MockXeroBillingService(XeroBillingService):
 
     def _create_xero_invoice(
         self, contact_id: str, invoice_details: Dict[str, Any], line_item_details: List[Dict[str, Any]]
-    ) -> str:
-        return "mock-invoice-number"
+    ) -> AccountingInvoice:
+        total = 0
+        for line_item in line_item_details:
+            total += line_item["unit_amount"] * line_item["quantity"]
+
+        invoice: AccountingInvoice = AccountingInvoice(
+            invoice_number="INV-1234",
+            date=str(invoice_details["date"].date()),
+            due_date=str(invoice_details["due_date"].date()),
+            total=total,
+            amount_due=total,
+            amount_paid=0,
+        )
+        return invoice

@@ -6,7 +6,7 @@ from django.utils import timezone
 from ams.users.forms import format_membership_option_description
 from ams.users.models import MembershipOption
 
-from .models import Account, Invoice
+from .models import Account
 from .service import get_billing_service
 
 
@@ -49,17 +49,7 @@ def create_membership_option_invoice(account: Account, membership_option: Member
         issue_date = timezone.localtime()
         due_date = issue_date + relativedelta(months=1)
 
-        invoice_number = billing_service.create_invoice(account, issue_date, due_date, invoice_line_items)
-
-        Invoice.objects.create(
-            account=account,
-            invoice_number=invoice_number,
-            issue_date=issue_date.date(),
-            due_date=due_date.date(),
-            amount=membership_option.cost,
-            due=membership_option.cost,
-            paid=0,
-        )
+        billing_service.create_invoice(account, issue_date, due_date, invoice_line_items)
 
     except Exception as e:
         print(f"Error creating invoice for account {account.pk}: {e}", file=stderr)
