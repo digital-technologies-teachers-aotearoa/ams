@@ -122,24 +122,24 @@ class XeroBillingServiceTests(TestCase):
         contact_id = "fake-existing-contact-id"
         XeroContact.objects.create(account=account, contact_id=contact_id)
         line_items = [{"description": "any description", "unit_amount": Decimal("123.45"), "quantity": 1}]
-        date = timezone.localtime()
-        due_date = date + relativedelta(months=1)
+        issue_date = timezone.localdate()
+        due_date = issue_date + relativedelta(months=1)
 
         mock__create_xero_invoice.return_value = AccountingInvoice(
             invoice_number="INV-1234",
-            date=str(date.date()),
-            due_date=str(due_date.date()),
+            date=str(issue_date),
+            due_date=str(due_date),
             total=line_items[0]["unit_amount"],
             amount_due=line_items[0]["unit_amount"],
             amount_paid=0,
         )
 
         # When
-        self.billing_service.create_invoice(account, date, due_date, line_items)
+        self.billing_service.create_invoice(account, issue_date, due_date, line_items)
 
         # Then
         expected_invoice_details = {
-            "date": date,
+            "date": issue_date,
             "due_date": due_date,
             "type": "ACCREC",
             "status": "AUTHORISED",
@@ -164,19 +164,19 @@ class XeroBillingServiceTests(TestCase):
         contact_id = "fake-existing-contact-id"
         XeroContact.objects.create(account=account, contact_id=contact_id)
         line_items = [{"description": "any description", "unit_amount": Decimal("123.45"), "quantity": 1}]
-        date = timezone.localtime()
-        due_date = date + relativedelta(months=1)
+        issue_date = timezone.localdate()
+        due_date = issue_date + relativedelta(months=1)
 
         # When
-        self.billing_service.create_invoice(account, date, due_date, line_items)
+        self.billing_service.create_invoice(account, issue_date, due_date, line_items)
 
         # Then
         invoice = Invoice.objects.get()
 
         self.assertEqual(invoice.invoice_number, "INV-1234")
         self.assertEqual(invoice.account, self.user.account)
-        self.assertEqual(invoice.issue_date, date.date())
-        self.assertEqual(invoice.due_date, due_date.date())
+        self.assertEqual(invoice.issue_date, issue_date)
+        self.assertEqual(invoice.due_date, due_date)
         self.assertEqual(invoice.amount, line_items[0]["unit_amount"])
         self.assertEqual(invoice.due, line_items[0]["unit_amount"])
         self.assertEqual(invoice.paid, Decimal("0"))

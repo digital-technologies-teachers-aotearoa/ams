@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date
 from typing import Any, Dict, List, Optional
 
 from django.conf import settings
@@ -17,9 +17,7 @@ class BillingService:
     def update_organisation_billing_details(self, organisation: Organisation) -> None:
         raise NotImplementedError
 
-    def create_invoice(
-        self, account: Account, date: datetime, due_date: datetime, line_items: List[Dict[str, Any]]
-    ) -> None:
+    def create_invoice(self, account: Account, date: date, due_date: date, line_items: List[Dict[str, Any]]) -> None:
         raise NotImplementedError
 
 
@@ -30,9 +28,7 @@ class MockBillingService:
     def update_organisation_billing_details(self, organisation: Organisation) -> None:
         return
 
-    def create_invoice(
-        self, account: Account, date: datetime, due_date: datetime, line_items: List[Dict[str, Any]]
-    ) -> None:
+    def create_invoice(self, account: Account, date: date, due_date: date, line_items: List[Dict[str, Any]]) -> None:
         return
 
 

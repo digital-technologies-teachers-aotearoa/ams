@@ -358,7 +358,7 @@ class AddOrganisationMembershipBillingTests(TestCase):
         due_date = mock_create_invoice.call_args.args[2]
 
         with self.subTest("should use expected issue date and due date"):
-            self.assertEqual(timezone.localtime().date(), issue_date.date())
+            self.assertEqual(timezone.localdate(), issue_date)
             self.assertEqual(issue_date + relativedelta(months=1), due_date)
 
         with self.subTest("should call create_invoice with expected values"):

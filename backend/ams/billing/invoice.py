@@ -46,7 +46,7 @@ def create_membership_option_invoice(account: Account, membership_option: Member
             }
         ]
 
-        issue_date = timezone.localtime()
+        issue_date = timezone.localdate()
         due_date = issue_date + relativedelta(months=1)
 
         billing_service.create_invoice(account, issue_date, due_date, invoice_line_items)

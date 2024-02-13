@@ -1,5 +1,5 @@
 import json
-from datetime import datetime
+from datetime import date
 from typing import Any, Dict, List, Optional
 
 from django.conf import settings
@@ -129,9 +129,7 @@ class XeroBillingService(BillingService):
 
             XeroContact.objects.create(account=account, contact_id=contact_id)
 
-    def create_invoice(
-        self, account: Account, date: datetime, due_date: datetime, line_items: List[Dict[str, Any]]
-    ) -> None:
+    def create_invoice(self, account: Account, date: date, due_date: date, line_items: List[Dict[str, Any]]) -> None:
         contact_id = account.xero_contact.contact_id
 
         if not settings.XERO_ACCOUNT_CODE:
@@ -201,8 +199,8 @@ class MockXeroBillingService(XeroBillingService):
 
         invoice: AccountingInvoice = AccountingInvoice(
             invoice_number="INV-1234",
-            date=str(invoice_details["date"].date()),
-            due_date=str(invoice_details["due_date"].date()),
+            date=str(invoice_details["date"]),
+            due_date=str(invoice_details["due_date"]),
             total=total,
             amount_due=total,
             amount_paid=0,
