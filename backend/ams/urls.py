@@ -43,6 +43,11 @@ if settings.DEBUG:
     urlpatterns += staticfiles_urlpatterns()
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
+if "ams.xero" in settings.INSTALLED_APPS:
+    from ams.xero.urls import urlpatterns as xero_urlpatterns
+
+    urlpatterns += [path("xero/", include(xero_urlpatterns))]
+
 urlpatterns += i18n_patterns(
     path("forum/", include(forum_urlpatterns)),
     path("users/", include(users_urlpatterns)),

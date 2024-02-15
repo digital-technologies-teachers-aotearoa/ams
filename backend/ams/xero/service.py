@@ -85,8 +85,14 @@ class XeroBillingService(BillingService):
 
         api_response = api_instance.create_invoices(settings.XERO_TENANT_ID, invoices)
 
-        response_invoice: Invoice = api_response.invoices[0]
+        response_invoice: AccountingInvoice = api_response.invoices[0]
         return response_invoice
+
+    def _get_xero_invoices(self, invoice_ids: List[str]) -> List[AccountingInvoice]:
+        api_instance = AccountingApi(self.api_client)
+        api_response = api_instance.get_invoices(settings.XERO_TENANT_ID, i_ds=invoice_ids)
+        invoices: List[AccountingInvoice] = api_response.invoices
+        return invoices
 
     # NOTE: The name in xero needs to be unique so we combined a name with Account.id primary key
     # For this reason it is important to not to change the Account.id sequence without considering
@@ -179,6 +185,20 @@ class XeroBillingService(BillingService):
             paid=invoice.amount_paid,
         )
 
+    def update_invoices(self, invoice_ids: List[str]) -> None:
+        self._get_authentication_token()
+
+        invoices: List[AccountingInvoice] = self._get_xero_invoices(invoice_ids)
+        for accounting_invoice in invoices:
+            invoice = Invoice.objects.filter(invoice_number=accounting_invoice.invoice_number).first()
+            if invoice:
+                invoice.amount = accounting_invoice.total
+                invoice.issue_date = accounting_invoice.date
+                invoice.due_date = accounting_invoice.due_date
+                invoice.paid = accounting_invoice.amount_paid
+                invoice.due = accounting_invoice.amount_due
+                invoice.save()
+
 
 class MockXeroBillingService(XeroBillingService):
     def _get_authentication_token(self) -> None:
@@ -189,6 +209,9 @@ class MockXeroBillingService(XeroBillingService):
 
     def _update_xero_contact(self, contact_id: str, contact_params: Dict[str, Any]) -> None:
         return
+
+    def _get_xero_invoices(self, invoice_ids: List[str]) -> List[AccountingInvoice]:
+        return []
 
     def _create_xero_invoice(
         self, contact_id: str, invoice_details: Dict[str, Any], line_item_details: List[Dict[str, Any]]

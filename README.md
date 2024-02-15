@@ -143,3 +143,13 @@ Recreate/Empty the Discourse database:
 
 To use Xero as your billing service set `BILLING_SERVICE_CLASS` to `ams.xero.service.XeroBillingService`
 in your `.env` file as well as the XERO prefixed variables.
+
+To receive updates to your invoices you need to setup [Xero webhooks](https://developer.xero.com/documentation/guides/webhooks/creating-webhooks).
+
+Configure Xero to call '/xero/webhooks/' on your website and set `XERO_WEBHOOK_KEY` to the key provided.
+
+For testing purposes you can use a proxy service like [Ngrok](https://ngrok.com/) to pass Xero webhook events to your local development server.
+
+Here is a tutorial on [how to setup Xero webhooks with Ngrok](https://ngrok.com/docs/integrations/xero/webhooks/). Command line:
+
+    ngrok http --host-header ams.local http://ams.local
