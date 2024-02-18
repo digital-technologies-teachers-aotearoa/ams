@@ -71,6 +71,9 @@ class IndividualRegistrationFormTests(TestCase):
             self.assertEqual(user_membership.membership_option.name, self.form_values["membership_option"])
             self.assertIsNone(user_membership.approved_datetime)
 
+        with self.subTest("created user billing account"):
+            self.assertIsNotNone(user.account, None)
+
         with self.subTest("verification email sent"):
             activation_key = RegistrationProfile.objects.get(user=user).activation_key
 

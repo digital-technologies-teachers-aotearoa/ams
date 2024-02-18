@@ -271,6 +271,9 @@ class OrganisationUserRegistrationFormTests(TestCase):
             self.assertEqual(new_user.last_name, self.form_values["last_name"])
             self.assertEqual(new_user.is_active, False)
 
+        with self.subTest("created user billing account"):
+            self.assertIsNotNone(self.organisation_member.user.account, None)
+
         with self.subTest("verification email sent"):
             activation_key = RegistrationProfile.objects.get(user=new_user).activation_key
 

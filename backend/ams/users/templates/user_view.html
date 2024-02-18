@@ -23,6 +23,10 @@
             </h1>
             <div class="content">
                 <p><a href="mailto:{{user_detail.email | urlencode}}">{{user_detail.email}}</a></p>
+
+                <p><label>{% translate "Account Number" %}:</label>
+                <br>{{ user_detail.account.pk }}</p>
+
                 <a href="{% url "edit-user-profile" user_detail.pk %}">{% translate "Edit Profile" %}</a>
                 <br><a href="javascript:{}" onclick="$('#profile_image_file').click();">
                     {% translate "Upload Profile Image" %}
