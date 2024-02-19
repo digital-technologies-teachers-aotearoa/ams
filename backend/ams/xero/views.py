@@ -12,6 +12,7 @@ from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
+from ams.billing.models import Invoice
 from ams.billing.service import BillingService, get_billing_service
 from ams.xero.service import XeroBillingService
 
@@ -27,7 +28,7 @@ def process_events(payload: Dict[str, Any]) -> None:
     if not billing_service or not isinstance(billing_service, XeroBillingService):
         return
 
-    invoice_ids: List[str] = []
+    billing_service_invoice_ids: List[str] = []
 
     events = payload["events"]
     for event in events:
@@ -36,11 +37,13 @@ def process_events(payload: Dict[str, Any]) -> None:
             and event["eventType"] == "UPDATE"
             and event["tenantId"] == settings.XERO_TENANT_ID
         ):
-            resourceId: str = event["resourceId"]
-            invoice_ids.append(resourceId)
+            billing_service_invoice_id: str = event["resourceId"]
 
-    if invoice_ids:
-        billing_service.update_invoices(invoice_ids)
+            if Invoice.objects.filter(billing_service_invoice_id=billing_service_invoice_id).exists():
+                billing_service_invoice_ids.append(billing_service_invoice_id)
+
+    if billing_service_invoice_ids:
+        billing_service.update_invoices(billing_service_invoice_ids)
 
 
 def verify_request_signature(request: HttpRequest) -> bool:

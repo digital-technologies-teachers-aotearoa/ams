@@ -77,12 +77,14 @@ class XeroWebhooksTests(TestCase):
     def test_should_update_invoice(self, mock__get_xero_invoices: Mock) -> None:
         # Given
         invoice_number = "INV-1234"
+        billing_service_invoice_id = "c576f965-e2fb-359f-7ea8-135424ae31d6"
 
         user = any_user()
         Account.objects.create(user=user)
 
         invoice = Invoice.objects.create(
             account=user.account,
+            billing_service_invoice_id=billing_service_invoice_id,
             invoice_number=invoice_number,
             issue_date=timezone.localdate(),
             due_date=timezone.localdate() + relativedelta(months=1),
@@ -92,7 +94,7 @@ class XeroWebhooksTests(TestCase):
         )
 
         updated_invoice = AccountingInvoice(
-            invoice_id="invoice-id",
+            invoice_id=billing_service_invoice_id,
             invoice_number=invoice_number,
             date=timezone.localdate() + relativedelta(days=1),
             due_date=timezone.localdate() + relativedelta(months=2),
@@ -126,6 +128,7 @@ class XeroWebhooksTests(TestCase):
 
         invoice.refresh_from_db()
 
+        self.assertEqual(invoice.billing_service_invoice_id, billing_service_invoice_id)
         self.assertEqual(invoice.invoice_number, invoice_number)
         self.assertEqual(invoice.issue_date, updated_invoice.date)
         self.assertEqual(invoice.due_date, updated_invoice.due_date)
@@ -133,28 +136,11 @@ class XeroWebhooksTests(TestCase):
         self.assertEqual(invoice.paid, updated_invoice.amount_paid)
         self.assertEqual(invoice.due, updated_invoice.amount_due)
 
-    @patch("ams.xero.service.MockXeroBillingService._get_xero_invoices")
-    def test_should_not_update_different_invoice(self, mock__get_xero_invoices: Mock) -> None:
+    @patch("ams.xero.service.MockXeroBillingService.update_invoices")
+    def test_should_not_update_unknown_invoice(self, mock_update_invoices: Mock) -> None:
         # Given
-        invoice_number = "INV-1234"
-
-        user = any_user()
-        Account.objects.create(user=user)
-
-        original_paid = 0
-
-        invoice = Invoice.objects.create(
-            account=user.account,
-            invoice_number=invoice_number,
-            issue_date=timezone.localdate(),
-            due_date=timezone.localdate() + relativedelta(months=1),
-            amount=100,
-            due=100,
-            paid=original_paid,
-        )
-
-        different_invoice = AccountingInvoice(
-            invoice_id="invoice-id",
+        unknown_invoice = AccountingInvoice(
+            invoice_id="f376f962-d2fe-259c-6fa1-235424ae31d5",
             invoice_number="INV-9999",
             date=timezone.localdate() + relativedelta(days=1),
             due_date=timezone.localdate() + relativedelta(months=2),
@@ -163,15 +149,13 @@ class XeroWebhooksTests(TestCase):
             amount_paid=100,
         )
 
-        mock__get_xero_invoices.return_value = [different_invoice]
-
         payload = {
             "events": [
                 {
                     "eventCategory": "INVOICE",
                     "eventType": "UPDATE",
                     "tenantId": settings.XERO_TENANT_ID,
-                    "resourceId": different_invoice.invoice_id,
+                    "resourceId": unknown_invoice.invoice_id,
                 }
             ]
         }
@@ -184,12 +168,7 @@ class XeroWebhooksTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
         # Then
-        mock__get_xero_invoices.assert_called_with([different_invoice.invoice_id])
-
-        invoice.refresh_from_db()
-
-        self.assertEqual(invoice.invoice_number, invoice_number)
-        self.assertEqual(invoice.paid, original_paid)
+        mock_update_invoices.assert_not_called()
 
     @patch("ams.xero.service.MockXeroBillingService._get_xero_invoices")
     def test_should_ignore_event_for_different_tenant(self, mock__get_xero_invoices: Mock) -> None:

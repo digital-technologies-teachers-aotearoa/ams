@@ -88,9 +88,9 @@ class XeroBillingService(BillingService):
         response_invoice: AccountingInvoice = api_response.invoices[0]
         return response_invoice
 
-    def _get_xero_invoices(self, invoice_ids: List[str]) -> List[AccountingInvoice]:
+    def _get_xero_invoices(self, billing_service_invoice_ids: List[str]) -> List[AccountingInvoice]:
         api_instance = AccountingApi(self.api_client)
-        api_response = api_instance.get_invoices(settings.XERO_TENANT_ID, i_ds=invoice_ids)
+        api_response = api_instance.get_invoices(settings.XERO_TENANT_ID, i_ds=billing_service_invoice_ids)
         invoices: List[AccountingInvoice] = api_response.invoices
         return invoices
 
@@ -177,6 +177,7 @@ class XeroBillingService(BillingService):
 
         Invoice.objects.create(
             account=account,
+            billing_service_invoice_id=invoice.invoice_id,
             invoice_number=invoice.invoice_number,
             issue_date=invoice.date,
             due_date=invoice.due_date,
@@ -185,19 +186,18 @@ class XeroBillingService(BillingService):
             paid=invoice.amount_paid,
         )
 
-    def update_invoices(self, invoice_ids: List[str]) -> None:
+    def update_invoices(self, billing_service_invoice_ids: List[str]) -> None:
         self._get_authentication_token()
 
-        invoices: List[AccountingInvoice] = self._get_xero_invoices(invoice_ids)
+        invoices: List[AccountingInvoice] = self._get_xero_invoices(billing_service_invoice_ids)
         for accounting_invoice in invoices:
-            invoice = Invoice.objects.filter(invoice_number=accounting_invoice.invoice_number).first()
-            if invoice:
-                invoice.amount = accounting_invoice.total
-                invoice.issue_date = accounting_invoice.date
-                invoice.due_date = accounting_invoice.due_date
-                invoice.paid = accounting_invoice.amount_paid
-                invoice.due = accounting_invoice.amount_due
-                invoice.save()
+            invoice = Invoice.objects.get(billing_service_invoice_id=accounting_invoice.invoice_id)
+            invoice.amount = accounting_invoice.total
+            invoice.issue_date = accounting_invoice.date
+            invoice.due_date = accounting_invoice.due_date
+            invoice.paid = accounting_invoice.amount_paid
+            invoice.due = accounting_invoice.amount_due
+            invoice.save()
 
 
 class MockXeroBillingService(XeroBillingService):
@@ -221,6 +221,7 @@ class MockXeroBillingService(XeroBillingService):
             total += line_item["unit_amount"] * line_item["quantity"]
 
         invoice: AccountingInvoice = AccountingInvoice(
+            invoice_id="e576f965-f2fb-459f-9ea8-035424ae31d7",
             invoice_number="INV-1234",
             date=str(invoice_details["date"]),
             due_date=str(invoice_details["due_date"]),
