@@ -1,0 +1,32 @@
+from typing import Optional
+
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.utils.module_loading import import_string
+
+from ams.users.models import Organisation
+
+
+class BillingService:
+    def update_user_billing_details(self, user: User) -> None:
+        raise NotImplementedError
+
+    def update_organisation_billing_details(self, organisation: Organisation) -> None:
+        raise NotImplementedError
+
+
+class NullBillingService:
+    def update_user_billing_details(self, user: User) -> None:
+        return
+
+    def update_organisation_billing_details(self, organisation: Organisation) -> None:
+        return
+
+
+def get_billing_service() -> Optional[BillingService]:
+    if settings.BILLING_SERVICE_CLASS:
+        service_class = import_string(settings.BILLING_SERVICE_CLASS)
+        billing_service: BillingService = service_class()
+        return billing_service
+
+    return None

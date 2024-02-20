@@ -59,9 +59,9 @@ compile-translations:
 test-backend:
 	./docker_compose run -T --rm --entrypoint="poetry run pytest $(TESTS)" backend
 
-.PHONY: test-backend-reuse-db
-test-backend-reuse-db:
-	./docker_compose run -T --rm --entrypoint="poetry run pytest --reuse-db $(TESTS)" backend
+.PHONY: test-dtta-backend
+test-dtta-backend:
+	./docker_compose run -T --rm --entrypoint="poetry run pytest --ds=ams.dtta.settings $(TESTS)" backend
 
 .PHONY: lint-python
 lint-python:
