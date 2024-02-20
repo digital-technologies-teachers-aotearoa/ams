@@ -18,6 +18,8 @@ from ams.test.utils import any_user
 if "ams.xero" not in settings.INSTALLED_APPS:
     pytest.skip(reason="ams.xero not in INSTALLED_APPS", allow_module_level=True)
 
+from ..views import fetch_updated_invoice_details
+
 
 @override_settings(
     BILLING_SERVICE_CLASS="ams.xero.service.MockXeroBillingService",
@@ -91,6 +93,7 @@ class XeroWebhooksTests(TestCase):
             amount=100,
             due=100,
             paid=0,
+            update_needed=False,
         )
 
         updated_invoice = AccountingInvoice(
@@ -135,6 +138,53 @@ class XeroWebhooksTests(TestCase):
         self.assertEqual(invoice.amount, updated_invoice.total)
         self.assertEqual(invoice.paid, updated_invoice.amount_paid)
         self.assertEqual(invoice.due, updated_invoice.amount_due)
+        self.assertEqual(invoice.update_needed, False)
+
+    @patch("ams.xero.service.MockXeroBillingService._get_xero_invoices")
+    def test_should_flag_invoice_as_update_needed_if_error(self, mock__get_xero_invoices: Mock) -> None:
+        # Given
+        invoice_number = "INV-1234"
+        billing_service_invoice_id = "c576f965-e2fb-359f-7ea8-135424ae31d6"
+
+        user = any_user()
+        Account.objects.create(user=user)
+
+        invoice = Invoice.objects.create(
+            account=user.account,
+            billing_service_invoice_id=billing_service_invoice_id,
+            invoice_number=invoice_number,
+            issue_date=timezone.localdate(),
+            due_date=timezone.localdate() + relativedelta(months=1),
+            amount=100,
+            due=100,
+            paid=0,
+            update_needed=False,
+        )
+
+        payload = {
+            "events": [
+                {
+                    "eventCategory": "INVOICE",
+                    "eventType": "UPDATE",
+                    "tenantId": settings.XERO_TENANT_ID,
+                    "resourceId": billing_service_invoice_id,
+                }
+            ]
+        }
+
+        mock__get_xero_invoices.side_effect = Exception("any exception")
+
+        request_body = json.dumps(payload).encode("utf-8")
+        headers = {"x-xero-signature": self._generate_signature(request_body)}
+
+        # When
+        response = self.client.post(self.url, content_type="application/json", data=request_body, headers=headers)
+        self.assertEqual(response.status_code, 200)
+        mock__get_xero_invoices.assert_called_with([billing_service_invoice_id])
+
+        # Then
+        invoice.refresh_from_db()
+        self.assertEqual(invoice.update_needed, True)
 
     @patch("ams.xero.service.MockXeroBillingService.update_invoices")
     def test_should_not_update_unknown_invoice(self, mock_update_invoices: Mock) -> None:
@@ -241,3 +291,75 @@ class XeroWebhooksTests(TestCase):
 
         # Then
         mock__get_xero_invoices.assert_not_called()
+
+
+@override_settings(
+    BILLING_SERVICE_CLASS="ams.xero.service.MockXeroBillingService",
+    XERO_WEBHOOK_KEY="xero-webhook-key",
+    XERO_TENANT_ID="xero-tenant-id",
+)
+class FetchUpdatedInvoiceTests(TestCase):
+    def setUp(self) -> None:
+        return
+
+    @patch("ams.xero.service.MockXeroBillingService._get_xero_invoices")
+    def test_should_update_invoice_marked_as_update_needed(self, mock__get_xero_invoices: Mock) -> None:
+        # Given
+        invoice_number = "INV-1234"
+        billing_service_invoice_id = "c576f965-e2fb-359f-7ea8-135424ae31d6"
+
+        user = any_user()
+        Account.objects.create(user=user)
+
+        invoice = Invoice.objects.create(
+            account=user.account,
+            billing_service_invoice_id=billing_service_invoice_id,
+            invoice_number=invoice_number,
+            issue_date=timezone.localdate(),
+            due_date=timezone.localdate() + relativedelta(months=1),
+            amount=100,
+            due=100,
+            paid=0,
+            update_needed=True,
+        )
+
+        Invoice.objects.create(
+            account=user.account,
+            billing_service_invoice_id="f376f962-d2fe-259c-6fa1-235424ae31d5",
+            invoice_number="INV-4321",
+            issue_date=timezone.localdate(),
+            due_date=timezone.localdate() + relativedelta(months=1),
+            amount=99,
+            due=99,
+            paid=0,
+            update_needed=False,
+        )
+
+        updated_invoice = AccountingInvoice(
+            invoice_id=billing_service_invoice_id,
+            invoice_number=invoice_number,
+            date=timezone.localdate() + relativedelta(days=1),
+            due_date=timezone.localdate() + relativedelta(months=2),
+            total=101,
+            amount_due=99,
+            amount_paid=2,
+        )
+
+        mock__get_xero_invoices.return_value = [updated_invoice]
+
+        # When
+        fetch_updated_invoice_details()
+
+        # Then
+        mock__get_xero_invoices.assert_called_with([billing_service_invoice_id])
+
+        invoice.refresh_from_db()
+
+        self.assertEqual(invoice.billing_service_invoice_id, billing_service_invoice_id)
+        self.assertEqual(invoice.invoice_number, invoice_number)
+        self.assertEqual(invoice.issue_date, updated_invoice.date)
+        self.assertEqual(invoice.due_date, updated_invoice.due_date)
+        self.assertEqual(invoice.amount, updated_invoice.total)
+        self.assertEqual(invoice.paid, updated_invoice.amount_paid)
+        self.assertEqual(invoice.due, updated_invoice.amount_due)
+        self.assertEqual(invoice.update_needed, False)

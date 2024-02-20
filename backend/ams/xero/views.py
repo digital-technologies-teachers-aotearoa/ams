@@ -3,8 +3,7 @@ import hashlib
 import hmac
 import json
 import logging
-from functools import partial
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, Optional
 
 from django.conf import settings
 from django.db import transaction
@@ -18,17 +17,48 @@ from ams.xero.service import XeroBillingService
 
 logger = logging.getLogger(__name__)
 
+INVOICE_FETCH_UPDATE_LIMIT = 20
+
 
 @transaction.atomic
-def process_events(payload: Dict[str, Any]) -> None:
+def fetch_updated_invoice_details(raise_exception: bool = False) -> None:
+    billing_service: Optional[BillingService] = get_billing_service()
+    if not billing_service or not isinstance(billing_service, XeroBillingService):
+        return
+
+    invoices = (
+        Invoice.objects.select_for_update(no_key=True)
+        .filter(update_needed=True, billing_service_invoice_id__isnull=False)
+        .order_by("id")[:INVOICE_FETCH_UPDATE_LIMIT]
+    )
+
+    if not invoices:
+        return
+
+    billing_service_invoice_ids = [invoice.billing_service_invoice_id for invoice in invoices]
+
+    invoice_numbers = ", ".join([invoice.invoice_number for invoice in invoices])
+    logger.info(f"Updating details of invoices {invoice_numbers} from Xero")
+
+    try:
+        invoice_numbers = ", ".join([invoice.invoice_number for invoice in invoices])
+        logger.info(f"Updating details of invoices {invoice_numbers} from Xero")
+
+        billing_service.update_invoices(billing_service_invoice_ids)
+    except Exception as e:
+        if not raise_exception:
+            logger.error(f"Error processing invoice updates: {e}")
+        else:
+            raise e
+
+
+def process_invoice_update_events(payload: Dict[str, Any]) -> None:
     if not settings.XERO_TENANT_ID:
         raise Exception("XERO_TENANT_ID setting not configured")
 
     billing_service: Optional[BillingService] = get_billing_service()
     if not billing_service or not isinstance(billing_service, XeroBillingService):
         return
-
-    billing_service_invoice_ids: List[str] = []
 
     events = payload["events"]
     for event in events:
@@ -38,12 +68,7 @@ def process_events(payload: Dict[str, Any]) -> None:
             and event["tenantId"] == settings.XERO_TENANT_ID
         ):
             billing_service_invoice_id: str = event["resourceId"]
-
-            if Invoice.objects.filter(billing_service_invoice_id=billing_service_invoice_id).exists():
-                billing_service_invoice_ids.append(billing_service_invoice_id)
-
-    if billing_service_invoice_ids:
-        billing_service.update_invoices(billing_service_invoice_ids)
+            Invoice.objects.filter(billing_service_invoice_id=billing_service_invoice_id).update(update_needed=True)
 
 
 def verify_request_signature(request: HttpRequest) -> bool:
@@ -80,5 +105,6 @@ def xero_webhooks(request: HttpRequest) -> HttpResponse:
         return HttpResponse(status=401)
 
     payload = json.loads(request.body)
+    process_invoice_update_events(payload)
 
-    return AfterHttpResponse(on_close=partial(process_events, payload), status=200)
+    return AfterHttpResponse(on_close=fetch_updated_invoice_details, status=200)

@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.db.models import (
     CASCADE,
+    BooleanField,
     CharField,
     CheckConstraint,
     DateField,
@@ -36,3 +37,4 @@ class Invoice(Model):
     paid = DecimalField(max_digits=10, decimal_places=2)
     due = DecimalField(max_digits=10, decimal_places=2)
     billing_service_invoice_id = CharField(max_length=255, unique=True, null=True)
+    update_needed = BooleanField(default=False)

@@ -14,4 +14,9 @@ class Migration(migrations.Migration):
             name="billing_service_invoice_id",
             field=models.CharField(max_length=255, null=True, unique=True),
         ),
+        migrations.AddField(
+            model_name="invoice",
+            name="update_needed",
+            field=models.BooleanField(default=False),
+        ),
     ]
