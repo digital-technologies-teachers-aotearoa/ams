@@ -144,6 +144,9 @@ Recreate/Empty the Discourse database:
 To use Xero as your billing service set `BILLING_SERVICE_CLASS` to `ams.xero.service.XeroBillingService`
 in your `.env` file as well as the XERO prefixed variables.
 
+To prevent accidentally emailing invoices while testing, set `BILLING_EMAIL_WHITELIST_REGEX` to
+a [regular expression](https://docs.python.org/3/library/re.html#regular-expression-syntax) matching email addresses that should receive invoices. E.g. '@example\.com$'.
+
 To receive updates to your invoices you need to setup [Xero webhooks](https://developer.xero.com/documentation/guides/webhooks/creating-webhooks).
 
 Configure Xero to call '/xero/webhooks/' on your website and set `XERO_WEBHOOK_KEY` to the key provided.

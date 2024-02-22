@@ -8,7 +8,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http.response import HttpResponse
 from xero_python.accounting import AccountingApi, Contact, Contacts, CurrencyCode
 from xero_python.accounting import Invoice as AccountingInvoice
-from xero_python.accounting import Invoices, LineAmountTypes, LineItem
+from xero_python.accounting import Invoices, LineAmountTypes, LineItem, RequestEmpty
 from xero_python.api_client import ApiClient
 from xero_python.api_client.configuration import Configuration
 from xero_python.api_client.oauth2 import OAuth2Token
@@ -50,7 +50,8 @@ class XeroBillingService(BillingService):
         return HttpResponse(json.dumps(serialize(data)), content_type="application/json")
 
     def _get_authentication_token(self) -> None:
-        self.api_client.get_client_credentials_token()
+        if not self.get_xero_token():
+            self.api_client.get_client_credentials_token()
 
     def _create_xero_contact(self, contact_params: Dict[str, Any]) -> str:
         api_instance = AccountingApi(self.api_client)
@@ -87,6 +88,10 @@ class XeroBillingService(BillingService):
 
         response_invoice: AccountingInvoice = api_response.invoices[0]
         return response_invoice
+
+    def _email_invoice(self, billing_service_invoice_id: str) -> None:
+        api_instance = AccountingApi(self.api_client)
+        api_instance.email_invoice(settings.XERO_TENANT_ID, billing_service_invoice_id, RequestEmpty())
 
     def _get_xero_invoices(self, billing_service_invoice_ids: List[str]) -> List[AccountingInvoice]:
         api_instance = AccountingApi(self.api_client)
@@ -135,7 +140,7 @@ class XeroBillingService(BillingService):
 
             XeroContact.objects.create(account=account, contact_id=contact_id)
 
-    def create_invoice(self, account: Account, date: date, due_date: date, line_items: List[Dict[str, Any]]) -> None:
+    def create_invoice(self, account: Account, date: date, due_date: date, line_items: List[Dict[str, Any]]) -> Invoice:
         contact_id = account.xero_contact.contact_id
 
         if not settings.XERO_ACCOUNT_CODE:
@@ -173,18 +178,25 @@ class XeroBillingService(BillingService):
             "line_amount_types": amount_type,
         }
 
-        invoice = self._create_xero_invoice(contact_id, invoice_details, line_items)
+        accounting_invoice = self._create_xero_invoice(contact_id, invoice_details, line_items)
 
-        Invoice.objects.create(
+        invoice: Invoice = Invoice.objects.create(
             account=account,
-            billing_service_invoice_id=invoice.invoice_id,
-            invoice_number=invoice.invoice_number,
-            issue_date=invoice.date,
-            due_date=invoice.due_date,
-            amount=invoice.total,
-            due=invoice.amount_due,
-            paid=invoice.amount_paid,
+            billing_service_invoice_id=accounting_invoice.invoice_id,
+            invoice_number=accounting_invoice.invoice_number,
+            issue_date=accounting_invoice.date,
+            due_date=accounting_invoice.due_date,
+            amount=accounting_invoice.total,
+            due=accounting_invoice.amount_due,
+            paid=accounting_invoice.amount_paid,
         )
+
+        return invoice
+
+    def email_invoice(self, invoice: Invoice) -> None:
+        self._get_authentication_token()
+
+        self._email_invoice(invoice.billing_service_invoice_id)
 
     def update_invoices(self, billing_service_invoice_ids: List[str]) -> None:
         self._get_authentication_token()
@@ -211,8 +223,11 @@ class MockXeroBillingService(XeroBillingService):
     def _update_xero_contact(self, contact_id: str, contact_params: Dict[str, Any]) -> None:
         return
 
-    def _get_xero_invoices(self, invoice_ids: List[str]) -> List[AccountingInvoice]:
+    def _get_xero_invoices(self, billing_service_invoice_ids: List[str]) -> List[AccountingInvoice]:
         return []
+
+    def _email_invoice(self, billing_service_invoice_id: str) -> None:
+        return
 
     def _create_xero_invoice(
         self, contact_id: str, invoice_details: Dict[str, Any], line_item_details: List[Dict[str, Any]]

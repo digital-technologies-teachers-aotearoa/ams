@@ -12,7 +12,7 @@ from django.test import TestCase, override_settings
 from django.utils import timezone
 from django.utils.formats import date_format
 
-from ams.billing.models import Account
+from ams.billing.models import Account, Invoice
 from ams.test.utils import any_membership_option, any_user, any_user_membership
 
 from ..models import MembershipOption, UserMembership
@@ -262,8 +262,17 @@ class AddUserMembershipBillingTests(TestCase):
     @patch("ams.billing.service.MockBillingService.create_invoice")
     def test_should_create_invoice(self, mock_create_invoice: Mock) -> None:
         # Given
-        invoice_number = "mock-invoice-number"
-        mock_create_invoice.return_value = invoice_number
+        invoice = Invoice.objects.create(
+            account=self.user.account,
+            invoice_number="INV-1234",
+            billing_service_invoice_id=None,
+            issue_date=timezone.localdate(),
+            due_date=timezone.localdate(),
+            amount=100,
+            paid=0,
+            due=0,
+        )
+        mock_create_invoice.return_value = invoice
 
         start_date = self.user_membership.start_date + self.user_membership.membership_option.duration
 
@@ -296,6 +305,76 @@ class AddUserMembershipBillingTests(TestCase):
 
         with self.subTest("should call create_invoice with expected values"):
             mock_create_invoice.assert_called_with(self.user.account, issue_date, due_date, expected_line_items)
+
+        with self.subTest("should associate invoice with user membership"):
+            new_membership = UserMembership.objects.filter(user=self.user).order_by("-id").first()
+            self.assertEqual(new_membership.invoice, invoice)
+
+    @override_settings(BILLING_EMAIL_WHITELIST_REGEX=None)
+    @patch("ams.billing.service.MockBillingService.email_invoice")
+    def test_should_email_invoice(self, mock_email_invoice: Mock) -> None:
+        # Given
+        start_date = self.user_membership.start_date + self.user_membership.membership_option.duration
+        membership_option = self.user_membership.membership_option
+
+        form_values = {
+            "start_date": date_format(start_date, format=settings.SHORT_DATE_FORMAT),
+            "membership_option": membership_option.name,
+        }
+
+        # When
+        with self.captureOnCommitCallbacks(execute=True):
+            response = self.client.post(self.url, form_values)
+            self.assertEqual(302, response.status_code)
+
+        # Then
+        mock_email_invoice.assert_called()
+
+    @override_settings(BILLING_EMAIL_WHITELIST_REGEX=r"@example\.com$")
+    @patch("ams.billing.service.MockBillingService.email_invoice")
+    def test_should_email_invoice_to_domain_on_whitelist(self, mock_email_invoice: Mock) -> None:
+        # Given
+        self.user.email = "name@example.com"
+        self.user.save()
+
+        start_date = self.user_membership.start_date + self.user_membership.membership_option.duration
+        membership_option = self.user_membership.membership_option
+
+        form_values = {
+            "start_date": date_format(start_date, format=settings.SHORT_DATE_FORMAT),
+            "membership_option": membership_option.name,
+        }
+
+        # When
+        with self.captureOnCommitCallbacks(execute=True):
+            response = self.client.post(self.url, form_values)
+            self.assertEqual(302, response.status_code)
+
+        # Then
+        mock_email_invoice.assert_called()
+
+    @override_settings(BILLING_EMAIL_WHITELIST_REGEX=r"@example\.com$")
+    @patch("ams.billing.service.MockBillingService.email_invoice")
+    def test_should_not_email_invoice_to_domain_not_on_whitelist(self, mock_email_invoice: Mock) -> None:
+        # Given
+        self.user.email = "name@otherdomain.com"
+        self.user.save()
+
+        start_date = self.user_membership.start_date + self.user_membership.membership_option.duration
+        membership_option = self.user_membership.membership_option
+
+        form_values = {
+            "start_date": date_format(start_date, format=settings.SHORT_DATE_FORMAT),
+            "membership_option": membership_option.name,
+        }
+
+        # When
+        with self.captureOnCommitCallbacks(execute=True):
+            response = self.client.post(self.url, form_values)
+            self.assertEqual(302, response.status_code)
+
+        # Then
+        mock_email_invoice.assert_not_called()
 
     @patch("ams.billing.service.MockBillingService.create_invoice")
     def test_should_show_message_when_error_creating_invoice(self, mock_create_invoice: Mock) -> None:
