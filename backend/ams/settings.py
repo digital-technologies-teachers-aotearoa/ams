@@ -121,6 +121,22 @@ class Common(Configuration):
         }
     }
 
+    # Logging
+    # https://docs.djangoproject.com/en/4.2/topics/logging/
+
+    LOGGING = {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "handlers": {
+            "console": {
+                "class": "logging.StreamHandler",
+            },
+        },
+        "loggers": {
+            "ams": {"handlers": ["console"], "level": environ.get("LOG_LEVEL", "INFO"), "propagate": True},
+        },
+    }
+
     # Discourse integration
     DISCOURSE_API_KEY = environ.get("DISCOURSE_API_KEY")
     DISCOURSE_API_USERNAME = environ.get("DISCOURSE_API_USERNAME")
