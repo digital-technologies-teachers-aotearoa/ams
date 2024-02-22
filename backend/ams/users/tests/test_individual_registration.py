@@ -1,6 +1,7 @@
 from typing import Any, Dict
 
 from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
 from django.core import mail
 from django.test import TestCase
 from registration.models import RegistrationProfile
@@ -49,6 +50,9 @@ class IndividualRegistrationFormTests(TestCase):
         self.assertTemplateUsed(response, "individual_registration.html")
 
     def test_post_completed_form_to_endpoint_creates_expected_user(self) -> None:
+        # Given
+        site = Site.objects.get()
+
         # When
         with self.captureOnCommitCallbacks(execute=True):
             response = self.client.post("/users/individual-registration/", self.form_values)
@@ -78,17 +82,17 @@ class IndividualRegistrationFormTests(TestCase):
             activation_key = RegistrationProfile.objects.get(user=user).activation_key
 
             self.assertEqual(len(mail.outbox), 1)
-            self.assertEqual(mail.outbox[0].subject, "Account activation on testserver")
+            self.assertEqual(mail.outbox[0].subject, f"Account activation on {site.name}")
             self.maxDiff = None
             self.assertEqual(
                 mail.outbox[0].body,
                 f"""Hello {user.first_name},
 
-You're almost ready to start enjoying testserver.
+You're almost ready to start enjoying {site.name}.
 
 Simply click the link below to verify your email address.
 
-https://testserver/users/activate/{activation_key}/
+https://{site.domain}/users/activate/{activation_key}/
 """,
             )
 

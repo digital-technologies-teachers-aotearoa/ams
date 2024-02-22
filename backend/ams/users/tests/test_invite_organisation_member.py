@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
 from django.core import mail
 from django.test import TestCase
 from django.utils import timezone
@@ -74,6 +75,8 @@ class InviteOrganisationMemberFormTests(TestCase):
         self.assertTemplateUsed(response, "invite_organisation_member.html")
 
     def test_invite_existing_user_email_to_organisation(self) -> None:
+        site = Site.objects.get()
+
         existing_user = User.objects.create_user(
             username="existinguser", first_name="John", email="user@example.com", is_staff=False, is_active=True
         )
@@ -97,15 +100,16 @@ class InviteOrganisationMemberFormTests(TestCase):
             mail.outbox[0].body,
             f"""Hello {existing_user.first_name},
 
-You have been invited to join the organisation {self.organisation.name} in testserver.
+You have been invited to join the organisation {self.organisation.name} in {site.name}.
 
 Click the link below to accept the invitation.
 
-https://testserver/users/accept-invite/{organisation_member.invite_token}/
+https://{site.domain}/users/accept-invite/{organisation_member.invite_token}/
 """,
         )
 
     def test_invite_non_user_email_to_organisation(self) -> None:
+        site = Site.objects.get()
         email = "non-user@example.com"
 
         with self.captureOnCommitCallbacks(execute=True):
@@ -125,11 +129,11 @@ https://testserver/users/accept-invite/{organisation_member.invite_token}/
         self.assertEqual(len(organisation_member.invite_token), 64)
         self.assertEqual(
             mail.outbox[0].body,
-            f"""You have been invited to join the organisation {self.organisation.name} in testserver.
+            f"""You have been invited to join the organisation {self.organisation.name} in {site.name}.
 
 Click the link below to accept the invitation.
 
-https://testserver/users/register-member/{organisation_member.invite_token}/
+https://{site.domain}/users/register-member/{organisation_member.invite_token}/
 
 You will be asked to provide a password when accepting the invitation. """
             """After that you will be given access to the project and will be able to login.
@@ -251,6 +255,8 @@ class OrganisationUserRegistrationFormTests(TestCase):
 
     def test_new_user_registers_as_organisation_member(self) -> None:
         # Given
+        site = Site.objects.get()
+
         with self.captureOnCommitCallbacks(execute=True):
             response = self.client.post(self.url, self.form_values)
 
@@ -278,17 +284,17 @@ class OrganisationUserRegistrationFormTests(TestCase):
             activation_key = RegistrationProfile.objects.get(user=new_user).activation_key
 
             self.assertEqual(len(mail.outbox), 1)
-            self.assertEqual(mail.outbox[0].subject, "Account activation on testserver")
+            self.assertEqual(mail.outbox[0].subject, f"Account activation on {site.name}")
 
             self.assertEqual(
                 mail.outbox[0].body,
                 f"""Hello {new_user.first_name},
 
-You're almost ready to start enjoying testserver.
+You're almost ready to start enjoying {site.name}.
 
 Simply click the link below to verify your email address.
 
-https://testserver/users/activate/{activation_key}/
+https://{site.domain}/users/activate/{activation_key}/
 """,
             )
 

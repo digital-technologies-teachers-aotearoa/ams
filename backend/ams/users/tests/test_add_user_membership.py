@@ -6,6 +6,7 @@ from dateutil.relativedelta import relativedelta
 from dateutil.tz import gettz
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
 from django.core import mail
 from django.test import TestCase, override_settings
 from django.utils import timezone
@@ -156,6 +157,8 @@ class AddUserMembershipTests(TestCase):
 
     def test_should_create_expected_membership(self) -> None:
         # Given
+        site = Site.objects.get()
+
         start_date = self.user_membership.start_date + self.user_membership.membership_option.duration
 
         membership_option = MembershipOption.objects.get(name="Second Membership Option")
@@ -191,7 +194,7 @@ A user has added a new membership and needs approval.
 
 Click the link below to review the user and approve their membership.
 
-https://testserver/users/view/{user_membership.user.id}
+https://{site.domain}/users/view/{user_membership.user.id}
 """,
             )
 

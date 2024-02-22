@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
-from django.contrib.sites.requests import RequestSite
+from django.contrib.sites.models import Site
+from django.contrib.sites.shortcuts import get_current_site
 from django.core import mail
 from django.test import RequestFactory, TestCase
 from django.utils import timezone
@@ -13,7 +14,7 @@ class UserActivationTests(TestCase):
         request = RequestFactory().get("/")
 
         self.user = RegistrationProfile.objects.create_inactive_user(
-            RequestSite(request),
+            get_current_site(request),
             send_email=False,
             username="user@example.com",
             email="user@example.com",
@@ -68,6 +69,8 @@ class UserActivationTests(TestCase):
             first_name="John", username="staff", is_staff=True, is_active=True, email="user@example.com"
         )
 
+        site = Site.objects.get()
+
         # When
         with self.captureOnCommitCallbacks(execute=True):
             response = self.client.get(f"/users/activate/{activation_key}/")
@@ -81,11 +84,11 @@ class UserActivationTests(TestCase):
             mail.outbox[0].body,
             f"""Hello {staff_user.first_name},
 
-A new user has registered for testserver and needs approval.
+A new user has registered for {site.name} and needs approval.
 
 Click the link below to review the user and approve their membership.
 
-https://testserver/users/view/{self.user.id}
+https://{site.domain}/users/view/{self.user.id}
 """,
         )
 

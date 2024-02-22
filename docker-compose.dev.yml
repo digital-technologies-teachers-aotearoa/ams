@@ -10,6 +10,7 @@ x-dev-backend-environment: &dev-backend-environment
   - EMAIL_HOST
   - EMAIL_HOST_USER
   - EMAIL_HOST_PASSWORD
+  - APPLICATION_SITE_NAME
   - APPLICATION_WEB_HOST
   - APPLICATION_VERSION
   - APPLICATION_DB_HOST

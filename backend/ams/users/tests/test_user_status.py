@@ -1,7 +1,7 @@
 from datetime import timedelta
 
 from dateutil.relativedelta import relativedelta
-from django.contrib.sites.requests import RequestSite
+from django.contrib.sites.shortcuts import get_current_site
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -24,7 +24,8 @@ class UserStatusTests(TestCase):
         request = RequestFactory().get("/")
 
         self.user = RegistrationProfile.objects.create_inactive_user(
-            RequestSite(request),
+            get_current_site(request),
+            send_email=False,
             username="user@example.com",
             email="user@example.com",
             first_name="John",

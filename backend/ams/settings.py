@@ -51,6 +51,7 @@ class Common(Configuration):
         "django.contrib.sessions",
         "django.contrib.messages",
         "django.contrib.staticfiles",
+        "django.contrib.sites",
         "wagtail.contrib.forms",
         "wagtail.contrib.redirects",
         "wagtail.contrib.simple_translation",
@@ -193,6 +194,10 @@ class Common(Configuration):
     EMAIL_HOST_USER = environ.get("EMAIL_HOST_USER", "")
     EMAIL_HOST_PASSWORD = environ.get("EMAIL_HOST_PASSWORD", "")
     DEFAULT_FROM_EMAIL = environ.get("DEFAULT_FROM_EMAIL", "webmaster@localhost")
+
+    # Django
+    # https://docs.djangoproject.com/en/4.2/ref/contrib/sites/#enabling-the-sites-framework
+    SITE_ID = 1
 
     # Wagtail settings
     # https://docs.wagtail.org/en/stable/reference/settings.html
