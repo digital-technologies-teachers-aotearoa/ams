@@ -28,6 +28,9 @@ x-test-backend-environment: &test-backend-environment
   - XERO_TENANT_ID
   - XERO_CLIENT_ID
   - XERO_CLIENT_SECRET
+  - XERO_ACCOUNT_CODE
+  - XERO_AMOUNT_TYPE
+  - XERO_CURRENCY_CODE
 
 services:
   db:

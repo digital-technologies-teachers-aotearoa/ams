@@ -1,8 +1,12 @@
+from decimal import Decimal
 from unittest.mock import Mock, patch
 
 import pytest
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
-from django.test import TestCase
+from django.test import TestCase, override_settings
+from django.utils import timezone
+from xero_python.accounting import CurrencyCode, LineAmountTypes
 
 from ams.billing.models import Account
 from ams.test.utils import any_organisation, any_user
@@ -14,6 +18,7 @@ else:
     from ..service import MockXeroBillingService
 
 
+@override_settings(XERO_CURRENCY_CODE="NZD", XERO_ACCOUNT_CODE="200", XERO_AMOUNT_TYPE="INCLUSIVE")
 class XeroBillingServiceTests(TestCase):
     def setUp(self) -> None:
         self.user = any_user()
@@ -107,3 +112,37 @@ class XeroBillingServiceTests(TestCase):
         }
 
         mock__update_xero_contact.assert_called_with(contact_id, expected_contact_params)
+
+    @patch("ams.xero.service.MockXeroBillingService._create_xero_invoice")
+    def test_should_call_create_xero_invoice_with_expected_details(self, mock__create_xero_invoice: Mock) -> None:
+        # Given
+        account = self.user.account
+        contact_id = "fake-existing-contact-id"
+        XeroContact.objects.create(account=account, contact_id=contact_id)
+        line_items = [{"description": "any description", "unit_amount": Decimal("123.45"), "quantity": 1}]
+        date = timezone.localtime()
+        due_date = date + relativedelta(months=1)
+
+        # When
+        self.billing_service.create_invoice(account, date, due_date, line_items)
+
+        # Then
+        expected_invoice_details = {
+            "date": date,
+            "due_date": due_date,
+            "type": "ACCREC",
+            "status": "AUTHORISED",
+            "reference": str(self.user.account.pk),
+            "currency_code": CurrencyCode[settings.XERO_CURRENCY_CODE],
+            "line_amount_types": LineAmountTypes[settings.XERO_AMOUNT_TYPE],
+        }
+        expected_line_item_details = [
+            {
+                "description": line_item["description"],
+                "unit_amount": line_item["unit_amount"],
+                "account_code": settings.XERO_ACCOUNT_CODE,
+                "quantity": 1,
+            }
+            for line_item in line_items
+        ]
+        mock__create_xero_invoice.assert_called_with(contact_id, expected_invoice_details, expected_line_item_details)

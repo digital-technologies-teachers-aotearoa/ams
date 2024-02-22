@@ -1,6 +1,5 @@
 from functools import partial
 from hashlib import sha256
-from sys import stderr
 from typing import Any, Dict, List, Optional
 from uuid import uuid4
 
@@ -28,8 +27,12 @@ from django_filters.views import FilterView
 from django_tables2 import MultiTableMixin, SingleTableMixin, SingleTableView, Table
 from registration.models import RegistrationProfile
 
+from ams.billing.invoice import (
+    BillingDetailUpdateException,
+    BillingException,
+    create_membership_option_invoice,
+)
 from ams.billing.models import Account
-from ams.billing.service import get_billing_service
 
 from ..base.models import EmailConfirmationPage
 from ..forum.views import forum_sync_user_profile
@@ -576,9 +579,20 @@ def notify_staff_of_new_organisation_membership(
         send_mail(subject, message, from_email, [user.email])
 
 
-add_membership_billing_error_message = user_message(
+add_membership_billing_details_error_message = user_message(
     _(
         "The billing contact could not be created. "
+        "The membership could not be added. "
+        "Please try to add the membership again. "
+        "If this message reappears please contact the site administrator."
+    ),
+    message_type="error",
+)
+
+
+add_membership_invoice_error_message = user_message(
+    _(
+        "The invoice could not be created. "
         "The membership could not be added. "
         "Please try to add the membership again. "
         "If this message reappears please contact the site administrator."
@@ -600,30 +614,22 @@ def add_user_membership(request: HttpRequest, pk: int) -> HttpResponse:
     else:
         user_view_url = reverse("current-user-view")
 
-    billing_service_exception: Optional[Exception] = None
+    billing_exception: Optional[BillingException] = None
 
     if request.method == "POST":
         form = AddUserMembershipForm(request.POST, user=user)
 
         if form.is_valid():
-            billing_service = get_billing_service()
-            if billing_service:
-                try:
-                    billing_service.update_user_billing_details(user)
-                except Exception as e:
-                    print(f"Error updating user {user.pk} billing details: {e}", file=stderr)
-                    billing_service_exception = e
+            form_data = form.cleaned_data
+            membership_option = MembershipOption.objects.get(name=form_data["membership_option"])
 
-            if not billing_service_exception:
-                form_data = form.cleaned_data
-
-                start_date = form_data["start_date"]
-                membership_option = MembershipOption.objects.get(name=form_data["membership_option"])
+            try:
+                create_membership_option_invoice(user.account, membership_option)
 
                 user_membership = UserMembership.objects.create(
                     user=user,
                     membership_option=membership_option,
-                    start_date=start_date,
+                    start_date=form_data["start_date"],
                     created_datetime=timezone.localtime(),
                 )
 
@@ -632,6 +638,9 @@ def add_user_membership(request: HttpRequest, pk: int) -> HttpResponse:
                 )
 
                 return HttpResponseRedirect(user_view_url + "?membership_added=true")
+
+            except BillingException as e:
+                billing_exception = e
     else:
         start_date = timezone.localdate()
 
@@ -646,8 +655,11 @@ def add_user_membership(request: HttpRequest, pk: int) -> HttpResponse:
         form = AddUserMembershipForm(initial=initial_values, user=user)
 
     messages: List[Dict[str, Any]] = []
-    if billing_service_exception:
-        messages.append(add_membership_billing_error_message)
+    if billing_exception:
+        if isinstance(billing_exception, BillingDetailUpdateException):
+            messages.append(add_membership_billing_details_error_message)
+        else:
+            messages.append(add_membership_invoice_error_message)
 
     return render(
         request,
@@ -679,29 +691,21 @@ def add_organisation_membership(request: HttpRequest, pk: int) -> HttpResponse:
 
     latest_membership = organisation.organisation_memberships.order_by("-start_date").first()
 
-    billing_service_exception: Optional[Exception] = None
+    billing_exception: Optional[BillingException] = None
 
     if request.method == "POST":
         form = AddOrganisationMembershipForm(request.POST, organisation=organisation)
         if form.is_valid():
-            billing_service = get_billing_service()
-            if billing_service:
-                try:
-                    billing_service.update_organisation_billing_details(organisation)
-                except Exception as e:
-                    print(f"Error updating organisation {organisation.pk} billing details: {e}", file=stderr)
-                    billing_service_exception = e
+            form_data = form.cleaned_data
+            membership_option = MembershipOption.objects.get(name=form_data["membership_option"])
 
-            if not billing_service_exception:
-                form_data = form.cleaned_data
-
-                start_date = form_data["start_date"]
-                membership_option = MembershipOption.objects.get(name=form_data["membership_option"])
+            try:
+                create_membership_option_invoice(organisation.account, membership_option)
 
                 organisation_membership = OrganisationMembership.objects.create(
                     organisation=organisation,
                     membership_option=membership_option,
-                    start_date=start_date,
+                    start_date=form_data["start_date"],
                     created_datetime=timezone.localtime(),
                 )
 
@@ -715,6 +719,10 @@ def add_organisation_membership(request: HttpRequest, pk: int) -> HttpResponse:
 
                 view_organisation_url = reverse("view-organisation", kwargs={"pk": pk})
                 return HttpResponseRedirect(view_organisation_url + "?membership_added=true")
+
+            except BillingException as e:
+                billing_exception = e
+
     else:
         start_date = timezone.localdate()
 
@@ -729,8 +737,12 @@ def add_organisation_membership(request: HttpRequest, pk: int) -> HttpResponse:
         form = AddOrganisationMembershipForm(initial=initial_values, organisation=organisation)
 
     messages: List[Dict[str, Any]] = []
-    if billing_service_exception:
-        messages.append(add_membership_billing_error_message)
+
+    if billing_exception:
+        if isinstance(billing_exception, BillingDetailUpdateException):
+            messages.append(add_membership_billing_details_error_message)
+        else:
+            messages.append(add_membership_invoice_error_message)
 
     return render(
         request,

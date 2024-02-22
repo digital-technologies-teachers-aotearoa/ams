@@ -1,11 +1,21 @@
 import json
-from typing import Any, Dict, Optional
+from datetime import datetime
+from typing import Any, Dict, List, Optional
 
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.http.response import HttpResponse
-from xero_python.accounting import AccountingApi, Contact, Contacts
+from xero_python.accounting import (
+    AccountingApi,
+    Contact,
+    Contacts,
+    CurrencyCode,
+    Invoice,
+    Invoices,
+    LineAmountTypes,
+    LineItem,
+)
 from xero_python.api_client import ApiClient
 from xero_python.api_client.configuration import Configuration
 from xero_python.api_client.oauth2 import OAuth2Token
@@ -68,6 +78,20 @@ class XeroBillingService(BillingService):
 
         api_instance.update_contact(settings.XERO_TENANT_ID, contact_id, contacts)
 
+    def _create_xero_invoice(
+        self, contact_id: str, invoice_details: Dict[str, Any], line_item_details: List[Dict[str, Any]]
+    ) -> None:
+        api_instance = AccountingApi(self.api_client)
+
+        contact = Contact(contact_id=contact_id)
+
+        line_items = [LineItem(**item_details) for item_details in line_item_details]
+
+        invoice = Invoice(contact=contact, line_items=line_items, **invoice_details)
+        invoices = Invoices(invoices=[invoice])
+
+        api_instance.create_invoices(settings.XERO_TENANT_ID, invoices)
+
     # NOTE: The name in xero needs to be unique so we combined a name with Account.id primary key
     # For this reason it is important to not to change the Account.id sequence without considering
     # the implications to external systems
@@ -109,6 +133,48 @@ class XeroBillingService(BillingService):
 
             XeroContact.objects.create(account=account, contact_id=contact_id)
 
+    def create_invoice(
+        self, account: Account, date: datetime, due_date: datetime, line_items: List[Dict[str, Any]]
+    ) -> None:
+        contact_id = account.xero_contact.contact_id
+
+        if not settings.XERO_ACCOUNT_CODE:
+            raise Exception("XERO_ACCOUNT_CODE setting not configured")
+
+        if not settings.XERO_AMOUNT_TYPE:
+            raise Exception("XERO_AMOUNT_TYPE setting not configured")
+
+        if not settings.XERO_CURRENCY_CODE:
+            raise Exception("XERO_CURRENCY_CODE setting not configured")
+
+        amount_type = LineAmountTypes[settings.XERO_AMOUNT_TYPE]
+
+        account_code = settings.XERO_ACCOUNT_CODE
+
+        currency_code = CurrencyCode[settings.XERO_CURRENCY_CODE]
+
+        line_items = [
+            {
+                "description": line_item["description"],
+                "unit_amount": line_item["unit_amount"],
+                "quantity": line_item["quantity"],
+                "account_code": account_code,
+            }
+            for line_item in line_items
+        ]
+
+        invoice_details = {
+            "type": "ACCREC",
+            "date": date,
+            "due_date": due_date,
+            "reference": str(account.pk),
+            "currency_code": currency_code,
+            "status": "AUTHORISED",
+            "line_amount_types": amount_type,
+        }
+
+        self._create_xero_invoice(contact_id, invoice_details, line_items)
+
 
 class MockXeroBillingService(XeroBillingService):
     def _get_authentication_token(self) -> None:
@@ -118,4 +184,9 @@ class MockXeroBillingService(XeroBillingService):
         return "mock-xero-contact-id"
 
     def _update_xero_contact(self, contact_id: str, contact_params: Dict[str, Any]) -> None:
+        return
+
+    def _create_xero_invoice(
+        self, contact_id: str, invoice_details: Dict[str, Any], line_item_details: List[Dict[str, Any]]
+    ) -> None:
         return
