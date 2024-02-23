@@ -173,6 +173,7 @@ class XeroBillingServiceTests(TestCase):
         # Then
         invoice = Invoice.objects.get()
 
+        self.assertEqual(invoice.billing_service_invoice_id, "e576f965-f2fb-459f-9ea8-035424ae31d7")
         self.assertEqual(invoice.invoice_number, "INV-1234")
         self.assertEqual(invoice.account, self.user.account)
         self.assertEqual(invoice.issue_date, issue_date)

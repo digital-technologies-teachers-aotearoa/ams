@@ -2,5 +2,9 @@
 printenv >> /etc/environment
 echo "Starting cron"
 
-tail -f /var/log/cron.log &
+mkfifo /tmp/cron.out
+chmod 666 /tmp/cron.out
+
+tail -f /tmp/cron.out &
+
 cron -f

@@ -50,9 +50,6 @@ COPY cronjobs /etc/cron.d/ams
 RUN chmod 0644 /etc/cron.d/ams
 RUN crontab -u user /etc/cron.d/ams
 
-RUN touch /var/log/cron.log
-RUN chown user:users /var/log/cron.log
-
 USER user
 
 ENTRYPOINT ["poetry", "run", "gunicorn", "ams.wsgi:application"]
