@@ -10,6 +10,7 @@ from ams.users.models import (
     MembershipOption,
     MembershipOptionType,
     Organisation,
+    OrganisationMembership,
     OrganisationType,
     UserMembership,
 )
@@ -92,3 +93,24 @@ def any_organisation() -> Organisation:
         postal_code="8080",
     )
     return organisation
+
+
+def any_organisation_membership(
+    organisation: Optional[Organisation] = None, membership_option: Optional[MembershipOption] = None
+) -> OrganisationMembership:
+    if not organisation:
+        organisation = any_organisation()
+
+    if not membership_option:
+        membership_option = any_membership_option(type=MembershipOptionType.ORGANISATION)
+
+    start = timezone.localtime() - timedelta(days=7)
+
+    organisation_membership: OrganisationMembership = OrganisationMembership.objects.create(
+        organisation=organisation,
+        membership_option=membership_option,
+        created_datetime=start,
+        start_date=start.date(),
+    )
+
+    return organisation_membership

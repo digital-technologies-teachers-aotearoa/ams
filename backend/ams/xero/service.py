@@ -209,6 +209,7 @@ class XeroBillingService(BillingService):
             invoice.due_date = accounting_invoice.due_date
             invoice.paid = accounting_invoice.amount_paid
             invoice.due = accounting_invoice.amount_due
+            invoice.paid_date = accounting_invoice.fully_paid_on_date
             invoice.update_needed = False
             invoice.save()
 
