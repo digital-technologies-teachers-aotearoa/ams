@@ -47,15 +47,11 @@ class Invoice(Model):
 
 
 @receiver(pre_save, sender=Invoice)
-def approve_paid_user_membership(sender: Any, instance: Invoice, **kwargs: Any) -> None:
-    # When the invoice for an active user's membership is paid, approve the membership
+def approve_paid_user_memberships(sender: Any, instance: Invoice, **kwargs: Any) -> None:
+    # When the invoice is paid, approve individual user membership(s)
     if instance.pk and instance.paid_date:
         if Invoice.objects.get(pk=instance.pk).paid_date is None:
-            user_membership = instance.user_memberships.all().first()
-            if (
-                user_membership
-                and user_membership.status() == MembershipStatus.PENDING
-                and user_membership.user.is_active
-            ):
-                user_membership.approved_datetime = timezone.now()
-                user_membership.save()
+            for user_membership in instance.user_memberships.all():
+                if user_membership.status() == MembershipStatus.PENDING:
+                    user_membership.approved_datetime = timezone.now()
+                    user_membership.save()

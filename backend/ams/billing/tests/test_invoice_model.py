@@ -36,12 +36,14 @@ class InvoiceModelTests(TestCase):
         user_membership.refresh_from_db()
         self.assertIsNotNone(user_membership.approved_datetime)
 
-    def test_paying_invoice_does_not_approve_cancelled_user_membership(self) -> None:
-        # Given
+    def test_paying_invoice_approves_user_membership_of_unverified_user(self) -> None:
+        # Given a user may pay the invoice before verifying their email (making them active)
         user_membership = any_user_membership()
         user_membership.approved_datetime = None
-        user_membership.cancelled_datetime = timezone.localtime()
         user_membership.save()
+
+        user_membership.user.is_active = False
+        user_membership.user.save()
 
         account = Account.objects.create(user=user_membership.user)
 
@@ -63,16 +65,14 @@ class InvoiceModelTests(TestCase):
 
         # Then
         user_membership.refresh_from_db()
-        self.assertIsNone(user_membership.approved_datetime)
+        self.assertIsNotNone(user_membership.approved_datetime)
 
-    def test_paying_invoice_does_not_approve_user_membership_of_inactive_user(self) -> None:
+    def test_paying_invoice_does_not_approve_cancelled_user_membership(self) -> None:
         # Given
         user_membership = any_user_membership()
         user_membership.approved_datetime = None
+        user_membership.cancelled_datetime = timezone.localtime()
         user_membership.save()
-
-        user_membership.user.is_active = False
-        user_membership.user.save()
 
         account = Account.objects.create(user=user_membership.user)
 
