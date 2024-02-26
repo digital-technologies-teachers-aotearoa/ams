@@ -10,11 +10,15 @@ from django.contrib.auth.models import User
 from django.test import TestCase, override_settings
 from PIL import Image
 
+from ams.test.utils import any_user_account
+
 
 @override_settings(MEDIA_ROOT=tempfile.gettempdir())
 class UpdateUserProfileImageTests(TestCase):
     def setUp(self) -> None:
         self.user = User.objects.create_user(username="testuser", is_staff=False)
+
+        self.account = any_user_account(user=self.user)
 
         self.temp_image_dir = tempfile.gettempdir()
 

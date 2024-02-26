@@ -5,6 +5,8 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import TestCase, override_settings
 
+from ams.test.utils import any_user_account
+
 from ..forms import EditUserProfileForm
 
 
@@ -17,6 +19,8 @@ class EditUserProfileTests(TestCase):
         self.user.last_name = "Smith"
         self.user.email = "user@example.com"
         self.user.save()
+
+        self.account = any_user_account(user=self.user)
 
         self.form_values = {"first_name": "Firstname", "last_name": "Lastname"}
 

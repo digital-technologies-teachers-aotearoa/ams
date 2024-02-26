@@ -7,13 +7,16 @@ from django.test import TestCase
 from django.utils import timezone
 from django.utils.formats import date_format
 
-from ...test.utils import parse_response_table_rows
+from ...test.utils import (
+    any_invoice,
+    any_organisation,
+    any_user_account,
+    parse_response_table_rows,
+)
 from ..models import (
     MembershipOption,
     MembershipOptionType,
-    Organisation,
     OrganisationMember,
-    OrganisationType,
     UserMembership,
 )
 
@@ -44,22 +47,14 @@ class AdminUserViewTests(TestCase):
             approved_datetime=start + timedelta(days=1),
         )
 
-        self.organisation = Organisation.objects.create(
-            type=OrganisationType.objects.create(name="Primary School"),
-            name="Any Organisation",
-            telephone="555-12345",
-            contact_name="John Smith",
-            email="john@example.com",
-            street_address="123 Main Street",
-            suburb="",
-            city="Capital City",
-            postal_code="8080",
-            postal_address="PO BOX 1234\nCapital City 8082",
-        )
+        self.organisation = any_organisation()
 
         self.organisation_member = OrganisationMember.objects.create(
             user=self.user, organisation=self.organisation, created_datetime=start, accepted_datetime=start
         )
+
+        self.account = any_user_account(user=self.user)
+        self.invoice = any_invoice(account=self.account, invoice_number="INV-0001")
 
         self.url = f"/users/view/{self.user.pk}/"
         self.client.force_login(self.admin_user)
@@ -340,7 +335,7 @@ class AdminUserViewTests(TestCase):
         self.assertEqual(200, response.status_code)
 
         expected_columns = ["organisation", "status", "join_date", "role", "actions"]
-        columns = [column.name for column in response.context["tables"][1].columns]
+        columns = [column.name for column in response.context["tables"][2].columns]
         self.assertListEqual(expected_columns, columns)
 
     def test_should_show_expected_organisation_members_headings(self) -> None:
@@ -351,10 +346,58 @@ class AdminUserViewTests(TestCase):
         self.assertEqual(200, response.status_code)
 
         expected_headings = ["Organisation", "Status", "Join Date", "Role", "Actions"]
-        headings = [column.header for column in response.context["tables"][1].columns]
+        headings = [column.header for column in response.context["tables"][2].columns]
         self.assertListEqual(expected_headings, headings)
 
     def test_should_show_expected_user_organisation_members(self) -> None:
+        # When
+        response = self.client.get(self.url)
+
+        # Then
+        self.assertEqual(200, response.status_code)
+
+        rows = parse_response_table_rows(response, 2)
+
+        self.maxDiff = None
+
+        expected_rows = [
+            [
+                self.organisation_member.organisation.name,
+                "Active",
+                date_format(self.organisation_member.accepted_datetime, format="SHORT_DATE_FORMAT"),
+                "Member",
+                "View",
+            ]
+        ]
+
+        self.assertListEqual(expected_rows, rows)
+
+    def test_should_show_expected_invoice_columns(self) -> None:
+        # When
+        response = self.client.get(self.url)
+
+        # Then
+        self.assertEqual(200, response.status_code)
+
+        expected_columns = ["invoice_number", "issue_date", "due_date", "amount", "paid", "due", "actions"]
+        columns = [column.name for column in response.context["tables"][1].columns]
+        self.assertListEqual(expected_columns, columns)
+
+    def test_should_show_expected_invoice_headings(self) -> None:
+        # When
+        response = self.client.get(self.url)
+
+        # Then
+        self.assertEqual(200, response.status_code)
+
+        expected_headings = ["Invoice Number", "Issue Date", "Due Date", "Amount", "Paid", "Due", "Actions"]
+        headings = [column.header for column in response.context["tables"][1].columns]
+        self.assertListEqual(expected_headings, headings)
+
+    def test_should_show_expected_invoices(self) -> None:
+        # Given
+        any_invoice()
+
         # When
         response = self.client.get(self.url)
 
@@ -367,11 +410,13 @@ class AdminUserViewTests(TestCase):
 
         expected_rows = [
             [
-                self.organisation_member.organisation.name,
-                "Active",
-                date_format(self.organisation_member.accepted_datetime, format="SHORT_DATE_FORMAT"),
-                "Member",
-                "View",
+                self.invoice.invoice_number,
+                date_format(self.invoice.issue_date, format="SHORT_DATE_FORMAT"),
+                date_format(self.invoice.due_date, format="SHORT_DATE_FORMAT"),
+                self.invoice.amount,
+                self.invoice.paid,
+                self.invoice.due,
+                "",
             ]
         ]
 
