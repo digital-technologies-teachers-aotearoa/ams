@@ -13,6 +13,7 @@ from xero_python.api_client import ApiClient
 from xero_python.api_client.configuration import Configuration
 from xero_python.api_client.oauth2 import OAuth2Token
 from xero_python.api_client.serializer import serialize
+from xero_python.identity import Connection, IdentityApi
 
 from ams.billing.models import Account, Invoice
 from ams.billing.service import BillingService
@@ -52,6 +53,12 @@ class XeroBillingService(BillingService):
     def _get_authentication_token(self) -> None:
         if not self.get_xero_token():
             self.api_client.get_client_credentials_token()
+
+    def _get_connections(self) -> List[Connection]:
+        api_instance = IdentityApi(self.api_client)
+
+        connections: List[Connection] = api_instance.get_connections()
+        return connections
 
     def _create_xero_contact(self, contact_params: Dict[str, Any]) -> str:
         api_instance = AccountingApi(self.api_client)
@@ -225,6 +232,9 @@ class MockXeroBillingService(XeroBillingService):
         return
 
     def _get_xero_invoices(self, billing_service_invoice_ids: List[str]) -> List[AccountingInvoice]:
+        return []
+
+    def _get_connections(self) -> List[Connection]:
         return []
 
     def _email_invoice(self, billing_service_invoice_id: str) -> None:
