@@ -6,7 +6,7 @@ from django.test import TestCase
 from django.utils import timezone
 from django.utils.formats import date_format
 
-from ...test.utils import parse_response_table_rows
+from ...test.utils import any_invoice, any_user_account, parse_response_table_rows
 from ..models import MembershipOption, MembershipOptionType, UserMembership
 
 
@@ -34,6 +34,7 @@ class AdminUserMembershipsTests(TestCase):
             created_datetime=start,
             start_date=start.date(),
             approved_datetime=start + relativedelta(days=1),
+            invoice=any_invoice(account=any_user_account(user=self.user)),
         )
 
         self.url = "/users/memberships/"
@@ -75,7 +76,16 @@ class AdminUserMembershipsTests(TestCase):
         # Then
         self.assertEqual(200, response.status_code)
 
-        expected_columns = ["full_name", "membership", "duration", "status", "start_date", "approved_date", "actions"]
+        expected_columns = [
+            "full_name",
+            "membership",
+            "duration",
+            "status",
+            "start_date",
+            "approved_date",
+            "invoice",
+            "actions",
+        ]
         columns = [column.name for column in response.context["table"].columns]
         self.assertListEqual(expected_columns, columns)
 
@@ -86,7 +96,16 @@ class AdminUserMembershipsTests(TestCase):
         # Then
         self.assertEqual(200, response.status_code)
 
-        expected_headings = ["Full Name", "Membership", "Duration", "Status", "Start Date", "Approved Date", "Actions"]
+        expected_headings = [
+            "Full Name",
+            "Membership",
+            "Duration",
+            "Status",
+            "Start Date",
+            "Approved Date",
+            "Invoice",
+            "Actions",
+        ]
         headings = [column.header for column in response.context["table"].columns]
         self.assertListEqual(expected_headings, headings)
 
@@ -107,6 +126,7 @@ class AdminUserMembershipsTests(TestCase):
                 "Active",
                 date_format(self.user_membership.start_date, format="SHORT_DATE_FORMAT"),
                 date_format(self.user_membership.approved_datetime, format="SHORT_DATE_FORMAT"),
+                self.user_membership.invoice.invoice_number,
                 "Cancel",
             ]
         ]
@@ -134,6 +154,7 @@ class AdminUserMembershipsTests(TestCase):
                 "Pending",
                 date_format(self.user_membership.start_date, format="SHORT_DATE_FORMAT"),
                 "—",
+                self.user_membership.invoice.invoice_number,
                 "Approve,Cancel",
             ]
         ]
@@ -164,6 +185,7 @@ class AdminUserMembershipsTests(TestCase):
                 "Expired",
                 date_format(self.user_membership.start_date, format="SHORT_DATE_FORMAT"),
                 date_format(self.user_membership.approved_datetime, format="SHORT_DATE_FORMAT"),
+                self.user_membership.invoice.invoice_number,
                 "",
             ]
         ]
@@ -193,6 +215,7 @@ class AdminUserMembershipsTests(TestCase):
                 "Cancelled",
                 date_format(self.user_membership.start_date, format="SHORT_DATE_FORMAT"),
                 date_format(self.user_membership.approved_datetime, format="SHORT_DATE_FORMAT"),
+                self.user_membership.invoice.invoice_number,
                 "",
             ]
         ]
@@ -228,6 +251,7 @@ class AdminUserMembershipsTests(TestCase):
                 "Active",
                 date_format(self.user_membership.start_date, format="SHORT_DATE_FORMAT"),
                 date_format(timezone.now().astimezone(self.time_zone), format="SHORT_DATE_FORMAT"),
+                self.user_membership.invoice.invoice_number,
                 "Cancel",
             ]
         ]

@@ -39,12 +39,16 @@ class AdminUserViewTests(TestCase):
 
         start = timezone.localtime() - timedelta(days=7)
 
+        self.account = any_user_account(user=self.user)
+        self.invoice = any_invoice(account=self.account, invoice_number="INV-0001")
+
         self.user_membership = UserMembership.objects.create(
             user=self.user,
             membership_option=membership_option,
             created_datetime=start,
             start_date=start.date(),
             approved_datetime=start + timedelta(days=1),
+            invoice=self.invoice,
         )
 
         self.organisation = any_organisation()
@@ -52,9 +56,6 @@ class AdminUserViewTests(TestCase):
         self.organisation_member = OrganisationMember.objects.create(
             user=self.user, organisation=self.organisation, created_datetime=start, accepted_datetime=start
         )
-
-        self.account = any_user_account(user=self.user)
-        self.invoice = any_invoice(account=self.account, invoice_number="INV-0001")
 
         self.url = f"/users/view/{self.user.pk}/"
         self.client.force_login(self.admin_user)
@@ -95,7 +96,7 @@ class AdminUserViewTests(TestCase):
         # Then
         self.assertEqual(200, response.status_code)
 
-        expected_columns = ["membership", "duration", "status", "start_date", "approved_date", "actions"]
+        expected_columns = ["membership", "duration", "status", "start_date", "approved_date", "invoice", "actions"]
         columns = [column.name for column in response.context["tables"][0].columns]
         self.assertListEqual(expected_columns, columns)
 
@@ -106,7 +107,7 @@ class AdminUserViewTests(TestCase):
         # Then
         self.assertEqual(200, response.status_code)
 
-        expected_headings = ["Membership", "Duration", "Status", "Start Date", "Approved Date", "Actions"]
+        expected_headings = ["Membership", "Duration", "Status", "Start Date", "Approved Date", "Invoice", "Actions"]
         headings = [column.header for column in response.context["tables"][0].columns]
         self.assertListEqual(expected_headings, headings)
 
@@ -126,6 +127,7 @@ class AdminUserViewTests(TestCase):
                 "Active",
                 date_format(self.user_membership.start_date, format="SHORT_DATE_FORMAT"),
                 date_format(self.user_membership.approved_datetime, format="SHORT_DATE_FORMAT"),
+                self.user_membership.invoice.invoice_number,
                 "Cancel",
             ]
         ]
@@ -152,6 +154,7 @@ class AdminUserViewTests(TestCase):
                 "Pending",
                 date_format(self.user_membership.start_date, format="SHORT_DATE_FORMAT"),
                 "—",
+                self.user_membership.invoice.invoice_number,
                 "Approve,Cancel",
             ]
         ]
@@ -184,6 +187,7 @@ class AdminUserViewTests(TestCase):
                 "Active",
                 date_format(self.user_membership.start_date, format="SHORT_DATE_FORMAT"),
                 date_format(timezone.now().astimezone(self.time_zone), format="SHORT_DATE_FORMAT"),
+                self.user_membership.invoice.invoice_number,
                 "Cancel",
             ]
         ]
@@ -233,6 +237,7 @@ class AdminUserViewTests(TestCase):
                 "Expired",
                 date_format(self.user_membership.start_date, format="SHORT_DATE_FORMAT"),
                 date_format(self.user_membership.approved_datetime, format="SHORT_DATE_FORMAT"),
+                self.user_membership.invoice.invoice_number,
                 "",
             ]
         ]
@@ -262,6 +267,7 @@ class AdminUserViewTests(TestCase):
                 "Cancelled",
                 date_format(self.user_membership.start_date, format="SHORT_DATE_FORMAT"),
                 date_format(self.user_membership.approved_datetime, format="SHORT_DATE_FORMAT"),
+                self.user_membership.invoice.invoice_number,
                 "",
             ]
         ]
@@ -321,6 +327,7 @@ class AdminUserViewTests(TestCase):
                 "Cancelled",
                 date_format(self.user_membership.start_date, format="SHORT_DATE_FORMAT"),
                 date_format(self.user_membership.approved_datetime, format="SHORT_DATE_FORMAT"),
+                self.user_membership.invoice.invoice_number,
                 "",
             ]
         ]

@@ -43,15 +43,16 @@ class ViewOrganisationFormTests(TestCase):
 
         start = timezone.localtime() - relativedelta(days=7)
 
+        self.account = any_organisation_account(organisation=self.organisation)
+        self.invoice = any_invoice(account=self.account, invoice_number="INV-0001")
+
         self.organisation_membership = OrganisationMembership.objects.create(
             organisation=self.organisation,
             membership_option=membership_option,
             created_datetime=start,
             start_date=start.date(),
+            invoice=self.invoice,
         )
-
-        self.account = any_organisation_account(organisation=self.organisation)
-        self.invoice = any_invoice(account=self.account, invoice_number="INV-0001")
 
         self.client.force_login(self.user)
 
@@ -287,7 +288,7 @@ class ViewOrganisationFormTests(TestCase):
         # Then
         self.assertEqual(200, response.status_code)
 
-        expected_columns = ["membership", "duration", "status", "start_date", "expiry_date", "actions"]
+        expected_columns = ["membership", "duration", "status", "start_date", "expiry_date", "invoice", "actions"]
         columns = [column.name for column in response.context["tables"][1].columns]
         self.assertListEqual(expected_columns, columns)
 
@@ -298,7 +299,7 @@ class ViewOrganisationFormTests(TestCase):
         # Then
         self.assertEqual(200, response.status_code)
 
-        expected_headings = ["Membership", "Duration", "Status", "Start Date", "Expires Date", "Actions"]
+        expected_headings = ["Membership", "Duration", "Status", "Start Date", "Expires Date", "Invoice", "Actions"]
         columns = [column.header for column in response.context["tables"][1].columns]
         self.assertListEqual(expected_headings, columns)
 
@@ -321,6 +322,7 @@ class ViewOrganisationFormTests(TestCase):
                     self.organisation_membership.start_date + self.organisation_membership.membership_option.duration,
                     format="SHORT_DATE_FORMAT",
                 ),
+                self.organisation_membership.invoice.invoice_number,
                 "",
             ]
         ]

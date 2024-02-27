@@ -64,7 +64,7 @@ class AdminUserMembershipTable(Table):
     )
     start_date = DateColumn(verbose_name=_("Start Date"), short=True)
     approved_date = DateColumn(verbose_name=_("Approved Date"), accessor="approved_datetime", short=True)
-
+    invoice = Column(accessor="invoice__invoice_number", default="", verbose_name=_("Invoice"))
     actions = TemplateColumn(
         verbose_name=_("Actions"), template_name="admin_user_membership_actions.html", orderable=False
     )
@@ -79,7 +79,7 @@ class AdminUserMembershipTable(Table):
         return format_membership_duration(value)
 
     class Meta:
-        fields = ("full_name", "membership", "duration", "status", "start_date", "approved_date")
+        fields = ("full_name", "membership", "duration", "status", "start_date", "approved_date", "invoice")
         order_by = (
             "full_name",
             "membership",
@@ -102,6 +102,7 @@ class UserDetailMembershipTable(Table):
     )
     start_date = DateColumn(verbose_name=_("Start Date"), short=True)
     approved_date = DateColumn(verbose_name=_("Approved Date"), accessor="approved_datetime", short=True)
+    invoice = Column(accessor="invoice__invoice_number", default="", verbose_name=_("Invoice"))
     actions = TemplateColumn(verbose_name=_("Actions"), template_name="user_membership_actions.html", orderable=False)
 
     def render_status(self, value: datetime, record: UserMembership) -> Any:
@@ -111,7 +112,7 @@ class UserDetailMembershipTable(Table):
         return format_membership_duration(value)
 
     class Meta:
-        fields = ("membership", "duration", "status", "start_date", "approved_date")
+        fields = ("membership", "duration", "status", "start_date", "approved_date", "invoice")
         order_by = ("membership", "duration", "status", "start_date", "approved_date", "cancelled_datetime")
         model = UserMembership
 
@@ -241,6 +242,7 @@ class OrganisationMembershipTable(Table):
     status = Column(verbose_name=_("Status"), accessor="start_date", empty_values=[], orderable=False)
     start_date = DateColumn(verbose_name=_("Start Date"), short=True)
     expiry_date = DateColumn(verbose_name=_("Expires Date"), accessor="start_date", short=True, orderable=False)
+    invoice = Column(accessor="invoice__invoice_number", default="", verbose_name=_("Invoice"))
     actions = TemplateColumn(
         verbose_name=_("Actions"), template_name="organisation_membership_actions.html", orderable=False
     )
@@ -255,6 +257,6 @@ class OrganisationMembershipTable(Table):
         return format_membership_duration(value)
 
     class Meta:
-        fields = ("membership", "duration", "status", "start_date")
+        fields = ("membership", "duration", "status", "start_date", "expiry_date", "invoice")
         order_by = ("membership", "duration", "status", "start_date", "expiry_date")
         model = OrganisationMembership

@@ -37,12 +37,16 @@ class UserViewTests(TestCase):
 
         start = timezone.localtime() - membership_option.duration + timedelta(days=7)
 
+        self.account = any_user_account(user=self.user)
+        self.invoice = any_invoice(account=self.account, invoice_number="INV-0001")
+
         self.user_membership = UserMembership.objects.create(
             user=self.user,
             membership_option=membership_option,
             start_date=start.date(),
             created_datetime=start,
             approved_datetime=start,
+            invoice=self.invoice,
         )
 
         self.organisation = any_organisation()
@@ -50,9 +54,6 @@ class UserViewTests(TestCase):
         self.organisation_member = OrganisationMember.objects.create(
             user=self.user, organisation=self.organisation, created_datetime=start, accepted_datetime=start
         )
-
-        self.account = any_user_account(user=self.user)
-        self.invoice = any_invoice(account=self.account, invoice_number="INV-0001")
 
         self.url = "/users/current/"
         self.client.force_login(self.user)
@@ -136,7 +137,7 @@ class UserViewTests(TestCase):
         # Then
         self.assertEqual(200, response.status_code)
 
-        expected_columns = ["membership", "duration", "status", "start_date", "approved_date", "actions"]
+        expected_columns = ["membership", "duration", "status", "start_date", "approved_date", "invoice", "actions"]
         columns = [column.name for column in response.context["tables"][0].columns]
         self.assertListEqual(expected_columns, columns)
 
@@ -147,7 +148,7 @@ class UserViewTests(TestCase):
         # Then
         self.assertEqual(200, response.status_code)
 
-        expected_headings = ["Membership", "Duration", "Status", "Start Date", "Approved Date", "Actions"]
+        expected_headings = ["Membership", "Duration", "Status", "Start Date", "Approved Date", "Invoice", "Actions"]
         headings = [column.header for column in response.context["tables"][0].columns]
         self.assertListEqual(expected_headings, headings)
 
@@ -171,6 +172,7 @@ class UserViewTests(TestCase):
                 "Pending",
                 date_format(self.user_membership.start_date, format="SHORT_DATE_FORMAT"),
                 "—",
+                self.user_membership.invoice.invoice_number,
                 "",
             ]
         ]
