@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Optional
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import connection
 from django.http.response import HttpResponse
 from xero_python.accounting import AccountingApi, Contact, Contacts, CurrencyCode
 from xero_python.accounting import Invoice as AccountingInvoice
@@ -50,9 +51,20 @@ class XeroBillingService(BillingService):
     def _debug_response(self, data: Any) -> HttpResponse:
         return HttpResponse(json.dumps(serialize(data)), content_type="application/json")
 
+    def _acquire_lock(self) -> None:
+        # Get an exclusive lock so only one instance can interact with Xero at a time
+        # to avoid running into API limits:
+        # https://developer.xero.com/documentation/guides/oauth2/limits/#api-rate-limits
+        cursor = connection.cursor()
+        cursor.execute("LOCK xero_xeromutex")
+
+    def _get_client_credentials_token(self) -> None:
+        self.api_client.get_client_credentials_token()
+
     def _get_authentication_token(self) -> None:
         if not self.get_xero_token():
-            self.api_client.get_client_credentials_token()
+            self._acquire_lock()
+            self._get_client_credentials_token()
 
     def _get_connections(self) -> List[Connection]:
         api_instance = IdentityApi(self.api_client)
@@ -222,8 +234,8 @@ class XeroBillingService(BillingService):
 
 
 class MockXeroBillingService(XeroBillingService):
-    def _get_authentication_token(self) -> None:
-        return
+    def _get_client_credentials_token(self) -> None:
+        self.set_xero_token("token")
 
     def _create_xero_contact(self, contact_params: Dict[str, Any]) -> str:
         return "mock-xero-contact-id"
