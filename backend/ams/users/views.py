@@ -98,6 +98,8 @@ def individual_registration(request: HttpRequest) -> HttpResponse:
                 membership_option=membership_option,
                 start_date=timezone.localdate(),
                 created_datetime=timezone.localtime(),
+                # NOTE: Invoice is created later when they verify the email (if billing is enabled)
+                invoice=None,
             )
 
             return render(
@@ -495,17 +497,67 @@ def activate_user(request: HttpRequest, activation_key: str) -> HttpResponse:
 
     if user:
         if activation_successful:
-            if user.user_memberships.exists():
-                transaction.on_commit(partial(notify_staff_of_new_user_with_membership, request=request, new_user=user))
+            try:
+                user_membership_to_invoice = user.user_memberships.filter(
+                    invoice__isnull=True, approved_datetime__isnull=True, cancelled_datetime__isnull=True
+                ).first()
+
+                if user_membership_to_invoice:
+                    invoice = create_membership_option_invoice(
+                        user.account, user_membership_to_invoice.membership_option
+                    )
+
+                    if invoice:
+                        user_membership_to_invoice.invoice = invoice
+                        user_membership_to_invoice.save()
+
+                if user.user_memberships.exists():
+                    transaction.on_commit(
+                        partial(notify_staff_of_new_user_with_membership, request=request, new_user=user)
+                    )
+
+            except BillingException:
+                # Something went wrong with billing, deactivate the user and registration profile
+                # so they need to try again
+                user.is_active = False
+                user.save()
+
+                profile = RegistrationProfile.objects.get(activation_key=activation_key)
+                profile.activated = False
+                profile.save()
+
+                user_activation_error_url = reverse("user-activation-error")
+                return HttpResponseRedirect(user_activation_error_url)
 
             email_confirmation_page = EmailConfirmationPage.objects.get(
                 live=True, locale__language_code=settings.LANGUAGE_CODE
             )
+
             return email_confirmation_page.serve(request)
+
         elif user.is_active:
             return HttpResponseRedirect("/")
 
     return HttpResponse(status=401)
+
+
+def user_activation_error(request: HttpRequest) -> HttpResponse:
+    return render(
+        request,
+        "user_activation_error.html",
+        {
+            "show_messages": [
+                user_message(
+                    _(
+                        "Your email could not be verified at this time. "
+                        "Please try again in a few minutes by visiting the link provided in your email. "
+                        "If this message reappears please contact the site administrator."
+                    ),
+                    message_type="error",
+                )
+            ],
+        },
+    )
 
 
 @login_required
@@ -626,6 +678,7 @@ def add_user_membership(request: HttpRequest, pk: int) -> HttpResponse:
             membership_option = MembershipOption.objects.get(name=form_data["membership_option"])
 
             try:
+                # NOTE: invoice will be None if no billing service installed
                 invoice = create_membership_option_invoice(user.account, membership_option)
 
                 user_membership = UserMembership.objects.create(
@@ -703,6 +756,7 @@ def add_organisation_membership(request: HttpRequest, pk: int) -> HttpResponse:
             membership_option = MembershipOption.objects.get(name=form_data["membership_option"])
 
             try:
+                # NOTE: invoice will be None if no billing service installed
                 invoice = create_membership_option_invoice(organisation.account, membership_option)
 
                 organisation_membership = OrganisationMembership.objects.create(
