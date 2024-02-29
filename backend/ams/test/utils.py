@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.http.response import HttpResponse
 from django.utils import timezone
 
+from ams.billing.models import Account, Invoice
 from ams.users.models import (
     MembershipOption,
     MembershipOptionType,
@@ -77,9 +78,17 @@ def any_user_membership(
     return user_membership
 
 
-def any_organisation() -> Organisation:
+def any_organisation_type(name: str = "Any Organisation Type") -> OrganisationType:
+    organisation_type: OrganisationType = OrganisationType.objects.get_or_create(name=name)[0]
+    return organisation_type
+
+
+def any_organisation(organisation_type: Optional[OrganisationType] = None) -> Organisation:
+    if not organisation_type:
+        organisation_type = any_organisation_type()
+
     organisation: Organisation = Organisation.objects.create(
-        type=OrganisationType.objects.create(name="Any Organisation Type"),
+        type=organisation_type,
         name="Any Organisation",
         telephone="555-12345",
         contact_name="John Smith",
@@ -114,3 +123,36 @@ def any_organisation_membership(
     )
 
     return organisation_membership
+
+
+def any_user_account(user: Optional[User] = None) -> Account:
+    if not user:
+        user = any_user()
+
+    account: Account = Account.objects.create(user=user)
+    return account
+
+
+def any_organisation_account(organisation: Optional[Organisation] = None) -> Account:
+    if not organisation:
+        organisation = any_organisation()
+
+    account: Account = Account.objects.create(organisation=organisation)
+    return account
+
+
+def any_invoice(account: Optional[Account] = None, invoice_number: str = "INV-1234") -> Invoice:
+    if not account:
+        account = any_user_account()
+
+    invoice: Invoice = Invoice.objects.create(
+        account=account,
+        invoice_number=invoice_number,
+        billing_service_invoice_id=None,
+        issue_date=timezone.localdate(),
+        due_date=timezone.localdate() + timedelta(days=30),
+        amount=100,
+        paid=0,
+        due=0,
+    )
+    return invoice

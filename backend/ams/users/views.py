@@ -33,6 +33,7 @@ from ams.billing.invoice import (
     create_membership_option_invoice,
 )
 from ams.billing.models import Account
+from ams.billing.tables import InvoiceTable
 
 from ..base.models import EmailConfirmationPage
 from ..forum.views import forum_sync_user_profile
@@ -212,6 +213,7 @@ class OrganisationDetailView(UserIsOrganisationAdminMixin, MultiTableMixin, Deta
         return [
             OrganisationMemberTable(self.object.organisation_members.select_related("user").all()),
             OrganisationMembershipTable(self.object.organisation_memberships.select_related("membership_option").all()),
+            InvoiceTable(self.object.account.invoices.all()),
         ]
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
@@ -987,6 +989,7 @@ class UserDetailView(LoginRequiredMixin, UserDetailViewBase):
     def get_tables(self) -> List[Table]:
         return [
             UserDetailMembershipTable(self.object.user_memberships.all()),
+            InvoiceTable(self.object.account.invoices.all()),
             UserDetailOrganisationMemberTable(self.object.organisation_members.select_related("user").all()),
         ]
 
@@ -1013,6 +1016,7 @@ class AdminUserDetailView(UserIsAdminMixin, UserDetailViewBase, MembershipAction
     def get_tables(self) -> List[Table]:
         return [
             AdminUserDetailMembershipTable(self.object.user_memberships.all()),
+            InvoiceTable(self.object.account.invoices.all()),
             AdminUserDetailOrganisationMemberTable(self.object.organisation_members.select_related("user").all()),
         ]
 

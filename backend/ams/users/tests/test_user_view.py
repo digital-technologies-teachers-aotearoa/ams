@@ -7,13 +7,16 @@ from django.test import TestCase
 from django.utils import timezone
 from django.utils.formats import date_format
 
-from ...test.utils import parse_response_table_rows
+from ...test.utils import (
+    any_invoice,
+    any_organisation,
+    any_user_account,
+    parse_response_table_rows,
+)
 from ..models import (
     MembershipOption,
     MembershipOptionType,
-    Organisation,
     OrganisationMember,
-    OrganisationType,
     UserMembership,
 )
 
@@ -34,26 +37,19 @@ class UserViewTests(TestCase):
 
         start = timezone.localtime() - membership_option.duration + timedelta(days=7)
 
+        self.account = any_user_account(user=self.user)
+        self.invoice = any_invoice(account=self.account, invoice_number="INV-0001")
+
         self.user_membership = UserMembership.objects.create(
             user=self.user,
             membership_option=membership_option,
             start_date=start.date(),
             created_datetime=start,
             approved_datetime=start,
+            invoice=self.invoice,
         )
 
-        self.organisation = Organisation.objects.create(
-            type=OrganisationType.objects.create(name="Primary School"),
-            name="Any Organisation",
-            telephone="555-12345",
-            contact_name="John Smith",
-            email="john@example.com",
-            street_address="123 Main Street",
-            suburb="",
-            city="Capital City",
-            postal_code="8080",
-            postal_address="PO BOX 1234\nCapital City 8082",
-        )
+        self.organisation = any_organisation()
 
         self.organisation_member = OrganisationMember.objects.create(
             user=self.user, organisation=self.organisation, created_datetime=start, accepted_datetime=start
@@ -141,7 +137,7 @@ class UserViewTests(TestCase):
         # Then
         self.assertEqual(200, response.status_code)
 
-        expected_columns = ["membership", "duration", "status", "start_date", "approved_date", "actions"]
+        expected_columns = ["membership", "duration", "status", "start_date", "approved_date", "invoice", "actions"]
         columns = [column.name for column in response.context["tables"][0].columns]
         self.assertListEqual(expected_columns, columns)
 
@@ -152,7 +148,7 @@ class UserViewTests(TestCase):
         # Then
         self.assertEqual(200, response.status_code)
 
-        expected_headings = ["Membership", "Duration", "Status", "Start Date", "Approved Date", "Actions"]
+        expected_headings = ["Membership", "Duration", "Status", "Start Date", "Approved Date", "Invoice", "Actions"]
         headings = [column.header for column in response.context["tables"][0].columns]
         self.assertListEqual(expected_headings, headings)
 
@@ -176,6 +172,7 @@ class UserViewTests(TestCase):
                 "Pending",
                 date_format(self.user_membership.start_date, format="SHORT_DATE_FORMAT"),
                 "—",
+                self.user_membership.invoice.invoice_number,
                 "",
             ]
         ]
@@ -190,7 +187,7 @@ class UserViewTests(TestCase):
         self.assertEqual(200, response.status_code)
 
         expected_columns = ["organisation", "status", "join_date", "role", "actions"]
-        columns = [column.name for column in response.context["tables"][1].columns]
+        columns = [column.name for column in response.context["tables"][2].columns]
         self.assertListEqual(expected_columns, columns)
 
     def test_should_show_expected_organisation_members_headings(self) -> None:
@@ -201,7 +198,7 @@ class UserViewTests(TestCase):
         self.assertEqual(200, response.status_code)
 
         expected_headings = ["Organisation", "Status", "Join Date", "Role", "Actions"]
-        headings = [column.header for column in response.context["tables"][1].columns]
+        headings = [column.header for column in response.context["tables"][2].columns]
         self.assertListEqual(expected_headings, headings)
 
     def test_should_show_expected_user_organisation_members(self) -> None:
@@ -211,7 +208,7 @@ class UserViewTests(TestCase):
         # Then
         self.assertEqual(200, response.status_code)
 
-        rows = parse_response_table_rows(response, 1)
+        rows = parse_response_table_rows(response, 2)
 
         self.maxDiff = None
 
@@ -238,7 +235,7 @@ class UserViewTests(TestCase):
         # Then
         self.assertEqual(200, response.status_code)
 
-        rows = parse_response_table_rows(response, 1)
+        rows = parse_response_table_rows(response, 2)
 
         self.maxDiff = None
 
@@ -249,6 +246,56 @@ class UserViewTests(TestCase):
                 date_format(self.organisation_member.accepted_datetime, format="SHORT_DATE_FORMAT"),
                 "Admin",
                 "View",
+            ]
+        ]
+
+        self.assertListEqual(expected_rows, rows)
+
+    def test_should_show_expected_invoice_columns(self) -> None:
+        # When
+        response = self.client.get(self.url)
+
+        # Then
+        self.assertEqual(200, response.status_code)
+
+        expected_columns = ["invoice_number", "issue_date", "due_date", "amount", "paid", "due", "actions"]
+        columns = [column.name for column in response.context["tables"][1].columns]
+        self.assertListEqual(expected_columns, columns)
+
+    def test_should_show_expected_invoice_headings(self) -> None:
+        # When
+        response = self.client.get(self.url)
+
+        # Then
+        self.assertEqual(200, response.status_code)
+
+        expected_headings = ["Invoice Number", "Issue Date", "Due Date", "Amount", "Paid", "Due", "Actions"]
+        headings = [column.header for column in response.context["tables"][1].columns]
+        self.assertListEqual(expected_headings, headings)
+
+    def test_should_show_expected_invoices(self) -> None:
+        # Given
+        any_invoice()
+
+        # When
+        response = self.client.get(self.url)
+
+        # Then
+        self.assertEqual(200, response.status_code)
+
+        rows = parse_response_table_rows(response, 1)
+
+        self.maxDiff = None
+
+        expected_rows = [
+            [
+                self.invoice.invoice_number,
+                date_format(self.invoice.issue_date, format="SHORT_DATE_FORMAT"),
+                date_format(self.invoice.due_date, format="SHORT_DATE_FORMAT"),
+                self.invoice.amount,
+                self.invoice.paid,
+                self.invoice.due,
+                "",
             ]
         ]
 

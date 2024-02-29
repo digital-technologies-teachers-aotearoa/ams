@@ -8,13 +8,13 @@ from django.test import TestCase
 from django.utils import timezone
 from pydiscourse.sso import sso_payload
 
+from ams.test.utils import any_organisation, any_user_account
+
 from ...users.models import (
     MembershipOption,
     MembershipOptionType,
-    Organisation,
     OrganisationMember,
     OrganisationMembership,
-    OrganisationType,
     UserMembership,
 )
 
@@ -56,6 +56,8 @@ class ForumSingleSignOnTests(TestCase):
         self.user = User.objects.create_user(username="testuser", is_staff=False)
         self.user.save()
 
+        self.account = any_user_account(user=self.user)
+
         membership_option = MembershipOption.objects.create(
             name="Membership Option", type=MembershipOptionType.INDIVIDUAL, duration="P1M", cost="1.00"
         )
@@ -69,19 +71,7 @@ class ForumSingleSignOnTests(TestCase):
             approved_datetime=start,
         )
 
-        self.organisation = Organisation.objects.create(
-            type=OrganisationType.objects.create(name="Primary School"),
-            name="Any Organisation",
-            telephone="555-12345",
-            contact_name="John Smith",
-            email="john@example.com",
-            street_address="123 Main Street",
-            suburb="",
-            city="Capital City",
-            postal_code="8080",
-            postal_address="PO BOX 1234\nCapital City 8082",
-        )
-
+        self.organisation = any_organisation()
         organisation_membership_option = MembershipOption.objects.create(
             name="Organisation Membership Option", type=MembershipOptionType.ORGANISATION, duration="P1M", cost="1.00"
         )

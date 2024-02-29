@@ -79,6 +79,20 @@
                     </div>
                 </div>
             </div>
+
+            {% if tables.2.rows %}
+            <br>
+            <h1>{% translate "Invoices" %}</h1>
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="table-container">
+                        <div class="table-actions">
+                        </div>
+                        {% render_table tables.2 %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
         </td>
     </tr>
 </table>
