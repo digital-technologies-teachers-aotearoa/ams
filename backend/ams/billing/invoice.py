@@ -45,6 +45,10 @@ def create_membership_option_invoice(account: Account, membership_option: Member
     if not billing_service:
         return None
 
+    # Don't create an invoice if the membership is free. Admin will need to approve membership manually
+    if membership_option.cost == 0:
+        return None
+
     try:
         if account.user_id:
             email = account.user.email
