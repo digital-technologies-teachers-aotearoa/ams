@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.db import connection
 from django.db.models import (
     CASCADE,
+    SET_NULL,
     BooleanField,
     CharField,
     DateField,
@@ -86,6 +87,7 @@ class MembershipStatus(TextChoices):
 class OrganisationMembership(Model):
     organisation = ForeignKey(Organisation, on_delete=CASCADE, related_name="organisation_memberships")
     membership_option = ForeignKey(MembershipOption, on_delete=CASCADE, related_name="organisation_memberships")
+    invoice = ForeignKey("billing.Invoice", on_delete=SET_NULL, null=True, related_name="organisation_memberships")
     start_date = DateField()
     created_datetime = DateTimeField()
     cancelled_datetime = DateTimeField(null=True)
@@ -117,6 +119,7 @@ class OrganisationMembership(Model):
 class UserMembership(Model):
     user = ForeignKey(User, on_delete=CASCADE, related_name="user_memberships")
     membership_option = ForeignKey(MembershipOption, on_delete=CASCADE, related_name="user_memberships")
+    invoice = ForeignKey("billing.Invoice", on_delete=SET_NULL, null=True, related_name="user_memberships")
     start_date = DateField()
     created_datetime = DateTimeField()
     approved_datetime = DateTimeField(null=True)

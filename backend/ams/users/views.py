@@ -539,7 +539,7 @@ def edit_user_profile(request: HttpRequest, pk: int) -> HttpResponse:
     )
 
 
-def notify_staff_of_new_user_membership(request: HttpRequest, user_membership: UserMembership) -> HttpResponse:
+def notify_staff_of_new_user_membership(request: HttpRequest, user_membership: UserMembership) -> None:
     site = get_current_site(request)
     from_email = settings.DEFAULT_FROM_EMAIL
 
@@ -560,7 +560,7 @@ def notify_staff_of_new_user_membership(request: HttpRequest, user_membership: U
 
 def notify_staff_of_new_organisation_membership(
     request: HttpRequest, organisation_membership: OrganisationMembership
-) -> HttpResponse:
+) -> None:
     site = get_current_site(request)
     from_email = settings.DEFAULT_FROM_EMAIL
 
@@ -624,13 +624,14 @@ def add_user_membership(request: HttpRequest, pk: int) -> HttpResponse:
             membership_option = MembershipOption.objects.get(name=form_data["membership_option"])
 
             try:
-                create_membership_option_invoice(user.account, membership_option)
+                invoice = create_membership_option_invoice(user.account, membership_option)
 
                 user_membership = UserMembership.objects.create(
                     user=user,
                     membership_option=membership_option,
                     start_date=form_data["start_date"],
                     created_datetime=timezone.localtime(),
+                    invoice=invoice,
                 )
 
                 transaction.on_commit(
@@ -700,13 +701,14 @@ def add_organisation_membership(request: HttpRequest, pk: int) -> HttpResponse:
             membership_option = MembershipOption.objects.get(name=form_data["membership_option"])
 
             try:
-                create_membership_option_invoice(organisation.account, membership_option)
+                invoice = create_membership_option_invoice(organisation.account, membership_option)
 
                 organisation_membership = OrganisationMembership.objects.create(
                     organisation=organisation,
                     membership_option=membership_option,
                     start_date=form_data["start_date"],
                     created_datetime=timezone.localtime(),
+                    invoice=invoice,
                 )
 
                 transaction.on_commit(

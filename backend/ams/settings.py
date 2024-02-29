@@ -145,6 +145,7 @@ class Common(Configuration):
 
     # Billing service (optional)
     BILLING_SERVICE_CLASS = environ.get("BILLING_SERVICE_CLASS")
+    BILLING_EMAIL_WHITELIST_REGEX = environ.get("BILLING_EMAIL_WHITELIST_REGEX")
     XERO_TENANT_ID = environ.get("XERO_TENANT_ID")
     XERO_CLIENT_ID = environ.get("XERO_CLIENT_ID")
     XERO_CLIENT_SECRET = environ.get("XERO_CLIENT_SECRET")
