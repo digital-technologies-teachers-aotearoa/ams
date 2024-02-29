@@ -20,6 +20,7 @@ from .views import (
     individual_registration,
     invite_organisation_member,
     register_organisation_member,
+    user_activation_error,
 )
 
 urlpatterns = [
@@ -42,5 +43,6 @@ urlpatterns = [
     path("register-member/<str:invite_token>/", register_organisation_member, name="register-organisation-member"),
     path("individual-registration/", individual_registration, name="registration_register"),
     path("activate/<str:activation_key>/", activate_user, name="activate-user"),
+    path("activation-error/", user_activation_error, name="user-activation-error"),
     path("", include("registration.auth_urls")),
 ]

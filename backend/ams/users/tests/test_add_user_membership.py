@@ -405,3 +405,29 @@ class AddUserMembershipBillingTests(TestCase):
             }
         ]
         self.assertEqual(expected_messages, response.context.get("show_messages"))
+
+    @patch("ams.billing.service.MockBillingService.create_invoice")
+    def test_should_not_create_invoice_for_free_membership(self, mock_create_invoice: Mock) -> None:
+        # Given
+        start_date = self.user_membership.start_date + self.user_membership.membership_option.duration
+
+        membership_option = self.user_membership.membership_option
+        membership_option.cost = 0
+        membership_option.save()
+
+        form_values = {
+            "start_date": date_format(start_date, format=settings.SHORT_DATE_FORMAT),
+            "membership_option": membership_option.name,
+        }
+
+        # When
+        response = self.client.post(self.url, form_values)
+        self.assertEqual(302, response.status_code)
+
+        # Then
+        with self.subTest("should not call create_invoice"):
+            mock_create_invoice.assert_not_called()
+
+        with self.subTest("user membership should not have an invoice"):
+            new_membership = UserMembership.objects.filter(user=self.user).order_by("-id").first()
+            self.assertEqual(new_membership.invoice, None)
