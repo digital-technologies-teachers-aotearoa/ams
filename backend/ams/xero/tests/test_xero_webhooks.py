@@ -13,7 +13,7 @@ from django.utils import timezone
 from xero_python.accounting import Invoice as AccountingInvoice
 
 from ams.billing.models import Account, Invoice
-from ams.test.utils import any_user
+from ams.test.utils import any_user, any_user_membership
 
 if "ams.xero" not in settings.INSTALLED_APPS:
     pytest.skip(reason="ams.xero not in INSTALLED_APPS", allow_module_level=True)
@@ -139,6 +139,75 @@ class XeroWebhooksTests(TestCase):
         self.assertEqual(invoice.paid, updated_invoice.amount_paid)
         self.assertEqual(invoice.due, updated_invoice.amount_due)
         self.assertEqual(invoice.update_needed, False)
+
+    @patch("ams.xero.service.MockXeroBillingService._get_xero_invoices")
+    def test_should_activate_user_membership_when_invoice_paid(self, mock__get_xero_invoices: Mock) -> None:
+        # Given
+        invoice_number = "INV-1234"
+        billing_service_invoice_id = "c576f965-e2fb-359f-7ea8-135424ae31d6"
+
+        user = any_user()
+        Account.objects.create(user=user)
+
+        user_membership = any_user_membership(user=user)
+        user_membership.approved_datetime = None
+        user_membership.save()
+
+        invoice = Invoice.objects.create(
+            account=user.account,
+            billing_service_invoice_id=billing_service_invoice_id,
+            invoice_number=invoice_number,
+            issue_date=timezone.localdate(),
+            due_date=timezone.localdate() + relativedelta(months=1),
+            amount=100,
+            due=100,
+            paid=0,
+            paid_date=None,
+            update_needed=False,
+        )
+
+        user_membership.invoice = invoice
+        user_membership.save()
+
+        updated_invoice = AccountingInvoice(
+            invoice_id=billing_service_invoice_id,
+            invoice_number=invoice_number,
+            date=timezone.localdate() + relativedelta(days=1),
+            due_date=timezone.localdate() + relativedelta(months=2),
+            fully_paid_on_date=timezone.localdate(),
+            total=100,
+            amount_paid=100,
+            amount_due=0,
+        )
+
+        mock__get_xero_invoices.return_value = [updated_invoice]
+
+        payload = {
+            "events": [
+                {
+                    "eventCategory": "INVOICE",
+                    "eventType": "UPDATE",
+                    "tenantId": settings.XERO_TENANT_ID,
+                    "resourceId": updated_invoice.invoice_id,
+                }
+            ]
+        }
+
+        request_body = json.dumps(payload).encode("utf-8")
+        headers = {"x-xero-signature": self._generate_signature(request_body)}
+
+        # When
+        response = self.client.post(self.url, content_type="application/json", data=request_body, headers=headers)
+        self.assertEqual(response.status_code, 200)
+
+        # Then
+        mock__get_xero_invoices.assert_called_with([updated_invoice.invoice_id])
+
+        invoice.refresh_from_db()
+        self.assertEqual(invoice.paid_date, updated_invoice.fully_paid_on_date)
+
+        user_membership.refresh_from_db()
+        self.assertIsNotNone(user_membership.approved_datetime)
 
     @patch("ams.xero.service.MockXeroBillingService._get_xero_invoices")
     def test_should_flag_invoice_as_update_needed_if_error(self, mock__get_xero_invoices: Mock) -> None:

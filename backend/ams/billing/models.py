@@ -1,3 +1,5 @@
+from typing import Any
+
 from django.contrib.auth.models import User
 from django.db.models import (
     CASCADE,
@@ -11,8 +13,11 @@ from django.db.models import (
     OneToOneField,
     Q,
 )
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
+from django.utils import timezone
 
-from ams.users.models import Organisation
+from ams.users.models import MembershipStatus, Organisation
 
 
 class Account(Model):
@@ -33,8 +38,20 @@ class Invoice(Model):
     invoice_number = CharField(max_length=255, unique=True)
     issue_date = DateField()
     due_date = DateField()
+    paid_date = DateField(null=True)
     amount = DecimalField(max_digits=10, decimal_places=2)
     paid = DecimalField(max_digits=10, decimal_places=2)
     due = DecimalField(max_digits=10, decimal_places=2)
     billing_service_invoice_id = CharField(max_length=255, unique=True, null=True)
     update_needed = BooleanField(default=False)
+
+
+@receiver(pre_save, sender=Invoice)
+def approve_paid_user_memberships(sender: Any, instance: Invoice, **kwargs: Any) -> None:
+    # When the invoice is paid, approve individual user membership(s)
+    if instance.pk and instance.paid_date:
+        if Invoice.objects.get(pk=instance.pk).paid_date is None:
+            for user_membership in instance.user_memberships.all():
+                if user_membership.status() == MembershipStatus.PENDING:
+                    user_membership.approved_datetime = timezone.now()
+                    user_membership.save()
