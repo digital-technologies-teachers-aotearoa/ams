@@ -144,6 +144,11 @@ Recreate/Empty the Discourse database:
 To use Xero as your billing service set `BILLING_SERVICE_CLASS` to `ams.xero.service.XeroBillingService`
 in your `.env` file as well as the XERO prefixed variables.
 
+To get the correct XERO_TENANT_ID you need to query the connection in the API:
+https://developer.xero.com/documentation/guides/oauth2/tenants/#check-the-tenants-youre-authorised-to-access
+
+It also appears in the API history entries.  Navigate to the history section of the app in the My Apps section of the Xero developer dashboard https://developer.xero.com/app/manage.
+
 To prevent accidentally emailing invoices while testing, set `BILLING_EMAIL_WHITELIST_REGEX` to
 a [regular expression](https://docs.python.org/3/library/re.html#regular-expression-syntax) matching email addresses that should receive invoices. E.g. '@example\.com$'.
 
