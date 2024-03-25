@@ -1,5 +1,8 @@
+from dateutil.tz import gettz
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import TestCase
+from django.utils.formats import date_format
 
 from ...test.utils import parse_response_table_rows
 
@@ -11,6 +14,7 @@ class AdminUserListTests(TestCase):
         self.user.last_name = "Smith"
         self.user.email = "user@example.com"
         self.user.save()
+        self.time_zone = gettz(settings.TIME_ZONE)
 
     def test_should_not_allow_access_to_non_admin_user(self) -> None:
         # Given
@@ -47,7 +51,7 @@ class AdminUserListTests(TestCase):
         # Then
         self.assertEqual(200, response.status_code)
 
-        expected_columns = ["full_name", "email", "active", "actions"]
+        expected_columns = ["full_name", "email", "active", "join_date", "actions"]
         columns = [column.name for column in response.context["table"].columns]
         self.assertListEqual(expected_columns, columns)
 
@@ -61,7 +65,7 @@ class AdminUserListTests(TestCase):
         # Then
         self.assertEqual(200, response.status_code)
 
-        expected_columns = ["Full Name", "Email", "Active", "Actions"]
+        expected_columns = ["Full Name", "Email", "Active", "Join Date", "Actions"]
         columns = [column.header for column in response.context["table"].columns]
         self.assertListEqual(expected_columns, columns)
 
@@ -82,8 +86,20 @@ class AdminUserListTests(TestCase):
         rows = parse_response_table_rows(response)
 
         expected_rows = [
-            [self.user.get_full_name(), self.user.email, "Active", "View,Edit"],
-            [inactive_user.get_full_name(), inactive_user.email, "Not Active", "View,Edit"],
+            [
+                self.user.get_full_name(),
+                self.user.email,
+                "Active",
+                date_format(self.user.date_joined.astimezone(self.time_zone), format="SHORT_DATE_FORMAT"),
+                "View,Edit",
+            ],
+            [
+                inactive_user.get_full_name(),
+                inactive_user.email,
+                "Not Active",
+                date_format(inactive_user.date_joined.astimezone(self.time_zone), format="SHORT_DATE_FORMAT"),
+                "View,Edit",
+            ],
         ]
 
         self.assertListEqual(expected_rows, rows)
