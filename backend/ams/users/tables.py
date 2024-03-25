@@ -32,6 +32,7 @@ class AdminUserTable(Table):
     )
     email = Column(verbose_name=_("Email"))
     active = Column(accessor="is_active", verbose_name=_("Active"))
+    join_date = DateColumn(accessor="date_joined", verbose_name=_("Join Date"), short=True)
     actions = TemplateColumn(verbose_name=_("Actions"), template_name="admin_user_actions.html", orderable=False)
 
     def render_full_name(self, value: str, record: User) -> str:
@@ -43,7 +44,7 @@ class AdminUserTable(Table):
         return _("Not Active")
 
     class Meta:
-        fields = ("full_name", "email")
+        fields = ("full_name", "email", "active", "join_date")
         order_by = ("full_name", "email", "active")
         model = User
 
