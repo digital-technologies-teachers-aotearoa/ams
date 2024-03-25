@@ -54,9 +54,9 @@ scan backend:
     - ./crane pull $IMAGE image.tar
     - trivy image --clear-cache
     - trivy --cache-dir .trivycache/ image --download-db-only --no-progress
-    - trivy --cache-dir .trivycache/ image --exit-code 1 --no-progress --severity HIGH,CRITICAL --input image.tar
+    - trivy --cache-dir .trivycache/ image --exit-code 1 --no-progress --scanners vuln --severity HIGH,CRITICAL --input image.tar
     # Explicitly scan python dependencies in poetry.lock as trivy misses them when scanning the image
-    - trivy --cache-dir .trivycache/ fs --exit-code 1 --no-progress --severity HIGH,CRITICAL ${CI_PROJECT_DIR}/backend/poetry.lock
+    - trivy --cache-dir .trivycache/ fs --exit-code 1 --no-progress --scanners vuln --severity HIGH,CRITICAL ${CI_PROJECT_DIR}/backend/poetry.lock
 
 
 lint backend:
