@@ -51,6 +51,7 @@ from .forms import (
 )
 from .models import (
     MembershipOption,
+    MembershipOptionType,
     MembershipStatus,
     Organisation,
     OrganisationMember,
@@ -92,7 +93,9 @@ def individual_registration(request: HttpRequest) -> HttpResponse:
 
             Account.objects.create(user=new_user)
 
-            membership_option = MembershipOption.objects.get(name=form_data["membership_option"])
+            membership_option = MembershipOption.objects.get(
+                name=form_data["membership_option"], type=MembershipOptionType.INDIVIDUAL
+            )
             UserMembership.objects.create(
                 user=new_user,
                 membership_option=membership_option,
@@ -675,7 +678,9 @@ def add_user_membership(request: HttpRequest, pk: int) -> HttpResponse:
 
         if form.is_valid():
             form_data = form.cleaned_data
-            membership_option = MembershipOption.objects.get(name=form_data["membership_option"])
+            membership_option = MembershipOption.objects.get(
+                name=form_data["membership_option"], type=MembershipOptionType.INDIVIDUAL
+            )
 
             try:
                 # NOTE: invoice will be None if no billing service installed
@@ -753,7 +758,9 @@ def add_organisation_membership(request: HttpRequest, pk: int) -> HttpResponse:
         form = AddOrganisationMembershipForm(request.POST, organisation=organisation)
         if form.is_valid():
             form_data = form.cleaned_data
-            membership_option = MembershipOption.objects.get(name=form_data["membership_option"])
+            membership_option = MembershipOption.objects.get(
+                name=form_data["membership_option"], type=MembershipOptionType.ORGANISATION
+            )
 
             try:
                 # NOTE: invoice will be None if no billing service installed
