@@ -24,6 +24,7 @@ Additional setup instructions:
 
 1. [Discourse setup](#discourse-setup) instructions.
 1. [Billing service setup](#billing-service-setup) instructions.
+1. [User import](#user-import) instructions.
 
 ### Stylesheet editing
 
@@ -161,3 +162,31 @@ For testing purposes you can use a proxy service like [Ngrok](https://ngrok.com/
 Here is a tutorial on [how to setup Xero webhooks with Ngrok](https://ngrok.com/docs/integrations/xero/webhooks/). Command line:
 
     ngrok http --host-header ams.local http://ams.local
+
+### User import
+
+The `importdttausers` management command can be used to bulk create users from a CSV file.
+
+    ./manage.py importdttausers [--dry-run] CSV_FILE
+
+The file should consist of the following columns:
+
+    ID                        - User ID from the legacy system
+    Unused                    - ignored
+    First name                - User first name
+    Last name                 - User last name
+    Email                     - User email
+    Organisation name         - Name of the organisation the user belongs to or blank if they don't belong to one
+    Inividual membership name - Name of the user's individual membership or blank if they don't have one
+    Organisation type         - Name of the organisation type if they have one or blank
+    Join date                 - Date they joined system
+    Organisation admin        - blank or 'Y' if the user should be made admin an admin of the organisation
+
+A user must either have an organisation or an individual membership.
+
+If the organisation does not exist already in the system it will be created with the details in the file. The email of the organisation will be
+created as `dtta-default-address+ID@catalyst.net.nz` where `ID` is the legacy user ID above (it is only used for this).
+
+Any rows that are invalid will be skipped with a message explaining the issue.
+
+You can run the script with `--dry-run` to see what it will do without it updating the database.

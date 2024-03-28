@@ -33,5 +33,12 @@
         "fields": {
             "name": "Commercial"
         }
+    },
+    {
+        "model": "users.OrganisationType",
+        "pk": 6,
+        "fields": {
+            "name": "Wider Education Sector"
+        }
     }
 ]
