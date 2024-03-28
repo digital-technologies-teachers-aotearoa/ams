@@ -107,6 +107,7 @@ class UserImportTests(TestCase):
             self.assertEqual(user.is_active, False)
             self.assertEqual(user.is_staff, False)
             self.assertEqual(user.is_superuser, False)
+            self.assertIsNotNone(user.account)
 
         with self.subTest("Creates expected individual user membership"):
             user_membership = user.user_memberships.get()
@@ -144,6 +145,7 @@ class UserImportTests(TestCase):
             self.assertEqual(user.is_active, False)
             self.assertEqual(user.is_staff, False)
             self.assertEqual(user.is_superuser, False)
+            self.assertIsNotNone(user.account)
 
         organisation = Organisation.objects.get()
         with self.subTest("Creates expected organisation"):
@@ -156,6 +158,7 @@ class UserImportTests(TestCase):
             self.assertEqual(organisation.postal_suburb, "N/A")
             self.assertEqual(organisation.postal_city, "N/A")
             self.assertEqual(organisation.postal_code, "N/A")
+            self.assertIsNotNone(organisation.account)
 
         with self.subTest("Creates expected organisation membership"):
             organisation_membership = organisation.organisation_memberships.get()

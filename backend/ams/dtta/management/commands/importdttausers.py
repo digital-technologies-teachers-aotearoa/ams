@@ -133,6 +133,8 @@ class Command(BaseCommand):
                     postal_city=placeholder,
                     postal_code=placeholder,
                 )
+                Account.objects.create(organisation=organisation)
+
                 organisation_membership_option = MembershipOption.objects.get(
                     name=organisation_type_name, type=MembershipOptionType.ORGANISATION
                 )
