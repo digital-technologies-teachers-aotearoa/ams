@@ -1,7 +1,0 @@
-{% load i18n %}{% blocktranslate with first_name=user.first_name organisation_name=organisation.name %}Hello {{ first_name }},
-
-{{ organisation_name }} has had a new membership added.
-
-Click the link below to review the organisation.
-{% endblocktranslate %}
-https://{{ site.domain }}/organisations/view/{{ organisation.pk }}

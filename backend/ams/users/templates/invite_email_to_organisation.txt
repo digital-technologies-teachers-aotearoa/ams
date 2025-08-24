@@ -1,8 +1,0 @@
-{% load i18n %}{% blocktranslate with organisation_name=organisation.name site_name=site.name %}You have been invited to join the organisation {{ organisation_name }} in {{ site_name }}.
-
-Click the link below to accept the invitation.
-{% endblocktranslate %}
-https://{{ site.domain }}/users/register-member/{{ invite_token }}/
-{% blocktranslate %}
-You will be asked to provide a password when accepting the invitation. After that you will be given access to the project and will be able to login.
-{% endblocktranslate %}

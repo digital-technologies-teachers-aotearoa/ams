@@ -1,2 +1,0 @@
-#!/bin/bash
-DOCKER_USER_UID=$UID docker compose -f docker-compose.yml -f docker-compose.dev.yml "$@"

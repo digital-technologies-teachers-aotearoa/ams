@@ -1,7 +1,0 @@
-{% load i18n %}{% blocktranslate with first_name=user.first_name site_name=site.name %}Hello {{ first_name }},
-
-You're almost ready to start enjoying {{ site_name }}.
-
-Simply click the link below to verify your email address.
-{% endblocktranslate %}
-https://{{ site.domain }}{% url 'activate-user' activation_key %}

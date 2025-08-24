@@ -1,6 +1,0 @@
-PATH=/bin:/usr/bin:/home/user/.local/bin/
-OUTPUT=/tmp/cron.out
-# Clean up expired user registrations daily
-0 1 * * * cd /src/app/ && poetry run /src/app/manage.py cleanupregistration > $OUTPUT 2>&1
-# Fetch any outstanding updates to invoices that have changed in Xero
-*/5 * * * * cd /src/app/ && poetry run /src/app/manage.py fetchinvoiceupdates > $OUTPUT 2>&1
