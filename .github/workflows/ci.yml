@@ -19,7 +19,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  linter:
+  project-lint:
+    name: Run project linting
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code Repository
@@ -29,12 +30,12 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version-file: '.python-version'
-      # Consider using pre-commit.ci for open source project
+
       - name: Run pre-commit
         uses: pre-commit/action@v3.0.1
 
-  # With no caching at all the entire ci process takes 3m to complete!
-  pytest:
+  django-test:
+    name: Run Django tests
     runs-on: ubuntu-latest
 
     steps:
@@ -67,14 +68,14 @@ jobs:
             docs.cache-from=type=gha,scope=cached-docs
             docs.cache-to=type=gha,scope=cached-docs,mode=max
 
-      - name: Check DB Migrations
+      - name: Check database migrations
         run: docker compose -f docker-compose.local.yml run --rm django python manage.py makemigrations --check
 
-      - name: Run DB Migrations
+      - name: Run database migrations
         run: docker compose -f docker-compose.local.yml run --rm django python manage.py migrate
 
-      - name: Run Django Tests
+      - name: Run Django tests
         run: docker compose -f docker-compose.local.yml run django pytest
 
-      - name: Tear down the Stack
+      - name: Teardown
         run: docker compose -f docker-compose.local.yml down
