@@ -104,13 +104,15 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push Django image
-        uses: docker/bake-action@v6
+        uses: docker/build-push-action@v6
         with:
+          context: .
+          file: compose/production/django/Dockerfile
           push: true
-          files: docker-compose.production.yml
-          targets: django
-          set: |
-            django.tags=ghcr.io/${{ github.repository }}-django:latest,ghcr.io/${{ github.repository }}-django:${{ github.sha }}
-            django.labels=org.opencontainers.image.revision=${{ github.sha }}
-            django.cache-from=type=gha,scope=django
-            django.cache-to=type=gha,scope=django,mode=max
+          tags: |
+            ghcr.io/${{ github.repository }}-django:latest
+            ghcr.io/${{ github.repository }}-django:${{ github.sha }}
+          labels: |
+            org.opencontainers.image.revision=${{ github.sha }}
+          cache-from: type=gha,scope=django
+          cache-to: type=gha,scope=django,mode=max
