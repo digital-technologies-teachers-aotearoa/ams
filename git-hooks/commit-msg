@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-
-regex='^(Merge branch|RM#[0-9]+: )'
-
-if ! [[ $(head --lines=1 "$1") =~ $regex ]]
-then
-    echo "Your commit subject must match ${regex}. Aborting." >&2
-    exit 1
-fi
