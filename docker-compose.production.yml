@@ -3,8 +3,6 @@ volumes:
   production_postgres_data_backups: {}
   production_traefik: {}
   production_django_media: {}
-  
-
 
 services:
   django:
@@ -49,7 +47,6 @@ services:
 
   redis:
     image: docker.io/redis:6
-    
 
   nginx:
     build:
