@@ -1,7 +1,6 @@
 volumes:
   ams_local_postgres_data: {}
   ams_local_postgres_data_backups: {}
-  
 
 services:
   django:
@@ -38,7 +37,7 @@ services:
     image: docker.io/axllent/mailpit:latest
     container_name: ams_local_mailpit
     ports:
-      - "8025:8025"
+      - '8025:8025'
 
   node:
     build:

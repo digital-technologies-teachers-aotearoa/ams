@@ -1,10 +1,9 @@
-# ruff: noqa: ERA001, E501
+# ruff: noqa: E501
 """Base settings to build other settings files upon."""
 
 from pathlib import Path
 
 import environ
-
 from django.utils.translation import gettext_lazy as _
 
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
@@ -30,7 +29,7 @@ TIME_ZONE = "UTC"
 LANGUAGE_CODE = "en-us"
 # https://docs.djangoproject.com/en/dev/ref/settings/#languages
 LANGUAGES = [
-    ('en', _('English')),
+    ("en", _("English")),
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#site-id
 SITE_ID = 1
