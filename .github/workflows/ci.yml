@@ -14,6 +14,10 @@ on:
     branches: ['main']
     paths-ignore: ['docs/**']
 
+permissions:
+  contents: read
+  packages: write
+
 concurrency:
   group: ${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
@@ -79,3 +83,34 @@ jobs:
 
       - name: Teardown
         run: docker compose -f docker-compose.local.yml down
+
+  publish-image:
+    name: Build and push image
+    runs-on: ubuntu-latest
+    needs: [project-lint, django-test]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v5
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Django image
+        uses: docker/bake-action@v6
+        with:
+          push: true
+          files: docker-compose.production.yml
+          targets: django
+          set: |
+            django.tags=ghcr.io/${{ github.repository }}-django:latest,ghcr.io/${{ github.repository }}-django:${{ github.sha }}
+            django.labels=org.opencontainers.image.revision=${{ github.sha }}
+            django.cache-from=type=gha,scope=django
+            django.cache-to=type=gha,scope=django,mode=max
