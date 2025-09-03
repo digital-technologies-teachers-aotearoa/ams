@@ -1,0 +1,15 @@
+site_name: Association Management System Documentation
+repo_url: https://github.com/digital-technologies-teachers-aotearoa/ams
+repo_name: AMS on GitHub
+
+theme:
+  name: material
+  custom_dir: overrides
+extra_css:
+  - assets/stylesheets/main.css
+
+markdown_extensions:
+  - tables
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences

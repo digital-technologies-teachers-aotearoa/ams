@@ -1,14 +1,14 @@
 volumes:
-  ams_local_postgres_data: {}
-  ams_local_postgres_data_backups: {}
+  ams_postgres_data: {}
+  ams_postgres_data_backups: {}
 
 services:
   django:
     build:
       context: .
       dockerfile: ./compose/local/django/Dockerfile
-    image: ams_local_django
-    container_name: ams_local_django
+    image: ams_django
+    container_name: ams_django
     depends_on:
       - postgres
       - mailpit
@@ -25,17 +25,17 @@ services:
     build:
       context: .
       dockerfile: ./compose/production/postgres/Dockerfile
-    image: ams_production_postgres
-    container_name: ams_local_postgres
+    image: ams_postgres
+    container_name: ams_postgres
     volumes:
-      - ams_local_postgres_data:/var/lib/postgresql/data
-      - ams_local_postgres_data_backups:/backups
+      - ams_postgres_data:/var/lib/postgresql/data
+      - ams_postgres_data_backups:/backups
     env_file:
       - ./.envs/.local/.postgres
 
   mailpit:
     image: docker.io/axllent/mailpit:latest
-    container_name: ams_local_mailpit
+    container_name: ams_mailpit
     ports:
       - '8025:8025'
 
@@ -43,8 +43,8 @@ services:
     build:
       context: .
       dockerfile: ./compose/local/node/Dockerfile
-    image: ams_local_node
-    container_name: ams_local_node
+    image: ams_node
+    container_name: ams_node
     depends_on:
       - django
     volumes:
@@ -56,3 +56,11 @@ services:
       - '3000:3000'
       # Expose browsersync UI: https://www.browsersync.io/docs/options/#option-ui
       - '3001:3001'
+
+  docs:
+    container_name: ams_docs
+    image: squidfunk/mkdocs-material
+    ports:
+      - '8001:8000'
+    volumes:
+      - ./docs/:/docs:z
