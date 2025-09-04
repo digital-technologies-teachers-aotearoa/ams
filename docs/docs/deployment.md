@@ -1,9 +1,16 @@
 # Deployment
 
-## Production
+Upon a push to the `main` branch, a Docker image is built and stored on [GitHub Container Registry](https://github.com/digital-technologies-teachers-aotearoa/ams/pkgs/container/ams-django).
+
+## Development environment
+
+When the Docker image is built, this image is automatically deployed to the development environment hosted on DigitalOcean.
+The development environment is avaiable at [django-rnnrj.ondigitalocean.app](https://django-rnnrj.ondigitalocean.app/).
+
+## Production environment
 
 By running an [AMS Docker image](https://ghcr.io/digital-technologies-teachers-aotearoa/ams-django), the software can be deployed in a production environment.
-This can be run on any managed platform that supports Docker containers, such as [Digital Ocean](https://www.digitalocean.com/), or you can manage it yourself with a system such as [Kubernetes](https://kubernetes.io/).
+This can be run on any managed platform that supports Docker containers, such as [DigitalOcean](https://www.digitalocean.com/), or you can manage it yourself with a system such as [Kubernetes](https://kubernetes.io/).
 The following environment variables are required:
 
 | Variable | Example Value | Description |

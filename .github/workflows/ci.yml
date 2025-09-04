@@ -104,6 +104,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push Django image
+        id: push
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -116,6 +117,16 @@ jobs:
             org.opencontainers.image.revision=${{ github.sha }}
           cache-from: type=gha,scope=django
           cache-to: type=gha,scope=django,mode=max
+
+      - name: Deploy to DigitalOcean App Platform (ams-dev)
+        uses: digitalocean/app_action/deploy@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_DEPLOY_TOKEN }}
+          app_name: ams-dev-website
+          print_build_logs: true
+          print_deploy_logs: true
+        env:
+          IMAGE_DIGEST_DJANGO: ${{ steps.push.outputs.digest }}
 
   deploy-docs:
     name: Deploy docs
