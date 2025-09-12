@@ -64,7 +64,7 @@ DJANGO_APPS = [
     "django.contrib.sites",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    # "django.contrib.humanize", # Handy template tags
+    "django.contrib.humanize",
     "django.contrib.admin",
     "django.forms",
 ]
@@ -75,11 +75,25 @@ THIRD_PARTY_APPS = [
     "allauth.account",
     "allauth.mfa",
     "allauth.socialaccount",
+    "wagtail.contrib.forms",
+    "wagtail.contrib.redirects",
+    "wagtail.embeds",
+    "wagtail.sites",
+    "wagtail.users",
+    "wagtail.snippets",
+    "wagtail.documents",
+    "wagtail.images",
+    "wagtail.search",
+    "wagtail.admin",
+    "wagtail",
+    "modelcluster",
+    "taggit",
 ]
 
 LOCAL_APPS = [
     "ams.users",
-    # Your stuff: custom apps go here
+    "ams.cms",
+    "ams.utils",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -137,6 +151,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",
+    "wagtail.contrib.redirects.middleware.RedirectMiddleware",
 ]
 
 # STATIC
@@ -276,5 +291,33 @@ SOCIALACCOUNT_ADAPTER = "ams.users.adapters.SocialAccountAdapter"
 SOCIALACCOUNT_FORMS = {"signup": "ams.users.forms.UserSocialSignupForm"}
 
 
-# Your stuff...
+# Wagtail
 # ------------------------------------------------------------------------------
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 10_000
+WAGTAIL_SITE_NAME = "AMS Demo"
+WAGTAILADMIN_BASE_URL = "http://example.com"
+WAGTAILDOCS_EXTENSIONS = [
+    "csv",
+    "docx",
+    "key",
+    "odt",
+    "pdf",
+    "pptx",
+    "rtf",
+    "txt",
+    "xlsx",
+    "zip",
+]
+
+# Sample data generation
+# ------------------------------------------------------------------------------
+# Admin
+SAMPLE_DATA_ADMIN_EMAIL = env("SAMPLE_DATA_ADMIN_EMAIL", default="admin@ams.com")
+SAMPLE_DATA_ADMIN_PASSWORD = env("SAMPLE_DATA_ADMIN_PASSWORD", default="password")
+# User
+SAMPLE_DATA_USER_EMAIL = env("SAMPLE_DATA_USER_EMAIL", default="user@ams.com")
+SAMPLE_DATA_USER_PASSWORD = env("SAMPLE_DATA_USER_PASSWORD", default="password")
+
+# Other settings
+# ------------------------------------------------------------------------------
+DEPLOYED = env.bool("DEPLOYED", default=False)
