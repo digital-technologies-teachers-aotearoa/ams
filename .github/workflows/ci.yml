@@ -54,7 +54,7 @@ jobs:
         with:
           push: false
           load: true
-          files: docker-compose.local.yml
+          files: docker-compose.yml
           targets: django
           set: |
             django.cache-from=type=gha,scope=django-cached-tests
@@ -63,16 +63,16 @@ jobs:
             postgres.cache-to=type=gha,scope=postgres-cached-tests,mode=max
 
       - name: Check database migrations
-        run: docker compose -f docker-compose.local.yml run --rm django python manage.py makemigrations --check
+        run: docker compose run --rm django python manage.py makemigrations --check
 
       - name: Run database migrations
-        run: docker compose -f docker-compose.local.yml run --rm django python manage.py migrate
+        run: docker compose run --rm django python manage.py migrate
 
       - name: Run Django tests
-        run: docker compose -f docker-compose.local.yml run django pytest
+        run: docker compose run django pytest
 
       - name: Teardown
-        run: docker compose -f docker-compose.local.yml down
+        run: docker compose down
 
   build-docs:
     name: Build docs
@@ -82,7 +82,7 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Build MkDocs documentation
-        run: docker compose -f docker-compose.local.yml run --rm docs build
+        run: docker compose run --rm docs build
 
   publish-image:
     name: Build and push image
@@ -141,7 +141,7 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Build MkDocs documentation
-        run: docker compose -f docker-compose.local.yml run --rm docs build
+        run: docker compose run --rm docs build
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5

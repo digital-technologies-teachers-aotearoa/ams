@@ -15,8 +15,8 @@ services:
     volumes:
       - .:/app:z
     env_file:
-      - ./.envs/.local/.django
-      - ./.envs/.local/.postgres
+      - ./.envs/.local/django.ini
+      - ./.envs/.local/postgres.ini
     ports:
       - '8000:8000'
     command: sleep infinity
@@ -33,7 +33,7 @@ services:
     ports:
       - '5432:5432'
     env_file:
-      - ./.envs/.local/.postgres
+      - ./.envs/.local/postgres.ini
 
   mailpit:
     image: docker.io/axllent/mailpit:latest
