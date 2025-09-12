@@ -11,6 +11,15 @@ class Command(management.base.BaseCommand):
 
     help = "Add sample data to database."
 
+    def add_arguments(self, parser):
+        """Interprets arguments passed to command."""
+
+        parser.add_argument(
+            "--flush",
+            action="store_true",
+            help="Flushes the database before adding sample data.",
+        )
+
     def handle(self, *args, **options):
         """Automatically called when the sampledata command is given."""
         if settings.DEPLOYED:
@@ -18,9 +27,12 @@ class Command(management.base.BaseCommand):
             raise management.base.CommandError(message)
 
         # Clear all data
-        self.stdout.write(LOG_HEADER.format("💾 Wipe database"))
-        management.call_command("flush", interactive=False)
-        self.stdout.write("✅ Database wiped.")
+        if options["flush"]:
+            self.stdout.write(LOG_HEADER.format("💾 Wipe database"))
+            management.call_command("flush", interactive=False)
+            management.call_command("loaddata", "wagtailcore_initial_data")
+            management.call_command("loaddata", "wagtailimages_initial_data")
+            self.stdout.write("✅ Database wiped.")
 
         # Create admin account
         management.call_command("create_admin")
