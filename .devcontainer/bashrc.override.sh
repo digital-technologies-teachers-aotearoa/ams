@@ -30,3 +30,5 @@ set +o errexit +o pipefail +o nounset 2>/dev/null || true
 # start ssh-agent
 # https://code.visualstudio.com/docs/remote/troubleshooting
 eval "$(ssh-agent -s)"
+
+alias runserver='python manage.py runserver 0.0.0.0:8000'
