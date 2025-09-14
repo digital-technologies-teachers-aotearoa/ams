@@ -17,8 +17,6 @@ services:
     env_file:
       - ./.envs/.local/django.ini
       - ./.envs/.local/postgres.ini
-    ports:
-      - '8000:8000'
     command: sleep infinity
 
   postgres:

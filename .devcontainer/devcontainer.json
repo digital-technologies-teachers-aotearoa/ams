@@ -41,6 +41,10 @@
                     "linting.enabled": true,
                     "linting.mypyEnabled": true,
                     "linting.mypyPath": "/usr/local/bin/mypy",
+                },
+                "[html][django-html][handlebars][hbs][mustache][jinja][jinja-html][nj][njk][nunjucks][twig]": {
+                    "editor.defaultFormatter": "monosans.djlint",
+                    "editor.formatOnSave": true
                 }
             },
             // https://code.visualstudio.com/docs/remote/devcontainerjson-reference#_vs-code-specific-properties
@@ -55,7 +59,8 @@
                 "ms-python.vscode-pylance",
                 "charliermarsh.ruff",
                 // django
-                "batisteo.vscode-django"
+                "batisteo.vscode-django",
+                "monosans.djlint"
             ]
         }
     },
