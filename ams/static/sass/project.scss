@@ -34,3 +34,11 @@ $red: #b94a48;
   border-color: $dark-pink;
   color: $red;
 }
+
+/* Custom */
+main > .container {
+  // Spacing from top of page to content (under navbar)
+  padding-top: 6rem;
+  // Spacing from bottom of content to footer
+  padding-bottom: 3rem;
+}

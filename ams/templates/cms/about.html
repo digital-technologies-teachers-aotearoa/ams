@@ -3,5 +3,6 @@
 {% load wagtailcore_tags %}
 
 {% block content %}
-  {{ page.body|richtext }}
+  <h1 class="text-body-emphasis">{{ page.title }}</h1>
+  <div class="col-12 col-sm-8 col-lg-6 mb-3">{{ page.text|richtext }}</div>
 {% endblock content %}
