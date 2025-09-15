@@ -36,3 +36,6 @@ class Command(management.base.BaseCommand):
 
         # Create admin account
         management.call_command("create_admin")
+
+        # Check CMS pages
+        management.call_command("ensure_required_cms_pages")
