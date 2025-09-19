@@ -1,0 +1,6 @@
+{% load wagtailimages_tags %}
+
+<figure class="figure text-center d-block">
+  {% image self.image original loading="lazy" class="figure-img img-fluid" %}
+  <figcaption class="figure-caption text-center">{{ self.caption }} - {{ self.attribution }}</figcaption>
+</figure>
