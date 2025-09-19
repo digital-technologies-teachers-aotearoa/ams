@@ -27,3 +27,10 @@ The following environment variables are required:
 | `MAILGUN_DOMAIN` | `sandbox.mailgun.org` | The domain for Mailgun |
 | `MAILGUN_API_URL` | `https://api.mailgun.net` | The API URL for Mailgun |
 | `SENTRY_DSN` | `https://123@456.ingest.de.sentry.io/789` | The DSN value for Sentry observability |
+
+## Deployment steps
+
+During the deployment, there is a Django management command `deploy_steps` that will perform the following steps:
+
+1. Migrate the database.
+2. Check required CMS pages are present.
