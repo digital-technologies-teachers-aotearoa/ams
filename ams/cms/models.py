@@ -4,7 +4,10 @@ from wagtail.admin.panels import MultiFieldPanel
 from wagtail.contrib.settings.models import BaseGenericSetting
 from wagtail.contrib.settings.models import register_setting
 from wagtail.fields import RichTextField
+from wagtail.fields import StreamField
 from wagtail.models import Page
+
+from ams.cms.blocks import BaseStreamBlock
 
 
 class HomePage(Page):
@@ -17,11 +20,16 @@ class HomePage(Page):
 
 
 class AboutPage(Page):
-    text = RichTextField(blank=True)
+    body = StreamField(
+        BaseStreamBlock(),
+        blank=True,
+        use_json_field=True,
+        help_text="Content for the about page.",
+    )
 
     # Metadata
     max_count = 1
-    content_panels = [*Page.content_panels, "text"]
+    content_panels = [*Page.content_panels, FieldPanel("body")]
     template = "cms/about.html"
     parent_page_types = ["cms.HomePage"]
     subpage_types = []

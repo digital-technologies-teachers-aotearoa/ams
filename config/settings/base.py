@@ -311,6 +311,7 @@ WAGTAILDOCS_EXTENSIONS = [
     "xlsx",
     "zip",
 ]
+WAGTAILEMBEDS_RESPONSIVE_HTML = True
 
 # Sample data generation
 # ------------------------------------------------------------------------------
