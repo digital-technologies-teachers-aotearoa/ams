@@ -1,5 +1,11 @@
 {
   "python.testing.pytestArgs": ["ams"],
   "python.testing.unittestEnabled": false,
-  "python.testing.pytestEnabled": true
+  "python.testing.pytestEnabled": true,
+  "markdownlint.config": {
+    "MD013": false,
+    "MD007": {
+      "indent": 4
+    }
+  }
 }
