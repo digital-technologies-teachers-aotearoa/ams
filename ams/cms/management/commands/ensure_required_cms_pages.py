@@ -33,13 +33,6 @@ class Command(BaseCommand):
         self.stdout.write(f"✅ Home page: {'Created' if created_home else 'Exists'}")
         self.stdout.write(f"✅ About page: {'Created' if created_about else 'Exists'}")
 
-        # Ensure About page is a child of Home page
-        if about.get_parent_id() != home.id:
-            about.move(home, pos="last-child")
-            self.stdout.write("✅ Moved About page under Home page")
-        else:
-            self.stdout.write("✅ About page already under Home page")
-
         # Ensure there's a Site pointing to the HomePage
         site = Site.objects.first()
         if site:
@@ -56,3 +49,11 @@ class Command(BaseCommand):
                 is_default_site=True,
             )
             self.stdout.write("✅ Created default Site pointing to HomePage")
+
+        # Ensure About page is a child of Home page
+        if about.get_parent().id != home.id:
+            about.move(home, pos="first-child")
+            about.save()
+            self.stdout.write("✅ Moved About page under Home page")
+        else:
+            self.stdout.write("✅ About page already under Home page")

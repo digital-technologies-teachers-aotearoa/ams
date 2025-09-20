@@ -1,0 +1,62 @@
+name: Tag Image
+
+on:
+  push:
+    tags:
+      - '*'
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+
+jobs:
+  retag-image:
+    name: Retag Docker image for tag
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (shallow)
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+
+      - name: Extract tag name
+        id: tag
+        run: |
+          ref="${GITHUB_REF}"
+          tag="${ref#refs/tags/}"
+          echo "tag=$tag" >> $GITHUB_OUTPUT
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pull source image by commit SHA
+        id: source
+        run: |
+          repo="ghcr.io/${{ github.repository }}-django"
+          sha_img="$repo:${{ github.sha }}"
+          if ! docker pull "$sha_img"; then
+            echo "Image $sha_img not found. Ensure main build workflow has pushed it before creating the tag." >&2
+            exit 1
+          fi
+          echo "image=$sha_img" >> $GITHUB_OUTPUT
+
+      - name: Retag and push
+        run: |
+          set -euo pipefail
+          repo="ghcr.io/${{ github.repository }}-django"
+          src="${{ steps.source.outputs.image }}"
+          tag="${{ steps.tag.outputs.tag }}"
+          docker tag "$src" "$repo:$tag"
+          echo "Pushing $repo:$tag"
+          docker push "$repo:$tag"
+
+      - name: Summary
+        run: |
+          echo "Tagged image:" >> $GITHUB_STEP_SUMMARY
+          repo="ghcr.io/${{ github.repository }}-django"
+          echo "- $repo:${{ steps.tag.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
