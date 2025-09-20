@@ -28,10 +28,17 @@ class Command(BaseCommand):
         self.stdout.write(LOG_HEADER.format("📋 Check required CMS pages"))
 
         home, created_home = get_or_create_page(HomePage, "Home", "home")
-        _, created_about = get_or_create_page(AboutPage, "About", "about")
+        about, created_about = get_or_create_page(AboutPage, "About", "about")
 
         self.stdout.write(f"✅ Home page: {'Created' if created_home else 'Exists'}")
         self.stdout.write(f"✅ About page: {'Created' if created_about else 'Exists'}")
+
+        # Ensure About page is a child of Home page
+        if about.get_parent_id() != home.id:
+            about.move(home, pos="last-child")
+            self.stdout.write("✅ Moved About page under Home page")
+        else:
+            self.stdout.write("✅ About page already under Home page")
 
         # Ensure there's a Site pointing to the HomePage
         site = Site.objects.first()
