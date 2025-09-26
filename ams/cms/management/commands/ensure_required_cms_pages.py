@@ -1,5 +1,6 @@
 """Management command to ensure required CMS pages exist."""
 
+from django.core import management
 from django.core.management.base import BaseCommand
 from wagtail.models import Page
 from wagtail.models import Site
@@ -9,13 +10,16 @@ from ams.cms.models import HomePage
 from ams.utils.management.commands._constants import LOG_HEADER
 
 
-def get_or_create_page(page_model, title, slug):
-    page = page_model.objects.first()
+def get_or_create_page(page_model, title, slug, parent=None):
     created = False
+    page = page_model.objects.first()
+
+    if parent is None:
+        parent = Page.get_first_root_node()
+
     if not page:
-        root = Page.get_first_root_node()
         page = page_model(title=title, slug=slug)
-        root.add_child(instance=page)
+        parent.add_child(instance=page)
         page.save_revision().publish()
         created = True
     return page, created
@@ -28,7 +32,12 @@ class Command(BaseCommand):
         self.stdout.write(LOG_HEADER.format("📋 Check required CMS pages"))
 
         home, created_home = get_or_create_page(HomePage, "Home", "home")
-        about, created_about = get_or_create_page(AboutPage, "About", "about")
+        about, created_about = get_or_create_page(
+            AboutPage,
+            "About",
+            "about",
+            parent=home,
+        )
 
         self.stdout.write(f"✅ Home page: {'Created' if created_home else 'Exists'}")
         self.stdout.write(f"✅ About page: {'Created' if created_about else 'Exists'}")
@@ -53,7 +62,10 @@ class Command(BaseCommand):
         # Ensure About page is a child of Home page
         if about.get_parent().id != home.id:
             about.move(home, pos="first-child")
-            about.save()
+            about.save_revision().publish()
+            home.save_revision().publish()
+            # Rebuild the CMS tree to ensure integrity
+            management.call_command("fixtree")
             self.stdout.write("✅ Moved About page under Home page")
         else:
             self.stdout.write("✅ About page already under Home page")
