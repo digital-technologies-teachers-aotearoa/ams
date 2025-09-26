@@ -36,13 +36,7 @@
         <!-- Fixed navbar -->
         <nav class="navbar navbar-expand-md navbar-light fixed-top bg-light">
           <div class="container">
-            <a class="navbar-brand" href="{% slugurl 'home' %}">
-              {% if settings.cms.AssociationSettings.use_logo_in_navbar %}
-                {% image settings.cms.AssociationSettings.association_logo height-40 preserve-svg %}
-              {% else %}
-                {{ settings.cms.AssociationSettings.association_short_name|default:'Association Management Software' }}
-              {% endif %}
-            </a>
+            <a class="navbar-brand" href="{% slugurl 'home' %}">{% include "snippets/association_logo_or_name.html" %}</a>
             <button class="navbar-toggler"
                     type="button"
                     data-bs-toggle="collapse"
@@ -107,11 +101,7 @@
             <div class="col mb-3">
               <a href="{% slugurl 'home' %}"
                  class="d-flex align-items-center mb-3 link-body-emphasis text-decoration-none">
-                {% if settings.cms.AssociationSettings.use_logo_in_navbar %}
-                  {% image settings.cms.AssociationSettings.association_logo height-40 preserve-svg %}
-                {% else %}
-                  {{ settings.cms.AssociationSettings.association_short_name|default:'Association Management Software' }}
-                {% endif %}
+                {% include "snippets/association_logo_or_name.html" %}
               </a>
               <div>
                 <ul class="nav justify-content-start list-unstyled d-flex">
