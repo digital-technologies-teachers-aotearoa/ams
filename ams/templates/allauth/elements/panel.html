@@ -10,8 +10,8 @@
     {% slot body %}
   {% endslot %}
   {% if slots.actions %}
-    <ul>
-      {% for action in slots.actions %}<li>{{ action }}</li>{% endfor %}
+    <ul class="list-unstyled">
+      {% for action in slots.actions %}<li class="mb-3">{{ action }}</li>{% endfor %}
     </ul>
   {% endif %}
 </div>

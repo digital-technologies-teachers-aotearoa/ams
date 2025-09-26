@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load i18n %}
+{% load i18n wagtailcore_tags %}
 
 {% block bodyclass %}
   bg-light
@@ -16,6 +16,7 @@
 {% block body %}
   <div class="d-flex justify-content-center h-100 py-4">
     <div class="col-md-4 py-4 my-4 px-4">
+      <h1 class="text-center mb-5">{% include "snippets/association_logo_or_name.html" %}</h1>
       {% if messages %}
         {% for message in messages %}
           <div class="alert alert-dismissible {% if message.tags %}alert-{{ message.tags }}{% endif %}">
@@ -27,9 +28,11 @@
           </div>
         {% endfor %}
       {% endif %}
-      <h1 class="text-center mb-5">{% include "snippets/association_logo_or_name.html" %}</h1>
       {% block content %}
       {% endblock content %}
+      <p class="mt-5">
+        <a href="{% slugurl 'home' %}">Return to homepage</a>
+      </p>
       {% block extra_body %}
       {% endblock extra_body %}
     </div>
