@@ -1,4 +1,4 @@
-{% load static i18n wagtailcore_tags wagtailimages_tags %}
+{% load static i18n wagtailcore_tags wagtailimages_tags menu_tags %}
 
 {% get_current_language as LANGUAGE_CODE %}
 <!DOCTYPE html>
@@ -48,9 +48,7 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarCollapse">
               <ul class="navbar-nav ms-auto mb-2 mb-md-0">
-                <li class="nav-item">
-                  <a class="nav-link" href="{% slugurl 'about' %}">About</a>
-                </li>
+                {% main_menu template="cms/menu/top_level_item.html" sub_menu_template="cms/menu/dropdown_item.html" max_levels=2 %}
                 {% if request.user.is_authenticated %}
                   <li class="nav-item">
                     <a class="nav-link" href="{% url 'users:detail' request.user.pk %}">{% translate "My Profile" %}</a>
