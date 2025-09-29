@@ -2,5 +2,11 @@
 
 <figure class="figure text-center d-block">
   {% image self.image original loading="lazy" class="figure-img img-fluid" %}
-  <figcaption class="figure-caption text-center">{{ self.caption }} - {{ self.attribution }}</figcaption>
+  {% if self.caption or self.attribution %}
+    <figcaption class="figure-caption text-center">
+      {{ self.caption }}
+      {% if self.caption and self.attribution %}-{% endif %}
+      {{ self.attribution }}
+    </figcaption>
+  {% endif %}
 </figure>

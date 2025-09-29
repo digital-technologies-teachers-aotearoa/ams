@@ -87,6 +87,7 @@ THIRD_PARTY_APPS = [
     "wagtail.search",
     "wagtail.admin",
     "wagtail",
+    "wagtailmenus",
     "modelcluster",
     "taggit",
 ]
@@ -200,6 +201,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "wagtail.contrib.settings.context_processors.settings",
                 "ams.users.context_processors.allauth_settings",
+                "wagtailmenus.context_processors.wagtailmenus",
             ],
         },
     },

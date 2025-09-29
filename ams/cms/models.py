@@ -16,10 +16,10 @@ class HomePage(Page):
     # Metadata
     max_count = 1
     content_panels = [*Page.content_panels, "lead_paragraph"]
-    template = "cms/home.html"
+    template = "cms/pages/home.html"
 
 
-class AboutPage(Page):
+class ContentPage(Page):
     body = StreamField(
         BaseStreamBlock(),
         blank=True,
@@ -28,11 +28,11 @@ class AboutPage(Page):
     )
 
     # Metadata
-    max_count = 1
     content_panels = [*Page.content_panels, FieldPanel("body")]
-    template = "cms/about.html"
-    parent_page_types = ["cms.HomePage"]
-    subpage_types = []
+    template = "cms/pages/content.html"
+    parent_page_types = ["cms.HomePage", "cms.ContentPage"]
+    subpage_types = ["cms.ContentPage"]
+    show_in_menus = True
 
 
 @register_setting
