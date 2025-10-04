@@ -314,6 +314,12 @@ WAGTAILDOCS_EXTENSIONS = [
     "zip",
 ]
 WAGTAILEMBEDS_RESPONSIVE_HTML = True
+WAGTAILMENUS_FLAT_MENUS_HANDLE_CHOICES = (
+    ("footer-1", "Footer - Column 1"),
+    ("footer-2", "Footer - Column 2"),
+    ("footer-3", "Footer - Column 3"),
+)
+
 
 # Sample data generation
 # ------------------------------------------------------------------------------

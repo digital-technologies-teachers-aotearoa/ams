@@ -1,0 +1,12 @@
+{% load menu_tags %}
+
+{% if show_menu_heading and menu_heading %}<h5>{{ menu_heading|safe }}</h5>{% endif %}
+<ul class="nav flex-column">
+  {% for item in menu_items %}
+    <li class="nav-item mb-2">
+      <a href="{{ item.href }}"
+         class="nav-link p-0 text-body-secondary{% if item.active_class %} active{% endif %}"
+         {% if item.active_class %}aria-current="true"{% endif %}>{{ item.text }}</a>
+    </li>
+  {% endfor %}
+</ul>
