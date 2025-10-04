@@ -127,6 +127,7 @@ jobs:
           print_deploy_logs: true
         env:
           IMAGE_DIGEST_DJANGO: ${{ steps.push.outputs.digest }}
+          IMAGE_DIGEST_JOB-DEPLOY: ${{ steps.push.outputs.digest }}
 
   deploy-docs:
     name: Deploy docs
