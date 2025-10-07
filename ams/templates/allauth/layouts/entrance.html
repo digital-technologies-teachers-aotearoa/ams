@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load i18n wagtailcore_tags %}
+{% load i18n wagtailcore_tags translate_url %}
 
 {% block bodyclass %}
   bg-light
@@ -31,7 +31,7 @@
       {% block content %}
       {% endblock content %}
       <p class="mt-5">
-        <a href="{% slugurl 'home' %}">Return to homepage</a>
+        <a href="{% translate_url LANGUAGE_CODE '/' %}">Return to homepage</a>
       </p>
       {% block extra_body %}
       {% endblock extra_body %}

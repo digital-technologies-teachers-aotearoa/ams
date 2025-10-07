@@ -8,7 +8,8 @@
       "args": ["runserver", "0.0.0.0:8000"],
       "django": true,
       "autoStartBrowser": false,
-      "program": "${workspaceFolder}/manage.py"
+      "program": "${workspaceFolder}/manage.py",
+      "justMyCode": false
     }
   ]
 }
