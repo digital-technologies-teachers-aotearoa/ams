@@ -14,16 +14,7 @@ from wagtail.models import Page
 
 from ams.cms.blocks import ContentAndLayoutStreamBlocks
 from ams.utils.permissions import user_has_active_membership
-
-# Reserved URL patterns that cannot be used as page slugs
-RESERVED_URL_SLUGS = {
-    "billing",
-    "users",
-    "forum",
-    "cms",
-    "cms-documents",
-    "accounts",
-}
+from ams.utils.reserved_paths import get_reserved_paths_set
 
 
 class HomePage(Page):
@@ -35,7 +26,6 @@ class HomePage(Page):
     )
 
     # Metadata
-    max_count = 1
     content_panels = [*Page.content_panels, "body"]
     template = "cms/pages/home.html"
 
@@ -88,17 +78,18 @@ class ContentPage(Page):
         """Validate that the page slug doesn't conflict with reserved URLs."""
         super().clean()
 
+        reserved_paths = get_reserved_paths_set()
         # Only check direct children of HomePage for reserved slug conflicts
         if (
             self.get_parent()
             and self.get_parent().specific.__class__.__name__ == "HomePage"
-            and self.slug in RESERVED_URL_SLUGS
+            and self.slug in reserved_paths
         ):
             raise ValidationError(
                 {
                     "slug": f'The slug "{self.slug}" is reserved for application URLs. '
                     f"Please choose a different slug. Reserved slugs are: "
-                    f"{', '.join(sorted(RESERVED_URL_SLUGS))}",
+                    f"{', '.join(sorted(reserved_paths))}",
                 },
             )
 

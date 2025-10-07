@@ -3,6 +3,7 @@
 
 from pathlib import Path
 
+import django.conf.locale
 import environ
 from django.utils.translation import gettext_lazy as _
 
@@ -26,11 +27,22 @@ DEBUG = env.bool("DJANGO_DEBUG", False)
 # In Windows, this must be set to your system time zone.
 TIME_ZONE = "Pacific/Auckland"
 # https://docs.djangoproject.com/en/dev/ref/settings/#language-code
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "en"
 # https://docs.djangoproject.com/en/dev/ref/settings/#languages
 LANGUAGES = [
     ("en", _("English")),
+    ("mi", _("Te Reo Māori")),
 ]
+EXTRA_LANG_INFO = {
+    "mi": {
+        "bidi": False,
+        "code": "mi",
+        "name": "Te Reo Māori",
+        "name_local": "Te Reo Māori",
+    },
+}
+django.conf.locale.LANG_INFO.update(EXTRA_LANG_INFO)
+
 # https://docs.djangoproject.com/en/dev/ref/settings/#site-id
 SITE_ID = 1
 # https://docs.djangoproject.com/en/dev/ref/settings/#use-i18n
@@ -87,6 +99,7 @@ THIRD_PARTY_APPS = [
     "wagtail.images",
     "wagtail.search",
     "wagtail.admin",
+    "wagtail.locales",
     "wagtail",
     "wagtailmenus",
     "modelcluster",
@@ -151,6 +164,7 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "ams.utils.middleware.site_by_path.PathBasedSiteMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -234,6 +248,7 @@ TEMPLATES = [
             ],
             "libraries": {
                 "icon": "config.templatetags.icon",
+                "translate_url": "config.templatetags.translate_url",
             },
         },
     },
@@ -339,7 +354,10 @@ SOCIALACCOUNT_FORMS = {"signup": "ams.users.forms.UserSocialSignupForm"}
 # Wagtail
 # ------------------------------------------------------------------------------
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 10_000
+WAGTAIL_ENABLE_UPDATE_CHECK = "lts"
 WAGTAIL_SITE_NAME = "AMS Demo"
+WAGTAIL_I18N_ENABLED = True
+WAGTAIL_CONTENT_LANGUAGES = LANGUAGES
 WAGTAILADMIN_BASE_URL = "http://example.com"
 WAGTAILIMAGES_EXTENSIONS = ["avif", "gif", "jpg", "jpeg", "png", "webp", "svg"]
 WAGTAILDOCS_DOCUMENT_MODEL = "cms.AMSDocument"

@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.conf.urls.i18n import i18n_patterns
 from django.contrib import admin
 from django.urls import include
 from django.urls import path
@@ -10,23 +11,26 @@ from wagtail.documents import urls as wagtaildocs_urls
 urlpatterns = [
     # Django Admin, use {% url 'admin:index' %}
     path(settings.ADMIN_URL, admin.site.urls),
-    # User management
-    path(
-        "users/memberships/",
-        include("ams.memberships.urls", namespace="memberships"),
-    ),
-    path("users/", include("ams.users.urls", namespace="users")),
+    # Billing webhooks (Xero, etc)
     path("billing/", include("ams.billing.urls", namespace="billing")),
-    path("accounts/", include("allauth.urls")),
     # CMS
     path("cms/", include(wagtailadmin_urls)),
     path("cms-documents/", include(wagtaildocs_urls)),
     # Forum
     path("forum/", include("ams.forum.urls", namespace="forum")),
-    # All other pages are handled by Wagtail
-    path("", include(wagtail_urls)),
 ]
 
+urlpatterns += i18n_patterns(
+    # User management
+    path(
+        "users/memberships/",
+        include("ams.memberships.urls", namespace="memberships"),
+    ),
+    path("accounts/", include("allauth.urls")),
+    path("users/", include("ams.users.urls", namespace="users")),
+    # CMS pages are handled by Wagtail
+    path("", include(wagtail_urls)),
+)
 
 if settings.DEBUG:
     # This allows the error pages to be debugged during development, just visit
