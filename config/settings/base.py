@@ -95,6 +95,8 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     "ams.users",
     "ams.cms",
+    "ams.memberships",
+    "ams.billing",
     "ams.utils",
     "ams.forum",
 ]
@@ -249,7 +251,7 @@ ADMINS = [("""DTTA""", "admin@dtta.org.nz")]
 MANAGERS = ADMINS
 # https://cookiecutter-django.readthedocs.io/en/latest/settings.html#other-environment-settings
 # Force the `admin` sign in process to go through the `django-allauth` workflow
-DJANGO_ADMIN_FORCE_ALLAUTH = env.bool("DJANGO_ADMIN_FORCE_ALLAUTH", default=False)
+DJANGO_ADMIN_FORCE_ALLAUTH = env.bool("DJANGO_ADMIN_FORCE_ALLAUTH", default=True)
 
 # LOGGING
 # ------------------------------------------------------------------------------
