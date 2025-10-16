@@ -34,8 +34,9 @@ class Command(management.base.BaseCommand):
             management.call_command("loaddata", "wagtailimages_initial_data")
             self.stdout.write("✅ Database wiped.")
 
-        # Create admin account
-        management.call_command("create_admin")
+        # Create accounts
+        management.call_command("create_sample_admin")
+        management.call_command("create_sample_user")
 
         # Check CMS pages
         management.call_command("ensure_required_cms_pages")

@@ -28,6 +28,8 @@ nav:
     - user/index.md
   - Website administrator guide:
     - admin/index.md
+    - admin/forum.md
   - Developer documentation:
     - developer/contributing.md
+    - developer/forum.md
     - developer/deployment.md

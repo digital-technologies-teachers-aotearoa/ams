@@ -1,4 +1,4 @@
-"""Module for the custom Django create_admin command."""
+"""Module for the custom Django create_sample_admin command."""
 
 from allauth.account.models import EmailAddress
 from django.conf import settings
@@ -9,12 +9,12 @@ from ams.utils.management.commands._constants import LOG_HEADER
 
 
 class Command(management.base.BaseCommand):
-    """Required command class for the custom Django create_admin command."""
+    """Required command class for the custom Django create_sample_admin command."""
 
     help = "Create admin account."
 
     def handle(self, *args, **options):
-        """Automatically called when the create_admin command is given."""
+        """Automatically called when the create_sample_admin command is given."""
 
         self.stdout.write(LOG_HEADER.format("👷 Create admin account"))
 

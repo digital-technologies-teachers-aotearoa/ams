@@ -17,6 +17,8 @@ urlpatterns = [
     # CMS
     path("cms/", include(wagtailadmin_urls)),
     path("cms-documents/", include(wagtaildocs_urls)),
+    # Forum
+    path("forum/", include("ams.forum.urls", namespace="forum")),
     # All other pages are handled by Wagtail
     path("", include(wagtail_urls)),
     # Media files
