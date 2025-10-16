@@ -96,6 +96,7 @@ LOCAL_APPS = [
     "ams.users",
     "ams.cms",
     "ams.utils",
+    "ams.forum",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -321,6 +322,11 @@ WAGTAILMENUS_FLAT_MENUS_HANDLE_CHOICES = (
 )
 
 
+# Discourse SSO
+# ------------------------------------------------------------------------------
+DISCOURSE_REDIRECT_DOMAIN = env("DISCOURSE_REDIRECT_DOMAIN", default=None)
+DISCOURSE_CONNECT_SECRET = env("DISCOURSE_CONNECT_SECRET", default=None)
+
 # Sample data generation
 # ------------------------------------------------------------------------------
 # Admin
@@ -329,6 +335,7 @@ SAMPLE_DATA_ADMIN_PASSWORD = env("SAMPLE_DATA_ADMIN_PASSWORD", default="password
 # User
 SAMPLE_DATA_USER_EMAIL = env("SAMPLE_DATA_USER_EMAIL", default="user@ams.com")
 SAMPLE_DATA_USER_PASSWORD = env("SAMPLE_DATA_USER_PASSWORD", default="password")
+
 
 # Other settings
 # ------------------------------------------------------------------------------
