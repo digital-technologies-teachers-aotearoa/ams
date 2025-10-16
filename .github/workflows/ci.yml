@@ -59,8 +59,8 @@ jobs:
           set: |
             django.cache-from=type=gha,scope=django-cached-tests
             django.cache-to=type=gha,scope=django-cached-tests,mode=max
-            postgres.cache-from=type=gha,scope=postgres-cached-tests
-            postgres.cache-to=type=gha,scope=postgres-cached-tests,mode=max
+            node.cache-from=type=gha,scope=node-cached-tests
+            node.cache-to=type=gha,scope=node-cached-tests,mode=max
 
       - name: Check database migrations
         run: docker compose run --rm django python manage.py makemigrations --check
