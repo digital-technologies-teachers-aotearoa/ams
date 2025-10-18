@@ -6,6 +6,10 @@ The Discourse forum can either be self or cloud hosted.
 The following documentation will set up the AMS service as the authentication provider for Discourse.
 This allows access to the forum to require an active membership.
 
+## Deployment
+
+If you plan to self host Discourse, please read the [documentation on GitHub](https://github.com/discourse/discourse/blob/main/docs/INSTALL-cloud.md).
+
 ## Forum setup
 
 There are several key settings that need to be set to ensure the forum works as expected with the AMS system.
@@ -39,11 +43,3 @@ discourse_connect_overrides_card_background: 'true'
 # See: https://meta.discourse.org/t/-/322876
 bootstrap_mode_min_users: '0'
 ```
-
-## Local development
-
-The following links may be useful when developing with Discourse locally:
-
-- [Setup DiscourseConnect - Official Single-Sign-On for Discourse (sso)](https://meta.discourse.org/t/setup-discourseconnect-official-single-sign-on-for-discourse-sso/13045)
-- [Log back in as admin after locking yourself out with read-only mode or an invalid SSO configuration](https://meta.discourse.org/t/log-back-in-as-admin-after-locking-yourself-out-with-read-only-mode-or-an-invalid-sso-configuration/89605)
-- [Administrative Bulk Operations](https://meta.discourse.org/t/administrative-bulk-operations/118349)
