@@ -132,6 +132,7 @@ function initBrowserSync() {
           },
         ],
       },
+      notify: false,
     },
   );
 }
