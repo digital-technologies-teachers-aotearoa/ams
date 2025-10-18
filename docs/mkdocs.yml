@@ -32,4 +32,5 @@ nav:
   - Developer documentation:
     - developer/contributing.md
     - developer/forum.md
+    - developer/urls.md
     - developer/deployment.md

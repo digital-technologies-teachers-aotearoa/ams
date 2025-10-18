@@ -12,7 +12,12 @@ urlpatterns = [
     # Django Admin, use {% url 'admin:index' %}
     path(settings.ADMIN_URL, admin.site.urls),
     # User management
+    path(
+        "users/memberships/",
+        include("ams.memberships.urls", namespace="memberships"),
+    ),
     path("users/", include("ams.users.urls", namespace="users")),
+    path("billing/", include("ams.billing.urls", namespace="billing")),
     path("accounts/", include("allauth.urls")),
     # CMS
     path("cms/", include(wagtailadmin_urls)),
