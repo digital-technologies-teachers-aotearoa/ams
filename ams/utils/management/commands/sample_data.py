@@ -38,5 +38,8 @@ class Command(management.base.BaseCommand):
         management.call_command("create_sample_admin")
         management.call_command("create_sample_user")
 
+        # Create membership options
+        management.call_command("create_sample_membership_options")
+
         # Check CMS pages
         management.call_command("ensure_required_cms_pages")
