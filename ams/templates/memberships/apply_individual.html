@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% load crispy_forms_tags i18n %}
+
+{% block title %}
+  {% translate "Register Membership" %}
+{% endblock title %}
+{% block content %}
+  <div class="row">
+    <div class="col-md-8 col-lg-6">
+      <h1>{% translate "Apply for Membership" %}</h1>
+      <p>{% translate "Select a membership option and submit to apply." %}</p>
+      {% crispy form %}
+    </div>
+  </div>
+  {{ option_end_dates|json_script:"option-end-dates-data" }}
+  <script>
+    (function() {
+      // Retrieve mapping from the JSON script element
+      const dataEl = document.getElementById('option-end-dates-data');
+      let mapping = {};
+      if (dataEl) {
+        try {
+          mapping = JSON.parse(dataEl.textContent);
+        } catch (e) {
+          /* noop */
+        }
+      }
+      const select = document.getElementById('id_membership_option');
+      const endEl = document.getElementById('membership-end-date');
+
+      function updateEnd() {
+        if (!select) return;
+        const val = select.value;
+        if (val && mapping[val]) {
+          endEl.textContent = mapping[val];
+        } else {
+          endEl.textContent = '—';
+        }
+      }
+      if (select) {
+        select.addEventListener('change', updateEnd);
+        updateEnd(); // initial
+      }
+    })();
+  </script>
+{% endblock content %}

@@ -2,6 +2,7 @@ from datetime import date
 from typing import Any
 
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.db.models import CASCADE
 from django.db.models import SET_NULL
 from django.db.models import CharField
@@ -72,12 +73,18 @@ class IndividualMembership(Model):
         "billing.Invoice",
         on_delete=SET_NULL,
         null=True,
+        blank=True,
         related_name="individual_memberships",
     )
     start_date = DateField()
+    expiry_date = DateField()
     created_datetime = DateTimeField()
     approved_datetime = DateTimeField(null=True)
     cancelled_datetime = DateTimeField(null=True)
+
+    class Meta:
+        verbose_name = "Membership: Individual"
+        verbose_name_plural = "Membership: Individual"
 
     def __str__(self):
         return (
@@ -85,18 +92,20 @@ class IndividualMembership(Model):
             f"Status: {self.status()}"
         )
 
-    def expiry_date(self) -> date:
-        # A membership is considered expired once the expiry date is reached
-        # (it is not inclusive of the expiry date)
-        expiry_date: date = self.start_date + self.membership_option.duration
-        return expiry_date
+    def clean(self):
+        # Enforce expiry_date is after start_date
+        if self.expiry_date and self.start_date and self.expiry_date <= self.start_date:
+            raise ValidationError(
+                {"expiry_date": "Expiry date must be after start date."},
+            )
+        super().clean()
 
     def is_expired(self) -> bool:
-        is_expired: bool = timezone.localdate() >= self.expiry_date()
+        is_expired: bool = timezone.localdate() >= self.expiry_date
         return is_expired
 
     def expires_in_days(self) -> int:
-        expires_in: int = (self.expiry_date() - timezone.localdate()).days
+        expires_in: int = (self.expiry_date - timezone.localdate()).days
         return expires_in
 
     def status(self) -> Any:
@@ -110,6 +119,13 @@ class IndividualMembership(Model):
             return MembershipStatus.PENDING
 
         return MembershipStatus.ACTIVE
+
+    def get_status_display(self) -> str:
+        # Always use MembershipStatus display name
+        try:
+            return MembershipStatus(self.status()).label
+        except ValueError:
+            return str(self.status())
 
 
 class OrganisationMembership(Model):
@@ -127,11 +143,17 @@ class OrganisationMembership(Model):
         "billing.Invoice",
         on_delete=SET_NULL,
         null=True,
+        blank=True,
         related_name="organisation_memberships",
     )
     start_date = DateField()
+    expiry_date = DateField()
     created_datetime = DateTimeField()
     cancelled_datetime = DateTimeField(null=True)
+
+    class Meta:
+        verbose_name = "Membership: Organisation"
+        verbose_name_plural = "Membership: Organisation"
 
     def __str__(self):
         return (
@@ -139,18 +161,24 @@ class OrganisationMembership(Model):
             f"Status: {self.status()}"
         )
 
-    def expiry_date(self) -> date:
-        # A membership is considered expired once the expiry date is reached
-        # (it is not inclusive of the expiry date)
-        expiry_date: date = self.start_date + self.membership_option.duration
-        return expiry_date
+    def clean(self):
+        # Enforce expiry_date is after start_date
+        if self.expiry_date and self.start_date and self.expiry_date <= self.start_date:
+            raise ValidationError(
+                {"expiry_date": "Expiry date must be after start date."},
+            )
+        super().clean()
+
+    def calculate_expiry_date(self) -> date:
+        # Calculate expiry date based on start_date and membership_option.duration
+        return self.start_date + self.membership_option.duration
 
     def is_expired(self) -> bool:
-        is_expired: bool = timezone.localdate() >= self.expiry_date()
+        is_expired: bool = timezone.localdate() >= self.expiry_date
         return is_expired
 
     def expires_in_days(self) -> int:
-        expires_in: int = (self.expiry_date() - timezone.localdate()).days
+        expires_in: int = (self.expiry_date - timezone.localdate()).days
         return expires_in
 
     def status(self) -> Any:

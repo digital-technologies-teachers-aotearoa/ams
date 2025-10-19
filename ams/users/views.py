@@ -7,13 +7,26 @@ from django.views.generic import DetailView
 from django.views.generic import RedirectView
 from django.views.generic import UpdateView
 
+from ams.memberships.models import MembershipStatus
 from ams.users.models import User
+from ams.users.tables import MembershipTable
 
 
 class UserDetailView(LoginRequiredMixin, DetailView):
     model = User
     slug_field = "id"
     slug_url_kwarg = "id"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.object
+        memberships = user.individual_memberships.all().order_by("-start_date")
+        context["membership_table"] = MembershipTable(memberships)
+        context["has_memberships"] = memberships.exists()
+        context["has_active_membership"] = any(
+            m.status() == MembershipStatus.ACTIVE for m in memberships
+        )
+        return context
 
 
 user_detail_view = UserDetailView.as_view()
