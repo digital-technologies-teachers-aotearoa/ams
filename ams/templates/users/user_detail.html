@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load static %}
+{% load static icon %}
 
 {% block title %}
   {{ object.get_full_name }}
@@ -25,7 +25,9 @@
             {% if has_active_membership %}
               <div class="alert alert-success" role="alert">You have a current active membership.</div>
             {% else %}
-              <div class="alert alert-warning" role="alert">You do not have a current active membership.</div>
+              <div class="alert alert-warning" role="alert">
+                {% icon "exclamation-triangle-fill" %} You do not have a current active membership.
+              </div>
             {% endif %}
             {% if has_memberships %}
               {% load django_tables2 %}

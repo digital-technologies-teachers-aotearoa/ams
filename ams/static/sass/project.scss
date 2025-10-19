@@ -1,8 +1,6 @@
 @import 'custom_bootstrap_vars';
 @import '~bootstrap/scss/bootstrap';
 
-// project specific CSS goes here
-
 ///////////////
 // Variables //
 ///////////////
@@ -56,4 +54,11 @@ main > .container {
   left: 0;
   width: 100%;
   height: 100%;
+}
+
+// Icons
+.bi {
+  display: inline-block;
+  vertical-align: -0.125em;
+  fill: currentcolor;
 }

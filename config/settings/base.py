@@ -207,6 +207,9 @@ TEMPLATES = [
                 "ams.users.context_processors.allauth_settings",
                 "wagtailmenus.context_processors.wagtailmenus",
             ],
+            "libraries": {
+                "icon": "config.templatetags.icon",
+            },
         },
     },
 ]
