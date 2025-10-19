@@ -4,9 +4,12 @@ from django.contrib import admin
 from django.contrib.auth import admin as auth_admin
 from django.utils.translation import gettext_lazy as _
 
-from .forms import UserAdminChangeForm
-from .forms import UserAdminCreationForm
-from .models import User
+from ams.users.forms import UserAdminChangeForm
+from ams.users.forms import UserAdminCreationForm
+from ams.users.models import Organisation
+from ams.users.models import OrganisationMember
+from ams.users.models import OrganisationType
+from ams.users.models import User
 
 if settings.DJANGO_ADMIN_FORCE_ALLAUTH:
     # Force the `admin` sign in process to go through the `django-allauth` workflow:
@@ -56,3 +59,29 @@ class UserAdmin(auth_admin.UserAdmin):
             },
         ),
     )
+
+
+@admin.register(OrganisationType)
+class OrganisationTypeAdmin(admin.ModelAdmin):
+    list_display = ("name",)
+    search_fields = ("name",)
+
+
+@admin.register(Organisation)
+class OrganisationAdmin(admin.ModelAdmin):
+    list_display = ("name", "type", "telephone", "email", "contact_name")
+    search_fields = ("name", "email", "contact_name")
+    list_filter = ("type",)
+
+
+@admin.register(OrganisationMember)
+class OrganisationMemberAdmin(admin.ModelAdmin):
+    list_display = (
+        "user",
+        "organisation",
+        "invite_email",
+        "is_admin",
+        "accepted_datetime",
+    )
+    search_fields = ("user__email", "organisation__name", "invite_email")
+    list_filter = ("organisation", "is_admin")

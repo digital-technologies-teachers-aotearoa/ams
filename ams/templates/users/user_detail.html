@@ -3,8 +3,7 @@
 {% load static %}
 
 {% block title %}
-  User:
-  {{ object.name }}
+  {{ object.get_full_name }}
 {% endblock title %}
 {% block content %}
   <div class="container">
@@ -20,18 +19,36 @@
                role="button">Update my e-mails</a>
             <a class="btn btn-primary" href="{% url 'mfa_index' %}" role="button">Manage MFA</a>
           </div>
+          <!-- Memberships Section -->
+          <div class="mt-4">
+            <h3 class="mb-3">Memberships</h3>
+            {% if has_active_membership %}
+              <div class="alert alert-success" role="alert">You have a current active membership.</div>
+            {% else %}
+              <div class="alert alert-warning" role="alert">You do not have a current active membership.</div>
+            {% endif %}
+            {% if has_memberships %}
+              {% load django_tables2 %}
+
+              {% render_table membership_table %}
+            {% else %}
+              <p>No memberships found.</p>
+            {% endif %}
+          </div>
           {% if request.user.is_staff or perms.wagtailadmin.access_admin %}
-            <h2>Staff links</h2>
-            <p>Administrative and management links.</p>
-            <div class="mb-3">
-              {% if request.user.is_staff %}
-                <a class="btn btn-primary" href="{% url 'admin:index' %}" role="button">Website Admin</a>
-              {% endif %}
-              {% if perms.wagtailadmin.access_admin %}
-                <a class="btn btn-primary"
-                   href="{% url 'wagtailadmin_home' %}"
-                   role="button">Wagtail CMS</a>
-              {% endif %}
+            <div class="mt-4">
+              <h2>Staff links</h2>
+              <p>Administrative and management links.</p>
+              <div class="mb-3">
+                {% if request.user.is_staff %}
+                  <a class="btn btn-primary" href="{% url 'admin:index' %}" role="button">Website Admin</a>
+                {% endif %}
+                {% if perms.wagtailadmin.access_admin %}
+                  <a class="btn btn-primary"
+                     href="{% url 'wagtailadmin_home' %}"
+                     role="button">Wagtail CMS</a>
+                {% endif %}
+              </div>
             </div>
           {% endif %}
         {% endif %}
