@@ -24,7 +24,7 @@ DEBUG = env.bool("DJANGO_DEBUG", False)
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # though not all of them may be available with every OS.
 # In Windows, this must be set to your system time zone.
-TIME_ZONE = "UTC"
+TIME_ZONE = "Pacific/Auckland"
 # https://docs.djangoproject.com/en/dev/ref/settings/#language-code
 LANGUAGE_CODE = "en-us"
 # https://docs.djangoproject.com/en/dev/ref/settings/#languages
@@ -71,6 +71,7 @@ DJANGO_APPS = [
 THIRD_PARTY_APPS = [
     "crispy_forms",
     "crispy_bootstrap5",
+    "django_tables2",
     "allauth",
     "allauth.account",
     "allauth.mfa",
@@ -328,6 +329,11 @@ WAGTAILMENUS_FLAT_MENUS_HANDLE_CHOICES = (
 # ------------------------------------------------------------------------------
 DISCOURSE_REDIRECT_DOMAIN = env("DISCOURSE_REDIRECT_DOMAIN", default=None)
 DISCOURSE_CONNECT_SECRET = env("DISCOURSE_CONNECT_SECRET", default=None)
+
+# Django Tables2
+# ------------------------------------------------------------------------------
+DJANGO_TABLES2_TEMPLATE = "django_tables2/bootstrap5-responsive.html"
+
 
 # Sample data generation
 # ------------------------------------------------------------------------------
