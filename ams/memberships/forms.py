@@ -9,6 +9,8 @@ from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
 from django.forms import CharField
 from django.forms import ChoiceField
+from django.forms import DateField
+from django.forms import DateInput
 from django.forms import DecimalField
 from django.forms import IntegerField
 from django.forms import ModelChoiceField
@@ -110,10 +112,16 @@ class CreateIndividualMembershipForm(ModelForm):
         ).order_by("cost"),
         empty_label=None,
     )
+    start_date = DateField(
+        label=_("Start date"),
+        widget=DateInput(attrs={"type": "date"}),
+        initial=timezone.localdate,
+        required=True,
+    )
 
     class Meta:
         model = IndividualMembership
-        fields = ["membership_option"]
+        fields = ["membership_option", "start_date"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -121,13 +129,10 @@ class CreateIndividualMembershipForm(ModelForm):
         self.helper.form_method = "post"
         self.helper.layout = Layout(
             "membership_option",
+            "start_date",
             HTML("""
                 {% load i18n %}
                 <div class="mb-3">
-                    <p>
-                        <strong>{% translate "Start date" %}:</strong>
-                        <span id="membership-start-date">{{ start_date_display }}</span>
-                    </p>
                     <p>
                         <strong>{% translate "End date" %}:</strong>
                         <span id="membership-end-date">—</span>
@@ -153,7 +158,7 @@ class CreateIndividualMembershipForm(ModelForm):
             raise ValueError(msg)
         instance: IndividualMembership = super().save(commit=False)
         instance.user = user
-        instance.start_date = timezone.localdate()
+        # Use the provided start_date from the form
         instance.expiry_date = instance.start_date + instance.membership_option.duration
         instance.created_datetime = timezone.now()
 
