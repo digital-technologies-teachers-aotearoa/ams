@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load crispy_forms_tags i18n %}
+{% load crispy_forms_tags i18n static %}
 
 {% block title %}
   {% translate "Register Membership" %}
@@ -15,33 +15,11 @@
   </div>
   {{ option_end_dates|json_script:"option-end-dates-data" }}
   <script>
-    (function() {
-      // Retrieve mapping from the JSON script element
-      const dataEl = document.getElementById('option-end-dates-data');
-      let mapping = {};
-      if (dataEl) {
-        try {
-          mapping = JSON.parse(dataEl.textContent);
-        } catch (e) {
-          /* noop */
-        }
+    window.membershipDurations = {
+      {
+        membership_durations_json | safe
       }
-      const select = document.getElementById('id_membership_option');
-      const endEl = document.getElementById('membership-end-date');
-
-      function updateEnd() {
-        if (!select) return;
-        const val = select.value;
-        if (val && mapping[val]) {
-          endEl.textContent = mapping[val];
-        } else {
-          endEl.textContent = '—';
-        }
-      }
-      if (select) {
-        select.addEventListener('change', updateEnd);
-        updateEnd(); // initial
-      }
-    })();
+    };
   </script>
+  <script src="{% static 'js/membership_apply.js' %}"></script>
 {% endblock content %}

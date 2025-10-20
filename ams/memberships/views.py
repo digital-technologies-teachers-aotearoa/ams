@@ -1,12 +1,9 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
-from django.utils import timezone
-from django.utils.formats import date_format
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 
-from ams.memberships.constants import MEMBERSHIP_DATE_DISPLAY_FORMAT
 from ams.memberships.forms import CreateIndividualMembershipForm
 from ams.memberships.models import MembershipOption
 
@@ -36,22 +33,21 @@ class CreateIndividualMembershipView(LoginRequiredMixin, FormView):
 
     def get_context_data(self, **kwargs):  # type: ignore[override]
         ctx = super().get_context_data(**kwargs)
-        start_date = timezone.localdate()
-        # Locale-aware formatting using Django's date_format utility.
-        # Use 'DATE_FORMAT' (respects current locale / LANGUAGE_CODE).
-        start_date_display = date_format(
-            start_date,
-            format=MEMBERSHIP_DATE_DISPLAY_FORMAT,
-        )
-        # Build mapping of membership option id -> formatted end/expiry date
-        option_end_dates: dict[int, str] = {}
+        membership_durations = {}
         for option in MembershipOption.objects.filter(type="INDIVIDUAL"):
-            end_date = start_date + option.duration
-            option_end_dates[option.id] = date_format(
-                end_date,
-                format=MEMBERSHIP_DATE_DISPLAY_FORMAT,
-            )
-        ctx["start_date"] = start_date  # raw date (if needed elsewhere)
-        ctx["start_date_display"] = start_date_display
-        ctx["option_end_dates"] = option_end_dates
+            # Decompose duration for JS
+            years = getattr(option.duration, "years", 0) or 0
+            months = getattr(option.duration, "months", 0) or 0
+            weeks = 0
+            days = getattr(option.duration, "days", 0) or 0
+            if days and days % 7 == 0:
+                weeks = days // 7
+                days = 0
+            membership_durations[str(option.id)] = {
+                "years": years,
+                "months": months,
+                "weeks": weeks,
+                "days": days,
+            }
+        ctx["membership_durations_json"] = membership_durations
         return ctx
