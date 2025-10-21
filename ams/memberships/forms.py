@@ -187,7 +187,7 @@ class CreateIndividualMembershipForm(ModelForm):
         membership_option = instance.membership_option
         if membership_option.cost and membership_option.cost > 0:
             try:
-                account, _ = Account.objects.get_or_create(user=user)
+                account, created = Account.objects.get_or_create(user=user)
             except Exception as e:
                 logger.exception(
                     "Failed to get or create billing account for user %s",
