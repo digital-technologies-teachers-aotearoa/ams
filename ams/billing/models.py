@@ -19,10 +19,17 @@ class Account(Model):
     organisation = OneToOneField(
         Organisation,
         null=True,
+        blank=True,
         on_delete=CASCADE,
         related_name="account",
     )
-    user = OneToOneField(User, null=True, on_delete=CASCADE, related_name="account")
+    user = OneToOneField(
+        User,
+        null=True,
+        blank=True,
+        on_delete=CASCADE,
+        related_name="account",
+    )
 
     class Meta:
         constraints = [
@@ -45,7 +52,7 @@ class Invoice(Model):
     invoice_number = CharField(max_length=255, unique=True)
     issue_date = DateField()
     due_date = DateField()
-    paid_date = DateField(null=True)
+    paid_date = DateField(null=True, blank=True)
     amount = DecimalField(max_digits=10, decimal_places=2)
     paid = DecimalField(max_digits=10, decimal_places=2)
     due = DecimalField(max_digits=10, decimal_places=2)
