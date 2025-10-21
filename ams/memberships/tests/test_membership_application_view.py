@@ -22,7 +22,7 @@ def test_get_application_form(client):
     assert resp.status_code == HTTPStatus.OK
     assert b"Apply for Membership" in resp.content
     # Start date should be present
-    assert b"membership-start-date" in resp.content
+    assert b"Start date" in resp.content
     # JSON script id for option end dates mapping
     assert b"option-end-dates-data" in resp.content
 
@@ -36,6 +36,7 @@ def test_post_application_creates_membership(client):
         reverse("memberships:apply"),
         data={
             "membership_option": option.id,
+            "start_date": timezone.localdate(),
         },
         follow=True,
     )
@@ -56,6 +57,7 @@ def test_user_cannot_set_user_field(client):
         reverse("memberships:apply"),
         data={
             "membership_option": option.id,
+            "start_date": timezone.localdate(),
             "user": user2.id,
         },
     )

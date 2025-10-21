@@ -1,6 +1,7 @@
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 from factory import Faker
+from factory import LazyAttribute
 from factory import LazyFunction
 from factory import SubFactory
 from factory import Trait
@@ -38,6 +39,10 @@ class MembershipOptionFactory(DjangoModelFactory[MembershipOption]):
         model = MembershipOption
         django_get_or_create = ["name", "type"]
 
+    class Params:
+        individual = Trait(type=MembershipOptionType.INDIVIDUAL)
+        organisation = Trait(type=MembershipOptionType.ORGANISATION)
+
     @classmethod
     def _create(cls, model_class, *args, **kwargs):
         """Convert stored duration dict into a relativedelta instance."""
@@ -57,12 +62,25 @@ class IndividualMembershipFactory(DjangoModelFactory[IndividualMembership]):
     created_datetime = LazyFunction(timezone.now)
     approved_datetime = None
     cancelled_datetime = None
+    expiry_date = LazyAttribute(lambda o: o.start_date + o.membership_option.duration)
 
     class Params:
         approved = Trait(approved_datetime=LazyFunction(timezone.now))
         cancelled = Trait(cancelled_datetime=LazyFunction(timezone.now))
         pending = Trait(approved_datetime=None)
         active = Trait(approved_datetime=LazyFunction(timezone.now))
+        # Start date sufficiently in the past so that expiry_date < today
+        expired = Trait(
+            start_date=LazyFunction(
+                lambda: timezone.localdate() - timezone.timedelta(days=500),
+            ),
+        )
+        # Start date in future => status should be pending
+        future = Trait(
+            start_date=LazyFunction(
+                lambda: timezone.localdate() + timezone.timedelta(days=30),
+            ),
+        )
 
     class Meta:
         model = IndividualMembership
@@ -77,11 +95,25 @@ class OrganisationMembershipFactory(DjangoModelFactory[OrganisationMembership]):
     invoice = None
     start_date = LazyFunction(timezone.localdate)
     created_datetime = LazyFunction(timezone.now)
+    approved_datetime = None
     cancelled_datetime = None
+    expiry_date = LazyAttribute(lambda o: o.start_date + o.membership_option.duration)
 
     class Params:
+        approved = Trait(approved_datetime=LazyFunction(timezone.now))
         cancelled = Trait(cancelled_datetime=LazyFunction(timezone.now))
-        active = Trait()  # implicit active unless expired or cancelled
+        pending = Trait(approved_datetime=None)
+        active = Trait(approved_datetime=LazyFunction(timezone.now))
+        expired = Trait(
+            start_date=LazyFunction(
+                lambda: timezone.localdate() - timezone.timedelta(days=500),
+            ),
+        )
+        future = Trait(
+            start_date=LazyFunction(
+                lambda: timezone.localdate() + timezone.timedelta(days=30),
+            ),
+        )
 
     class Meta:
         model = OrganisationMembership

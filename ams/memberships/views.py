@@ -18,6 +18,11 @@ class CreateIndividualMembershipView(LoginRequiredMixin, FormView):
     template_name = "memberships/apply_individual.html"
     form_class = CreateIndividualMembershipForm
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
+
     def get_success_url(self):  # type: ignore[override]
         return reverse("users:detail", args=[self.request.user.pk])
 
