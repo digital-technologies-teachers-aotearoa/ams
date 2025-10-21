@@ -157,5 +157,7 @@ sentry_sdk.init(
 )
 
 
-# Your stuff...
+# Billing
 # ------------------------------------------------------------------------------
+BILLING_SERVICE_CLASS = env("BILLING_SERVICE_CLASS")
+BILLING_EMAIL_WHITELIST_REGEX = env("BILLING_EMAIL_WHITELIST_REGEX")
