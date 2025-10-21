@@ -73,5 +73,10 @@ if env("USE_DOCKER") == "yes":
 # https://django-extensions.readthedocs.io/en/latest/installation_instructions.html#configuration
 INSTALLED_APPS += ["django_extensions"]
 
-# Your stuff...
+# Billing
 # ------------------------------------------------------------------------------
+BILLING_SERVICE_CLASS = "ams.billing.providers.mock.MockBillingService"
+BILLING_EMAIL_WHITELIST_REGEX = env(
+    "BILLING_EMAIL_WHITELIST_REGEX",
+    default="@ams.com",
+)
