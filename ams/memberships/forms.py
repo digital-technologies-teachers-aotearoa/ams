@@ -123,7 +123,8 @@ class CreateIndividualMembershipForm(ModelForm):
         model = IndividualMembership
         fields = ["membership_option", "start_date"]
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, user, **kwargs):
+        self.user = user
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_method = "post"
@@ -141,6 +142,27 @@ class CreateIndividualMembershipForm(ModelForm):
             """),
             Submit("submit", "Register membership", css_class="btn btn-primary"),
         )
+
+    def clean_start_date(self):
+        start_date = self.cleaned_data.get("start_date")
+        if self.user and start_date:
+            overlapping = IndividualMembership.objects.filter(
+                user=self.user,
+                cancelled_datetime__isnull=True,
+                start_date__lte=start_date,
+                expiry_date__gt=start_date,
+            )
+            # Exclude self if updating
+            if self.instance.pk:
+                overlapping = overlapping.exclude(pk=self.instance.pk)
+            if overlapping.exists():
+                raise ValidationError(
+                    _(
+                        "You already have a non-cancelled membership active"
+                        " on this start date.",
+                    ),
+                )
+        return start_date
 
     def save(self, user=None):
         """Create an IndividualMembership bound to provided user.
