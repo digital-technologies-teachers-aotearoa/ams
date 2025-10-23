@@ -77,6 +77,6 @@ INSTALLED_APPS += ["django_extensions"]
 # ------------------------------------------------------------------------------
 BILLING_SERVICE_CLASS = "ams.billing.providers.mock.MockBillingService"
 BILLING_EMAIL_WHITELIST_REGEX = env(
-    "BILLING_EMAIL_WHITELIST_REGEX",
+    "AMS_BILLING_EMAIL_WHITELIST_REGEX",
     default="@ams.com",
 )

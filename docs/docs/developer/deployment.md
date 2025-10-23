@@ -27,6 +27,8 @@ The following environment variables are required:
 | `MAILGUN_DOMAIN` | `sandbox.mailgun.org` | The domain for Mailgun |
 | `MAILGUN_API_URL` | `https://api.mailgun.net` | The API URL for Mailgun |
 | `SENTRY_DSN` | `https://123@456.ingest.de.sentry.io/789` | The DSN value for Sentry observability |
+| `AMS_BILLING_SERVICE_CLASS` | `ams.billing.providers.xero.XeroBillingService` | The provider to use for billing |
+| `AMS_BILLING_EMAIL_WHITELIST_REGEX` | | Allowed emails to send billing emails to (can be blank) |
 
 ## Deployment steps
 
