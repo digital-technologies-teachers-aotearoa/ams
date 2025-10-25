@@ -283,16 +283,25 @@ LOGGING = {
 
 # django-allauth
 # ------------------------------------------------------------------------------
+
+
+def display_user(user):
+    return user.get_full_name()
+
+
+# https://docs.allauth.org/en/latest/account/configuration.html
 ACCOUNT_ALLOW_REGISTRATION = env.bool("DJANGO_ACCOUNT_ALLOW_REGISTRATION", True)
-# https://docs.allauth.org/en/latest/account/configuration.html
 ACCOUNT_LOGIN_METHODS = {"email"}
-# https://docs.allauth.org/en/latest/account/configuration.html
-ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
-# https://docs.allauth.org/en/latest/account/configuration.html
-ACCOUNT_USER_MODEL_USERNAME_FIELD = None
-# https://docs.allauth.org/en/latest/account/configuration.html
+ACCOUNT_SIGNUP_FIELDS = [
+    "email*",
+    "password1*",
+    "password2*",
+    "username*",
+]
+ACCOUNT_USER_DISPLAY = display_user
+ACCOUNT_USER_MODEL_USERNAME_FIELD = "username"
+ACCOUNT_USERNAME_MIN_LENGTH = 3
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
-# https://docs.allauth.org/en/latest/account/configuration.html
 ACCOUNT_ADAPTER = "ams.users.adapters.AccountAdapter"
 # https://docs.allauth.org/en/latest/account/forms.html
 ACCOUNT_FORMS = {"signup": "ams.users.forms.UserSignupForm"}

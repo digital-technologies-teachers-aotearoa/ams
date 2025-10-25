@@ -3,6 +3,7 @@ from allauth.socialaccount.forms import SignupForm as SocialSignupForm
 from django.contrib.auth import forms as admin_forms
 from django.forms import CharField
 from django.forms import EmailField
+from django.forms import TextInput
 from django.utils.translation import gettext_lazy as _
 
 from .models import User
@@ -36,13 +37,43 @@ class UserSignupForm(SignupForm):
     Check UserSocialSignupForm for accounts created from social.
     """
 
-    first_name = CharField(label="First name", max_length=150)
-    last_name = CharField(label="Last name", max_length=150)
+    first_name = CharField(
+        label="First name",
+        max_length=150,
+        widget=TextInput(
+            attrs={"placeholder": _("First name"), "autocomplete": "first_name"},
+        ),
+    )
+    last_name = CharField(
+        label="Last name",
+        max_length=150,
+        widget=TextInput(
+            attrs={"placeholder": _("Last name"), "autocomplete": "last_name"},
+        ),
+    )
+    username = CharField(
+        label="Username",
+        max_length=150,
+        help_text="This is used in the community forum.",
+        widget=TextInput(
+            attrs={"placeholder": _("Username"), "autocomplete": "username"},
+        ),
+    )
+
+    field_order = [
+        "email",
+        "password1",
+        "password2",
+        "first_name",
+        "last_name",
+        "username",
+    ]
 
     def save(self, request):
         user = super().save(request)
         user.first_name = self.cleaned_data.get("first_name")
         user.last_name = self.cleaned_data.get("last_name")
+        user.username = self.cleaned_data.get("username")
         return user
 
 

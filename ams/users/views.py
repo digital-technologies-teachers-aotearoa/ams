@@ -14,8 +14,8 @@ from ams.users.tables import MembershipTable
 
 class UserDetailView(LoginRequiredMixin, DetailView):
     model = User
-    slug_field = "id"
-    slug_url_kwarg = "id"
+    slug_field = "username"
+    slug_url_kwarg = "username"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -34,8 +34,8 @@ user_detail_view = UserDetailView.as_view()
 
 class UserUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = User
-    fields = ["first_name", "last_name"]
-    success_message = _("Information successfully updated")
+    fields = ["first_name", "last_name", "username"]
+    success_message = _("Your user details have been successfully updated")
 
     def get_success_url(self) -> str:
         assert self.request.user.is_authenticated  # type guard
@@ -53,7 +53,7 @@ class UserRedirectView(LoginRequiredMixin, RedirectView):
     permanent = False
 
     def get_redirect_url(self) -> str:
-        return reverse("users:detail", kwargs={"pk": self.request.user.pk})
+        return reverse("users:detail", kwargs={"username": self.request.user.username})
 
 
 user_redirect_view = UserRedirectView.as_view()
