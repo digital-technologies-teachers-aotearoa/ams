@@ -1,10 +1,14 @@
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
+from django.urls import reverse
 from pydiscourse.sso import sso_redirect_url
 from pydiscourse.sso import sso_validate
+
+from ams.utils.permissions import user_has_active_membership
 
 
 @login_required
@@ -16,7 +20,16 @@ def forum_sso_login_redirect(request: HttpRequest) -> HttpResponse:
 
 @login_required
 def forum_sso_login_callback(request: HttpRequest) -> HttpResponse:
-    # TODO: Check user is admin or a user with an active membership.
+    # Check if user has forum access (superuser or active membership)
+    if not user_has_active_membership(request.user):
+        messages.error(
+            request,
+            "You must have an active membership to view this feature",
+        )
+        return HttpResponseRedirect(
+            reverse("users:detail", kwargs={"username": request.user.username}),
+        )
+
     secret = settings.DISCOURSE_CONNECT_SECRET
 
     payload = request.GET.get("sso")
@@ -24,10 +37,7 @@ def forum_sso_login_callback(request: HttpRequest) -> HttpResponse:
 
     nonce = sso_validate(payload, signature, secret)
 
-    # TODO: Replace with an editable forum username or change
-    # how we approach usernames as Discourse displays the username
-    # on posts. Our usernames are currently the primary key.
-    username = request.user.id
+    username = request.user.username
     name = request.user.get_full_name()
     external_id = request.user.id
 
