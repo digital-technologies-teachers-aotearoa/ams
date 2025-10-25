@@ -80,3 +80,7 @@ BILLING_EMAIL_WHITELIST_REGEX = env(
     "AMS_BILLING_EMAIL_WHITELIST_REGEX",
     default="@ams.com",
 )
+
+# Documentation
+# ------------------------------------------------------------------------------
+DOCUMENTATION_URL = env("DOCUMENTATION_URL", default="http://localhost:8001")
