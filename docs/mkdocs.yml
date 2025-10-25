@@ -34,4 +34,5 @@ nav:
     - developer/forum.md
     - developer/icons.md
     - developer/urls.md
+    - developer/permission_caching.md
     - developer/deployment.md
