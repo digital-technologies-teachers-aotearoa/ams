@@ -24,7 +24,7 @@ class CreateIndividualMembershipView(LoginRequiredMixin, FormView):
         return kwargs
 
     def get_success_url(self):  # type: ignore[override]
-        return reverse("users:detail", args=[self.request.user.pk])
+        return reverse("users:detail", args=[self.request.user.username])
 
     def form_valid(self, form):  # type: ignore[override]
         form.save(user=self.request.user)

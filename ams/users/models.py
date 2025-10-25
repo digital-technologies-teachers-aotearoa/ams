@@ -25,9 +25,19 @@ class User(AbstractUser):
     check forms.SignupForm and forms.SocialSignupForms accordingly.
     """
 
-    # Inherit first and last name attributes from base class
     email = EmailField(_("email address"), unique=True)
-    username = None  # type: ignore[assignment]
+    username = CharField(
+        _("username"),
+        max_length=150,
+        unique=True,
+        help_text=_("This is used in the community forum."),
+        validators=[AbstractUser.username_validator],
+        error_messages={
+            "unique": _("A user with that username already exists."),
+        },
+    )
+    first_name = CharField(_("first name"), max_length=150, null=False, blank=False)
+    last_name = CharField(_("last name"), max_length=150, null=False, blank=False)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
@@ -41,7 +51,7 @@ class User(AbstractUser):
             str: URL for user detail.
 
         """
-        return reverse("users:detail", kwargs={"pk": self.id})
+        return reverse("users:detail", kwargs={"username": self.username})
 
 
 # --- Organisation models ---

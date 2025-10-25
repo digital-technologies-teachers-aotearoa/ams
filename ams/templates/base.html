@@ -51,7 +51,8 @@
                 {% main_menu template="cms/menu/top_level_item.html" sub_menu_template="cms/menu/dropdown_item.html" max_levels=2 %}
                 {% if request.user.is_authenticated %}
                   <li class="nav-item">
-                    <a class="nav-link" href="{% url 'users:detail' request.user.pk %}">{% translate "My Profile" %}</a>
+                    <a class="nav-link"
+                       href="{% url 'users:detail' request.user.username %}">{% translate "My Profile" %}</a>
                   </li>
                   <li class="nav-item">
                     {# URL provided by django-allauth/account/urls.py #}

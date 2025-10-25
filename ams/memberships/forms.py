@@ -191,7 +191,7 @@ class CreateIndividualMembershipForm(ModelForm):
             except Exception as e:
                 logger.exception(
                     "Failed to get or create billing account for user %s",
-                    user.pk,
+                    user.username,
                 )
                 raise ValidationError(
                     _("Could not create billing account. Please contact us."),

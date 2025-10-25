@@ -19,6 +19,8 @@ class UserManager(DjangoUserManager["User"]):
             raise ValueError(msg)
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
+        if "username" not in extra_fields:
+            user.username = email
         user.password = make_password(password)
         user.save(using=self._db)
         return user
