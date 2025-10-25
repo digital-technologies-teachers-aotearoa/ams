@@ -357,6 +357,13 @@ SAMPLE_DATA_USER_EMAIL = env("SAMPLE_DATA_USER_EMAIL", default="user@ams.com")
 SAMPLE_DATA_USER_PASSWORD = env("SAMPLE_DATA_USER_PASSWORD", default="password")
 
 
+# Documentation
+# ------------------------------------------------------------------------------
+DOCUMENTATION_URL = env(
+    "DOCUMENTATION_URL",
+    default="https://digital-technologies-teachers-aotearoa.github.io/ams/",
+)
+
 # Other settings
 # ------------------------------------------------------------------------------
 DEPLOYED = env.bool("DEPLOYED", default=False)

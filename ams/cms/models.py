@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 from wagtail.admin.panels import FieldPanel
 from wagtail.admin.panels import MultiFieldPanel
@@ -8,6 +9,16 @@ from wagtail.fields import StreamField
 from wagtail.models import Page
 
 from ams.cms.blocks import BaseStreamBlock
+
+# Reserved URL patterns that cannot be used as page slugs
+RESERVED_URL_SLUGS = {
+    "billing",
+    "users",
+    "forum",
+    "cms",
+    "cms-documents",
+    "accounts",
+}
 
 
 class HomePage(Page):
@@ -33,6 +44,24 @@ class ContentPage(Page):
     parent_page_types = ["cms.HomePage", "cms.ContentPage"]
     subpage_types = ["cms.ContentPage"]
     show_in_menus = True
+
+    def clean(self):
+        """Validate that the page slug doesn't conflict with reserved URLs."""
+        super().clean()
+
+        # Only check direct children of HomePage for reserved slug conflicts
+        if (
+            self.get_parent()
+            and self.get_parent().specific.__class__.__name__ == "HomePage"
+            and self.slug in RESERVED_URL_SLUGS
+        ):
+            raise ValidationError(
+                {
+                    "slug": f'The slug "{self.slug}" is reserved for application URLs. '
+                    f"Please choose a different slug. Reserved slugs are: "
+                    f"{', '.join(sorted(RESERVED_URL_SLUGS))}",
+                },
+            )
 
 
 @register_setting
