@@ -2,6 +2,7 @@ import uuid
 from typing import ClassVar
 
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import RegexValidator
 from django.db.models import CASCADE
 from django.db.models import BooleanField
 from django.db.models import CharField
@@ -14,6 +15,16 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from .managers import UserManager
+
+# Custom username validator
+username_validator = RegexValidator(
+    regex=r"^[a-zA-ZāēīōūĀĒĪŌŪ0-9._-]+$",
+    message=_(
+        "Username must only include numbers, letters (including macrons), "
+        "dashes, dots, and underscores.",
+    ),
+    code="invalid_username",
+)
 
 # --- User models ---
 
@@ -30,8 +41,11 @@ class User(AbstractUser):
         _("username"),
         max_length=150,
         unique=True,
-        help_text=_("This is used in the community forum."),
-        validators=[AbstractUser.username_validator],
+        help_text=_(
+            "This is used in the community forum. Username must only include numbers, "
+            "letters (including macrons), dashes, dots, and underscores.",
+        ),
+        validators=[username_validator],
         error_messages={
             "unique": _("A user with that username already exists."),
         },
