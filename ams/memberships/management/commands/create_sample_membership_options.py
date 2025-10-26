@@ -35,6 +35,14 @@ class Command(management.base.BaseCommand):
             },
         )
         MembershipOption.objects.get_or_create(
+            name="Free Individual Membership - 1 Day",
+            type=MembershipOptionType.INDIVIDUAL,
+            defaults={
+                "duration": relativedelta(days=1),
+                "cost": 0,
+            },
+        )
+        MembershipOption.objects.get_or_create(
             name="Sample Organisation Membership - 1 Month",
             type=MembershipOptionType.ORGANISATION,
             defaults={

@@ -213,6 +213,14 @@ class CreateIndividualMembershipForm(ModelForm):
                         "membership. Please contact us.",
                     ),
                 ) from e
+        else:
+            # Zero-cost membership: automatically approve
+            instance.approved_datetime = timezone.now()
+            logger.info(
+                "Auto-approving zero-cost membership for user %s with option %s",
+                user.pk,
+                membership_option.name,
+            )
 
         instance.save()
         return instance
