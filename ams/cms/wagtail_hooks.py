@@ -10,7 +10,7 @@ def add_ams_help_menu_item(request, menu_items):
     menu_items.append(
         MenuItem(
             _("AMS help"),
-            settings.DOCUMENTATION_URL,
+            f"{settings.DOCUMENTATION_URL}/admin/cms/",
             name="ams_help",
             icon_name="help",
             attrs={"target": "_blank", "rel": "noopener noreferrer"},
