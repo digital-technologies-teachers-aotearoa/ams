@@ -13,7 +13,7 @@ This guide enables AI coding agents to work productively in the Association Mana
 
 - **Run Server:** `python manage.py runserver 0.0.0.0:8000` (local dev)
 - **Create Superuser:** `python manage.py createsuperuser`
-- **Run Tests:** `pytest` (all tests), or `pytest ams/<app>/tests/` for app-specific tests
+- **Run Tests:** `pytest` (all tests), or `pytest ams/<app>/tests/` for app-specific tests. There is no need to create a virtual environment manually, it already exists.
 - **Type Checks:** `mypy ams`
 - **Coverage:** `coverage run -m pytest && coverage html` (view at `htmlcov/index.html`)
 - **Translations:**
@@ -46,7 +46,3 @@ This guide enables AI coding agents to work productively in the Association Mana
 - See `/app/locale/README.md` for translation workflow
 - See `config/settings/` for environment configs
 - See `compose/` for Docker service definitions
-
----
-
-**If any section is unclear or missing, please provide feedback so this guide can be improved.**
