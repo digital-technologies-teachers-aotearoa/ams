@@ -1,0 +1,7 @@
+{% if not value %}
+  <span class="text-secondary">Not required</span>
+{% elif value.paid_date %}
+  <a href="#" class="text-success">Paid</a>
+{% else %}
+  <a href="#" class="text-warning">Awaiting payment</a>
+{% endif %}

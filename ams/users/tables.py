@@ -1,5 +1,6 @@
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
+from django_tables2 import TemplateColumn
 from django_tables2.columns import Column
 from django_tables2.columns import DateColumn
 from django_tables2.tables import Table
@@ -26,7 +27,11 @@ class MembershipTable(Table):
     status = StatusBadgeColumn(accessor="status", verbose_name="Status")
     start_date = DateColumn(verbose_name="Start Date")
     expiry_date = DateColumn(verbose_name="End Date")
-    invoice = Column(accessor="invoice", verbose_name="Invoice")
+    invoice = TemplateColumn(
+        template_name="users/tables/invoice_column.html",
+        accessor="invoice",
+        verbose_name="Invoice",
+    )
 
     class Meta:
         model = IndividualMembership
