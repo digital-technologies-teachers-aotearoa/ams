@@ -172,3 +172,9 @@ sentry_sdk.init(
 # ------------------------------------------------------------------------------
 BILLING_SERVICE_CLASS = env("AMS_BILLING_SERVICE_CLASS")
 BILLING_EMAIL_WHITELIST_REGEX = env("AMS_BILLING_EMAIL_WHITELIST_REGEX")
+
+
+# Discourse SSO
+# ------------------------------------------------------------------------------
+DISCOURSE_REDIRECT_DOMAIN = env("DISCOURSE_REDIRECT_DOMAIN", default=None)
+DISCOURSE_CONNECT_SECRET = env("DISCOURSE_CONNECT_SECRET", default=None)

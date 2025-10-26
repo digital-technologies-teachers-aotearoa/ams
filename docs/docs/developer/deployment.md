@@ -29,6 +29,8 @@ The following environment variables are required:
 | `SENTRY_DSN` | `https://123@456.ingest.de.sentry.io/789` | The DSN value for Sentry observability |
 | `AMS_BILLING_SERVICE_CLASS` | `ams.billing.providers.xero.XeroBillingService` | The provider to use for billing |
 | `AMS_BILLING_EMAIL_WHITELIST_REGEX` | | Allowed emails to send billing emails to (can be blank) |
+| `DISCOURSE_REDIRECT_DOMAIN` | `https://forum.ams.com` | The domain of the forum to send users to. |
+| `DISCOURSE_CONNECT_SECRET` | `redacted-secret` | The secret used in SSO Discourse communication. |
 
 ## Deployment steps
 
