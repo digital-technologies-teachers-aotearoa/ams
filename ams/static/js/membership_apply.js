@@ -1,8 +1,17 @@
 // membership_apply.js
 
 document.addEventListener('DOMContentLoaded', function () {
-  // Provide durations for JS
-  window.membershipDurations = window.membershipDurations || {};
+  // Load durations from JSON script block
+  let membershipDurations = {};
+  const durationsScript = document.getElementById('membership-durations-data');
+  if (durationsScript) {
+    try {
+      membershipDurations = JSON.parse(durationsScript.textContent);
+    } catch (e) {
+      console.error('Failed to parse membership durations data:', e);
+    }
+  }
+
   const select = document.getElementById('id_membership_option');
   const startInput = document.getElementById('id_start_date');
   const endEl = document.getElementById('membership-end-date');
@@ -35,13 +44,8 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!select || !startInput) return;
     const val = select.value;
     const startVal = startInput.value;
-    if (
-      val &&
-      startVal &&
-      window.membershipDurations &&
-      window.membershipDurations[val]
-    ) {
-      const duration = window.membershipDurations[val];
+    if (val && startVal && membershipDurations && membershipDurations[val]) {
+      const duration = membershipDurations[val];
       const startDate = parseDate(startVal);
       const endDate = addDuration(startDate, duration);
       endEl.textContent = formatDate(endDate);
