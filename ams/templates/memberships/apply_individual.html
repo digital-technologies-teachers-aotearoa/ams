@@ -13,13 +13,6 @@
       {% crispy form %}
     </div>
   </div>
-  {{ option_end_dates|json_script:"option-end-dates-data" }}
-  <script>
-    window.membershipDurations = {
-      {
-        membership_durations_json | safe
-      }
-    };
-  </script>
+  {{ membership_durations_json|json_script:"membership-durations-data" }}
   <script src="{% static 'js/membership_apply.js' %}"></script>
 {% endblock content %}
