@@ -35,6 +35,7 @@ class Command(management.base.BaseCommand):
                 password=settings.SAMPLE_DATA_USER_PASSWORD,
                 first_name="Sample",
                 last_name="User",
+                username="user",
             )
             EmailAddress.objects.create(
                 user=user,

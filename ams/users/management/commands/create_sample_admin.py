@@ -39,6 +39,7 @@ class Command(management.base.BaseCommand):
                 password=password,
                 first_name="Admin",
                 last_name="Account",
+                username="admin",
             )
             self.stdout.write("✅ Admin account created.\n")
 

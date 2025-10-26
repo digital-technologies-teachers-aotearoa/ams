@@ -23,8 +23,8 @@ def test_get_application_form(client):
     assert b"Apply for Membership" in resp.content
     # Start date should be present
     assert b"Start date" in resp.content
-    # JSON script id for option end dates mapping
-    assert b"option-end-dates-data" in resp.content
+    # JSON script id for membership durations
+    assert b"membership-durations-data" in resp.content
 
 
 def test_post_application_creates_membership(client):
