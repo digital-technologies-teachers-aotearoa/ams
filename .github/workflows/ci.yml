@@ -86,6 +86,7 @@ jobs:
 
   publish-image:
     name: Build and push image
+    environment: dev
     runs-on: ubuntu-latest
     needs: [project-lint, django-test, build-docs]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -122,12 +123,21 @@ jobs:
         uses: digitalocean/app_action/deploy@v2
         with:
           token: ${{ secrets.DIGITALOCEAN_DEPLOY_TOKEN }}
+          project_id: ams-dev
           app_name: ams-dev-website
-          print_build_logs: true
-          print_deploy_logs: true
         env:
-          IMAGE_DIGEST_DJANGO: ${{ steps.push.outputs.digest }}
-          IMAGE_DIGEST_JOB-DEPLOY: ${{ steps.push.outputs.digest }}
+          DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+          DJANGO_ADMIN_URL: ${{ secrets.DJANGO_ADMIN_URL }}
+          DJANGO_ALLOWED_HOSTS: ${{ secrets.DJANGO_ALLOWED_HOSTS }}
+          MAILGUN_API_KEY: ${{ secrets.MAILGUN_API_KEY }}
+          MAILGUN_DOMAIN: ${{ secrets.MAILGUN_DOMAIN }}
+          MAILGUN_API_URL: ${{ secrets.MAILGUN_API_URL }}
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          AMS_BILLING_SERVICE_CLASS: ${{ secrets.AMS_BILLING_SERVICE_CLASS }}
+          DISCOURSE_REDIRECT_DOMAIN: ${{ secrets.DISCOURSE_REDIRECT_DOMAIN }}
+          DISCOURSE_CONNECT_SECRET: ${{ secrets.DISCOURSE_CONNECT_SECRET }}
+          registry_credentials: ${{ secrets.REGISTRY_CREDENTIALS }}
+          django_digest: ${{ steps.push.outputs.digest }}
 
   deploy-docs:
     name: Deploy docs

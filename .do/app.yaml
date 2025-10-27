@@ -1,0 +1,154 @@
+name: ams-dev-website
+alerts:
+  - rule: DEPLOYMENT_FAILED
+  - rule: DOMAIN_FAILED
+databases:
+  - engine: PG
+    name: db
+    version: '16'
+domains:
+  - domain: ams-dev.dtta.org.nz
+    type: PRIMARY
+features:
+  - buildpack-stack=ubuntu-22
+ingress:
+  rules:
+    - component:
+        name: django
+      match:
+        path:
+          prefix: /
+jobs:
+  - envs:
+      - key: POSTGRES_HOST
+        scope: RUN_AND_BUILD_TIME
+        value: ${db.HOSTNAME}
+      - key: POSTGRES_PORT
+        scope: RUN_AND_BUILD_TIME
+        value: ${db.PORT}
+      - key: POSTGRES_DB
+        scope: RUN_AND_BUILD_TIME
+        value: ${db.DATABASE}
+      - key: POSTGRES_USER
+        scope: RUN_AND_BUILD_TIME
+        value: ${db.USERNAME}
+      - key: POSTGRES_PASSWORD
+        scope: RUN_AND_BUILD_TIME
+        value: ${db.PASSWORD}
+      - key: DJANGO_SECRET_KEY
+        scope: RUN_AND_BUILD_TIME
+        value: ${{ DJANGO_SECRET_KEY }}
+      - key: DJANGO_ADMIN_URL
+        scope: RUN_AND_BUILD_TIME
+        value: ${{ DJANGO_ADMIN_URL }}
+      - key: DJANGO_ALLOWED_HOSTS
+        scope: RUN_AND_BUILD_TIME
+        value: ${{ DJANGO_ALLOWED_HOSTS }}
+      - key: MAILGUN_API_KEY
+        scope: RUN_AND_BUILD_TIME
+        value: ${{ MAILGUN_API_KEY }}
+      - key: MAILGUN_DOMAIN
+        scope: RUN_AND_BUILD_TIME
+        value: ${{ MAILGUN_DOMAIN }}
+      - key: MAILGUN_API_URL
+        scope: RUN_AND_BUILD_TIME
+        value: ${{ MAILGUN_API_URL }}
+      - key: SENTRY_DSN
+        scope: RUN_AND_BUILD_TIME
+        value: ${{ SENTRY_DSN }}
+      - key: DJANGO_SETTINGS_MODULE
+        scope: RUN_AND_BUILD_TIME
+        value: config.settings.production
+      - key: DATABASE_URL
+        scope: RUN_AND_BUILD_TIME
+        value: ${db.DATABASE_URL}
+      - key: AMS_BILLING_SERVICE_CLASS
+        scope: RUN_AND_BUILD_TIME
+        value: ${{ AMS_BILLING_SERVICE_CLASS }}
+      - key: AMS_BILLING_EMAIL_WHITELIST_REGEX
+        scope: RUN_AND_BUILD_TIME
+      - key: DISCOURSE_REDIRECT_DOMAIN
+        scope: RUN_AND_BUILD_TIME
+        value: ${{ DISCOURSE_REDIRECT_DOMAIN }}
+      - key: DISCOURSE_CONNECT_SECRET
+        scope: RUN_AND_BUILD_TIME
+        value: ${{ DISCOURSE_CONNECT_SECRET }}
+    image:
+      digest: ${{ django_digest }}
+      registry: digital-technologies-teachers-aotearoa
+      registry_credentials: ${{ registry_credentials }}
+      registry_type: GHCR
+      repository: ams-django
+    instance_count: 1
+    instance_size_slug: apps-s-1vcpu-1gb-fixed
+    kind: PRE_DEPLOY
+    name: job-deploy
+    run_command: python /app/manage.py deploy_steps
+maintenance: {}
+region: syd
+services:
+  - envs:
+      - key: POSTGRES_HOST
+        scope: RUN_AND_BUILD_TIME
+        value: ${db.HOSTNAME}
+      - key: POSTGRES_PORT
+        scope: RUN_AND_BUILD_TIME
+        value: ${db.PORT}
+      - key: POSTGRES_DB
+        scope: RUN_AND_BUILD_TIME
+        value: ${db.DATABASE}
+      - key: POSTGRES_USER
+        scope: RUN_AND_BUILD_TIME
+        value: ${db.USERNAME}
+      - key: POSTGRES_PASSWORD
+        scope: RUN_AND_BUILD_TIME
+        value: ${db.PASSWORD}
+      - key: DJANGO_SECRET_KEY
+        scope: RUN_AND_BUILD_TIME
+        value: ${{ DJANGO_SECRET_KEY }}
+      - key: DJANGO_ADMIN_URL
+        scope: RUN_AND_BUILD_TIME
+        value: ${{ DJANGO_ADMIN_URL }}
+      - key: DJANGO_ALLOWED_HOSTS
+        scope: RUN_AND_BUILD_TIME
+        value: ${{ DJANGO_ALLOWED_HOSTS }}
+      - key: MAILGUN_API_KEY
+        scope: RUN_AND_BUILD_TIME
+        value: ${{ MAILGUN_API_KEY }}
+      - key: MAILGUN_DOMAIN
+        scope: RUN_AND_BUILD_TIME
+        value: ${{ MAILGUN_DOMAIN }}
+      - key: MAILGUN_API_URL
+        scope: RUN_AND_BUILD_TIME
+        value: ${{ MAILGUN_API_URL }}
+      - key: SENTRY_DSN
+        scope: RUN_AND_BUILD_TIME
+        value: ${{ SENTRY_DSN }}
+      - key: DJANGO_SETTINGS_MODULE
+        scope: RUN_AND_BUILD_TIME
+        value: config.settings.production
+      - key: DATABASE_URL
+        scope: RUN_AND_BUILD_TIME
+        value: ${db.DATABASE_URL}
+      - key: AMS_BILLING_SERVICE_CLASS
+        scope: RUN_AND_BUILD_TIME
+        value: ${{ AMS_BILLING_SERVICE_CLASS }}
+      - key: AMS_BILLING_EMAIL_WHITELIST_REGEX
+        scope: RUN_AND_BUILD_TIME
+      - key: DISCOURSE_REDIRECT_DOMAIN
+        scope: RUN_AND_BUILD_TIME
+        value: ${{ DISCOURSE_REDIRECT_DOMAIN }}
+      - key: DISCOURSE_CONNECT_SECRET
+        scope: RUN_AND_BUILD_TIME
+        value: ${{ DISCOURSE_CONNECT_SECRET }}
+    http_port: 5000
+    image:
+      digest: ${{ django_digest }}
+      registry: digital-technologies-teachers-aotearoa
+      registry_credentials: ${{ registry_credentials }}
+      registry_type: GHCR
+      repository: ams-django
+    instance_count: 1
+    instance_size_slug: apps-s-1vcpu-0.5gb
+    name: django
+    run_command: /start
