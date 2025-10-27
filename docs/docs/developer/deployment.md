@@ -38,3 +38,15 @@ During the deployment, there is a Django management command `deploy_steps` that 
 
 1. Migrate the database.
 2. Check required CMS pages are present.
+
+## Services
+
+The following provides details on services recommended for use with AMS.
+
+### Mailgun
+
+Using Mailgun for emails is officially supported by AMS.
+After setting up a domain in Mailgun, there are two types of credentials required.
+
+1. A 'Sending Key' for the Django website.
+2. A 'SMTP credential' for the Discourse server.
