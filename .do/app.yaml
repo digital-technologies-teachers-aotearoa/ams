@@ -37,25 +37,25 @@ jobs:
         value: ${db.PASSWORD}
       - key: DJANGO_SECRET_KEY
         scope: RUN_AND_BUILD_TIME
-        value: ${{ DJANGO_SECRET_KEY }}
+        value: ${DJANGO_SECRET_KEY}
       - key: DJANGO_ADMIN_URL
         scope: RUN_AND_BUILD_TIME
-        value: ${{ DJANGO_ADMIN_URL }}
+        value: ${DJANGO_ADMIN_URL}
       - key: DJANGO_ALLOWED_HOSTS
         scope: RUN_AND_BUILD_TIME
-        value: ${{ DJANGO_ALLOWED_HOSTS }}
+        value: ${DJANGO_ALLOWED_HOSTS}
       - key: MAILGUN_API_KEY
         scope: RUN_AND_BUILD_TIME
-        value: ${{ MAILGUN_API_KEY }}
+        value: ${MAILGUN_API_KEY}
       - key: MAILGUN_DOMAIN
         scope: RUN_AND_BUILD_TIME
-        value: ${{ MAILGUN_DOMAIN }}
+        value: ${MAILGUN_DOMAIN}
       - key: MAILGUN_API_URL
         scope: RUN_AND_BUILD_TIME
-        value: ${{ MAILGUN_API_URL }}
+        value: ${MAILGUN_API_URL}
       - key: SENTRY_DSN
         scope: RUN_AND_BUILD_TIME
-        value: ${{ SENTRY_DSN }}
+        value: ${SENTRY_DSN}
       - key: DJANGO_SETTINGS_MODULE
         scope: RUN_AND_BUILD_TIME
         value: config.settings.production
@@ -64,19 +64,20 @@ jobs:
         value: ${db.DATABASE_URL}
       - key: AMS_BILLING_SERVICE_CLASS
         scope: RUN_AND_BUILD_TIME
-        value: ${{ AMS_BILLING_SERVICE_CLASS }}
+        value: ${AMS_BILLING_SERVICE_CLASS}
       - key: AMS_BILLING_EMAIL_WHITELIST_REGEX
         scope: RUN_AND_BUILD_TIME
+        value: ${AMS_BILLING_EMAIL_WHITELIST_REGEX}
       - key: DISCOURSE_REDIRECT_DOMAIN
         scope: RUN_AND_BUILD_TIME
-        value: ${{ DISCOURSE_REDIRECT_DOMAIN }}
+        value: ${DISCOURSE_REDIRECT_DOMAIN}
       - key: DISCOURSE_CONNECT_SECRET
         scope: RUN_AND_BUILD_TIME
-        value: ${{ DISCOURSE_CONNECT_SECRET }}
+        value: ${DISCOURSE_CONNECT_SECRET}
     image:
-      digest: ${{ django_digest }}
+      digest: ${django_digest}
       registry: digital-technologies-teachers-aotearoa
-      registry_credentials: ${{ registry_credentials }}
+      registry_credentials: ${registry_credentials}
       registry_type: GHCR
       repository: ams-django
     instance_count: 1
@@ -105,25 +106,25 @@ services:
         value: ${db.PASSWORD}
       - key: DJANGO_SECRET_KEY
         scope: RUN_AND_BUILD_TIME
-        value: ${{ DJANGO_SECRET_KEY }}
+        value: ${DJANGO_SECRET_KEY}
       - key: DJANGO_ADMIN_URL
         scope: RUN_AND_BUILD_TIME
-        value: ${{ DJANGO_ADMIN_URL }}
+        value: ${DJANGO_ADMIN_URL}
       - key: DJANGO_ALLOWED_HOSTS
         scope: RUN_AND_BUILD_TIME
-        value: ${{ DJANGO_ALLOWED_HOSTS }}
+        value: ${DJANGO_ALLOWED_HOSTS}
       - key: MAILGUN_API_KEY
         scope: RUN_AND_BUILD_TIME
-        value: ${{ MAILGUN_API_KEY }}
+        value: ${MAILGUN_API_KEY}
       - key: MAILGUN_DOMAIN
         scope: RUN_AND_BUILD_TIME
-        value: ${{ MAILGUN_DOMAIN }}
+        value: ${MAILGUN_DOMAIN}
       - key: MAILGUN_API_URL
         scope: RUN_AND_BUILD_TIME
-        value: ${{ MAILGUN_API_URL }}
+        value: ${MAILGUN_API_URL}
       - key: SENTRY_DSN
         scope: RUN_AND_BUILD_TIME
-        value: ${{ SENTRY_DSN }}
+        value: ${SENTRY_DSN}
       - key: DJANGO_SETTINGS_MODULE
         scope: RUN_AND_BUILD_TIME
         value: config.settings.production
@@ -132,20 +133,21 @@ services:
         value: ${db.DATABASE_URL}
       - key: AMS_BILLING_SERVICE_CLASS
         scope: RUN_AND_BUILD_TIME
-        value: ${{ AMS_BILLING_SERVICE_CLASS }}
+        value: ${AMS_BILLING_SERVICE_CLASS}
       - key: AMS_BILLING_EMAIL_WHITELIST_REGEX
         scope: RUN_AND_BUILD_TIME
+        value: ${AMS_BILLING_EMAIL_WHITELIST_REGEX}
       - key: DISCOURSE_REDIRECT_DOMAIN
         scope: RUN_AND_BUILD_TIME
-        value: ${{ DISCOURSE_REDIRECT_DOMAIN }}
+        value: ${DISCOURSE_REDIRECT_DOMAIN}
       - key: DISCOURSE_CONNECT_SECRET
         scope: RUN_AND_BUILD_TIME
-        value: ${{ DISCOURSE_CONNECT_SECRET }}
+        value: ${DISCOURSE_CONNECT_SECRET}
     http_port: 5000
     image:
-      digest: ${{ django_digest }}
+      digest: ${django_digest}
       registry: digital-technologies-teachers-aotearoa
-      registry_credentials: ${{ registry_credentials }}
+      registry_credentials: ${registry_credentials}
       registry_type: GHCR
       repository: ams-django
     instance_count: 1

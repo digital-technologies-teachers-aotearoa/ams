@@ -124,7 +124,6 @@ jobs:
         with:
           token: ${{ secrets.DIGITALOCEAN_DEPLOY_TOKEN }}
           project_id: ams-dev
-          app_name: ams-dev-website
         env:
           DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
           DJANGO_ADMIN_URL: ${{ secrets.DJANGO_ADMIN_URL }}
@@ -134,6 +133,7 @@ jobs:
           MAILGUN_API_URL: ${{ secrets.MAILGUN_API_URL }}
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
           AMS_BILLING_SERVICE_CLASS: ${{ secrets.AMS_BILLING_SERVICE_CLASS }}
+          AMS_BILLING_EMAIL_WHITELIST_REGEX: ${{ secrets.AMS_BILLING_EMAIL_WHITELIST_REGEX }}
           DISCOURSE_REDIRECT_DOMAIN: ${{ secrets.DISCOURSE_REDIRECT_DOMAIN }}
           DISCOURSE_CONNECT_SECRET: ${{ secrets.DISCOURSE_CONNECT_SECRET }}
           registry_credentials: ${{ secrets.REGISTRY_CREDENTIALS }}
