@@ -1,17 +1,17 @@
 python-slugify==8.0.4
 Pillow==11.3.0 # pyup: != 11.2.0
 argon2-cffi==25.1.0
-whitenoise==6.9.0
+whitenoise==6.11.0
 redis==6.4.0
-hiredis==3.2.1
+hiredis==3.3.0
 
 # Django
 # ------------------------------------------------------------------------------
-django==5.2.5  # pyup: < 5.2
+django==5.2.8  # pyup: < 5.2
 django-environ==0.12.0
 django-model-utils==5.0.0
-django-allauth[mfa]==65.11.0
-django-crispy-forms==2.4
+django-allauth[mfa]==65.13.0
+django-crispy-forms==2.5
 crispy-bootstrap5==2025.6
 django-redis==6.0.0
 django-relativedelta==2.0.0
@@ -19,7 +19,7 @@ django-tables2==2.7.5
 
 # Wagtail
 # ------------------------------------------------------------------------------
-wagtail==7.1.2
+wagtail==7.2
 wagtailmenus==4.0.4
 
 # Discourse
