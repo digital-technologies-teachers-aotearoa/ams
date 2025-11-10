@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.http import HttpResponseForbidden
 from wagtail.admin.panels import FieldPanel
 from wagtail.admin.panels import MultiFieldPanel
 from wagtail.contrib.settings.models import BaseGenericSetting
@@ -9,6 +10,7 @@ from wagtail.fields import StreamField
 from wagtail.models import Page
 
 from ams.cms.blocks import BaseStreamBlock
+from ams.utils.permissions import user_has_active_membership
 
 # Reserved URL patterns that cannot be used as page slugs
 RESERVED_URL_SLUGS = {
@@ -31,6 +33,13 @@ class HomePage(Page):
 
 
 class ContentPage(Page):
+    VISIBILITY_PUBLIC = "public"
+    VISIBILITY_MEMBERS = "members"
+    VISIBILITY_CHOICES = [
+        (VISIBILITY_PUBLIC, "Public"),
+        (VISIBILITY_MEMBERS, "Members only"),
+    ]
+
     body = StreamField(
         BaseStreamBlock(),
         blank=True,
@@ -38,12 +47,34 @@ class ContentPage(Page):
         help_text="Content for the about page.",
     )
 
+    visibility = models.CharField(
+        max_length=16,
+        choices=VISIBILITY_CHOICES,
+        default=VISIBILITY_PUBLIC,
+        help_text=(
+            "Who can view this page: everyone or only members with active membership.",
+        ),
+    )
+
     # Metadata
-    content_panels = [*Page.content_panels, FieldPanel("body")]
+    content_panels = [
+        *Page.content_panels,
+        FieldPanel("visibility"),
+        FieldPanel("body"),
+    ]
     template = "cms/pages/content.html"
     parent_page_types = ["cms.HomePage", "cms.ContentPage"]
     subpage_types = ["cms.ContentPage"]
     show_in_menus = True
+
+    def serve(self, request, *args, **kwargs):
+        """Override serve to enforce visibility restrictions."""
+        if self.visibility == self.VISIBILITY_MEMBERS:
+            if not user_has_active_membership(request.user):
+                return HttpResponseForbidden(
+                    "This page is only available to members with an active membership.",
+                )
+        return super().serve(request, *args, **kwargs)
 
     def clean(self):
         """Validate that the page slug doesn't conflict with reserved URLs."""
