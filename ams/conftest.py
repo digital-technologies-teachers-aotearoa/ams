@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 from django.contrib.auth import get_user_model
 from django.utils.crypto import get_random_string
@@ -11,6 +13,11 @@ from ams.users.models import User
 from ams.users.tests.factories import OrganisationFactory
 from ams.users.tests.factories import OrganisationMemberFactory
 from ams.users.tests.factories import UserFactory
+
+
+def pytest_configure():
+    # Ensure the staticfiles directory exists
+    Path("staticfiles/").mkdir(parents=True, exist_ok=True)
 
 
 @pytest.fixture(autouse=True)
