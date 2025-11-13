@@ -91,6 +91,7 @@ THIRD_PARTY_APPS = [
     "wagtailmenus",
     "modelcluster",
     "taggit",
+    "storages",
 ]
 
 LOCAL_APPS = [
@@ -176,10 +177,32 @@ STATICFILES_FINDERS = [
 
 # MEDIA
 # ------------------------------------------------------------------------------
-# https://docs.djangoproject.com/en/dev/ref/settings/#media-root
-MEDIA_ROOT = str(APPS_DIR / "media")
-# https://docs.djangoproject.com/en/dev/ref/settings/#media-url
-MEDIA_URL = "/media/"
+STORAGES = {
+    "default": {
+        "BACKEND": "config.storage_backends.PublicMediaStorage",
+        "OPTIONS": {
+            "bucket_name": env("DJANGO_MEDIA_PUBLIC_BUCKET_NAME"),
+            "endpoint_url": env("DJANGO_MEDIA_PUBLIC_ENDPOINT_URL"),
+            "access_key": env("DJANGO_MEDIA_PUBLIC_ACCESS_KEY"),
+            "secret_key": env("DJANGO_MEDIA_PUBLIC_SECRET_KEY"),
+            "region_name": env("DJANGO_MEDIA_PUBLIC_REGION_NAME", default=None),
+        },
+    },
+    "private": {
+        "BACKEND": "config.storage_backends.PrivateMediaStorage",
+        "OPTIONS": {
+            "bucket_name": env("DJANGO_MEDIA_PRIVATE_BUCKET_NAME"),
+            "endpoint_url": env("DJANGO_MEDIA_PRIVATE_ENDPOINT_URL"),
+            "access_key": env("DJANGO_MEDIA_PRIVATE_ACCESS_KEY"),
+            "secret_key": env("DJANGO_MEDIA_PRIVATE_SECRET_KEY"),
+            "region_name": env("DJANGO_MEDIA_PRIVATE_REGION_NAME", default=None),
+        },
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
 
 # TEMPLATES
 # ------------------------------------------------------------------------------

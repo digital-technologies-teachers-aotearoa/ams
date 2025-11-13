@@ -6,10 +6,12 @@ from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk.integrations.logging import LoggingIntegration
 from sentry_sdk.integrations.redis import RedisIntegration
 
-from .base import *  # noqa: F403
-from .base import DATABASES
-from .base import INSTALLED_APPS
-from .base import env
+from config.settings.base import *  # noqa: F403
+from config.settings.base import DATABASES
+from config.settings.base import INSTALLED_APPS
+from config.settings.base import env
+from config.storage_backends import PrivateMediaStorage
+from config.storage_backends import PublicMediaStorage
 
 # GENERAL
 # ------------------------------------------------------------------------------
@@ -54,16 +56,16 @@ SECURE_CONTENT_TYPE_NOSNIFF = env.bool(
     default=True,
 )
 
-# STATIC & MEDIA
-# ------------------------
-STORAGES = {
-    "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    },
-}
+# MEDIA
+# ------------------------------------------------------------------------------
+PublicMediaStorage.custom_domain = env(
+    "DJANGO_MEDIA_PUBLIC_CUSTOM_DOMAIN",
+    default=None,
+)
+PrivateMediaStorage.custom_domain = env(
+    "DJANGO_MEDIA_PRIVATE_CUSTOM_DOMAIN",
+    default=None,
+)
 
 # CACHES
 # ------------------------------------------------------------------------------
@@ -81,7 +83,7 @@ CACHES = {
 # https://docs.djangoproject.com/en/dev/ref/settings/#default-from-email
 DEFAULT_FROM_EMAIL = env(
     "DJANGO_DEFAULT_FROM_EMAIL",
-    default="Association Management Software <noreply@dtta.org.nz>",
+    default="Association Management Software <noreply@ams.com>",
 )
 # https://docs.djangoproject.com/en/dev/ref/settings/#server-email
 SERVER_EMAIL = env("DJANGO_SERVER_EMAIL", default=DEFAULT_FROM_EMAIL)
@@ -171,7 +173,7 @@ sentry_sdk.init(
 # Billing
 # ------------------------------------------------------------------------------
 BILLING_SERVICE_CLASS = env("AMS_BILLING_SERVICE_CLASS")
-BILLING_EMAIL_WHITELIST_REGEX = env("AMS_BILLING_EMAIL_WHITELIST_REGEX")
+BILLING_EMAIL_WHITELIST_REGEX = env("AMS_BILLING_EMAIL_WHITELIST_REGEX", default=None)
 
 
 # Discourse SSO
