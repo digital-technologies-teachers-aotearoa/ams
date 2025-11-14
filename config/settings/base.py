@@ -1,7 +1,6 @@
 # ruff: noqa: E501
 """Base settings to build other settings files upon."""
 
-import logging
 from pathlib import Path
 
 import environ
@@ -178,67 +177,33 @@ STATICFILES_FINDERS = [
 
 # MEDIA
 # ------------------------------------------------------------------------------
-public_bucket = env("DJANGO_MEDIA_PUBLIC_BUCKET_NAME", default=None)
-private_bucket = env("DJANGO_MEDIA_PRIVATE_BUCKET_NAME", default=None)
-
-logger = logging.getLogger("ams.storage")
-
-# Ensure MEDIA_ROOT exists for FileSystemStorage fallbacks
-MEDIA_ROOT = str(BASE_DIR / "media")
-MEDIA_URL = "/media/"
-
 STORAGES = {
+    "default": {
+        "BACKEND": "config.storage_backends.PublicMediaStorage",
+        "OPTIONS": {
+            "bucket_name": env("DJANGO_MEDIA_PUBLIC_BUCKET_NAME"),
+            "endpoint_url": env("DJANGO_MEDIA_PUBLIC_ENDPOINT_URL"),
+            "access_key": env("DJANGO_MEDIA_PUBLIC_ACCESS_KEY"),
+            "secret_key": env("DJANGO_MEDIA_PUBLIC_SECRET_KEY"),
+            "region_name": env("DJANGO_MEDIA_PUBLIC_REGION_NAME", default=None),
+            "custom_domain": env("DJANGO_MEDIA_PUBLIC_CUSTOM_DOMAIN", default=None),
+        },
+    },
+    "private": {
+        "BACKEND": "config.storage_backends.PrivateMediaStorage",
+        "OPTIONS": {
+            "bucket_name": env("DJANGO_MEDIA_PRIVATE_BUCKET_NAME"),
+            "endpoint_url": env("DJANGO_MEDIA_PRIVATE_ENDPOINT_URL"),
+            "access_key": env("DJANGO_MEDIA_PRIVATE_ACCESS_KEY"),
+            "secret_key": env("DJANGO_MEDIA_PRIVATE_SECRET_KEY"),
+            "region_name": env("DJANGO_MEDIA_PRIVATE_REGION_NAME", default=None),
+            "custom_domain": env("DJANGO_MEDIA_PRIVATE_CUSTOM_DOMAIN", default=None),
+        },
+    },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
-
-if public_bucket:
-    STORAGES["default"] = {
-        "BACKEND": "config.storage_backends.PublicMediaStorage",
-        "OPTIONS": {
-            "bucket_name": public_bucket,
-            "endpoint_url": env("DJANGO_MEDIA_PUBLIC_ENDPOINT_URL", default=None),
-            "access_key": env("DJANGO_MEDIA_PUBLIC_ACCESS_KEY", default=None),
-            "secret_key": env("DJANGO_MEDIA_PUBLIC_SECRET_KEY", default=None),
-            "region_name": env("DJANGO_MEDIA_PUBLIC_REGION_NAME", default=None),
-            "custom_domain": env("DJANGO_MEDIA_PUBLIC_CUSTOM_DOMAIN", default=None),
-        },
-    }
-else:
-    logger.warning(
-        "DJANGO_MEDIA_PUBLIC_BUCKET_NAME not set; falling back to Django FileSystemStorage for public media.",
-    )
-    STORAGES["default"] = {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
-        "OPTIONS": {
-            "location": MEDIA_ROOT,
-            "base_url": MEDIA_URL,
-        },
-    }
-
-if private_bucket:
-    STORAGES["private"] = {
-        "BACKEND": "config.storage_backends.PrivateMediaStorage",
-        "OPTIONS": {
-            "bucket_name": private_bucket,
-            "endpoint_url": env("DJANGO_MEDIA_PRIVATE_ENDPOINT_URL", default=None),
-            "access_key": env("DJANGO_MEDIA_PRIVATE_ACCESS_KEY", default=None),
-            "secret_key": env("DJANGO_MEDIA_PRIVATE_SECRET_KEY", default=None),
-            "region_name": env("DJANGO_MEDIA_PRIVATE_REGION_NAME", default=None),
-            "custom_domain": env("DJANGO_MEDIA_PRIVATE_CUSTOM_DOMAIN", default=None),
-        },
-    }
-else:
-    logger.warning(
-        "DJANGO_MEDIA_PRIVATE_BUCKET_NAME not set; falling back to Django FileSystemStorage for private media.",
-    )
-    STORAGES["private"] = {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
-        "OPTIONS": {
-            "location": str(BASE_DIR / "private_media"),
-        },
-    }
 
 
 # TEMPLATES

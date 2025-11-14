@@ -36,14 +36,14 @@ TEMPLATES[0]["OPTIONS"]["debug"] = True  # type: ignore[index]
 MEDIA_URL = "/test-media/"
 STORAGES = {
     "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
+        "BACKEND": "django.core.files.storage.InMemoryStorage",
         "OPTIONS": {
             "location": "tmp/public-media/",
             "base_url": "/public-media/",
         },
     },
     "private": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
+        "BACKEND": "django.core.files.storage.InMemoryStorage",
         "OPTIONS": {
             "location": "tmp/private-media/",
             "base_url": "/private-media/",
