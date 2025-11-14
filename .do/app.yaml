@@ -74,6 +74,36 @@ jobs:
       - key: DISCOURSE_CONNECT_SECRET
         scope: RUN_AND_BUILD_TIME
         value: ${DISCOURSE_CONNECT_SECRET}
+      - key: DJANGO_MEDIA_PUBLIC_BUCKET_NAME
+        scope: RUN_AND_BUILD_TIME
+        value: ${DJANGO_MEDIA_PUBLIC_BUCKET_NAME}
+      - key: DJANGO_MEDIA_PUBLIC_ENDPOINT_URL
+        scope: RUN_AND_BUILD_TIME
+        value: ${DJANGO_MEDIA_PUBLIC_ENDPOINT_URL}
+      - key: DJANGO_MEDIA_PUBLIC_ACCESS_KEY
+        scope: RUN_AND_BUILD_TIME
+        value: ${DJANGO_MEDIA_PUBLIC_ACCESS_KEY}
+      - key: DJANGO_MEDIA_PUBLIC_SECRET_KEY
+        scope: RUN_AND_BUILD_TIME
+        value: ${DJANGO_MEDIA_PUBLIC_SECRET_KEY}
+      - key: DJANGO_MEDIA_PUBLIC_REGION_NAME
+        scope: RUN_AND_BUILD_TIME
+        value: ${DJANGO_MEDIA_PUBLIC_REGION_NAME}
+      - key: DJANGO_MEDIA_PRIVATE_BUCKET_NAME
+        scope: RUN_AND_BUILD_TIME
+        value: ${DJANGO_MEDIA_PRIVATE_BUCKET_NAME}
+      - key: DJANGO_MEDIA_PRIVATE_ENDPOINT_URL
+        scope: RUN_AND_BUILD_TIME
+        value: ${DJANGO_MEDIA_PRIVATE_ENDPOINT_URL}
+      - key: DJANGO_MEDIA_PRIVATE_ACCESS_KEY
+        scope: RUN_AND_BUILD_TIME
+        value: ${DJANGO_MEDIA_PRIVATE_ACCESS_KEY}
+      - key: DJANGO_MEDIA_PRIVATE_SECRET_KEY
+        scope: RUN_AND_BUILD_TIME
+        value: ${DJANGO_MEDIA_PRIVATE_SECRET_KEY}
+      - key: DJANGO_MEDIA_PRIVATE_REGION_NAME
+        scope: RUN_AND_BUILD_TIME
+        value: ${DJANGO_MEDIA_PRIVATE_REGION_NAME}
     image:
       digest: ${django_digest}
       registry: digital-technologies-teachers-aotearoa
@@ -143,6 +173,36 @@ services:
       - key: DISCOURSE_CONNECT_SECRET
         scope: RUN_AND_BUILD_TIME
         value: ${DISCOURSE_CONNECT_SECRET}
+      - key: DJANGO_MEDIA_PUBLIC_BUCKET_NAME
+        scope: RUN_AND_BUILD_TIME
+        value: ${DJANGO_MEDIA_PUBLIC_BUCKET_NAME}
+      - key: DJANGO_MEDIA_PUBLIC_ENDPOINT_URL
+        scope: RUN_AND_BUILD_TIME
+        value: ${DJANGO_MEDIA_PUBLIC_ENDPOINT_URL}
+      - key: DJANGO_MEDIA_PUBLIC_ACCESS_KEY
+        scope: RUN_AND_BUILD_TIME
+        value: ${DJANGO_MEDIA_PUBLIC_ACCESS_KEY}
+      - key: DJANGO_MEDIA_PUBLIC_SECRET_KEY
+        scope: RUN_AND_BUILD_TIME
+        value: ${DJANGO_MEDIA_PUBLIC_SECRET_KEY}
+      - key: DJANGO_MEDIA_PUBLIC_REGION_NAME
+        scope: RUN_AND_BUILD_TIME
+        value: ${DJANGO_MEDIA_PUBLIC_REGION_NAME}
+      - key: DJANGO_MEDIA_PRIVATE_BUCKET_NAME
+        scope: RUN_AND_BUILD_TIME
+        value: ${DJANGO_MEDIA_PRIVATE_BUCKET_NAME}
+      - key: DJANGO_MEDIA_PRIVATE_ENDPOINT_URL
+        scope: RUN_AND_BUILD_TIME
+        value: ${DJANGO_MEDIA_PRIVATE_ENDPOINT_URL}
+      - key: DJANGO_MEDIA_PRIVATE_ACCESS_KEY
+        scope: RUN_AND_BUILD_TIME
+        value: ${DJANGO_MEDIA_PRIVATE_ACCESS_KEY}
+      - key: DJANGO_MEDIA_PRIVATE_SECRET_KEY
+        scope: RUN_AND_BUILD_TIME
+        value: ${DJANGO_MEDIA_PRIVATE_SECRET_KEY}
+      - key: DJANGO_MEDIA_PRIVATE_REGION_NAME
+        scope: RUN_AND_BUILD_TIME
+        value: ${DJANGO_MEDIA_PRIVATE_REGION_NAME}
     http_port: 5000
     image:
       digest: ${django_digest}
