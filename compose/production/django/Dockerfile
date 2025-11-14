@@ -150,7 +150,7 @@ USER django
 
 # Compile translation message files; DB settings blanked as migrations aren't run here.
 RUN DATABASE_URL="" \
-  DJANGO_SETTINGS_MODULE="config.settings.test" \
+  DJANGO_SETTINGS_MODULE="config.settings.base" \
   python manage.py compilemessages
 
 ENTRYPOINT ["/entrypoint"]
