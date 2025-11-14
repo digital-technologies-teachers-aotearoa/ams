@@ -27,8 +27,10 @@ sleep 5
 # Set up MinIO client alias for local server
 mc alias set local http://minio:9000 "$MINIO_ROOT_USER" "$MINIO_ROOT_PASSWORD"
 
-# Create ams-media bucket (if it doesn't exist)
-mc mb --ignore-existing local/ams-media
+# Create ams-media buckets (if they doesn't exist)
+mc mb --ignore-existing local/ams-media-public
+mc mb --ignore-existing local/ams-media-private
 
-# Set bucket policy
-mc anonymous set-json /bucket-policy.json local/ams-media
+# Set bucket policies
+mc anonymous set-json /public-bucket-policy.json local/ams-media-public
+mc anonymous set-json /private-bucket-policy.json local/ams-media-private

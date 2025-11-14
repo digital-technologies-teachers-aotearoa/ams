@@ -2,18 +2,18 @@
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Sid": "AllowPublicReadOnlyOnPublicPrefix",
+      "Sid": "AllowPublicReadOnly",
       "Effect": "Allow",
       "Principal": "*",
       "Action": ["s3:GetObject"],
-      "Resource": ["arn:aws:s3:::ams-media/public/*"]
+      "Resource": ["arn:aws:s3:::ams-media-public/*"]
     },
     {
       "Sid": "DenyDirectoryListing",
       "Effect": "Deny",
       "Principal": "*",
       "Action": ["s3:ListBucket", "s3:ListBucketVersions"],
-      "Resource": ["arn:aws:s3:::ams-media"]
+      "Resource": ["arn:aws:s3:::ams-media-public"]
     }
   ]
 }

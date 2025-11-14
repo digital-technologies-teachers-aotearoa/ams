@@ -138,7 +138,8 @@ services:
     entrypoint: /bin/sh
     volumes:
       - ./compose/local/minio/minio-init.sh:/minio-init.sh:ro
-      - ./compose/production/media-storage/bucket-policy.json:/bucket-policy.json:ro
+      - ./compose/production/media-storage/public-bucket-policy.json:/public-bucket-policy.json:ro
+      - ./compose/production/media-storage/private-bucket-policy.json:/private-bucket-policy.json:ro
     env_file:
       - ./.envs/.local/minio.ini
     command: /minio-init.sh
