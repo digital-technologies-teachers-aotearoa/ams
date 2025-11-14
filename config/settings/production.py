@@ -10,8 +10,6 @@ from config.settings.base import *  # noqa: F403
 from config.settings.base import DATABASES
 from config.settings.base import INSTALLED_APPS
 from config.settings.base import env
-from config.storage_backends import PrivateMediaStorage
-from config.storage_backends import PublicMediaStorage
 
 # GENERAL
 # ------------------------------------------------------------------------------
@@ -54,17 +52,6 @@ SECURE_HSTS_PRELOAD = env.bool("DJANGO_SECURE_HSTS_PRELOAD", default=True)
 SECURE_CONTENT_TYPE_NOSNIFF = env.bool(
     "DJANGO_SECURE_CONTENT_TYPE_NOSNIFF",
     default=True,
-)
-
-# MEDIA
-# ------------------------------------------------------------------------------
-PublicMediaStorage.custom_domain = env(
-    "DJANGO_MEDIA_PUBLIC_CUSTOM_DOMAIN",
-    default=None,
-)
-PrivateMediaStorage.custom_domain = env(
-    "DJANGO_MEDIA_PRIVATE_CUSTOM_DOMAIN",
-    default=None,
 )
 
 # CACHES
