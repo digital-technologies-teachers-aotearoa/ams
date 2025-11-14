@@ -91,5 +91,5 @@ DOCUMENTATION_URL = env("DOCUMENTATION_URL", default="http://localhost:8001")
 # ------------------------------------------------------------------------------
 # Ensure storage backends output browser-friendly URLs for local development
 AWS_S3_URL_PROTOCOL = "http:"
-PublicMediaStorage.custom_domain = "localhost:9000/ams-media"
-PrivateMediaStorage.custom_domain = "localhost:9000/ams-media"
+PublicMediaStorage.custom_domain = "localhost:9000/ams-media-public"
+PrivateMediaStorage.custom_domain = "localhost:9000/ams-media-private"
