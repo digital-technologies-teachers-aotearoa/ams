@@ -1,10 +1,14 @@
 from django.core.exceptions import ValidationError
+from django.core.files.storage import storages
 from django.db import models
 from django.http import HttpResponseForbidden
+from django.utils.translation import gettext_lazy as _
 from wagtail.admin.panels import FieldPanel
 from wagtail.admin.panels import MultiFieldPanel
 from wagtail.contrib.settings.models import BaseGenericSetting
 from wagtail.contrib.settings.models import register_setting
+from wagtail.documents.models import AbstractDocument
+from wagtail.documents.models import Document
 from wagtail.fields import RichTextField
 from wagtail.fields import StreamField
 from wagtail.models import Page
@@ -169,3 +173,15 @@ class AssociationSettings(BaseGenericSetting):
             "Social networks",
         ),
     ]
+
+
+class AMSDocument(AbstractDocument):
+    """Custom Document model that stores to private storage."""
+
+    file = models.FileField(
+        storage=storages["private"],
+        upload_to="documents",
+        verbose_name=_("file"),
+    )
+
+    admin_form_fields = Document.admin_form_fields

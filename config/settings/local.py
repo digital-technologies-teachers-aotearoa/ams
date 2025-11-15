@@ -2,8 +2,6 @@ from config.settings.base import *  # noqa: F403
 from config.settings.base import INSTALLED_APPS
 from config.settings.base import MIDDLEWARE
 from config.settings.base import env
-from config.storage_backends import PrivateMediaStorage
-from config.storage_backends import PublicMediaStorage
 
 # GENERAL
 # ------------------------------------------------------------------------------
@@ -87,9 +85,7 @@ BILLING_EMAIL_WHITELIST_REGEX = env(
 # ------------------------------------------------------------------------------
 DOCUMENTATION_URL = env("DOCUMENTATION_URL", default="http://localhost:8001")
 
-# MEDIA
-# ------------------------------------------------------------------------------
-# Ensure storage backends output browser-friendly URLs for local development
+# # MEDIA
+# # ------------------------------------------------------------------------------
+# # Ensure storage backends output browser-friendly URLs for local development
 AWS_S3_URL_PROTOCOL = "http:"
-PublicMediaStorage.custom_domain = "localhost:9000/ams-media-public"
-PrivateMediaStorage.custom_domain = "localhost:9000/ams-media-private"
