@@ -10,4 +10,4 @@ class PublicMediaStorage(S3Storage):
 class PrivateMediaStorage(S3Storage):
     default_acl = "private"
     querystring_auth = True
-    file_overwrite = True
+    file_overwrite = False

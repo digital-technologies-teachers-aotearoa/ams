@@ -342,7 +342,10 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 10_000
 WAGTAIL_SITE_NAME = "AMS Demo"
 WAGTAILADMIN_BASE_URL = "http://example.com"
 WAGTAILIMAGES_EXTENSIONS = ["avif", "gif", "jpg", "jpeg", "png", "webp", "svg"]
+WAGTAILDOCS_DOCUMENT_MODEL = "cms.AMSDocument"
+WAGTAILDOCS_SERVE_METHOD = "serve_view"
 WAGTAILDOCS_EXTENSIONS = [
+    *WAGTAILIMAGES_EXTENSIONS,
     "csv",
     "docx",
     "key",
@@ -366,6 +369,7 @@ WAGTAILMENUS_FLAT_MENUS_HANDLE_CHOICES = (
 # ------------------------------------------------------------------------------
 DISCOURSE_REDIRECT_DOMAIN = env("DISCOURSE_REDIRECT_DOMAIN", default=None)
 DISCOURSE_CONNECT_SECRET = env("DISCOURSE_CONNECT_SECRET", default=None)
+
 
 # Django Tables2
 # ------------------------------------------------------------------------------
