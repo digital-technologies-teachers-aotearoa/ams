@@ -7,6 +7,11 @@ Upon a push to the `main` branch, a Docker image is built and stored on [GitHub 
 When the Docker image is built, this image is automatically deployed to the development environment hosted on DigitalOcean.
 The development environment is avaiable at [django-rnnrj.ondigitalocean.app](https://django-rnnrj.ondigitalocean.app/).
 
+This website is managed by the `.do/app.yaml` configuration file, and this will override any configuration done on the DigitalOcean website.
+
+All [secrets are stored within GitHub](https://github.com/digital-technologies-teachers-aotearoa/ams/settings/environments/9546005305/edit) and are available to the GitHub Actions workflow.
+These secrets are then passed through to the DigitalOcean deployment step, and rendered into the `.do/app.yaml` configuration file.
+
 ## Production environment
 
 By running an [AMS Docker image](https://ghcr.io/digital-technologies-teachers-aotearoa/ams-django), the software can be deployed in a production environment.
@@ -15,9 +20,11 @@ This can be run on any managed platform that supports Docker containers, such as
 ### Requirements
 
 - Postgres database
-- Media storage
+- Media storage (storage buckets)
     - Media storage requires Amazon S3, DigitalOcean Spaces, or [any other compatible providers listed here](https://django-storages.readthedocs.io/en/latest/backends/s3_compatible/index.html).
-    Additional details regarding media related environment variables can be found on [this settings page](https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html#settings), matching settings by suffix (for example: `AWS_S3_ENDPOINT_URL` and `DJANGO_MEDIA_PUBLIC_ENDPOINT_URL` are equivalent).
+    - Additional details regarding media related environment variables can be found on [this settings page](https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html#settings), matching settings by suffix (for example: `AWS_S3_ENDPOINT_URL` and `DJANGO_MEDIA_PUBLIC_ENDPOINT_URL` are equivalent).
+    - Storage buckets should have policies applied to them to match expected behaviour by AMS.
+      Default policies are provided within the [`compose/production/media-storage` directory](https://github.com/digital-technologies-teachers-aotearoa/ams/tree/main/compose/production/media-storage), with a [README providing additional information about these files](https://github.com/digital-technologies-teachers-aotearoa/ams/blob/main/compose/production/media-storage/README.md).
 
 ### Environment variables
 
@@ -42,17 +49,18 @@ The following environment variables are available, with some required for runnin
 | `DISCOURSE_REDIRECT_DOMAIN` | 🔴 Required | `https://forum.ams.com` | The domain of the forum to send users to |
 | `DISCOURSE_CONNECT_SECRET` | 🔴 Required | `redacted-secret` | The secret used in SSO Discourse communication |
 | `DJANGO_MEDIA_PUBLIC_BUCKET_NAME` | 🔴 Required | `public-media` | The name of the bucket used for public media storage |
-| `DJANGO_MEDIA_PUBLIC_ENDPOINT_URL` | 🔴 Required | `https://public-media.ams.com` | Custom URL to use when connecting to public media storage, including scheme |
-| `DJANGO_MEDIA_PUBLIC_ACCESS_KEY` | 🔴 Required | `admin` | Access key used for updating the public media storage |
-| `DJANGO_MEDIA_PUBLIC_SECRET_KEY` | 🔴 Required | `password` | Secret key used for updating the public media storage |
-| `DJANGO_MEDIA_PUBLIC_REGION_NAME` | ⚪ Optional | `ap-east-1` | Name of the region to use  for public media storage |
-| `DJANGO_MEDIA_PUBLIC_CUSTOM_DOMAIN` | ⚪ Optional | `https://public-media.ams.com` | Custom URL to use when connecting to public media storage, including scheme. |
+| `DJANGO_MEDIA_PUBLIC_ENDPOINT_URL` | 🔴 Required | `https://syd1.digitaloceanspaces.com` | Custom URL to use when connecting to public media storage, including scheme |
+| `DJANGO_MEDIA_PUBLIC_ACCESS_KEY` | 🔴 Required | `G789DFGH349VH` | Access key used for updating the public media storage |
+| `DJANGO_MEDIA_PUBLIC_SECRET_KEY` | 🔴 Required | `DSGF987DGF9D8` | Secret key used for updating the public media storage |
+| `DJANGO_MEDIA_PUBLIC_REGION_NAME` | ⚪ Optional | `syd1` | Name of the region to use  for public media storage |
+| `DJANGO_MEDIA_PUBLIC_CUSTOM_DOMAIN` | ⚪ Optional | `https://syd1.digitaloceanspaces.com` | Custom URL to use when connecting to public media storage, including scheme. |
 | `DJANGO_MEDIA_PUBLIC_BUCKET_NAME` | 🔴 Required | `public-media` | The name of the bucket used for public media storage |
 | `DJANGO_MEDIA_PRIVATE_ENDPOINT_URL` | 🔴 Required | `https://private-media.ams.com` | Custom URL to use when connecting to private media storage, including scheme |
-| `DJANGO_MEDIA_PRIVATE_ACCESS_KEY` | 🔴 Required | `admin` | Access key used for updating the private media storage |
-| `DJANGO_MEDIA_PRIVATE_SECRET_KEY` | 🔴 Required | `password` | Secret key used for updating the private media storage |
-| `DJANGO_MEDIA_PRIVATE_REGION_NAME` | ⚪ Optional | `ap-east-1` | Name of the region to use  for private media storage |
+| `DJANGO_MEDIA_PRIVATE_ACCESS_KEY` | 🔴 Required | `G789DFGH349VH` | Access key used for updating the private media storage |
+| `DJANGO_MEDIA_PRIVATE_SECRET_KEY` | 🔴 Required | `DSGF987DGF9D8` | Secret key used for updating the private media storage |
+| `DJANGO_MEDIA_PRIVATE_REGION_NAME` | ⚪ Optional | `syd1` | Name of the region to use  for private media storage |
 | `DJANGO_MEDIA_PRIVATE_CUSTOM_DOMAIN` | ⚪ Optional | `https://private-media.ams.com` | Custom URL to use when connecting to private media storage, including scheme. |
+| `DJANGO_WAGTAIL_AMS_ADMIN_HELPERS` | ⚪ Optional | `True` | Shows helper text within the Wagtail CMS admin. |
 
 ## Deployment steps
 

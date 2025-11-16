@@ -363,6 +363,7 @@ WAGTAILMENUS_FLAT_MENUS_HANDLE_CHOICES = (
     ("footer-2", "Footer - Column 2"),
     ("footer-3", "Footer - Column 3"),
 )
+WAGTAIL_AMS_ADMIN_HELPERS = env.bool("DJANGO_WAGTAIL_AMS_ADMIN_HELPERS", default=True)
 
 
 # Discourse SSO

@@ -19,7 +19,6 @@ import rename from 'gulp-rename';
 import gulpSass from 'gulp-sass';
 import * as dartSass from 'sass';
 import gulUglifyES from 'gulp-uglify-es';
-import { spawn } from 'node:child_process';
 
 const browserSync = browserSyncLib.create();
 const reload = browserSync.reload;
@@ -63,7 +62,9 @@ function styles() {
     cssnano({ preset: 'default' }), // minify result
   ];
 
-  return src(`${paths.sass}/project.scss`)
+  // Compile all top-level SCSS files that do not start with an underscore.
+  // Each source file will produce a matching .css and .min.css.
+  return src([`${paths.sass}/*.scss`, `!${paths.sass}/_*.scss`])
     .pipe(
       sass({
         importer: tildeImporter,
@@ -80,7 +81,12 @@ function styles() {
 
 // Javascript minification
 function scripts() {
-  return src(`${paths.js}/project.js`)
+  // Minify all top-level JS files that do not start with an underscore and are not already minified.
+  return src([
+    `${paths.js}/*.js`,
+    `!${paths.js}/_*.js`,
+    `!${paths.js}/*.min.js`,
+  ])
     .pipe(plumber()) // Checks for errors
     .pipe(uglify()) // Minifies the js
     .pipe(rename({ suffix: '.min' }))
@@ -104,14 +110,6 @@ async function imgCompression() {
   return src(`${paths.images}/*`, { encoding: false })
     .pipe(imagemin()) // Compresses PNG, JPEG, GIF and SVG images
     .pipe(dest(paths.images));
-}
-// Run django server
-function runServer(cb) {
-  const cmd = spawn('python', ['manage.py', 'runserver'], { stdio: 'inherit' });
-  cmd.on('close', function (code) {
-    console.log('runServer exited with code ' + code);
-    cb(code);
-  });
 }
 
 // Browser sync server for live reload

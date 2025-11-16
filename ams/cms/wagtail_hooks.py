@@ -1,9 +1,13 @@
 from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import redirect
+from django.template.loader import render_to_string
+from django.templatetags.static import static
+from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 from wagtail import hooks
 from wagtail.admin.menu import MenuItem
+from wagtail.admin.ui.components import Component
 
 from ams.utils.permissions import user_has_active_membership
 
@@ -33,3 +37,33 @@ def check_document_permissions(document, request):
         "You must have an active membership to view this file",
     )
     return redirect("account_login")
+
+
+if settings.WAGTAIL_AMS_ADMIN_HELPERS:
+
+    class WelcomePanel(Component):
+        order = 10
+
+        def render_html(self, parent_context):
+            return render_to_string(
+                "wagtail/homepage-welcome.html",
+                {"DOCUMENTATION_URL": settings.DOCUMENTATION_URL},
+            )
+
+    @hooks.register("construct_homepage_panels")
+    def add_another_welcome_panel(request, panels):
+        panels.append(WelcomePanel())
+
+    @hooks.register("insert_global_admin_css")
+    def global_admin_css():
+        return format_html(
+            '<link rel="stylesheet" href="{}">',
+            static("css/wagtail-admin-helpers.min.css"),
+        )
+
+    @hooks.register("insert_global_admin_js")
+    def global_admin_js():
+        return format_html(
+            '<script src="{}"></script>',
+            static("js/wagtail-admin-helpers.min.js"),
+        )

@@ -272,8 +272,7 @@ ams/media/
 
 .pytest_cache/
 .ipython/
-project.css
-project.min.css
+ams/static/css/
 vendors.js
 *.min.js
 *.min.js.map

@@ -1,0 +1,17 @@
+.ams-help-banner {
+  padding: 10px;
+  font-size: 14px;
+}
+
+.ams-privacy-banner {
+  margin-bottom: 15px;
+}
+
+.ams-privacy-banner + [aria-labelledby='status-sidebar-visible-to-all'] {
+  opacity: 0.3;
+  transition: opacity 0.1s;
+}
+
+.ams-privacy-banner + [aria-labelledby='status-sidebar-visible-to-all']:hover {
+  opacity: 1;
+}
