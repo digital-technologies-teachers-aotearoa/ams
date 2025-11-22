@@ -4,12 +4,14 @@ from wagtail.embeds.blocks import EmbedBlock
 
 from .captioned_image_block import CaptionedImageBlock
 from .heading_block import HeadingBlock
+from .horizontal_rule_block import HorizontalRuleBlock
 
 
 class ContentStreamBlocks(StreamBlock):
     heading_block = HeadingBlock()
     paragraph_block = RichTextBlock(icon="pilcrow")
     image_block = CaptionedImageBlock()
+    horizontal_rule_block = HorizontalRuleBlock()
     embed_block = EmbedBlock(
         help_text="Insert a URL to embed. For example, https://www.youtube.com/watch?v=V-6m0jW0X9E",
         icon="media",
