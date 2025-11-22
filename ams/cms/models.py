@@ -13,7 +13,7 @@ from wagtail.fields import RichTextField
 from wagtail.fields import StreamField
 from wagtail.models import Page
 
-from ams.cms.blocks import BaseStreamBlock
+from ams.cms.blocks import ContentAndLayoutStreamBlocks
 from ams.utils.permissions import user_has_active_membership
 
 # Reserved URL patterns that cannot be used as page slugs
@@ -45,7 +45,7 @@ class ContentPage(Page):
     ]
 
     body = StreamField(
-        BaseStreamBlock(),
+        ContentAndLayoutStreamBlocks(),
         blank=True,
         use_json_field=True,
         help_text="Content for the about page.",
