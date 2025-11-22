@@ -1,0 +1,38 @@
+{% load wagtailcore_tags %}
+
+<div class="row mb-4">
+  {% if self.layout == "2-equal" %}
+    {# 2 Equal Columns: 50% / 50% #}
+    {% for column in self.columns %}
+      <div class="col-12 col-md-6">{% include_block column %}</div>
+    {% endfor %}
+  {% elif self.layout == "3-equal" %}
+    {# 3 Equal Columns: 33% / 33% / 33% #}
+    {% for column in self.columns %}
+      <div class="col-12 col-md-4">{% include_block column %}</div>
+    {% endfor %}
+  {% elif self.layout == "4-equal" %}
+    {# 4 Equal Columns: 25% / 25% / 25% / 25% #}
+    {% for column in self.columns %}
+      <div class="col-12 col-sm-6 col-lg-3">{% include_block column %}</div>
+    {% endfor %}
+  {% elif self.layout == "2-thirds-1-third" %}
+    {# 2/3 + 1/3 Split: 66% / 33% #}
+    {% for column in self.columns %}
+      {% if forloop.first %}
+        <div class="col-12 col-md-8">{% include_block column %}</div>
+      {% else %}
+        <div class="col-12 col-md-4">{% include_block column %}</div>
+      {% endif %}
+    {% endfor %}
+  {% elif self.layout == "1-third-2-thirds" %}
+    {# 1/3 + 2/3 Split: 33% / 66% #}
+    {% for column in self.columns %}
+      {% if forloop.first %}
+        <div class="col-12 col-md-4">{% include_block column %}</div>
+      {% else %}
+        <div class="col-12 col-md-8">{% include_block column %}</div>
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+</div>
