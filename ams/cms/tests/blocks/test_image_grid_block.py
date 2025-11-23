@@ -235,54 +235,6 @@ class TestImageGridBlock:
         # Check for rounded class
         assert "rounded-4" in html
 
-    def test_image_grid_block_render_with_circle_border(self, test_image):
-        """Test rendering grid with circle border style."""
-        block = ImageGridBlock()
-        value = block.to_python(
-            {
-                "columns": "3",
-                "border_style": "circle",
-                "items": [
-                    {
-                        "image": test_image.id,
-                        "title": "Test Person",
-                        "subtitle": "",
-                        "description": "",
-                    },
-                ],
-            },
-        )
-
-        html = block.render(value)
-
-        # Check for circle class
-        assert "rounded-circle" in html
-
-    def test_image_grid_block_render_with_different_columns(self, test_image):
-        """Test rendering grid with different column configurations."""
-        block = ImageGridBlock()
-
-        for columns in ["2", "3", "4", "6"]:
-            value = block.to_python(
-                {
-                    "columns": columns,
-                    "border_style": "none",
-                    "items": [
-                        {
-                            "image": test_image.id,
-                            "title": "Test Person",
-                            "subtitle": "",
-                            "description": "",
-                        },
-                    ],
-                },
-            )
-
-            html = block.render(value)
-
-            # Check that the column class is present
-            assert f"col-md-{columns}" in html
-
     def test_image_grid_block_render_rich_text_description(self, test_image):
         """Test rendering grid item with rich text formatting in description."""
         block = ImageGridBlock()

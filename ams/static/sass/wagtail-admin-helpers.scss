@@ -16,7 +16,7 @@
   opacity: 1;
 }
 
-/* Background for StreamField columns in Wagtail editor */
+/* StreamField columns in Wagtail editor */
 [data-contentpath='columns']
   [data-streamfield-list-container]
   > div[data-streamfield-child] {
@@ -24,12 +24,6 @@
   border-radius: 4px;
   margin-top: 5px;
   margin-bottom: 5px;
-}
-
-/* Slight internal spacing so background is visible beyond panel edges */
-[data-contentpath='columns']
-  [data-streamfield-list-container]
-  > div[data-streamfield-child] {
   padding: 10px 10px 0 10px;
   position: relative;
 }
