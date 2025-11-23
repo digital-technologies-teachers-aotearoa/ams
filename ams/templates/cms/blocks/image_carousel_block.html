@@ -1,0 +1,52 @@
+{% load wagtailimages_tags %}
+
+{% comment %}
+Bootstrap 5 Image Carousel Block
+Supports configurable indicators, controls, transitions, and auto-advance
+{% endcomment %}
+<div id="carousel-{{ self.id }}"
+     class="carousel{% if self.transition_type == 'fade' %} carousel-fade{% endif %} slide"
+     data-bs-ride="{% if self.auto_advance %}carousel{% else %}false{% endif %}"
+     {% if self.auto_advance %}data-bs-interval="{{ self.interval }}"{% endif %}
+     data-bs-touch="true">
+  {% if self.show_indicators and self.slides|length > 1 %}
+    <div class="carousel-indicators">
+      {% for slide in self.slides %}
+        <button type="button"
+                data-bs-target="#carousel-{{ self.id }}"
+                data-bs-slide-to="{{ forloop.counter0 }}"
+                {% if forloop.first %}class="active" aria-current="true"{% endif %}
+                aria-label="Slide {{ forloop.counter }}"></button>
+      {% endfor %}
+    </div>
+  {% endif %}
+  <div class="carousel-inner">
+    {% for slide in self.slides %}
+      <div class="carousel-item{% if forloop.first %} active{% endif %}">
+        {% image slide.image width-1920 loading="lazy" class="d-block w-100" %}
+        {% if slide.caption or slide.attribution %}
+          <div class="carousel-caption d-none d-md-block">
+            {% if slide.caption %}<p class="mb-0">{{ slide.caption }}</p>{% endif %}
+            {% if slide.attribution %}<p class="small mb-0">{{ slide.attribution }}</p>{% endif %}
+          </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+  {% if self.show_controls and self.slides|length > 1 %}
+    <button class="carousel-control-prev"
+            type="button"
+            data-bs-target="#carousel-{{ self.id }}"
+            data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next"
+            type="button"
+            data-bs-target="#carousel-{{ self.id }}"
+            data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+  {% endif %}
+</div>

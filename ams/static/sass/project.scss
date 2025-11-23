@@ -56,6 +56,12 @@ main > .container {
   height: 100%;
 }
 
+// Carousel image fix
+.carousel-item img {
+  height: auto !important;
+  max-width: 100%;
+}
+
 // Icons
 .bi {
   display: inline-block;
