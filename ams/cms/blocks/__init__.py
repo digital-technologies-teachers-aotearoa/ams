@@ -5,6 +5,7 @@ from ams.cms.blocks.content_stream_blocks import ContentStreamBlocks
 from ams.cms.blocks.heading_block import HeadingBlock
 from ams.cms.blocks.horizontal_rule_block import HorizontalRuleBlock
 from ams.cms.blocks.image_carousel_block import ImageCarouselBlock
+from ams.cms.blocks.image_grid_block import ImageGridBlock
 from ams.cms.blocks.layout_stream_blocks import ContentAndLayoutStreamBlocks
 
 __all__ = [
@@ -16,4 +17,5 @@ __all__ = [
     "HeadingBlock",
     "HorizontalRuleBlock",
     "ImageCarouselBlock",
+    "ImageGridBlock",
 ]
