@@ -3,20 +3,8 @@
 {% load wagtailcore_tags %}
 
 {% block content %}
-  <div class="row flex-lg-row-reverse align-items-center g-3">
-    <h1 class="text-center display-5 fw-bold text-body-emphasis lh-1 mb-3">
-      {{ settings.cms.AssociationSettings.association_long_name|default:'Association Management Software' }}
-    </h1>
-    <div class="col-10 col-sm-8 col-lg-6">
-      <img src="https://placeholdit.com/600x400/dddddd/999999"
-           class="d-block mx-lg-auto img-fluid"
-           alt="Bootstrap Themes"
-           width="700"
-           height="500"
-           loading="lazy" />
-    </div>
-    <div class="col-lg-6">
-      <div class="lead">{{ page.lead_paragraph|richtext }}</div>
-    </div>
-  </div>
+  <h1 class="text-center display-5 fw-bold text-body-emphasis lh-1 mb-3">
+    {{ settings.cms.AssociationSettings.association_long_name|default:'Association Management Software' }}
+  </h1>
+  <div class="col-12 mb-3">{{ page.body }}</div>
 {% endblock content %}
