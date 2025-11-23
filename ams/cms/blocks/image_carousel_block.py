@@ -73,6 +73,16 @@ class ImageCarouselBlock(StructBlock):
         ),
     )
 
+    border_style = ChoiceBlock(
+        choices=[
+            ("none", "None (Square corners)"),
+            ("rounded", "Rounded corners"),
+        ],
+        default="none",
+        required=False,
+        help_text="Choose the image border style for all slides",
+    )
+
     class Meta:
         icon = "image"
         label = "Image Carousel"

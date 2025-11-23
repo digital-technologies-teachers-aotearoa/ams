@@ -1,9 +1,5 @@
 {% load wagtailimages_tags %}
 
-{% comment %}
-Bootstrap 5 Image Carousel Block
-Supports configurable indicators, controls, transitions, and auto-advance
-{% endcomment %}
 <div id="carousel-{{ self.id }}"
      class="carousel{% if self.transition_type == 'fade' %} carousel-fade{% endif %} slide"
      data-bs-ride="{% if self.auto_advance %}carousel{% else %}false{% endif %}"
@@ -20,7 +16,7 @@ Supports configurable indicators, controls, transitions, and auto-advance
       {% endfor %}
     </div>
   {% endif %}
-  <div class="carousel-inner">
+  <div class="carousel-inner{% if self.border_style == 'rounded' %} rounded-4{% endif %}">
     {% for slide in self.slides %}
       <div class="carousel-item{% if forloop.first %} active{% endif %}">
         {% image slide.image width-1920 loading="lazy" class="d-block w-100" %}
