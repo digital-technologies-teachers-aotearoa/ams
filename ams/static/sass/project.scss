@@ -68,3 +68,19 @@ main > .container {
   vertical-align: -0.125em;
   fill: currentcolor;
 }
+
+// Circle image mask
+.circle-responsive {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  /* Makes it a perfect square at any width */
+  border-radius: 50%;
+  /* Turns the square into a circle */
+  overflow: hidden;
+}
+
+.circle-responsive img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

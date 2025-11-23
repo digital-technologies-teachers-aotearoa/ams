@@ -1,7 +1,13 @@
 {% load wagtailimages_tags %}
 
 <figure class="figure text-center d-block">
-  {% image self.image original loading="lazy" class="figure-img img-fluid" %}
+  {% if self.border_style == 'rounded' %}
+    {% image self.image original loading="lazy" class="figure-img img-fluid rounded-4" %}
+  {% elif self.border_style == 'circle' %}
+    <div class="circle-responsive">{% image self.image original loading="lazy" class="figure-img img-fluid" %}</div>
+  {% else %}
+    {% image self.image original loading="lazy" class="figure-img img-fluid" %}
+  {% endif %}
   {% if self.caption or self.attribution %}
     <figcaption class="figure-caption text-center">
       {{ self.caption }}
