@@ -54,7 +54,7 @@ class ColumnsBlock(StructBlock):
         layout = cleaned_data.get("layout")
         columns = cleaned_data.get("columns", [])
         column_metadata = COLUMNS_METADATA.get(layout)
-        expected_count = column_metadata.get("columns")
+        expected_count = column_metadata.get("columns") if column_metadata else None
         actual_count = len(columns)
 
         if expected_count and actual_count != expected_count:

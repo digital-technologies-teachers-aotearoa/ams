@@ -130,7 +130,7 @@ class TestColumnsBlock:
             )
 
     def test_columns_block_below_minimum_columns(self):
-        """Test that validation passes with correct column count."""
+        """Test that validation fails with fewer than minimum columns."""
         block = ColumnsBlock()
         with pytest.raises(StructBlockValidationError) as excinfo:
             block.clean(
@@ -146,7 +146,7 @@ class TestColumnsBlock:
         assert "columns" in excinfo.value.block_errors
 
     def test_columns_block_over_maximum_columns(self):
-        """Test that validation passes with correct column count."""
+        """Test that validation fails with more than maximum columns."""
         block = ColumnsBlock()
         with pytest.raises(StructBlockValidationError) as excinfo:
             block.clean(

@@ -52,7 +52,7 @@ class ContentPage(Page):
         ContentAndLayoutStreamBlocks(),
         blank=True,
         use_json_field=True,
-        help_text="Content for the about page.",
+        help_text="Content for this page.",
     )
 
     visibility = models.CharField(

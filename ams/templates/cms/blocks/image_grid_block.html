@@ -2,15 +2,13 @@
 
 <div class="image-grid row g-4">
   {% for item in self.items %}
-    <div class="col-12 col-sm-6 col-md-{{ self.columns }}">
+    <div class="col-12 col-sm-6 col-md-{% if self.columns == '2' %}6{% elif self.columns == '3' %}4{% elif self.columns == '4' %}3{% elif self.columns == '6' %}2{% endif %}">
       <div class="grid-item text-center">
         <div class="grid-item-image mb-3">
           {% if self.border_style == 'rounded' %}
             {% image item.image fill-300x300 loading="lazy" class="img-fluid rounded-4" %}
           {% elif self.border_style == 'circle' %}
-            <div class="circle-responsive">
-              {% image item.image fill-300x300 loading="lazy" class="img-fluid rounded-circle" %}
-            </div>
+            <div class="circle-responsive">{% image item.image fill-300x300 loading="lazy" class="img-fluid" %}</div>
           {% else %}
             {% image item.image fill-300x300 loading="lazy" class="img-fluid" %}
           {% endif %}
