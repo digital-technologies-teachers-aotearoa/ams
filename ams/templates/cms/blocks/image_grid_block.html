@@ -1,0 +1,24 @@
+{% load wagtailcore_tags wagtailimages_tags %}
+
+<div class="image-grid row g-4">
+  {% for item in self.items %}
+    <div class="col-12 col-sm-6 col-md-{{ self.columns }}">
+      <div class="grid-item text-center">
+        <div class="grid-item-image mb-3">
+          {% if self.border_style == 'rounded' %}
+            {% image item.image fill-300x300 loading="lazy" class="img-fluid rounded-4" %}
+          {% elif self.border_style == 'circle' %}
+            <div class="circle-responsive">
+              {% image item.image fill-300x300 loading="lazy" class="img-fluid rounded-circle" %}
+            </div>
+          {% else %}
+            {% image item.image fill-300x300 loading="lazy" class="img-fluid" %}
+          {% endif %}
+        </div>
+        {% if item.title %}<h4 class="grid-item-title h5 mb-2">{{ item.title }}</h4>{% endif %}
+        {% if item.subtitle %}<p class="grid-item-subtitle text-muted mb-2">{{ item.subtitle }}</p>{% endif %}
+        {% if item.description %}<div class="grid-item-description">{{ item.description|richtext }}</div>{% endif %}
+      </div>
+    </div>
+  {% endfor %}
+</div>
