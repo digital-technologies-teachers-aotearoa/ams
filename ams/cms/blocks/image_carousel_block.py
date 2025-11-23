@@ -85,5 +85,5 @@ class ImageCarouselBlock(StructBlock):
 
     class Meta:
         icon = "image"
-        label = "Image Carousel"
+        label = "Image carousel"
         template = "cms/blocks/image_carousel_block.html"

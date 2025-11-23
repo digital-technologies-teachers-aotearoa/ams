@@ -9,7 +9,6 @@ from wagtail.contrib.settings.models import BaseGenericSetting
 from wagtail.contrib.settings.models import register_setting
 from wagtail.documents.models import AbstractDocument
 from wagtail.documents.models import Document
-from wagtail.fields import RichTextField
 from wagtail.fields import StreamField
 from wagtail.models import Page
 
@@ -28,11 +27,16 @@ RESERVED_URL_SLUGS = {
 
 
 class HomePage(Page):
-    lead_paragraph = RichTextField(blank=True)
+    body = StreamField(
+        ContentAndLayoutStreamBlocks(),
+        blank=True,
+        use_json_field=True,
+        help_text="Content for the home page.",
+    )
 
     # Metadata
     max_count = 1
-    content_panels = [*Page.content_panels, "lead_paragraph"]
+    content_panels = [*Page.content_panels, "body"]
     template = "cms/pages/home.html"
 
 
