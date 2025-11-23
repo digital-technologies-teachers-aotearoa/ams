@@ -15,3 +15,44 @@
 .ams-privacy-banner + [aria-labelledby='status-sidebar-visible-to-all']:hover {
   opacity: 1;
 }
+
+/* Background for StreamField columns in Wagtail editor */
+[data-contentpath='columns']
+  [data-streamfield-list-container]
+  > div[data-streamfield-child] {
+  border: 1px solid var(--w-color-border-button-outline-default);
+  border-radius: 4px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+/* Slight internal spacing so background is visible beyond panel edges */
+[data-contentpath='columns']
+  [data-streamfield-list-container]
+  > div[data-streamfield-child] {
+  padding: 10px 10px 0 10px;
+  position: relative;
+}
+
+/* Numbered badges for columns - sticky positioned */
+[data-contentpath='columns']
+  [data-streamfield-list-container]
+  > div[data-streamfield-child]::before {
+  content: 'Column ' counter(column-number);
+  counter-increment: column-number;
+  position: sticky;
+  top: 60px;
+  display: inline-block;
+  background-color: var(--w-color-border-button-outline-default);
+  color: var(--w-color-text-context);
+  font-size: 12px;
+  font-weight: 600;
+  z-index: 10;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+/* Initialize counter on the parent container */
+[data-contentpath='columns'] [data-streamfield-list-container] {
+  counter-reset: column-number;
+}
