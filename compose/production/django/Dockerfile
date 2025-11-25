@@ -61,7 +61,7 @@ RUN npm run build
 # Base Python image alias (shared between build & run stages) -------------------------------------
 # Using a single alias lets us pin the version once and reuse it for consistency.
 ###################################################################################################
-FROM docker.io/python:3.12.11-slim-bookworm AS python
+FROM docker.io/python:3.12.12-slim-bookworm AS python
 
 ###################################################################################################
 # ---- Stage 2: Python build stage ---------------------------------------------------------------
