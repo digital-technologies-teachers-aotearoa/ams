@@ -146,6 +146,8 @@ jobs:
           DJANGO_MEDIA_PRIVATE_ACCESS_KEY: ${{ secrets.DJANGO_MEDIA_PRIVATE_ACCESS_KEY }}
           DJANGO_MEDIA_PRIVATE_SECRET_KEY: ${{ secrets.DJANGO_MEDIA_PRIVATE_SECRET_KEY }}
           DJANGO_MEDIA_PRIVATE_REGION_NAME: ${{ secrets.DJANGO_MEDIA_PRIVATE_REGION_NAME }}
+          DJANGO_DEFAULT_FROM_EMAIL: ${{ secrets.DJANGO_DEFAULT_FROM_EMAIL }}
+          DJANGO_EMAIL_SUBJECT_PREFIX: ${{ secrets.DJANGO_EMAIL_SUBJECT_PREFIX }}
           registry_credentials: ${{ secrets.REGISTRY_CREDENTIALS }}
           django_digest: ${{ steps.push.outputs.digest }}
 

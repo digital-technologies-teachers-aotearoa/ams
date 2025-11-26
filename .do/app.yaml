@@ -104,6 +104,12 @@ jobs:
       - key: DJANGO_MEDIA_PRIVATE_REGION_NAME
         scope: RUN_AND_BUILD_TIME
         value: ${DJANGO_MEDIA_PRIVATE_REGION_NAME}
+      - key: DJANGO_DEFAULT_FROM_EMAIL
+        scope: RUN_AND_BUILD_TIME
+        value: ${DJANGO_DEFAULT_FROM_EMAIL}
+      - key: DJANGO_EMAIL_SUBJECT_PREFIX
+        scope: RUN_AND_BUILD_TIME
+        value: ${DJANGO_EMAIL_SUBJECT_PREFIX}
     image:
       digest: ${django_digest}
       registry: digital-technologies-teachers-aotearoa
@@ -203,6 +209,12 @@ services:
       - key: DJANGO_MEDIA_PRIVATE_REGION_NAME
         scope: RUN_AND_BUILD_TIME
         value: ${DJANGO_MEDIA_PRIVATE_REGION_NAME}
+      - key: DJANGO_DEFAULT_FROM_EMAIL
+        scope: RUN_AND_BUILD_TIME
+        value: ${DJANGO_DEFAULT_FROM_EMAIL}
+      - key: DJANGO_EMAIL_SUBJECT_PREFIX
+        scope: RUN_AND_BUILD_TIME
+        value: ${DJANGO_EMAIL_SUBJECT_PREFIX}
     http_port: 5000
     image:
       digest: ${django_digest}
