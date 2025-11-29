@@ -8,6 +8,8 @@ from wagtail import urls as wagtail_urls
 from wagtail.admin import urls as wagtailadmin_urls
 from wagtail.documents import urls as wagtaildocs_urls
 
+from ams.utils.views import PageNotFoundView
+
 urlpatterns = [
     # Django Admin, use {% url 'admin:index' %}
     path(settings.ADMIN_URL, admin.site.urls),
@@ -48,8 +50,7 @@ if settings.DEBUG:
         ),
         path(
             "404/",
-            default_views.page_not_found,
-            kwargs={"exception": Exception("Page not Found")},
+            PageNotFoundView.as_view(),
         ),
         path("500/", default_views.server_error),
     ]
@@ -60,3 +61,7 @@ if settings.DEBUG:
             path("__debug__/", include(debug_toolbar.urls)),
             *urlpatterns,
         ]
+
+
+# Set custom 404 handler
+handler404 = PageNotFoundView.as_view()
