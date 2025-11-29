@@ -1,15 +1,26 @@
 {% extends "base.html" %}
 
+{% load translate_url %}
+
 {% block title %}
   Page not found
 {% endblock title %}
 {% block content %}
   <h1>Page not found</h1>
+  <p>This is not the page you were looking for.</p>
   <p>
-    {% if exception %}
-      {{ exception }}
-    {% else %}
-      This is not the page you were looking for.
-    {% endif %}
+    <a href="{% translate_url LANGUAGE_CODE '/' %}">Go to homepage</a>
   </p>
+  {% if available_locales %}
+    <div>
+      <p>This page is available in:</p>
+      <ul>
+        {% for page in available_locales %}
+          <li>
+            <a href="{{ locale.url }}">{{ page }}</a>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
 {% endblock content %}
