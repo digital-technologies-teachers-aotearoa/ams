@@ -26,6 +26,10 @@ class Command(management.base.BaseCommand):
             message = "This command can only be executed on a non-production website."
             raise management.base.CommandError(message)
 
+        self.stdout.write(LOG_HEADER.format("💾 Migrating database"))
+        management.call_command("migrate")
+        self.stdout.write("✅ Database migrated.")
+
         # Clear all data
         if options["flush"]:
             self.stdout.write(LOG_HEADER.format("💾 Wipe database"))

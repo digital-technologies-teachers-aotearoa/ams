@@ -89,3 +89,8 @@ DOCUMENTATION_URL = env("DOCUMENTATION_URL", default="http://localhost:8001")
 # # ------------------------------------------------------------------------------
 # # Ensure storage backends output browser-friendly URLs for local development
 AWS_S3_URL_PROTOCOL = "http:"
+
+# Other settings
+# ------------------------------------------------------------------------------
+SITE_DOMAIN = env("SITE_DOMAIN", default="localhost")
+SITE_PORT = env.int("SITE_PORT", default=3000)

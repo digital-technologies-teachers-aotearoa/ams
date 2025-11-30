@@ -1,12 +1,14 @@
 """Management command to ensure required CMS pages exist."""
 
 from django.conf import settings
+from django.core import management
 from django.core.management.base import BaseCommand
 from wagtail.models import Locale
 from wagtail.models import Page
 from wagtail.models import Site
 
 from ams.cms.models import HomePage
+from ams.cms.models import SiteSettings
 from ams.utils.management.commands._constants import LOG_HEADER
 
 
@@ -16,10 +18,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.stdout.write(LOG_HEADER.format("📋 Check required CMS pages"))
 
-        # Domain configuration
-        # TODO: Use env settings
-        base_domain = "localhost"
-        base_port = 3000
+        # Domain configuration from settings
+        base_domain = settings.SITE_DOMAIN
+        base_port = settings.SITE_PORT
 
         # Get or create root page
         try:
@@ -30,9 +31,13 @@ class Command(BaseCommand):
             )
             return
 
+        # Ensure site constaint is removed
+        management.call_command("modify_site_hostname_constraint", "--remove")
+
         # Process each language from settings.LANGUAGES
         created_locales = []
         language_sites = []
+        managed_site_ids = []
 
         for lang_code, lang_name in settings.LANGUAGES:
             # Ensure locale exists
@@ -72,11 +77,30 @@ class Command(BaseCommand):
                     "port": base_port,
                 },
             )
+            if created:
+                SiteSettings.objects.update_or_create(
+                    site=site,
+                    defaults={
+                        "language": lang_code,
+                    },
+                )
             action = "Created" if created else "Updated"
             self.stdout.write(
                 self.style.SUCCESS(f"✅ {action} {lang_name} site: {site}"),
             )
             language_sites.append((lang_code, lang_name))
+            managed_site_ids.append(site.id)
+
+        # Delete any sites not managed by this command
+        deleted_sites = Site.objects.exclude(id__in=managed_site_ids)
+        deleted_count = deleted_sites.count()
+        if deleted_count > 0:
+            deleted_sites.delete()
+            self.stdout.write(
+                self.style.WARNING(
+                    f"🗑️  Deleted {deleted_count} unmanaged site(s)",
+                ),
+            )
 
         # Summary output
         self.stdout.write(
@@ -85,4 +109,8 @@ class Command(BaseCommand):
         self.stdout.write(f"✅ Locales: {', '.join(created_locales)}")
         self.stdout.write("\nYour sites are now accessible at:")
         for lang_code, lang_name in language_sites:
-            self.stdout.write(f"  • {lang_name}: http://{base_domain}/{lang_code}/")
+            protocol = "http" if base_domain == "localhost" else "https"
+            port_suffix = f":{base_port}" if base_port != 80 else ""  # noqa: PLR2004
+            self.stdout.write(
+                f"  • {lang_name}: {protocol}://{base_domain}{port_suffix}/{lang_code}/",
+            )

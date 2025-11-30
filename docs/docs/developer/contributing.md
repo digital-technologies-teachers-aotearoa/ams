@@ -36,3 +36,61 @@ The following URLs should then be available:
 - [Local email server - `localhost:8025`](http://localhost:8025)
 
 Additionally, the database will be available on `localhost:5432`.
+
+## Local Development Guide
+
+### Common Commands
+
+- Start the server:
+
+    ```bash
+    python manage.py runserver 0.0.0.0:8000
+    ```
+
+    - If you are using Dev Containers, an alias is preset for you:
+
+        ```bash
+        runserver
+        ```
+
+- Load sample data for development:
+
+    ```bash
+    python manage.py sample_data
+    ```
+
+- Run tests and coverage:
+
+    ```bash
+    pytest
+    coverage run -m pytest && coverage html
+    ```
+
+- Type checks:
+
+    ```bash
+    mypy ams
+    ```
+
+### Justfile Shortcuts
+
+The repository includes a `justfile` with common tasks.
+This is useful for starting or stopping the containers from the host machine.
+
+### Database & Migrations
+
+    ```bash
+    python manage.py makemigrations
+    python manage.py migrate
+    ```
+
+### Environment Settings
+
+- Environment values are loaded from `.envs/.local/` files.
+- Django settings files live in `config/settings/` (`local.py`, `production.py`, `test.py`).
+
+### Coding Conventions
+
+- Keep changes focused; update docs for new features.
+- Write tests for new functionality and ensure coverage.
+- Follow Django app structure (`models.py`, `views.py`, `urls.py`, `tests/`).

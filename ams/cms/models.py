@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.files.storage import storages
 from django.db import models
@@ -5,7 +6,7 @@ from django.http import HttpResponseForbidden
 from django.utils.translation import gettext_lazy as _
 from wagtail.admin.panels import FieldPanel
 from wagtail.admin.panels import MultiFieldPanel
-from wagtail.contrib.settings.models import BaseGenericSetting
+from wagtail.contrib.settings.models import BaseSiteSetting
 from wagtail.contrib.settings.models import register_setting
 from wagtail.documents.models import AbstractDocument
 from wagtail.documents.models import Document
@@ -95,7 +96,21 @@ class ContentPage(Page):
 
 
 @register_setting
-class AssociationSettings(BaseGenericSetting):
+class SiteSettings(BaseSiteSetting):
+    language = models.CharField(
+        max_length=10,
+        verbose_name="Language",
+        blank=True,
+        choices=settings.LANGUAGES,
+    )
+
+    panels = [
+        FieldPanel("language"),
+    ]
+
+
+@register_setting
+class AssociationSettings(BaseSiteSetting):
     association_short_name = models.CharField(
         max_length=255,
         verbose_name="Association short name",

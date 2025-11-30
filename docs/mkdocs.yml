@@ -25,15 +25,17 @@ markdown_extensions:
 nav:
   - Home: index.md
   - User guide:
-    - user/index.md
+      - user/index.md
   - Website administrator guide:
-    - admin/index.md
-    - admin/cms.md
-    - admin/forum.md
+      - admin/index.md
+      - admin/cms.md
+      - admin/forum.md
   - Developer documentation:
-    - developer/contributing.md
-    - developer/forum.md
-    - developer/icons.md
-    - developer/urls.md
-    - developer/permission_caching.md
-    - developer/deployment.md
+      - developer/contributing.md
+      - developer/management-commands-catalog.md
+      - developer/forum.md
+      - developer/icons.md
+      - developer/urls.md
+      - developer/permission_caching.md
+      - developer/deployment.md
+      - developer/wagtail-cms.md
