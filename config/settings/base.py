@@ -164,8 +164,8 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    "ams.utils.middleware.site_by_path.PathBasedSiteMiddleware",
     "django.middleware.locale.LocaleMiddleware",
+    "ams.utils.middleware.site_by_path.PathBasedSiteMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -358,7 +358,7 @@ WAGTAIL_ENABLE_UPDATE_CHECK = "lts"
 WAGTAIL_SITE_NAME = "AMS Demo"
 WAGTAIL_I18N_ENABLED = True
 WAGTAIL_CONTENT_LANGUAGES = LANGUAGES
-WAGTAILADMIN_BASE_URL = "http://example.com"
+WAGTAILADMIN_BASE_URL = env("SITE_DOMAIN", default="ams.com") + "/cms/"
 WAGTAILIMAGES_EXTENSIONS = ["avif", "gif", "jpg", "jpeg", "png", "webp", "svg"]
 WAGTAILDOCS_DOCUMENT_MODEL = "cms.AMSDocument"
 WAGTAILDOCS_SERVE_METHOD = "serve_view"
@@ -415,3 +415,5 @@ DOCUMENTATION_URL = env(
 # Other settings
 # ------------------------------------------------------------------------------
 DEPLOYED = env.bool("DEPLOYED", default=False)
+SITE_DOMAIN = env("SITE_DOMAIN", default="ams.com")
+SITE_PORT = env.int("SITE_PORT", default=80)
