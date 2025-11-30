@@ -11,15 +11,14 @@ Sets up the CMS for multi-language path-based sites. Ensures the root page exist
 
 ## `sample_data`
 
-Seeds a non-production database with realistic sample content for development: migrates the database, optionally flushes and reloads initial Wagtail data, creates sample admin and user accounts, sample membership options, and runs `setup_cms` to ensure CMS pages and sites are ready. Intended for local dev; guarded from running in deployed environments.
+Seeds a non-production database with realistic sample content for development: migrates the database, reloads initial Wagtail data, creates sample admin and user accounts, sample membership options, and runs `setup_cms` to ensure CMS pages and sites are ready. Intended for local dev; guarded from running in deployed environments.
 
-- Arguments:
-    - `--flush`: flushes the database before adding sample data (also reloads initial Wagtail data).
+- Arguments: none.
 - Safety: Errors if `settings.DEPLOYED` is true.
 - Example:
 
   ```bash
-  python manage.py sample_data --flush
+  python manage.py sample_data
   ```
 
 ## `modify_site_hostname_constraint`
