@@ -41,5 +41,5 @@ class Command(management.base.BaseCommand):
         # Create membership options
         management.call_command("create_sample_membership_options")
 
-        # Check CMS pages
-        management.call_command("ensure_required_cms_pages")
+        # Setup CMS pages
+        management.call_command("setup_cms")
