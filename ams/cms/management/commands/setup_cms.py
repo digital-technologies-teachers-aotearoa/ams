@@ -17,7 +17,9 @@ class Command(BaseCommand):
         self.stdout.write(LOG_HEADER.format("📋 Check required CMS pages"))
 
         # Domain configuration
-        base_domain = "localhost:3000"
+        # TODO: Use env settings
+        base_domain = "localhost"
+        base_port = 3000
 
         # Get or create root page
         try:
@@ -61,11 +63,13 @@ class Command(BaseCommand):
             # Create or update site for this language
             # English language is the default site
             site, created = Site.objects.update_or_create(
-                hostname=lang_code,
+                hostname=base_domain,
+                sitesettings__language=lang_code,
                 defaults={
                     "root_page": home,
                     "site_name": f"{lang_name} Site",
                     "is_default_site": lang_code == "en",
+                    "port": base_port,
                 },
             )
             action = "Created" if created else "Updated"
@@ -75,10 +79,10 @@ class Command(BaseCommand):
             language_sites.append((lang_code, lang_name))
 
         # Summary output
-        self.stdout.write(f"✅ Locales: {', '.join(created_locales)}")
         self.stdout.write(
             self.style.SUCCESS("\n✅ Site setup complete!"),
         )
+        self.stdout.write(f"✅ Locales: {', '.join(created_locales)}")
         self.stdout.write("\nYour sites are now accessible at:")
         for lang_code, lang_name in language_sites:
             self.stdout.write(f"  • {lang_name}: http://{base_domain}/{lang_code}/")

@@ -14,4 +14,4 @@ class Command(management.base.BaseCommand):
         self.stdout.write(LOG_HEADER.format("💾 Migrate database"))
         management.call_command("migrate", interactive=False)
 
-        management.call_command("ensure_required_cms_pages")
+        management.call_command("setup_cms")
