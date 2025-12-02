@@ -1,8 +1,10 @@
 from django.conf import settings
 from django.conf.urls.i18n import i18n_patterns
 from django.contrib import admin
+from django.http import HttpResponseRedirect
 from django.urls import include
 from django.urls import path
+from django.utils.translation import get_language
 from django.views import defaults as default_views
 from wagtail import urls as wagtail_urls
 from wagtail.admin import urls as wagtailadmin_urls
@@ -10,7 +12,16 @@ from wagtail.documents import urls as wagtaildocs_urls
 
 from ams.utils.views import PageNotFoundView
 
+
+def redirect_to_user_language(request):
+    """Redirect to the user's preferred language, falling back to 'en'."""
+    language = get_language() or "en"
+    return HttpResponseRedirect(f"/{language}/")
+
+
 urlpatterns = [
+    # Redirect root to user's preferred language
+    path("", redirect_to_user_language, name="root_redirect"),
     # Django Admin, use {% url 'admin:index' %}
     path(settings.ADMIN_URL, admin.site.urls),
     # Billing webhooks (Xero, etc)
