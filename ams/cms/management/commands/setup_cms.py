@@ -46,24 +46,25 @@ class Command(BaseCommand):
             )
             created_locales.append(str(locale))
 
-            # Create home page if it doesn't exist
-            home = HomePage.objects.filter(locale=locale).first()
-            if not home:
-                home = HomePage(
-                    title=f"{lang_name} Home",
-                    slug=f"{lang_code}",
-                    locale=locale,
-                )
+            # Create or update home page
+            home, created = HomePage.objects.update_or_create(
+                locale=locale,
+                defaults={
+                    "title": "Home",
+                    "slug": f"{lang_code}",
+                },
+            )
+
+            # If newly created, add it as a child of root page
+            if created:
                 root_page.add_child(instance=home)
-                self.stdout.write(
-                    self.style.SUCCESS(
-                        f"✅ Created {lang_name} home page: {home}",
-                    ),
-                )
-            else:
-                self.stdout.write(
-                    f"✅ {lang_name} home page already exists: {home}",
-                )
+
+            action = "Created" if created else "Updated"
+            self.stdout.write(
+                self.style.SUCCESS(
+                    f"✅ {action} {lang_name} home page: {home}",
+                ),
+            )
 
             # Create or update site for this language
             # English language is the default site
