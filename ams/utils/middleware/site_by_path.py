@@ -39,13 +39,12 @@ class PathBasedSiteMiddleware:
         """
         Process the incoming request and set the Wagtail Site based on language code.
 
-        - Checks if the request path is valid and language code is in allowed locales.
+        - Checks if the language code is in allowed locales.
         - Sets `request.site` and `_wagtail_site` if a matching site is found.
         """
-        path = request.path or request.META.get("PATH_INFO", "")
         language_code = getattr(request, "LANGUAGE_CODE", None)
-        # Only process if path is valid and language code is recognized
-        if path.startswith("/") and language_code in self._valid_locales:
+        # Only process if language code is recognized
+        if language_code in self._valid_locales:
             site = self._resolve_site(request)
             if site:
                 request.site = site
