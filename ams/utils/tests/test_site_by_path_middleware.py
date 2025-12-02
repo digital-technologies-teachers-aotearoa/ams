@@ -2,6 +2,7 @@ import pytest
 from django.test import RequestFactory
 from wagtail.models import Site
 
+from ams.cms.models import SiteSettings
 from ams.utils.middleware.site_by_path import PathBasedSiteMiddleware
 
 
@@ -38,151 +39,136 @@ def sites(db):
         is_default_site=False,
         site_name="Te Reo Māori",
     )
+    # Create SiteSettings with language for each site
+    SiteSettings.objects.create(site=en_default_site, language="en")
+    SiteSettings.objects.create(site=mi_site, language="mi")
     return {"en": en_default_site, "mi": mi_site}
 
 
-def _process(mw: PathBasedSiteMiddleware, path: str, host: str = "website.com"):
+def _process(
+    mw: PathBasedSiteMiddleware,
+    path: str,
+    language_code: str | None = None,
+    host: str = "website.com",
+):
+    """Helper to process a request through the middleware."""
     request = RequestFactory().get(path, HTTP_HOST=host)
-    mw.process_request(request)
+    if language_code:
+        request.LANGUAGE_CODE = language_code
+    # Middleware returns the response from get_response
+    mw(request)
     return request
 
 
 @pytest.mark.parametrize(
-    ("path", "locale", "expected_path"),
+    ("language_code", "expected_hostname"),
     [
-        ("/en/about/", "en", "/about/"),
-        ("/mi/contact/", "mi", "/contact/"),
+        ("en", "en"),
+        ("mi", "mi"),
     ],
 )
-def test_locale_routes_and_strips_prefix(sites, rf, path, locale, expected_path):
-    mw = PathBasedSiteMiddleware(lambda r: r)
-    request = _process(mw, path)
+def test_middleware_sets_site_based_on_language_code(
+    sites,
+    language_code,
+    expected_hostname,
+):
+    """Middleware sets site based on request.LANGUAGE_CODE."""
+    mw = PathBasedSiteMiddleware(lambda r: None)
+    request = _process(mw, "/about/", language_code=language_code)
 
     assert getattr(request, "site", None) is not None
-    assert request.site.hostname == locale
+    assert request.site.hostname == expected_hostname
     # Wagtail cached site must also be set for third-party calls
     assert getattr(request, "_wagtail_site", None) is request.site
-    # Prefix stripped
-    assert request.META["PATH_INFO"] == expected_path
 
 
-@pytest.mark.parametrize("path", ["/about/", "/xx/page/"])
-def test_non_locale_prefix_does_not_set_site(sites, rf, path):
-    """When no/invalid locale prefix, middleware does not set site."""
-    mw = PathBasedSiteMiddleware(lambda r: r)
-    request = _process(mw, path)
+def test_middleware_without_language_code_does_not_set_site(sites):
+    """When no LANGUAGE_CODE, middleware does not set site."""
+    mw = PathBasedSiteMiddleware(lambda r: None)
+    request = _process(mw, "/about/")
 
-    # Middleware doesn't set site when prefix is not a valid locale
-    assert not hasattr(request, "site")
-    assert not hasattr(request, "_wagtail_site")
-    # Path remains unchanged
-    assert request.META["PATH_INFO"] == path
-
-
-def test_non_slash_path_is_ignored(sites, rf):
-    mw = PathBasedSiteMiddleware(lambda r: r)
-    # PATH_INFO without leading slash should be ignored (returns early)
-    request = RequestFactory().get("en/about")
-    mw.process_request(request)
-    # No site assigned
+    # Middleware doesn't set site when LANGUAGE_CODE is not set
     assert not hasattr(request, "site")
     assert not hasattr(request, "_wagtail_site")
 
 
-def test_unknown_locale_with_languages_empty_ignores_processing(sites, rf, settings):
+def test_middleware_with_invalid_language_code_does_not_set_site(sites):
+    """Invalid language code should not set site."""
+    mw = PathBasedSiteMiddleware(lambda r: None)
+    request = _process(mw, "/about/", language_code="xx")
+
+    # Middleware doesn't set site when language code is not valid
+    assert not hasattr(request, "site")
+    assert not hasattr(request, "_wagtail_site")
+
+
+def test_middleware_falls_back_to_default_site_when_no_match(sites, db):
+    """When no site matches the language, fall back to default site."""
+    # Remove SiteSettings for 'mi' site
+    SiteSettings.objects.filter(site=sites["mi"]).delete()
+
+    mw = PathBasedSiteMiddleware(lambda r: None)
+    request = _process(mw, "/about/", language_code="mi")
+
+    # Should fall back to default site
+    assert request.site.is_default_site
+    assert request.site.hostname == "en"
+
+
+def test_middleware_with_empty_languages_setting(sites, settings):
+    """When LANGUAGES is empty, middleware does not set site."""
     settings.LANGUAGES = []
-    mw = PathBasedSiteMiddleware(lambda r: r)
-    request = _process(mw, "/en/about/")
+    mw = PathBasedSiteMiddleware(lambda r: None)
+    request = _process(mw, "/about/", language_code="en")
+
     # No site assigned because valid locales are empty
     assert not hasattr(request, "site")
     assert not hasattr(request, "_wagtail_site")
 
 
-@pytest.mark.parametrize(
-    ("path", "expected"),
-    [
-        ("/en/", "en"),
-        ("/en/about/", "en"),
-        ("/", None),
-        ("", None),
-    ],
-)
-def test_first_segment_detects_locale_correctly(sites, path, expected):
-    assert PathBasedSiteMiddleware._first_segment(path) == expected  # noqa: SLF001
+def test_middleware_calls_get_response(sites):
+    """Middleware calls get_response and returns its result."""
+    response_mock = object()
+    get_response_called = []
+
+    def mock_get_response(request):
+        get_response_called.append(request)
+        return response_mock
+
+    mw = PathBasedSiteMiddleware(mock_get_response)
+    request = RequestFactory().get("/about/")
+    request.LANGUAGE_CODE = "en"
+
+    result = mw(request)
+
+    assert result is response_mock
+    assert len(get_response_called) == 1
+    assert get_response_called[0] is request
 
 
-@pytest.mark.parametrize(
-    ("path", "prefix", "expected"),
-    [
-        ("/en/about/", "en", "/about/"),
-        ("/mi", "mi", "/"),
-        ("/en", "en", "/"),
-        ("/xx/page", "en", "/xx/page"),
-    ],
-)
-def test_strip_prefix_preserves_leading_slash(sites, path, prefix, expected):
-    assert PathBasedSiteMiddleware._strip_prefix(path, prefix) == expected  # noqa: SLF001
+def test_middleware_sets_both_site_attributes_on_language_match(sites):
+    """Middleware sets both site and _wagtail_site attributes."""
+    mw = PathBasedSiteMiddleware(lambda r: None)
+    request = _process(mw, "/", language_code="en")
 
-
-def test_middleware_sets_both_site_attributes_on_locale_match(sites, rf):
-    mw = PathBasedSiteMiddleware(lambda r: r)
-    request = _process(mw, "/en/")
     assert request.site.hostname == "en"
     assert getattr(request, "_wagtail_site", None) is request.site
 
 
-def test_middleware_sets_default_on_no_prefix(sites, rf):
-    """When no prefix, middleware doesn't interfere - lets Wagtail handle it."""
-    mw = PathBasedSiteMiddleware(lambda r: r)
-    request = _process(mw, "/")
-    # Middleware doesn't set site - Wagtail's SiteMiddleware handles this
-    assert not hasattr(request, "site")
-    assert not hasattr(request, "_wagtail_site")
+def test_middleware_handles_multiple_sites_with_same_language(sites, db):
+    """When multiple sites have the same language, first match is used."""
+    # Create another site with English language
+    another_en_site = Site.objects.create(
+        hostname="en-alt",
+        port=80,
+        root_page_id=1,
+        is_default_site=False,
+        site_name="English Alternative",
+    )
+    SiteSettings.objects.create(site=another_en_site, language="en")
 
+    mw = PathBasedSiteMiddleware(lambda r: None)
+    request = _process(mw, "/about/", language_code="en")
 
-def test_middleware_handles_different_hostnames_gracefully(sites, rf):
-    mw = PathBasedSiteMiddleware(lambda r: r)
-    # Even with a different host, locale routing should match by hostname==locale
-    request = _process(mw, "/mi/section/", host="otherhost.example")
-    assert request.site.hostname == "mi"
-    assert request.META["PATH_INFO"] == "/section/"
-
-
-@pytest.mark.parametrize(
-    "path",
-    [
-        "/billing/invoice/123/",
-        "/users/profile/",
-        "/forum/thread/456/",
-        "/cms/admin/",
-        "/accounts/login/",
-    ],
-)
-def test_reserved_paths_not_treated_as_locales(sites, rf, path):
-    """Reserved paths like /billing/, /users/, etc are not treated as locales."""
-    mw = PathBasedSiteMiddleware(lambda r: r)
-    request = _process(mw, path)
-    # Should not set site attribute (or should set to default)
-    assert not hasattr(request, "site") or request.site.is_default_site
-
-
-@pytest.mark.parametrize(
-    "path",
-    [
-        "/en/billing/invoice/123/",
-        "/mi/users/profile/",
-        "/en/forum/thread/456/",
-        "/mi/cms/admin/",
-        "/en/accounts/login/",
-    ],
-)
-def test_reserved_paths_after_locale_do_not_set_site(sites, rf, path):
-    """Locale prefix + reserved path should not set site or strip path."""
-    mw = PathBasedSiteMiddleware(lambda r: r)
-    original_path = path
-    request = _process(mw, path)
-    # Middleware should ignore locale because next segment is reserved
-    assert not hasattr(request, "site") or request.site.is_default_site
-    assert not hasattr(request, "_wagtail_site")
-    # Path should remain unchanged
-    assert request.META["PATH_INFO"] == original_path
+    # Should get one of the English sites (implementation uses .first())
+    assert request.site.sitesettings.language == "en"
