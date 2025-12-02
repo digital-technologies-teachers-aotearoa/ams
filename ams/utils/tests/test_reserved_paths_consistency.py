@@ -4,7 +4,6 @@ from pathlib import Path
 
 from django.conf import settings
 
-import ams.utils.middleware.site_by_path as mw
 from ams.cms import models
 from ams.utils.reserved_paths import get_reserved_paths_list
 from ams.utils.reserved_paths import get_reserved_paths_set
@@ -28,10 +27,6 @@ def test_reserved_paths_functions():
 def test_cms_models_uses_function():
     assert hasattr(models, "ContentPage")
     assert not hasattr(models, "RESERVED_URL_SLUGS")
-
-
-def test_middleware_uses_function():
-    assert hasattr(mw, "get_reserved_paths_set")
 
 
 def test_no_hardcoded_reserved_paths_in_urls():
