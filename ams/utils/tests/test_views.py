@@ -22,104 +22,105 @@ def request_factory():
     return RequestFactory()
 
 
-@pytest.fixture
-def setup_multilingual_sites(db):
+@pytest.fixture(scope="class")
+def setup_multilingual_sites(django_db_setup, django_db_blocker):
     """Set up English and Māori sites with mirrored page structures."""
-    # Clean slate
-    Site.objects.all().delete()
-    Page.objects.filter(depth__gt=1).delete()
+    with django_db_blocker.unblock():
+        # Clean slate
+        Site.objects.all().delete()
+        Page.objects.filter(depth__gt=1).delete()
 
-    # Get root page
-    root = Page.get_first_root_node()
+        # Get root page
+        root = Page.get_first_root_node()
 
-    # Create English site (default)
-    en_home = HomePage(title="Home", slug="home-en")
-    root.add_child(instance=en_home)
-    en_home.save_revision().publish()
+        # Create English site (default)
+        en_home = HomePage(title="Home", slug="home-en")
+        root.add_child(instance=en_home)
+        en_home.save_revision().publish()
 
-    en_site = Site.objects.create(
-        hostname="en.example.com",
-        port=80,
-        root_page=en_home,
-        is_default_site=True,
-        site_name="English Site",
-    )
-    SiteSettings.objects.create(site=en_site, language="en")
+        en_site = Site.objects.create(
+            hostname="en.example.com",
+            port=80,
+            root_page=en_home,
+            is_default_site=True,
+            site_name="English Site",
+        )
+        SiteSettings.objects.create(site=en_site, language="en")
 
-    # Create English pages
-    en_about = ContentPage(title="About Us", slug="about")
-    en_home.add_child(instance=en_about)
-    en_about.save_revision().publish()
+        # Create English pages
+        en_about = ContentPage(title="About Us", slug="about")
+        en_home.add_child(instance=en_about)
+        en_about.save_revision().publish()
 
-    en_contact = ContentPage(title="Contact", slug="contact")
-    en_home.add_child(instance=en_contact)
-    en_contact.save_revision().publish()
+        en_contact = ContentPage(title="Contact", slug="contact")
+        en_home.add_child(instance=en_contact)
+        en_contact.save_revision().publish()
 
-    en_team = ContentPage(title="Our Team", slug="team")
-    en_about.add_child(instance=en_team)
-    en_team.save_revision().publish()
+        en_team = ContentPage(title="Our Team", slug="team")
+        en_about.add_child(instance=en_team)
+        en_team.save_revision().publish()
 
-    # Create Māori site
-    mi_home = HomePage(title="Kāinga", slug="home-mi")
-    root.add_child(instance=mi_home)
-    mi_home.save_revision().publish()
+        # Create Māori site
+        mi_home = HomePage(title="Kāinga", slug="home-mi")
+        root.add_child(instance=mi_home)
+        mi_home.save_revision().publish()
 
-    mi_site = Site.objects.create(
-        hostname="mi.example.com",
-        port=80,
-        root_page=mi_home,
-        is_default_site=False,
-        site_name="Te Reo Māori Site",
-    )
-    SiteSettings.objects.create(site=mi_site, language="mi")
+        mi_site = Site.objects.create(
+            hostname="mi.example.com",
+            port=80,
+            root_page=mi_home,
+            is_default_site=False,
+            site_name="Te Reo Māori Site",
+        )
+        SiteSettings.objects.create(site=mi_site, language="mi")
 
-    # Create Māori pages (mirrored structure)
-    mi_about = ContentPage(title="Mō Mātou", slug="about")
-    mi_home.add_child(instance=mi_about)
-    mi_about.save_revision().publish()
+        # Create Māori pages (mirrored structure)
+        mi_about = ContentPage(title="Mō Mātou", slug="about")
+        mi_home.add_child(instance=mi_about)
+        mi_about.save_revision().publish()
 
-    mi_contact = ContentPage(title="Whakapā Mai", slug="contact")
-    mi_home.add_child(instance=mi_contact)
-    mi_contact.save_revision().publish()
+        mi_contact = ContentPage(title="Whakapā Mai", slug="contact")
+        mi_home.add_child(instance=mi_contact)
+        mi_contact.save_revision().publish()
 
-    mi_team = ContentPage(title="Tō Mātou Rōpū", slug="team")
-    mi_about.add_child(instance=mi_team)
-    mi_team.save_revision().publish()
+        mi_team = ContentPage(title="Tō Mātou Rōpū", slug="team")
+        mi_about.add_child(instance=mi_team)
+        mi_team.save_revision().publish()
 
-    # Create French site with partial overlap
-    fr_home = HomePage(title="Accueil", slug="home-fr")
-    root.add_child(instance=fr_home)
-    fr_home.save_revision().publish()
+        # Create French site with partial overlap
+        fr_home = HomePage(title="Accueil", slug="home-fr")
+        root.add_child(instance=fr_home)
+        fr_home.save_revision().publish()
 
-    fr_site = Site.objects.create(
-        hostname="fr.example.com",
-        port=80,
-        root_page=fr_home,
-        is_default_site=False,
-        site_name="French Site",
-    )
-    SiteSettings.objects.create(site=fr_site, language="fr")
+        fr_site = Site.objects.create(
+            hostname="fr.example.com",
+            port=80,
+            root_page=fr_home,
+            is_default_site=False,
+            site_name="French Site",
+        )
+        SiteSettings.objects.create(site=fr_site, language="fr")
 
-    # French only has about page
-    fr_about = ContentPage(title="À Propos", slug="about")
-    fr_home.add_child(instance=fr_about)
-    fr_about.save_revision().publish()
+        # French only has about page
+        fr_about = ContentPage(title="À Propos", slug="about")
+        fr_home.add_child(instance=fr_about)
+        fr_about.save_revision().publish()
 
-    return {
-        "en_site": en_site,
-        "mi_site": mi_site,
-        "fr_site": fr_site,
-        "en_home": en_home,
-        "mi_home": mi_home,
-        "fr_home": fr_home,
-        "en_about": en_about,
-        "mi_about": mi_about,
-        "fr_about": fr_about,
-        "en_contact": en_contact,
-        "mi_contact": mi_contact,
-        "en_team": en_team,
-        "mi_team": mi_team,
-    }
+        return {
+            "en_site": en_site,
+            "mi_site": mi_site,
+            "fr_site": fr_site,
+            "en_home": en_home,
+            "mi_home": mi_home,
+            "fr_home": fr_home,
+            "en_about": en_about,
+            "mi_about": mi_about,
+            "fr_about": fr_about,
+            "en_contact": en_contact,
+            "mi_contact": mi_contact,
+            "en_team": en_team,
+            "mi_team": mi_team,
+        }
 
 
 class TestNormalizePath:
@@ -158,6 +159,7 @@ class TestNormalizePath:
         assert result == "/"
 
 
+@pytest.mark.django_db
 class TestFindPageInSite:
     """Test the _find_page_in_site helper function."""
 
@@ -225,6 +227,7 @@ class TestFindPageInSite:
         assert page.id == sites["en_home"].id
 
 
+@pytest.mark.django_db
 class TestBuildLocaleInfo:
     """Test the _build_locale_info helper function."""
 
@@ -260,6 +263,7 @@ class TestBuildLocaleInfo:
         assert result["title"] == "About Us"
 
 
+@pytest.mark.django_db
 class TestPageNotFoundFunction:
     """Test the page_not_found function (integration tests)."""
 
