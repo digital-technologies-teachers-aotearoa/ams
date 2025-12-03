@@ -64,6 +64,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#root-urlconf
 ROOT_URLCONF = "config.urls"
+APPEND_SLASH = True
 # https://docs.djangoproject.com/en/dev/ref/settings/#wsgi-application
 WSGI_APPLICATION = "config.wsgi.application"
 
@@ -356,6 +357,7 @@ SOCIALACCOUNT_FORMS = {"signup": "ams.users.forms.UserSocialSignupForm"}
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 10_000
 WAGTAIL_ENABLE_UPDATE_CHECK = "lts"
 WAGTAIL_SITE_NAME = "AMS Demo"
+WAGTAIL_APPEND_SLASH = True
 WAGTAIL_I18N_ENABLED = True
 WAGTAIL_CONTENT_LANGUAGES = LANGUAGES
 WAGTAILADMIN_BASE_URL = env("SITE_DOMAIN", default="ams.com") + "/cms/"
