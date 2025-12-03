@@ -7,6 +7,7 @@ from wagtail.models import Locale
 from wagtail.models import Page
 from wagtail.models import Site
 
+from ams.cms.models import AssociationSettings
 from ams.cms.models import HomePage
 from ams.cms.models import SiteSettings
 from ams.utils.management.commands._constants import LOG_HEADER
@@ -46,18 +47,24 @@ class Command(BaseCommand):
             )
             created_locales.append(str(locale))
 
-            # Create or update home page
-            home, created = HomePage.objects.update_or_create(
-                locale=locale,
-                defaults={
-                    "title": "Home",
-                    "slug": f"{lang_code}",
-                },
-            )
-
-            # If newly created, add it as a child of root page
-            if created:
+            # Try to get existing home page for this locale
+            try:
+                home = HomePage.objects.get(locale=locale)
+                created = False
+                # Update existing page
+                home.title = "Home"
+                home.slug = f"{lang_code}"
+                home.save()
+            except HomePage.DoesNotExist:
+                # Create new home page and add it to the tree
+                home = HomePage(
+                    title="Home",
+                    slug=f"{lang_code}",
+                    locale=locale,
+                )
                 root_page.add_child(instance=home)
+                home.save()
+                created = True
 
             action = "Created" if created else "Updated"
             self.stdout.write(
@@ -78,13 +85,22 @@ class Command(BaseCommand):
                     "port": base_port,
                 },
             )
+            # Check settings for site
+            SiteSettings.objects.update_or_create(
+                site=site,
+                defaults={
+                    "language": lang_code,
+                },
+            )
             if created:
-                SiteSettings.objects.update_or_create(
+                AssociationSettings.objects.update_or_create(
                     site=site,
                     defaults={
-                        "language": lang_code,
+                        "association_short_name": f"{lang_name} AMS",
+                        "association_long_name": f"{lang_name} AMS",
                     },
                 )
+
             action = "Created" if created else "Updated"
             self.stdout.write(
                 self.style.SUCCESS(f"✅ {action} {lang_name} site: {site}"),
