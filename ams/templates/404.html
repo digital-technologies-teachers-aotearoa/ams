@@ -7,7 +7,6 @@
 {% endblock title %}
 {% block content %}
   <h1>Page not found</h1>
-  <p>This is not the page you were looking for.</p>
   <p>
     <a href="{% translate_url LANGUAGE_CODE '/' %}">Go to homepage</a>
   </p>
@@ -15,9 +14,9 @@
     <div>
       <p>This page is available in:</p>
       <ul>
-        {% for page in available_locales %}
+        {% for locale in available_locales %}
           <li>
-            <a href="{{ locale.url }}">{{ page }}</a>
+            <a href="{{ locale.url }}">{{ locale.language_name }} - {{ locale.title }}</a>
           </li>
         {% endfor %}
       </ul>

@@ -5,12 +5,14 @@ from django.http import HttpResponseRedirect
 from django.urls import include
 from django.urls import path
 from django.utils.translation import get_language
-from django.views import defaults as default_views
 from wagtail import urls as wagtail_urls
 from wagtail.admin import urls as wagtailadmin_urls
 from wagtail.documents import urls as wagtaildocs_urls
 
-from ams.utils.views import PageNotFoundView
+from ams.utils.views import bad_request
+from ams.utils.views import page_not_found
+from ams.utils.views import permission_denied
+from ams.utils.views import server_error
 
 
 def redirect_to_user_language(request):
@@ -49,21 +51,10 @@ if settings.DEBUG:
     # This allows the error pages to be debugged during development, just visit
     # these url in browser to see how these error pages look like.
     urlpatterns += [
-        path(
-            "400/",
-            default_views.bad_request,
-            kwargs={"exception": Exception("Bad Request!")},
-        ),
-        path(
-            "403/",
-            default_views.permission_denied,
-            kwargs={"exception": Exception("Permission Denied")},
-        ),
-        path(
-            "404/",
-            PageNotFoundView.as_view(),
-        ),
-        path("500/", default_views.server_error),
+        path("400/", bad_request),
+        path("403/", permission_denied),
+        path("404/", page_not_found),
+        path("500/", server_error),
     ]
     if "debug_toolbar" in settings.INSTALLED_APPS:
         import debug_toolbar
@@ -74,5 +65,9 @@ if settings.DEBUG:
         ]
 
 
-# Set custom 404 handler
-handler404 = PageNotFoundView.as_view()
+# Set custom error handlers
+# Use string paths for error handlers to maintain APPEND_SLASH functionality
+handler400 = "ams.utils.views.bad_request"
+handler403 = "ams.utils.views.permission_denied"
+handler404 = "ams.utils.views.page_not_found"
+handler500 = "ams.utils.views.server_error"
