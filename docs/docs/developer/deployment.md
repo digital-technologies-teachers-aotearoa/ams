@@ -32,6 +32,8 @@ The following environment variables are available, with some required for runnin
 
 | Variable | Requirement | Example Value | Description |
 |---|---|---|---|
+| `SITE_DOMAIN` | 🔴 Required | `ams.com` | The domain the website is hosted on |
+| `SITE_PORT` | ⚪ Optional | `80` | The port number the website is accessible at |
 | `POSTGRES_HOST` | 🔴 Required | `postgres` | The hostname of the PostgreSQL database server |
 | `POSTGRES_PORT` | 🔴 Required | `5432` | The port of the PostgreSQL database server |
 | `POSTGRES_DB` | 🔴 Required | `ams` | The database name of the PostgreSQL database server |
