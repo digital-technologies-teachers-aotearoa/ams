@@ -185,48 +185,7 @@ To prevent content pages from conflicting with Django application URLs (like `/u
 
 ## Development Workflow
 
-### Initial Setup
-
-Site configuration is handled automatically. The `setup_cms` command runs as part of:
-
-- `python manage.py sample_data` (local development data generation)
-- `python manage.py deploy_steps` (production deployment)
-
-Manual site creation or configuration is typically unnecessary unless debugging or customizing the setup.
-
-### Content Management
-
-#### Accessing the admin
-
-Navigate to `/cms/` to access the Wagtail admin interface.
-
-#### Working with multiple sites
-
-When editing settings (Settings → Association Settings), use the site selector dropdown to switch between English and Māori sites. Each site has independent settings.
-
-#### Creating pages
-
-Pages are created under the appropriate language's HomePage. The Wagtail page tree clearly shows which pages belong to which language site based on their parent hierarchy.
-
-### Configuration Requirements
-
-#### Middleware ordering
-
-Verify middleware configuration in `config/settings/base.py`:
-
-```python
-MIDDLEWARE = [
-    # ... earlier middleware
-    "django.middleware.locale.LocaleMiddleware",       # Must come first
-    "ams.utils.middleware.site_by_path.PathBasedSiteMiddleware",  # Then site resolution
-    "django.middleware.common.CommonMiddleware",       # Then common processing
-    # ... remaining middleware
-]
-```
-
-#### Environment variables
-
-Set `WAGTAILADMIN_BASE_URL` in production settings for proper admin link generation in emails and notifications.
+Running `python manage.py sample_data` can be useful to setup a basic website configuration for local development.
 
 ## Technical Considerations
 
