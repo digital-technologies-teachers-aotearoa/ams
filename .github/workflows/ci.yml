@@ -125,6 +125,7 @@ jobs:
           token: ${{ secrets.DIGITALOCEAN_DEPLOY_TOKEN }}
           project_id: ams-dev
         env:
+          SITE_DOMAIN: ${{ secrets.SITE_DOMAIN }}
           DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
           DJANGO_ADMIN_URL: ${{ secrets.DJANGO_ADMIN_URL }}
           DJANGO_ALLOWED_HOSTS: ${{ secrets.DJANGO_ALLOWED_HOSTS }}
