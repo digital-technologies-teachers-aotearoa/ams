@@ -100,7 +100,6 @@ THIRD_PARTY_APPS = [
     "wagtail.images",
     "wagtail.search",
     "wagtail.admin",
-    "wagtail.locales",
     "wagtail",
     "wagtailmenus",
     "modelcluster",
