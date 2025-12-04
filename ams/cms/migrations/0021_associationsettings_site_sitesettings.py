@@ -4,6 +4,19 @@ import django.db.models.deletion
 from django.db import migrations, models
 
 
+def set_default_site(apps, schema_editor):
+    """Set the site field to the first available site."""
+    AssociationSettings = apps.get_model('cms', 'AssociationSettings')
+    Site = apps.get_model('wagtailcore', 'Site')
+
+    # Get the first site, ordered by ID
+    first_site = Site.objects.order_by('id').first()
+
+    if first_site:
+        # Update all existing AssociationSettings records
+        AssociationSettings.objects.filter(site__isnull=True).update(site=first_site)
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -12,12 +25,30 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        # Step 1: Add the field as nullable
         migrations.AddField(
             model_name='associationsettings',
             name='site',
-            field=models.OneToOneField(default=1, editable=False, on_delete=django.db.models.deletion.CASCADE, to='wagtailcore.site'),
-            preserve_default=False,
+            field=models.OneToOneField(
+                null=True,
+                editable=False,
+                on_delete=django.db.models.deletion.CASCADE,
+                to='wagtailcore.site'
+            ),
         ),
+        # Step 2: Populate with the first available site
+        migrations.RunPython(set_default_site, reverse_code=migrations.RunPython.noop),
+        # Step 3: Make the field non-nullable
+        migrations.AlterField(
+            model_name='associationsettings',
+            name='site',
+            field=models.OneToOneField(
+                editable=False,
+                on_delete=django.db.models.deletion.CASCADE,
+                to='wagtailcore.site'
+            ),
+        ),
+        # Create the SiteSettings model with site field as OneToOneField
         migrations.CreateModel(
             name='SiteSettings',
             fields=[
