@@ -3,6 +3,7 @@ import uuid
 from typing import ClassVar
 
 from django.contrib.auth.models import AbstractUser
+from django.core.files.storage import storages
 from django.core.validators import RegexValidator
 from django.db.models import CASCADE
 from django.db.models import BooleanField
@@ -15,8 +16,6 @@ from django.db.models import Model
 from django.db.models import UUIDField
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-
-from config.storage_backends import PublicMediaStorage
 
 from .managers import UserManager
 
@@ -37,11 +36,16 @@ def user_profile_picture_path(instance, filename):
     """
     Generate upload path for user profile pictures.
     Uses user UUID and timestamp to ensure uniqueness and cache busting.
-    Path format: profile-pictures/{user_uuid}/{timestamp}.{extension}
+    Path format: profile_pictures/{user_uuid}/{timestamp}.{extension}
     """
     extension = filename.split(".")[-1] if "." in filename else "jpg"
     timestamp = int(time.time())
-    return f"profile-pictures/{instance.uuid}/{timestamp}.{extension}"
+    return f"profile_pictures/{instance.uuid}/{timestamp}.{extension}"
+
+
+def get_public_media_storage():
+    """Get the configured public media storage backend."""
+    return storages["default"]
 
 
 class User(AbstractUser):
@@ -71,7 +75,7 @@ class User(AbstractUser):
     profile_picture = ImageField(
         _("profile picture"),
         upload_to=user_profile_picture_path,
-        storage=PublicMediaStorage,
+        storage=get_public_media_storage,
         blank=True,
     )
 

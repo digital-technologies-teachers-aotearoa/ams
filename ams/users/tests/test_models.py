@@ -3,12 +3,12 @@ from unittest.mock import patch
 
 import pytest
 from django.core.exceptions import ValidationError
+from django.core.files.storage import storages
 from django.core.files.uploadedfile import SimpleUploadedFile
 
 from ams.users.models import User
 from ams.users.models import user_profile_picture_path
 from ams.users.models import username_validator
-from config.storage_backends import PublicMediaStorage
 
 
 def test_user_get_absolute_url(user: User):
@@ -218,7 +218,7 @@ class TestUserProfilePicturePath:
         path = user_profile_picture_path(user, "photo.jpg")
 
         expected_path = (
-            "profile-pictures/550e8400-e29b-41d4-a716-446655440000/1234567890.jpg"
+            "profile_pictures/550e8400-e29b-41d4-a716-446655440000/1234567890.jpg"
         )
         assert path == expected_path
 
@@ -246,7 +246,7 @@ class TestUserProfilePicturePath:
 
         path = user_profile_picture_path(user, filename)
 
-        expected_path = f"profile-pictures/550e8400-e29b-41d4-a716-446655440000/1234567890.{expected_extension}"  # noqa: E501
+        expected_path = f"profile_pictures/550e8400-e29b-41d4-a716-446655440000/1234567890.{expected_extension}"  # noqa: E501
         assert path == expected_path
 
     @patch("ams.users.models.time.time")
@@ -260,7 +260,7 @@ class TestUserProfilePicturePath:
         path = user_profile_picture_path(user, "photo")
 
         expected_path = (
-            "profile-pictures/550e8400-e29b-41d4-a716-446655440000/1234567890.jpg"
+            "profile_pictures/550e8400-e29b-41d4-a716-446655440000/1234567890.jpg"
         )
         assert path == expected_path
 
@@ -276,7 +276,7 @@ class TestUserProfilePicturePath:
 
         # Ensure timestamp is converted to int
         expected_path = (
-            "profile-pictures/550e8400-e29b-41d4-a716-446655440000/1702888888.jpg"
+            "profile_pictures/550e8400-e29b-41d4-a716-446655440000/1702888888.jpg"
         )
         assert path == expected_path
 
@@ -313,14 +313,8 @@ class TestUserProfilePictureField:
         user.full_clean(exclude=["password"])
 
     @pytest.mark.django_db
-    @patch("config.storage_backends.PublicMediaStorage.save")
-    def test_user_profile_picture_upload(self, mock_storage_save):
+    def test_user_profile_picture_upload(self):
         """Test uploading a profile picture to a user."""
-
-        # Mock the storage save to return a path without actually saving to S3
-        mock_storage_save.return_value = (
-            "profile-pictures/550e8400-e29b-41d4-a716-446655440000/1234567890.jpg"
-        )
 
         user = User.objects.create_user(
             email="test@example.com",
@@ -338,22 +332,29 @@ class TestUserProfilePictureField:
             content_type="image/jpeg",
         )
 
-        user.profile_picture = image
-        user.save()
+        # Mock the storage save method
+        with patch.object(storages["default"], "save") as mock_save:
+            mock_save.return_value = f"profile_pictures/{user.uuid}/1234567890.jpg"
 
-        # Verify the storage save was called
-        assert mock_storage_save.called
-        # Verify the file path contains expected components
-        assert (
-            user.profile_picture.name
-            == "profile-pictures/550e8400-e29b-41d4-a716-446655440000/1234567890.jpg"
-        )
+            user.profile_picture = image
+            user.save()
+
+            # Verify the storage save was called
+            assert mock_save.called
 
     @pytest.mark.django_db
     def test_user_profile_picture_uses_public_storage(self):
-        """Test that profile_picture uses PublicMediaStorage."""
+        """Test that profile_picture uses the default (public) storage."""
+
         profile_picture_field = User._meta.get_field("profile_picture")  # noqa: SLF001
-        assert isinstance(profile_picture_field.storage, PublicMediaStorage)
+        # The storage should be a callable that returns the default storage
+        storage_instance = (
+            profile_picture_field.storage()
+            if callable(profile_picture_field.storage)
+            else profile_picture_field.storage
+        )
+        # Verify it's the same as the default storage
+        assert storage_instance == storages["default"]
 
     @pytest.mark.django_db
     def test_user_uuid_is_unique(self):

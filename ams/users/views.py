@@ -8,6 +8,7 @@ from django.views.generic import RedirectView
 from django.views.generic import UpdateView
 
 from ams.memberships.models import MembershipStatus
+from ams.users.forms import UserUpdateForm
 from ams.users.models import User
 from ams.users.tables import MembershipTable
 
@@ -34,7 +35,7 @@ user_detail_view = UserDetailView.as_view()
 
 class UserUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = User
-    fields = ["first_name", "last_name", "username"]
+    form_class = UserUpdateForm
     success_message = _("Your user details have been successfully updated")
 
     def get_success_url(self) -> str:

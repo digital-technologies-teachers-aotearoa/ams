@@ -1,8 +1,11 @@
 from allauth.account.forms import SignupForm
 from allauth.socialaccount.forms import SignupForm as SocialSignupForm
 from django.contrib.auth import forms as admin_forms
+from django.core.exceptions import ValidationError
 from django.forms import CharField
 from django.forms import EmailField
+from django.forms import ImageField
+from django.forms import ModelForm
 from django.forms import TextInput
 from django.utils.translation import gettext_lazy as _
 
@@ -83,3 +86,43 @@ class UserSocialSignupForm(SocialSignupForm):
     Default fields will be added automatically.
     See UserSignupForm otherwise.
     """
+
+
+class UserUpdateForm(ModelForm):
+    """
+    Form for updating user profile information including profile picture.
+    """
+
+    profile_picture = ImageField(
+        label=_("Profile picture"),
+        required=False,
+        help_text=_(
+            "Upload a profile picture (JPEG, PNG, GIF, or WEBP). "
+            "Maximum file size: 5MB.",
+        ),
+    )
+
+    class Meta:
+        model = User
+        fields = ["first_name", "last_name", "username", "profile_picture"]
+        widgets = {
+            "first_name": TextInput(attrs={"autocomplete": "given-name"}),
+            "last_name": TextInput(attrs={"autocomplete": "family-name"}),
+            "username": TextInput(attrs={"autocomplete": "username"}),
+        }
+
+    def clean_profile_picture(self):
+        """Validate profile picture file size and format."""
+        picture = self.cleaned_data.get("profile_picture")
+
+        if picture:
+            # Check file size (5MB limit)
+            max_size = 5 * 1024 * 1024  # 5MB in bytes
+            if picture.size > max_size:
+                raise ValidationError(
+                    _("File size must be no more than 5MB. Your file is %(size).1fMB."),
+                    params={"size": picture.size / (1024 * 1024)},
+                    code="file_too_large",
+                )
+
+        return picture
