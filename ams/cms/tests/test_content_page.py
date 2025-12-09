@@ -20,9 +20,8 @@ from ams.memberships.models import MembershipOptionType
 class TestContentPageVisibility:
     def setup_method(self):
         # Ensure HomePage exists
-        try:
-            self.homepage = HomePage.objects.get()
-        except HomePage.DoesNotExist:
+        self.homepage = HomePage.objects.first()
+        if not self.homepage:
             root = Page.get_first_root_node()
             self.homepage = HomePage(title="Home", slug="home")
             root.add_child(instance=self.homepage)
@@ -121,9 +120,8 @@ class TestContentPageSlugValidation:
     def test_reserved_slug_validation_for_homepage_child(self):
         """Test that reserved slugs are blocked for direct children of HomePage."""
         # Get or create the HomePage
-        try:
-            homepage = HomePage.objects.get()
-        except HomePage.DoesNotExist:
+        homepage = HomePage.objects.first()
+        if not homepage:
             # Create a root page if it doesn't exist
             root = Page.get_first_root_node()
             homepage = HomePage(
@@ -149,9 +147,8 @@ class TestContentPageSlugValidation:
     def test_reserved_slug_allowed_for_nested_page(self):
         """Test that reserved slugs are allowed for non-direct children of HomePage."""
         # Get or create the HomePage
-        try:
-            homepage = HomePage.objects.get()
-        except HomePage.DoesNotExist:
+        homepage = HomePage.objects.first()
+        if not homepage:
             root = Page.get_first_root_node()
             homepage = HomePage(
                 title="Home",
@@ -160,10 +157,10 @@ class TestContentPageSlugValidation:
             root.add_child(instance=homepage)
             homepage.save()
 
-        # Create an intermediate content page
+        # Create an intermediate content page (use unique slug to avoid conflicts)
         intermediate_page = ContentPage(
-            title="Intermediate Page",
-            slug="intermediate",
+            title="Intermediate Page For Test",
+            slug="intermediate-for-nested-test",
         )
         homepage.add_child(instance=intermediate_page)
         intermediate_page.save()
@@ -187,9 +184,8 @@ class TestContentPageSlugValidation:
     def test_non_reserved_slug_allowed(self):
         """Test that non-reserved slugs are allowed for direct children of HomePage."""
         # Get or create the HomePage
-        try:
-            homepage = HomePage.objects.get()
-        except HomePage.DoesNotExist:
+        homepage = HomePage.objects.first()
+        if not homepage:
             root = Page.get_first_root_node()
             homepage = HomePage(
                 title="Home",
@@ -198,10 +194,10 @@ class TestContentPageSlugValidation:
             root.add_child(instance=homepage)
             homepage.save()
 
-        # Create a page with a non-reserved slug
+        # Create a page with a non-reserved slug (use unique slug to avoid conflicts)
         content_page = ContentPage(
-            title="About Page",
-            slug="about",  # This should be allowed
+            title="Test Non Reserved Page",
+            slug="test-non-reserved",  # This should be allowed
         )
         homepage.add_child(instance=content_page)
 
