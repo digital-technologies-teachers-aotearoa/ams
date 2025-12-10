@@ -16,6 +16,8 @@ from django.db.models import Model
 from django.db.models import UUIDField
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from imagekit.models import ImageSpecField
+from imagekit.processors import ResizeToFill
 
 from .managers import UserManager
 
@@ -77,6 +79,12 @@ class User(AbstractUser):
         upload_to=user_profile_picture_path,
         storage=get_public_media_storage,
         blank=True,
+    )
+    profile_picture_thumbnail = ImageSpecField(
+        source="profile_picture",
+        processors=[ResizeToFill(800, 800)],
+        format="JPEG",
+        options={"quality": 80},
     )
 
     USERNAME_FIELD = "email"

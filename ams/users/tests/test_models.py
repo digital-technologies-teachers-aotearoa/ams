@@ -5,6 +5,7 @@ import pytest
 from django.core.exceptions import ValidationError
 from django.core.files.storage import storages
 from django.core.files.uploadedfile import SimpleUploadedFile
+from imagekit.models import ImageSpecField
 
 from ams.users.models import User
 from ams.users.models import user_profile_picture_path
@@ -355,6 +356,16 @@ class TestUserProfilePictureField:
         )
         # Verify it's the same as the default storage
         assert storage_instance == storages["default"]
+
+    @pytest.mark.django_db
+    def test_profile_picture_thumbnail_field_exists(self):
+        """Test that the profile_picture_thumbnail ImageSpecField exists."""
+
+        # Check that the field exists
+        assert hasattr(User, "profile_picture_thumbnail")
+        # Verify it's an ImageSpecField
+        field = User.profile_picture_thumbnail
+        assert isinstance(field, ImageSpecField)
 
     @pytest.mark.django_db
     def test_user_uuid_is_unique(self):

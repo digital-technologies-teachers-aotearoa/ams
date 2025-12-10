@@ -12,7 +12,7 @@
         {% if object == request.user %}
           <div class="d-flex align-items-center mb-4">
             {% if object.profile_picture %}
-              <img src="{{ object.profile_picture.url }}"
+              <img src="{{ object.profile_picture_thumbnail.url }}"
                    alt="{{ object.get_full_name }}'s profile picture"
                    class="rounded-circle me-3 object-fit-cover"
                    width="100"
