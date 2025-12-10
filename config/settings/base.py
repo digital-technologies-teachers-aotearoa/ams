@@ -105,6 +105,7 @@ THIRD_PARTY_APPS = [
     "modelcluster",
     "taggit",
     "storages",
+    "imagekit",
 ]
 
 LOCAL_APPS = [
@@ -418,3 +419,4 @@ DOCUMENTATION_URL = env(
 DEPLOYED = env.bool("DEPLOYED", default=False)
 SITE_DOMAIN = env("SITE_DOMAIN", default="ams.com")
 SITE_PORT = env.int("SITE_PORT", default=80)
+IMAGEKIT_CACHEFILE_DIR = "imagekit-modified"
