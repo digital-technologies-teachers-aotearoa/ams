@@ -137,7 +137,7 @@ function initBrowserSync() {
 
 // Watch
 function watchPaths() {
-  watch(`${paths.sass}/*.scss`, styles);
+  watch(`${paths.sass}/**/*.scss`, styles);
   watch(`${paths.templates}/**/*.html`).on('change', reload);
   watch([`${paths.js}/*.js`, `!${paths.js}/*.min.js`], scripts).on(
     'change',
