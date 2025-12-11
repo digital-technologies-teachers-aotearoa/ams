@@ -79,25 +79,46 @@
               <ul class="navbar-nav ms-auto mb-2 mb-md-0">
                 {% main_menu template="cms/menu/top_level_item.html" sub_menu_template="cms/menu/dropdown_item.html" max_levels=2 %}
                 {% if request.user.is_authenticated %}
-                  <li class="nav-item">
-                    <a class="nav-link"
-                       href="{% url 'users:detail' request.user.username %}">{% translate "My Profile" %}</a>
-                  </li>
-                  <li class="nav-item">
-                    {# URL provided by django-allauth/account/urls.py #}
-                    <a class="nav-link" href="{% url 'account_logout' %}">{% translate "Sign Out" %}</a>
+                  <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center"
+                       href="#"
+                       id="navbarUserDropdown"
+                       role="button"
+                       data-bs-toggle="dropdown"
+                       aria-expanded="false">
+                      <div class="me-2 profile-picture profile-picture-small">
+                        {% include "snippets/user_avatar.html" with user=request.user %}
+                      </div>
+                      <span class="d-none d-md-inline">{{ request.user.get_full_name }}</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end"
+                        aria-labelledby="navbarUserDropdown">
+                      <li>
+                        <a class="dropdown-item"
+                           href="{% url 'users:detail' request.user.username %}">{% translate "My Profile" %}</a>
+                      </li>
+                      <li>
+                        <hr class="dropdown-divider" />
+                      </li>
+                      <li>
+                        {# URL provided by django-allauth/account/urls.py #}
+                        <a class="dropdown-item" href="{% url 'account_logout' %}">{% translate "Sign Out" %}</a>
+                      </li>
+                    </ul>
                   </li>
                 {% else %}
-                  {% if ACCOUNT_ALLOW_REGISTRATION %}
-                    <li class="nav-item">
-                      {# URL provided by django-allauth/account/urls.py #}
-                      <a id="sign-up-link" class="nav-link" href="{% url 'account_signup' %}">{% translate "Sign Up" %}</a>
-                    </li>
-                  {% endif %}
                   <li class="nav-item">
                     {# URL provided by django-allauth/account/urls.py #}
                     <a id="log-in-link" class="nav-link" href="{% url 'account_login' %}">{% translate "Sign In" %}</a>
                   </li>
+                  {% if ACCOUNT_ALLOW_REGISTRATION %}
+                    <li class="nav-item">
+                      {# URL provided by django-allauth/account/urls.py #}
+                      <a id="sign-up-link"
+                         class="btn btn-primary ms-2"
+                         href="{% url 'account_signup' %}">{% translate "Sign Up" %}</a>
+                    </li>
+                  {% endif %}
                 {% endif %}
               </ul>
             </div>
