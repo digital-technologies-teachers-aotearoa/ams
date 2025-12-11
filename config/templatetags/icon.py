@@ -2,7 +2,7 @@ import re
 
 from django import template
 from django.template.loader import render_to_string
-from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 
 register = template.Library()
 
@@ -19,5 +19,11 @@ def icon(name, classes=""):
         # Only allow safe class names
         if not re.match(r"^[\w\s-]*$", classes):
             classes = ""
-        svg = re.sub(r'(<svg[^>]*class=")([^"]*)"', rf'\1\2 {classes}"', svg, count=1)
-    return format_html("{}", svg)
+        else:
+            svg = re.sub(
+                r'(<svg[^>]*class=")([^"]*)"',
+                rf'\1\2 {classes}"',
+                svg,
+                count=1,
+            )
+    return mark_safe(svg)  # noqa: S308
