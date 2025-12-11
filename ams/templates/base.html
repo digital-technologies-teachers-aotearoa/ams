@@ -44,39 +44,8 @@
             </button>
             <a class="navbar-brand me-0"
                href="{% translate_url LANGUAGE_CODE '/' %}">{% include "snippets/association_logo_or_name.html" %}</a>
-            <div class="dropdown ml-md-3 order-md-last">
-              <button id="navbarLanguageSelector"
-                      class="navbar-toggler d-inline-block"
-                      type="button"
-                      data-bs-toggle="dropdown"
-                      aria-expanded="false"
-                      aria-label="Toggle navigation">
-                <svg xmlns="http://www.w3.org/2000/svg"
-                     xmlns:xlink="http://www.w3.org/1999/xlink"
-                     version="1.1"
-                     viewBox="0 0 100 100"
-                     xml:space="preserve"
-                     class="icon navbar-icon navbar-language-icon">
-                  <title>{% trans "Language" %}</title>
-                  <path d="m19.199 56.277v-8.1992h-8.5742c-3.3203 0-6.0195-2.875-6.0195-6.4062l-0.003907-18.492c0-3.5312 2.6992-6.4062 6.0195-6.4062h38.344c3.3203 0 6.0195 2.875 6.0195 6.4062v18.492c0 3.5312-2.6992 6.4062-6.0195 6.4062v4.4961c5.7969 0 10.516-4.8906 10.516-10.902v-18.492c0-6.0117-4.7148-10.902-10.512-10.902h-38.348c-5.7969 0-10.516 4.8906-10.516 10.902v18.492c0 6.0117 4.7188 10.902 10.516 10.902h4.0781v7.9688c0 1.2227 0.78906 2.332 1.9648 2.7656 0.33594 0.12109 0.67578 0.18359 1.0156 0.18359 0.82031 0 1.6094-0.35547 2.1641-1.0117l8.3672-9.9062h8.3516v-4.4961h-10.434z" />
-                  <path d="m89.379 36.512h-25.961v4.4961h25.961c3.3203 0 6.0195 2.875 6.0195 6.4062v18.488c0 3.5312-2.6992 6.4062-6.0195 6.4062h-8.5742v8.2031l-6.9297-8.2031-22.844 0.003906c-3.3164 0-6.0195-2.875-6.0195-6.4062v-18.492c0-3.5312 2.6992-6.4062 6.0195-6.4062v-4.4961c-5.7969 0-10.516 4.8906-10.516 10.902v18.492c0 6.0156 4.7188 10.902 10.516 10.902h20.754l8.3711 9.9102c0.55469 0.65234 1.3438 1.0039 2.1602 1.0039 0.33594 0 0.67969-0.058594 1.0156-0.18359 1.1758-0.43359 1.9688-1.543 1.9688-2.7695v-7.9609h4.0781c5.8008 0 10.516-4.8906 10.516-10.902v-18.492c0-6.0117-4.7188-10.902-10.516-10.902z" />
-                  <path d="m26.531 19.715-7.9531 20.949h4.6641l1.6445-4.6641h7.8359l1.5859 4.6641h4.7812l-7.8359-20.949zm-0.4375 12.852 2.7305-7.6875h0.058593l2.6406 7.6875z" />
-                  <path d="m60.121 61.391c0 2.2969 1.4688 3.7852 3.8633 3.7852 2.875-0.0625 5.7227-1.8867 6.6484-2.7109 0.92578-0.82422 3.4219-3.6914 4.5195-5.9648 1.3945 0.65625 2.0547 1.7617 2.0547 2.9805 0 2.6406-2.543 4.1719-6.5977 4.6367l1.9688 2.7266c6.3555-0.83203 8.5156-3.5 8.5156-7.4062 0-3.3008-2.0781-5.3047-4.7383-6.1836 0.050781-0.24219 0.13672-0.49609 0.1875-0.73828l-3.6094-0.64453c-0.023438 0.36328-0.097656 0.43359-0.16797 0.79688-1.2969-0.074219-2.7383 0.12109-3.2031 0.21875 0-0.66016 0.023438-2.4219 0.050781-3.0547 3.0078-0.12109 5.9609-0.36328 8.6992-0.78125l-0.31641-3.5664c-2.8086 0.5625-5.5234 0.85547-8.1875 1.0039 0.070312-0.71094 0.17188-2.7188 0.17188-2.7188l-3.8125-0.28906c-0.050781 0.97656-0.070313 2.1289-0.12109 3.1289-1.6875 0.023437-3.6875 0.023437-4.7422 0l0.17187 3.4453h0.41406c1.0039 0 2.6406-0.050782 4.1094-0.097657 0 0.95312 0.023438 3.0039 0.046875 3.9336-3.457 1.4375-5.9258 4.1016-5.9258 7.5zm11.484-5.5234c-0.51562 1.0234-1.125 1.957-1.8086 2.7344-0.10156-0.80859-0.14844-1.6367-0.19531-2.5156 0.26953-0.046876 1.3438-0.21875 2.0039-0.21875zm-5.375 1.418c0.12109 1.3672 0.26953 2.6875 0.48828 3.8867-0.63281 0.31641-1.2422 0.51562-1.8086 0.53906-1.2227 0.050781-1.2227-0.73047-1.2227-1.0742 0-1.3008 1-2.4961 2.543-3.3516z" />
-                </svg>
-              </button>
-              <ul class="dropdown-menu dropdown-menu-end"
-                  aria-labelledby="navbar-language-dropdown">
-                {% for language_code, language_name in LANGUAGES %}
-                  {% get_language_info for language_code as lang %}
-                  <li>
-                    <a class="dropdown-item{% if LANGUAGE_CODE == language_code %} active{% endif %}"
-                       href="{% translate_url language_code %}">{{ lang.name_local|capfirst }}</a>
-                  </li>
-                {% endfor %}
-              </ul>
-            </div>
             <div class="collapse navbar-collapse" id="navbarCollapse">
-              <ul class="navbar-nav ms-auto mb-2 mb-md-0">
+              <ul class="navbar-nav ms-auto mb-2 mb-md-0 gap-2">
                 {% main_menu template="cms/menu/top_level_item.html" sub_menu_template="cms/menu/dropdown_item.html" max_levels=2 %}
                 {% if request.user.is_authenticated %}
                   <li class="nav-item dropdown">
@@ -86,10 +55,9 @@
                        role="button"
                        data-bs-toggle="dropdown"
                        aria-expanded="false">
-                      <div class="me-2 profile-picture profile-picture-small">
+                      <div class="profile-picture profile-picture-small">
                         {% include "snippets/user_avatar.html" with user=request.user %}
                       </div>
-                      <span class="d-none d-md-inline">{{ request.user.get_full_name }}</span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end"
                         aria-labelledby="navbarUserDropdown">
@@ -115,10 +83,40 @@
                     <li class="nav-item">
                       {# URL provided by django-allauth/account/urls.py #}
                       <a id="sign-up-link"
-                         class="btn btn-primary ms-2"
+                         class="btn btn-primary"
                          href="{% url 'account_signup' %}">{% translate "Sign Up" %}</a>
                     </li>
                   {% endif %}
+                  <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle"
+                       href="#"
+                       role="button"
+                       data-bs-toggle="dropdown"
+                       aria-expanded="false"
+                       aria-label="Toggle navigation">
+                      <svg xmlns="http://www.w3.org/2000/svg"
+                           xmlns:xlink="http://www.w3.org/1999/xlink"
+                           version="1.1"
+                           viewBox="0 0 100 100"
+                           xml:space="preserve"
+                           class="icon navbar-icon">
+                        <title>{% trans "Language" %}</title>
+                        <path d="m19.199 56.277v-8.1992h-8.5742c-3.3203 0-6.0195-2.875-6.0195-6.4062l-0.003907-18.492c0-3.5312 2.6992-6.4062 6.0195-6.4062h38.344c3.3203 0 6.0195 2.875 6.0195 6.4062v18.492c0 3.5312-2.6992 6.4062-6.0195 6.4062v4.4961c5.7969 0 10.516-4.8906 10.516-10.902v-18.492c0-6.0117-4.7148-10.902-10.512-10.902h-38.348c-5.7969 0-10.516 4.8906-10.516 10.902v18.492c0 6.0117 4.7188 10.902 10.516 10.902h4.0781v7.9688c0 1.2227 0.78906 2.332 1.9648 2.7656 0.33594 0.12109 0.67578 0.18359 1.0156 0.18359 0.82031 0 1.6094-0.35547 2.1641-1.0117l8.3672-9.9062h8.3516v-4.4961h-10.434z" />
+                        <path d="m89.379 36.512h-25.961v4.4961h25.961c3.3203 0 6.0195 2.875 6.0195 6.4062v18.488c0 3.5312-2.6992 6.4062-6.0195 6.4062h-8.5742v8.2031l-6.9297-8.2031-22.844 0.003906c-3.3164 0-6.0195-2.875-6.0195-6.4062v-18.492c0-3.5312 2.6992-6.4062 6.0195-6.4062v-4.4961c-5.7969 0-10.516 4.8906-10.516 10.902v18.492c0 6.0156 4.7188 10.902 10.516 10.902h20.754l8.3711 9.9102c0.55469 0.65234 1.3438 1.0039 2.1602 1.0039 0.33594 0 0.67969-0.058594 1.0156-0.18359 1.1758-0.43359 1.9688-1.543 1.9688-2.7695v-7.9609h4.0781c5.8008 0 10.516-4.8906 10.516-10.902v-18.492c0-6.0117-4.7188-10.902-10.516-10.902z" />
+                        <path d="m26.531 19.715-7.9531 20.949h4.6641l1.6445-4.6641h7.8359l1.5859 4.6641h4.7812l-7.8359-20.949zm-0.4375 12.852 2.7305-7.6875h0.058593l2.6406 7.6875z" />
+                        <path d="m60.121 61.391c0 2.2969 1.4688 3.7852 3.8633 3.7852 2.875-0.0625 5.7227-1.8867 6.6484-2.7109 0.92578-0.82422 3.4219-3.6914 4.5195-5.9648 1.3945 0.65625 2.0547 1.7617 2.0547 2.9805 0 2.6406-2.543 4.1719-6.5977 4.6367l1.9688 2.7266c6.3555-0.83203 8.5156-3.5 8.5156-7.4062 0-3.3008-2.0781-5.3047-4.7383-6.1836 0.050781-0.24219 0.13672-0.49609 0.1875-0.73828l-3.6094-0.64453c-0.023438 0.36328-0.097656 0.43359-0.16797 0.79688-1.2969-0.074219-2.7383 0.12109-3.2031 0.21875 0-0.66016 0.023438-2.4219 0.050781-3.0547 3.0078-0.12109 5.9609-0.36328 8.6992-0.78125l-0.31641-3.5664c-2.8086 0.5625-5.5234 0.85547-8.1875 1.0039 0.070312-0.71094 0.17188-2.7188 0.17188-2.7188l-3.8125-0.28906c-0.050781 0.97656-0.070313 2.1289-0.12109 3.1289-1.6875 0.023437-3.6875 0.023437-4.7422 0l0.17187 3.4453h0.41406c1.0039 0 2.6406-0.050782 4.1094-0.097657 0 0.95312 0.023438 3.0039 0.046875 3.9336-3.457 1.4375-5.9258 4.1016-5.9258 7.5zm11.484-5.5234c-0.51562 1.0234-1.125 1.957-1.8086 2.7344-0.10156-0.80859-0.14844-1.6367-0.19531-2.5156 0.26953-0.046876 1.3438-0.21875 2.0039-0.21875zm-5.375 1.418c0.12109 1.3672 0.26953 2.6875 0.48828 3.8867-0.63281 0.31641-1.2422 0.51562-1.8086 0.53906-1.2227 0.050781-1.2227-0.73047-1.2227-1.0742 0-1.3008 1-2.4961 2.543-3.3516z" />
+                      </svg>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-md-end">
+                      {% for language_code, language_name in LANGUAGES %}
+                        {% get_language_info for language_code as lang %}
+                        <li>
+                          <a class="dropdown-item{% if LANGUAGE_CODE == language_code %} active{% endif %}"
+                             href="{% translate_url language_code %}">{{ lang.name_local|capfirst }}</a>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  </li>
                 {% endif %}
               </ul>
             </div>
@@ -182,6 +180,24 @@
               {% flat_menu 'footer-3' template="cms/menu/footer_menu.html" max_levels=1 show_menu_heading=True %}
             </div>
           </div>
+          {% if LANGUAGES|length > 1 %}
+            <div class="row">
+              <div class="col">
+                <div class="text-center text-muted small">
+                  {% for language_code, language_name in LANGUAGES %}
+                    {% get_language_info for language_code as lang %}
+                    {% if not forloop.first %}|{% endif %}
+                    {% if LANGUAGE_CODE == language_code %}
+                      <span>{{ lang.name_local|capfirst }}</span>
+                    {% else %}
+                      <a href="{% translate_url language_code %}"
+                         class="text-muted text-decoration-none">{{ lang.name_local|capfirst }}</a>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          {% endif %}
         </div>
       </footer>
     {% endblock body %}
