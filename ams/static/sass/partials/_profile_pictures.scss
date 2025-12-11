@@ -1,4 +1,39 @@
-.profile-picture-letters {
-  width: 100px;
-  height: 100px;
+.profile-picture {
+  flex-shrink: 0;
+  &-small {
+    width: 32px;
+    height: 32px;
+  }
+  &-large {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+// User avatar placeholder with icon
+.user-avatar-placeholder {
+  svg {
+    width: 60% !important;
+    height: 60% !important;
+    max-width: none;
+    max-height: none;
+  }
+}
+
+// Navbar avatar styling
+.navbar {
+  .nav-link.dropdown-toggle {
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+
+    img,
+    div {
+      flex-shrink: 0;
+    }
+  }
+
+  .btn-primary {
+    // Ensure sign-up button aligns properly with nav items
+    align-self: center;
+  }
 }

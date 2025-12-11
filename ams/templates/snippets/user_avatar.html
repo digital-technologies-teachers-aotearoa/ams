@@ -1,0 +1,15 @@
+{% load icon %}
+
+{% comment %}
+Reusable user avatar snippet
+Parameters:
+  - user: The user object
+{% endcomment %}
+{% if user.profile_picture %}
+  <img src="{{ user.profile_picture_thumbnail.url }}"
+       alt="{{ user.get_full_name }}'s profile picture"
+       class="rounded-circle object-fit-cover w-100 h-100" />
+{% else %}
+  <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center user-avatar-placeholder w-100 h-100"
+       aria-label="{{ user.get_full_name }}'s profile placeholder">{% icon "person-fill" "text-white" %}</div>
+{% endif %}
