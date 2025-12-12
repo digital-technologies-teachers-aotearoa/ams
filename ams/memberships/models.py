@@ -58,7 +58,40 @@ class MembershipOption(Model):
         return format_membership_duration(self.duration)
 
 
-class IndividualMembership(Model):
+class BaseMembership(Model):
+    """Abstract base class for membership models."""
+
+    start_date = DateField()
+    expiry_date = DateField()
+    created_datetime = DateTimeField()
+    approved_datetime = DateTimeField(null=True)
+    cancelled_datetime = DateTimeField(null=True)
+
+    class Meta:
+        abstract = True
+
+    def clean(self):
+        # Enforce expiry_date is after start_date
+        if self.expiry_date and self.start_date and self.expiry_date <= self.start_date:
+            raise ValidationError(
+                {"expiry_date": "Expiry date must be after start date."},
+            )
+        super().clean()
+
+    def is_expired(self) -> bool:
+        if self.expiry_date is None:
+            return False
+        return timezone.localdate() >= self.expiry_date
+
+    def get_status_display(self) -> str:
+        # Always use MembershipStatus display name
+        try:
+            return MembershipStatus(self.status()).label
+        except ValueError:
+            return str(self.status())
+
+
+class IndividualMembership(BaseMembership):
     user = ForeignKey(
         User,
         on_delete=CASCADE,
@@ -76,11 +109,6 @@ class IndividualMembership(Model):
         blank=True,
         related_name="individual_memberships",
     )
-    start_date = DateField()
-    expiry_date = DateField()
-    created_datetime = DateTimeField()
-    approved_datetime = DateTimeField(null=True)
-    cancelled_datetime = DateTimeField(null=True)
 
     class Meta:
         verbose_name = "Membership: Individual"
@@ -91,19 +119,6 @@ class IndividualMembership(Model):
             f"{self.user.get_full_name()} - {self.membership_option.name} - "
             f"Status: {self.status()}"
         )
-
-    def clean(self):
-        # Enforce expiry_date is after start_date
-        if self.expiry_date and self.start_date and self.expiry_date <= self.start_date:
-            raise ValidationError(
-                {"expiry_date": "Expiry date must be after start date."},
-            )
-        super().clean()
-
-    def is_expired(self) -> bool:
-        if self.expiry_date is None:
-            return False
-        return timezone.localdate() >= self.expiry_date
 
     def status(self) -> Any:
         if self.cancelled_datetime:
@@ -117,15 +132,8 @@ class IndividualMembership(Model):
 
         return MembershipStatus.ACTIVE
 
-    def get_status_display(self) -> str:
-        # Always use MembershipStatus display name
-        try:
-            return MembershipStatus(self.status()).label
-        except ValueError:
-            return str(self.status())
 
-
-class OrganisationMembership(Model):
+class OrganisationMembership(BaseMembership):
     organisation = ForeignKey(
         Organisation,
         on_delete=CASCADE,
@@ -143,11 +151,6 @@ class OrganisationMembership(Model):
         blank=True,
         related_name="organisation_memberships",
     )
-    start_date = DateField()
-    expiry_date = DateField()
-    created_datetime = DateTimeField()
-    approved_datetime = DateTimeField(null=True)
-    cancelled_datetime = DateTimeField(null=True)
 
     class Meta:
         verbose_name = "Membership: Organisation"
@@ -159,22 +162,9 @@ class OrganisationMembership(Model):
             f"Status: {self.status()}"
         )
 
-    def clean(self):
-        # Enforce expiry_date is after start_date
-        if self.expiry_date and self.start_date and self.expiry_date <= self.start_date:
-            raise ValidationError(
-                {"expiry_date": "Expiry date must be after start date."},
-            )
-        super().clean()
-
     def calculate_expiry_date(self) -> date:
         # Calculate expiry date based on start_date and membership_option.duration
         return self.start_date + self.membership_option.duration
-
-    def is_expired(self) -> bool:
-        if self.expiry_date is None:
-            return False
-        return timezone.localdate() >= self.expiry_date
 
     def status(self) -> Any:
         if self.cancelled_datetime:
