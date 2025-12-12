@@ -113,6 +113,9 @@ jobs:
       - key: DJANGO_EMAIL_SUBJECT_PREFIX
         scope: RUN_AND_BUILD_TIME
         value: ${DJANGO_EMAIL_SUBJECT_PREFIX}
+      - key: SENTRY_ENVIRONMENT
+        scope: RUN_AND_BUILD_TIME
+        value: dev
     image:
       digest: ${django_digest}
       registry: digital-technologies-teachers-aotearoa
@@ -221,6 +224,9 @@ services:
       - key: DJANGO_EMAIL_SUBJECT_PREFIX
         scope: RUN_AND_BUILD_TIME
         value: ${DJANGO_EMAIL_SUBJECT_PREFIX}
+      - key: SENTRY_ENVIRONMENT
+        scope: RUN_AND_BUILD_TIME
+        value: dev
     http_port: 5000
     image:
       digest: ${django_digest}
