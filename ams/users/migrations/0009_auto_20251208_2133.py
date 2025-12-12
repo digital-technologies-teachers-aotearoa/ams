@@ -8,7 +8,7 @@ from django.db import migrations
 def populate_user_uuids(apps, schema_editor):
     """Generate unique UUIDs for existing users."""
     User = apps.get_model("users", "User")
-    for user in User.objects.filter(uuid__isnull=True):
+    for user in User.objects.all():
         user.uuid = uuid.uuid4()
         user.save(update_fields=["uuid"])
 
