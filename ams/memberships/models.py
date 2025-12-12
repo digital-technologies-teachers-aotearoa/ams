@@ -101,12 +101,9 @@ class IndividualMembership(Model):
         super().clean()
 
     def is_expired(self) -> bool:
-        is_expired: bool = timezone.localdate() >= self.expiry_date
-        return is_expired
-
-    def expires_in_days(self) -> int:
-        expires_in: int = (self.expiry_date - timezone.localdate()).days
-        return expires_in
+        if self.expiry_date is None:
+            return False
+        return timezone.localdate() >= self.expiry_date
 
     def status(self) -> Any:
         if self.cancelled_datetime:
@@ -175,12 +172,9 @@ class OrganisationMembership(Model):
         return self.start_date + self.membership_option.duration
 
     def is_expired(self) -> bool:
-        is_expired: bool = timezone.localdate() >= self.expiry_date
-        return is_expired
-
-    def expires_in_days(self) -> int:
-        expires_in: int = (self.expiry_date - timezone.localdate()).days
-        return expires_in
+        if self.expiry_date is None:
+            return False
+        return timezone.localdate() >= self.expiry_date
 
     def status(self) -> Any:
         if self.cancelled_datetime:

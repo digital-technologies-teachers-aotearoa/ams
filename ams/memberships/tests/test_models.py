@@ -60,16 +60,14 @@ class TestIndividualMembership:
         # Assert
         assert result is True
 
-    def test_expires_in_days(self):
+    def test_is_expired_with_none_expiry_date(self):
         # Arrange
-        days_ahead = 5
-        membership = IndividualMembershipFactory(
-            expiry_date=timezone.localdate() + timedelta(days=days_ahead),
-        )
+        membership = IndividualMembershipFactory()
+        membership.expiry_date = None
         # Act
-        days = membership.expires_in_days()
-        # Assert
-        assert days == days_ahead
+        result = membership.is_expired()
+        # Assert - membership without expiry_date should not be considered expired
+        assert result is False
 
     @pytest.mark.parametrize(
         ("approved", "cancelled", "start_offset", "expected_status"),
@@ -126,16 +124,14 @@ class TestOrganisationMembership:
         # Assert
         assert result is True
 
-    def test_expires_in_days(self):
+    def test_is_expired_with_none_expiry_date(self):
         # Arrange
-        days_ahead = 3
-        membership = OrganisationMembershipFactory(
-            expiry_date=timezone.localdate() + timedelta(days=days_ahead),
-        )
+        membership = OrganisationMembershipFactory()
+        membership.expiry_date = None
         # Act
-        days = membership.expires_in_days()
-        # Assert
-        assert days == days_ahead
+        result = membership.is_expired()
+        # Assert - membership without expiry_date should not be considered expired
+        assert result is False
 
     def test_status_cancelled(self):
         # Arrange
