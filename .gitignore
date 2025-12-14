@@ -285,3 +285,6 @@ vendors.js
 
 # Built documentation
 docs/site/
+
+# Local secrets
+.envs/.local/django-private.ini
