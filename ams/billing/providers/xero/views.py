@@ -26,6 +26,19 @@ INVOICE_FETCH_UPDATE_LIMIT = 20
 
 @transaction.atomic
 def fetch_updated_invoice_details(*, raise_exception: bool = False) -> None:
+    """Fetch and update invoice details from Xero for invoices needing updates.
+
+    Queries for up to INVOICE_FETCH_UPDATE_LIMIT invoices that have update_needed=True
+    and a billing_service_invoice_id, then fetches their current details from Xero
+    and updates the local records.
+
+    This function is typically called after receiving webhook notifications from Xero
+    indicating that invoices have been updated.
+
+    Args:
+        raise_exception: If True, exceptions are re-raised. If False (default),
+            exceptions are logged but not raised.
+    """
     billing_service: BillingService | None = get_billing_service()
     if not billing_service or not isinstance(billing_service, XeroBillingService):
         return
@@ -49,6 +62,18 @@ def fetch_updated_invoice_details(*, raise_exception: bool = False) -> None:
 
 
 def process_invoice_update_events(payload: dict[str, Any]) -> None:
+    """Process invoice update events from a Xero webhook payload.
+
+    Parses the webhook payload for INVOICE UPDATE events matching the configured
+    tenant, and marks the corresponding local Invoice records as needing updates.
+
+    Args:
+        payload: The webhook payload dictionary containing an 'events' key with
+            a list of event objects.
+
+    Raises:
+        SettingNotConfiguredError: If XERO_TENANT_ID is not configured.
+    """
     if not settings.XERO_TENANT_ID:
         setting_name = "XERO_TENANT_ID"
         raise SettingNotConfiguredError(setting_name)
@@ -69,6 +94,20 @@ def process_invoice_update_events(payload: dict[str, Any]) -> None:
 
 
 def verify_request_signature(request: HttpRequest) -> bool:
+    """Verify that a webhook request came from Xero using HMAC signature.
+
+    Computes an HMAC-SHA256 signature of the request body using the configured
+    webhook key and compares it to the signature in the x-xero-signature header.
+
+    Args:
+        request: The incoming HTTP request to verify.
+
+    Returns:
+        True if the signature is valid, False otherwise.
+
+    Raises:
+        SettingNotConfiguredError: If XERO_WEBHOOK_KEY is not configured.
+    """
     if not settings.XERO_WEBHOOK_KEY:
         setting_name = "XERO_WEBHOOK_KEY"
         raise SettingNotConfiguredError(setting_name)
@@ -84,17 +123,47 @@ def verify_request_signature(request: HttpRequest) -> bool:
 
 
 class AfterHttpResponse(HttpResponse):
+    """HTTP response that executes a callback after the response is closed.
+
+    This allows for deferred execution of tasks after sending the HTTP response,
+    useful for webhook handlers that need to acknowledge receipt quickly before
+    performing potentially slow processing.
+
+    Attributes:
+        on_close: Callable to execute after the response is closed.
+    """
+
     def __init__(self, on_close: Callable[[], Any], *args: Any, **kwargs: Any) -> None:
+        """Initialize the response with a close callback.
+
+        Args:
+            on_close: Function to call after the response is closed.
+            *args: Arguments to pass to HttpResponse.
+            **kwargs: Keyword arguments to pass to HttpResponse.
+        """
         super().__init__(*args, **kwargs)
         self.on_close = on_close
 
     def close(self) -> None:
+        """Close the response and execute the on_close callback."""
         super().close()
         self.on_close()
 
 
 @csrf_exempt
 def xero_webhooks(request: HttpRequest) -> HttpResponse:
+    """Handle incoming webhook notifications from Xero.
+
+    Verifies the webhook signature, processes invoice update events, and returns
+    a 200 response. After the response is sent, triggers a fetch of updated
+    invoice details from Xero.
+
+    Args:
+        request: The incoming webhook HTTP request from Xero.
+
+    Returns:
+        HttpResponse with status 200 if valid, 401 if invalid.
+    """
     if not (request.method == "POST" and verify_request_signature(request)):
         return HttpResponse(status=401)
     payload = json.loads(request.body)
