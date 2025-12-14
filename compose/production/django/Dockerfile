@@ -149,8 +149,7 @@ RUN chown -R django:django ${APP_HOME}
 USER django
 
 # Compile translation message files with required settings blanked.
-RUN DATABASE_URL="" \
-  DJANGO_SETTINGS_MODULE="config.settings.test" \
+RUN DJANGO_SETTINGS_MODULE="config.settings.test" \
   DJANGO_MEDIA_PUBLIC_BUCKET_NAME="" \
   DJANGO_MEDIA_PUBLIC_ENDPOINT_URL="" \
   DJANGO_MEDIA_PUBLIC_ACCESS_KEY="" \

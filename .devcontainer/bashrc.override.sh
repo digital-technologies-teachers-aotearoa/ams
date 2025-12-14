@@ -14,14 +14,13 @@ PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
 # would then terminate your login shell (and VS Code interprets that as container exit).
 # Instead, we (re)construct only the env vars we practically need for dev.
 
-# Recreate DATABASE_URL (entrypoint normally does this). All POSTGRES_* vars
-# already come from docker-compose env_file. Provide defaults where sensible.
+# Export POSTGRES_* vars with defaults where sensible.
+# These come from docker-compose env_file and are used by Django settings.
 if [ -n "${POSTGRES_PASSWORD:-}" ] && [ -n "${POSTGRES_DB:-}" ]; then
 	: "${POSTGRES_USER:=postgres}"
 	: "${POSTGRES_HOST:=postgres}"
 	: "${POSTGRES_PORT:=5432}"
 	export POSTGRES_USER POSTGRES_HOST POSTGRES_PORT
-	export DATABASE_URL="postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}"
 fi
 
 # Ensure relaxed interactive shell (in case image/base changed defaults)
