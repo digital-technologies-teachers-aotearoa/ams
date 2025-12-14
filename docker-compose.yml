@@ -22,6 +22,8 @@ services:
     env_file:
       - ./.envs/.local/django.ini
       - ./.envs/.local/postgres.ini
+      - path: ./.envs/.local/django-private.ini
+        required: false
     command: sleep infinity
 
   postgres:

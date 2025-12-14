@@ -14,6 +14,7 @@ It is possible to develop the project locally, but we recommend using Dev Contai
 
 After cloning the repository to your machine:
 
+1.
 1. Start the Docker containers using Docker Compose: `docker compose up -d`.
     - The first time this runs, it may take some time to build the required images.
     - A [justfile](https://github.com/casey/just) is provided to shortcut commands, use `just up`.
@@ -79,15 +80,46 @@ This is useful for starting or stopping the containers from the host machine.
 
 ### Database & Migrations
 
-    ```bash
-    python manage.py makemigrations
-    python manage.py migrate
-    ```
+```bash
+python manage.py makemigrations
+python manage.py migrate
+```
 
 ### Environment Settings
 
 - Environment values are loaded from `.envs/.local/` files.
 - Django settings files live in `config/settings/` (`local.py`, `production.py`, `test.py`).
+
+#### Optional Private Settings
+
+For optional features like billing integrations, you can create a `django-private.ini` file in `.envs/.local/`:
+
+1. Copy the example file:
+
+    ```bash
+    cp .envs/.local/django-private-example.ini .envs/.local/django-private.ini
+    ```
+
+2. Update the values in `django-private.ini` with your actual credentials.
+
+The `django-private.ini` file supports the following optional settings:
+
+- **Billing Service Configuration:**
+    - `AMS_BILLING_SERVICE_CLASS` - The billing service provider class (e.g., `"ams.billing.providers.xero.XeroBillingService"`)
+
+- **Xero Integration** (if using Xero as billing provider):
+    - `XERO_CLIENT_ID` - Your Xero OAuth2 client ID
+    - `XERO_CLIENT_SECRET` - Your Xero OAuth2 client secret
+    - `XERO_TENANT_ID` - Your Xero tenant/organization ID
+    - `XERO_WEBHOOK_KEY` - Webhook signing key for Xero webhooks
+    - `XERO_ACCOUNT_CODE` - Default account code for invoices (e.g., `"200"`)
+    - `XERO_AMOUNT_TYPE` - Tax amount type: `"INCLUSIVE"` or `"EXCLUSIVE"`
+    - `XERO_CURRENCY_CODE` - Currency code for invoices (e.g., `"NZD"`)
+
+- **Local Development:**
+    - `NGROK_HOST` - Your ngrok tunnel URL for webhook testing (e.g., `"your-subdomain.ngrok-free.dev"`)
+
+**Note:** The `django-private.ini` file is gitignored and should never be committed to version control as it contains sensitive credentials.
 
 ### Coding Conventions
 
