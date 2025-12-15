@@ -149,6 +149,13 @@ jobs:
           DJANGO_MEDIA_PRIVATE_REGION_NAME: ${{ secrets.DJANGO_MEDIA_PRIVATE_REGION_NAME }}
           DJANGO_DEFAULT_FROM_EMAIL: ${{ secrets.DJANGO_DEFAULT_FROM_EMAIL }}
           DJANGO_EMAIL_SUBJECT_PREFIX: ${{ secrets.DJANGO_EMAIL_SUBJECT_PREFIX }}
+          XERO_CLIENT_ID: ${{ secrets.XERO_CLIENT_ID }}
+          XERO_CLIENT_SECRET: ${{ secrets.XERO_CLIENT_SECRET }}
+          XERO_TENANT_ID: ${{ secrets.XERO_TENANT_ID }}
+          XERO_WEBHOOK_KEY: ${{ secrets.XERO_WEBHOOK_KEY }}
+          XERO_ACCOUNT_CODE: ${{ secrets.XERO_ACCOUNT_CODE }}
+          XERO_AMOUNT_TYPE: ${{ secrets.XERO_AMOUNT_TYPE }}
+          XERO_CURRENCY_CODE: ${{ secrets.XERO_CURRENCY_CODE }}
           registry_credentials: ${{ secrets.REGISTRY_CREDENTIALS }}
           django_digest: ${{ steps.push.outputs.digest }}
 

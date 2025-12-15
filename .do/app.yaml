@@ -113,6 +113,27 @@ jobs:
       - key: SENTRY_ENVIRONMENT
         scope: RUN_AND_BUILD_TIME
         value: dev
+      - key: XERO_CLIENT_ID
+        scope: RUN_AND_BUILD_TIME
+        value: ${XERO_CLIENT_ID}
+      - key: XERO_CLIENT_SECRET
+        scope: RUN_AND_BUILD_TIME
+        value: ${XERO_CLIENT_SECRET}
+      - key: XERO_TENANT_ID
+        scope: RUN_AND_BUILD_TIME
+        value: ${XERO_TENANT_ID}
+      - key: XERO_WEBHOOK_KEY
+        scope: RUN_AND_BUILD_TIME
+        value: ${XERO_WEBHOOK_KEY}
+      - key: XERO_ACCOUNT_CODE
+        scope: RUN_AND_BUILD_TIME
+        value: ${XERO_ACCOUNT_CODE}
+      - key: XERO_AMOUNT_TYPE
+        scope: RUN_AND_BUILD_TIME
+        value: ${XERO_AMOUNT_TYPE}
+      - key: XERO_CURRENCY_CODE
+        scope: RUN_AND_BUILD_TIME
+        value: ${XERO_CURRENCY_CODE}
     image:
       digest: ${django_digest}
       registry: digital-technologies-teachers-aotearoa
@@ -221,6 +242,27 @@ services:
       - key: SENTRY_ENVIRONMENT
         scope: RUN_AND_BUILD_TIME
         value: dev
+      - key: XERO_CLIENT_ID
+        scope: RUN_AND_BUILD_TIME
+        value: ${XERO_CLIENT_ID}
+      - key: XERO_CLIENT_SECRET
+        scope: RUN_AND_BUILD_TIME
+        value: ${XERO_CLIENT_SECRET}
+      - key: XERO_TENANT_ID
+        scope: RUN_AND_BUILD_TIME
+        value: ${XERO_TENANT_ID}
+      - key: XERO_WEBHOOK_KEY
+        scope: RUN_AND_BUILD_TIME
+        value: ${XERO_WEBHOOK_KEY}
+      - key: XERO_ACCOUNT_CODE
+        scope: RUN_AND_BUILD_TIME
+        value: ${XERO_ACCOUNT_CODE}
+      - key: XERO_AMOUNT_TYPE
+        scope: RUN_AND_BUILD_TIME
+        value: ${XERO_AMOUNT_TYPE}
+      - key: XERO_CURRENCY_CODE
+        scope: RUN_AND_BUILD_TIME
+        value: ${XERO_CURRENCY_CODE}
     http_port: 5000
     image:
       digest: ${django_digest}

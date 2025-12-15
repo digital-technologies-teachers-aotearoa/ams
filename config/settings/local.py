@@ -78,11 +78,21 @@ INSTALLED_APPS += ["django_extensions"]
 
 # Billing
 # ------------------------------------------------------------------------------
-BILLING_SERVICE_CLASS = "ams.billing.providers.mock.MockBillingService"
+BILLING_SERVICE_CLASS = env(
+    "AMS_BILLING_SERVICE_CLASS",
+    default="ams.billing.providers.mock.MockBillingService",
+)
 BILLING_EMAIL_WHITELIST_REGEX = env(
     "AMS_BILLING_EMAIL_WHITELIST_REGEX",
     default="@ams.com",
 )
+XERO_CLIENT_ID = env("XERO_CLIENT_ID", default="test-client-id")
+XERO_CLIENT_SECRET = env("XERO_CLIENT_SECRET", default="test-client-secret")
+XERO_TENANT_ID = env("XERO_TENANT_ID", default="test-tenant-id")
+XERO_WEBHOOK_KEY = env("XERO_WEBHOOK_KEY", default="test-webhook-key")
+XERO_ACCOUNT_CODE = env("XERO_ACCOUNT_CODE", default="200")
+XERO_AMOUNT_TYPE = env("XERO_AMOUNT_TYPE", default="INCLUSIVE")
+XERO_CURRENCY_CODE = env("XERO_CURRENCY_CODE", default="NZD")
 
 # Documentation
 # ------------------------------------------------------------------------------
