@@ -1,7 +1,6 @@
 from django.contrib import admin
 
 from .models import XeroContact
-from .models import XeroMutex
 
 
 @admin.register(XeroContact)
@@ -18,14 +17,3 @@ class XeroContactAdmin(admin.ModelAdmin):
         "account__organisation__name",
         "account__user__email",
     )
-
-
-@admin.register(XeroMutex)
-class XeroMutexAdmin(admin.ModelAdmin):
-    """Django admin configuration for XeroMutex model.
-
-    Provides minimal admin interface for the mutex table, which exists
-    primarily for database-level locking rather than data management.
-    """
-
-    list_display = ("__str__",)

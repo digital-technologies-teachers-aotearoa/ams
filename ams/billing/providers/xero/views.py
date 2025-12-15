@@ -12,7 +12,6 @@ from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from ams.billing.exceptions import SettingNotConfiguredError
 from ams.billing.models import Invoice
 from ams.billing.services import BillingService
 from ams.billing.services import get_billing_service
@@ -70,13 +69,7 @@ def process_invoice_update_events(payload: dict[str, Any]) -> None:
     Args:
         payload: The webhook payload dictionary containing an 'events' key with
             a list of event objects.
-
-    Raises:
-        SettingNotConfiguredError: If XERO_TENANT_ID is not configured.
     """
-    if not settings.XERO_TENANT_ID:
-        setting_name = "XERO_TENANT_ID"
-        raise SettingNotConfiguredError(setting_name)
     billing_service: BillingService | None = get_billing_service()
     if not billing_service or not isinstance(billing_service, XeroBillingService):
         return
@@ -104,13 +97,7 @@ def verify_request_signature(request: HttpRequest) -> bool:
 
     Returns:
         True if the signature is valid, False otherwise.
-
-    Raises:
-        SettingNotConfiguredError: If XERO_WEBHOOK_KEY is not configured.
     """
-    if not settings.XERO_WEBHOOK_KEY:
-        setting_name = "XERO_WEBHOOK_KEY"
-        raise SettingNotConfiguredError(setting_name)
     signature = request.headers.get("x-xero-signature")
     generated_signature = base64.b64encode(
         hmac.new(
