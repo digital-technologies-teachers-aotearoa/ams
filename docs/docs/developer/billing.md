@@ -71,9 +71,13 @@ Configure the following environment variables for Xero integration:
 
 #### Optional Variables
 
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `AMS_BILLING_EMAIL_WHITELIST_REGEX` | Regex pattern to filter invoice email recipients (for testing) | `@example.com$` |
+| Variable | Description | Example | Default |
+|----------|-------------|---------|---------|
+| `AMS_BILLING_EMAIL_WHITELIST_REGEX` | Regex pattern to filter invoice email recipients (for testing) | `@example.com$` | None |
+| `XERO_DEBUG` | Enable HTTP request/response debugging for Xero API calls | `True` or `False` | `False` |
+
+!!! warning "Security Warning"
+    Setting `XERO_DEBUG=True` will log all HTTP requests and responses, including sensitive credentials and bearer tokens. Only enable this for debugging specific API issues in isolated development environments. Never enable in production.
 
 ### Webhook Configuration
 

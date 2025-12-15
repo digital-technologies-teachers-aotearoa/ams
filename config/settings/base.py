@@ -431,3 +431,4 @@ DEPLOYED = env.bool("DEPLOYED", default=False)
 SITE_DOMAIN = env("SITE_DOMAIN", default="ams.com")
 SITE_PORT = env.int("SITE_PORT", default=80)
 IMAGEKIT_CACHEFILE_DIR = "imagekit-modified"
+XERO_DEBUG = env.bool("XERO_DEBUG", default=False)
