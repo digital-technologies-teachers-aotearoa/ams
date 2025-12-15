@@ -61,3 +61,6 @@ class MockBillingService(BillingService):
             recipient,
             fail_silently=True,
         )
+
+    def get_invoice_url(self, invoice: Invoice) -> str | None:
+        return

@@ -442,3 +442,103 @@ class TestMockXeroBillingService:
         service = MockXeroBillingService()
         connections = service._get_connections()  # noqa: SLF001
         assert connections == []
+
+
+class TestXeroBillingServiceInvoiceUrl:
+    """Tests for getting invoice URLs from Xero."""
+
+    @patch("ams.billing.providers.xero.service.AccountingApi")
+    def test_get_online_invoice_url(
+        self,
+        mock_accounting_api_class,
+        xero_service,
+        invoice_user,
+        xero_settings,
+    ):
+        """Test getting the online invoice URL from Xero."""
+        invoice_user.billing_service_invoice_id = "test-invoice-123"
+        invoice_user.save()
+
+        # Mock Xero API response
+        mock_api = Mock()
+        mock_response = Mock()
+        mock_online_invoice = Mock()
+        mock_online_invoice.online_invoice_url = (
+            "https://invoices.xero.com/view/abc123-def456"
+        )
+        mock_response.online_invoices = [mock_online_invoice]
+        mock_api.get_online_invoice.return_value = mock_response
+        mock_accounting_api_class.return_value = mock_api
+
+        with patch.object(xero_service, "_get_authentication_token"):
+            invoice_url = xero_service.get_invoice_url(invoice_user)
+
+        assert invoice_url == "https://invoices.xero.com/view/abc123-def456"
+        mock_api.get_online_invoice.assert_called_once_with(
+            xero_settings.XERO_TENANT_ID,
+            "test-invoice-123",
+        )
+
+    def test_get_invoice_url_returns_none_without_billing_service_id(
+        self,
+        xero_service,
+        invoice_user,
+    ):
+        """Test that get_invoice_url returns None when invoice has no invoice id."""
+        invoice_user.billing_service_invoice_id = None
+        invoice_user.save()
+
+        invoice_url = xero_service.get_invoice_url(invoice_user)
+
+        assert invoice_url is None
+
+    @patch("ams.billing.providers.xero.service.AccountingApi")
+    def test_get_invoice_url_calls_authentication(
+        self,
+        mock_accounting_api_class,
+        xero_service,
+        invoice_user,
+    ):
+        """Test that get_invoice_url calls authentication before API call."""
+        invoice_user.billing_service_invoice_id = "test-invoice-123"
+        invoice_user.save()
+
+        mock_api = Mock()
+        mock_response = Mock()
+        mock_online_invoice = Mock()
+        mock_online_invoice.online_invoice_url = "https://invoices.xero.com/view/test"
+        mock_response.online_invoices = [mock_online_invoice]
+        mock_api.get_online_invoice.return_value = mock_response
+        mock_accounting_api_class.return_value = mock_api
+
+        with patch.object(
+            xero_service,
+            "_get_authentication_token",
+        ) as mock_auth:
+            xero_service.get_invoice_url(invoice_user)
+
+        mock_auth.assert_called_once()
+
+    @patch("ams.billing.providers.xero.service.AccountingApi")
+    def test_internal_get_online_invoice_url(
+        self,
+        mock_accounting_api_class,
+        xero_service,
+        xero_settings,
+    ):
+        """Test the internal _get_online_invoice_url method."""
+        mock_api = Mock()
+        mock_response = Mock()
+        mock_online_invoice = Mock()
+        mock_online_invoice.online_invoice_url = "https://invoices.xero.com/view/xyz789"
+        mock_response.online_invoices = [mock_online_invoice]
+        mock_api.get_online_invoice.return_value = mock_response
+        mock_accounting_api_class.return_value = mock_api
+
+        url = xero_service._get_online_invoice_url("invoice-id-789")  # noqa: SLF001
+
+        assert url == "https://invoices.xero.com/view/xyz789"
+        mock_api.get_online_invoice.assert_called_once_with(
+            xero_settings.XERO_TENANT_ID,
+            "invoice-id-789",
+        )
