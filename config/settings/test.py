@@ -53,3 +53,14 @@ STORAGES = {
         "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
     },
 }
+
+# Billing
+# ------------------------------------------------------------------------------
+BILLING_SERVICE_CLASS = "ams.billing.providers.xero.MockXeroBillingService"
+XERO_CLIENT_ID = "test-client-id"
+XERO_CLIENT_SECRET = "test-client-secret"  # noqa: S105
+XERO_TENANT_ID = "test-tenant-id"
+XERO_WEBHOOK_KEY = "test-webhook-key"
+XERO_ACCOUNT_CODE = "200"
+XERO_AMOUNT_TYPE = "INCLUSIVE"
+XERO_CURRENCY_CODE = "NZD"

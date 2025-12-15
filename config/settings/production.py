@@ -157,13 +157,25 @@ sentry_sdk.init(
 )
 
 
-# Billing
-# ------------------------------------------------------------------------------
-BILLING_SERVICE_CLASS = env("AMS_BILLING_SERVICE_CLASS")
-BILLING_EMAIL_WHITELIST_REGEX = env("AMS_BILLING_EMAIL_WHITELIST_REGEX", default=None)
-
-
 # Discourse SSO
 # ------------------------------------------------------------------------------
 DISCOURSE_REDIRECT_DOMAIN = env("DISCOURSE_REDIRECT_DOMAIN", default=None)
 DISCOURSE_CONNECT_SECRET = env("DISCOURSE_CONNECT_SECRET", default=None)
+
+# Billing
+# ------------------------------------------------------------------------------
+BILLING_SERVICE_CLASS = env(
+    "AMS_BILLING_SERVICE_CLASS",
+    default="ams.billing.providers.xero.XeroBillingService",
+)
+BILLING_EMAIL_WHITELIST_REGEX = env("AMS_BILLING_EMAIL_WHITELIST_REGEX", default=None)
+
+# Xero Billing Settings
+# ------------------------------------------------------------------------------
+XERO_CLIENT_ID = env("XERO_CLIENT_ID")
+XERO_CLIENT_SECRET = env("XERO_CLIENT_SECRET")
+XERO_TENANT_ID = env("XERO_TENANT_ID")
+XERO_WEBHOOK_KEY = env("XERO_WEBHOOK_KEY")
+XERO_ACCOUNT_CODE = env("XERO_ACCOUNT_CODE")
+XERO_AMOUNT_TYPE = env("XERO_AMOUNT_TYPE")
+XERO_CURRENCY_CODE = env("XERO_CURRENCY_CODE")
