@@ -57,6 +57,7 @@ STORAGES = {
 # Billing
 # ------------------------------------------------------------------------------
 BILLING_SERVICE_CLASS = "ams.billing.providers.xero.MockXeroBillingService"
+BILLING_EMAIL_WHITELIST_REGEX = None
 XERO_CLIENT_ID = "test-client-id"
 XERO_CLIENT_SECRET = "test-client-secret"  # noqa: S105
 XERO_TENANT_ID = "test-tenant-id"
