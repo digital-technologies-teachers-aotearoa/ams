@@ -23,19 +23,3 @@ class XeroContact(Model):
 
     def __str__(self):
         return f"XeroContact(account={self.account}, contact_id={self.contact_id})"
-
-
-class XeroMutex(Model):
-    """Database-level mutex for coordinating Xero API access.
-
-    This model is used to implement an exclusive lock mechanism via database
-    table locking (LOCK billing_xeromutex). Only one instance can interact
-    with the Xero API at a time, preventing concurrent requests that could
-    exceed Xero's API rate limits.
-
-    The model itself has no fields; it exists solely for table-level locking.
-    See: https://developer.xero.com/documentation/guides/oauth2/limits/#api-rate-limits
-    """
-
-    def __str__(self):
-        return "Xero Mutex (Exclusive Lock)"

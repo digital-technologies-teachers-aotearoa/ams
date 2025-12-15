@@ -6,7 +6,6 @@ from typing import Any
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
-from django.db import connection
 from django.http.response import HttpResponse
 from xero_python.accounting import AccountingApi
 from xero_python.accounting import Contact
@@ -24,10 +23,10 @@ from xero_python.api_client.serializer import serialize
 from xero_python.identity import Connection
 from xero_python.identity import IdentityApi
 
-from ams.billing.exceptions import SettingNotConfiguredError
 from ams.billing.models import Account
 from ams.billing.models import Invoice
 from ams.billing.providers.xero.models import XeroContact
+from ams.billing.providers.xero.rate_limiting import retry_on_rate_limit
 from ams.billing.services import BillingService
 from ams.memberships.models import Organisation
 
@@ -91,18 +90,6 @@ class XeroBillingService(BillingService):
             content_type="application/json",
         )
 
-    def _acquire_lock(self) -> None:
-        """Acquire an exclusive database lock for Xero API access.
-
-        Obtains a table-level lock on the XeroMutex model to ensure only one
-        instance can interact with the Xero API at a time. This prevents
-        concurrent API requests that could exceed Xero's rate limits.
-
-        See: https://developer.xero.com/documentation/guides/oauth2/limits/#api-rate-limits
-        """
-        cursor = connection.cursor()
-        cursor.execute("LOCK billing_xeromutex")
-
     def _get_client_credentials_token(self) -> None:
         """Obtain a client credentials token from Xero OAuth2.
 
@@ -114,12 +101,10 @@ class XeroBillingService(BillingService):
     def _get_authentication_token(self) -> None:
         """Ensure a valid authentication token is available.
 
-        If no token is currently set, acquires the database lock and requests
-        a new client credentials token from Xero. Should be called before
-        any Xero API operations.
+        If no token is currently set, requests a new client credentials token
+        from Xero. Should be called before any Xero API operations.
         """
         if not self.get_xero_token():
-            self._acquire_lock()
             self._get_client_credentials_token()
 
     def _get_connections(self) -> list[Connection]:
@@ -132,6 +117,7 @@ class XeroBillingService(BillingService):
         connections: list[Connection] = api_instance.get_connections()
         return connections
 
+    @retry_on_rate_limit(max_retries=3)
     def _create_xero_contact(self, contact_params: dict[str, Any]) -> str:
         """Create a new contact in Xero.
 
@@ -152,6 +138,7 @@ class XeroBillingService(BillingService):
         contact_id: str = api_response.contacts[0].contact_id
         return contact_id
 
+    @retry_on_rate_limit(max_retries=3)
     def _update_xero_contact(
         self,
         contact_id: str,
@@ -170,6 +157,7 @@ class XeroBillingService(BillingService):
 
         api_instance.update_contact(settings.XERO_TENANT_ID, contact_id, contacts)
 
+    @retry_on_rate_limit(max_retries=3)
     def _create_xero_invoice(
         self,
         contact_id: str,
@@ -205,6 +193,7 @@ class XeroBillingService(BillingService):
         response_invoice: AccountingInvoice = api_response.invoices[0]
         return response_invoice
 
+    @retry_on_rate_limit(max_retries=3)
     def _email_invoice(self, billing_service_invoice_id: str) -> None:
         """Send an invoice email via Xero.
 
@@ -218,6 +207,7 @@ class XeroBillingService(BillingService):
             RequestEmpty(),
         )
 
+    @retry_on_rate_limit(max_retries=3)
     def _get_xero_invoices(
         self,
         billing_service_invoice_ids: list[str],
@@ -342,24 +332,8 @@ class XeroBillingService(BillingService):
 
         Returns:
             The newly created Invoice model instance.
-
-        Raises:
-            SettingNotConfiguredError: If XERO_ACCOUNT_CODE, XERO_AMOUNT_TYPE, or
-                XERO_CURRENCY_CODE settings are not configured.
         """
         contact_id = account.xero_contact.contact_id
-
-        if not settings.XERO_ACCOUNT_CODE:
-            setting_name = "XERO_ACCOUNT_CODE"
-            raise SettingNotConfiguredError(setting_name)
-
-        if not settings.XERO_AMOUNT_TYPE:
-            setting_name = "XERO_AMOUNT_TYPE"
-            raise SettingNotConfiguredError(setting_name)
-
-        if not settings.XERO_CURRENCY_CODE:
-            setting_name = "XERO_CURRENCY_CODE"
-            raise SettingNotConfiguredError(setting_name)
 
         amount_type = LineAmountTypes[settings.XERO_AMOUNT_TYPE]
         account_code = settings.XERO_ACCOUNT_CODE
