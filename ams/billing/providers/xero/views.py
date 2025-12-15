@@ -13,18 +13,20 @@ from django.http.response import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from ams.billing.models import Invoice
+from ams.billing.providers.xero.service import XeroBillingService
 from ams.billing.services import BillingService
 from ams.billing.services import get_billing_service
 
-from .service import XeroBillingService
-
 logger = logging.getLogger(__name__)
 
-INVOICE_FETCH_UPDATE_LIMIT = 20
+INVOICE_FETCH_UPDATE_LIMIT = 30
 
 
 @transaction.atomic
-def fetch_updated_invoice_details(*, raise_exception: bool = False) -> None:
+def fetch_updated_invoice_details(
+    *,
+    raise_exception: bool = False,
+) -> dict[str, Any]:
     """Fetch and update invoice details from Xero for invoices needing updates.
 
     Queries for up to INVOICE_FETCH_UPDATE_LIMIT invoices that have update_needed=True
@@ -37,27 +39,55 @@ def fetch_updated_invoice_details(*, raise_exception: bool = False) -> None:
     Args:
         raise_exception: If True, exceptions are re-raised. If False (default),
             exceptions are logged but not raised.
+
+    Returns:
+        Dictionary containing:
+        - 'updated_count': Number of invoices updated
+        - 'invoice_numbers': List of invoice numbers that were updated
+        - 'invoice_ids': List of invoice IDs that were updated
     """
+    result = {"updated_count": 0, "invoice_numbers": [], "invoice_ids": []}
+
     billing_service: BillingService | None = get_billing_service()
     if not billing_service or not isinstance(billing_service, XeroBillingService):
-        return
+        return result
+
     invoices = (
         Invoice.objects.select_for_update(no_key=True)
         .filter(update_needed=True, billing_service_invoice_id__isnull=False)
         .order_by("id")[:INVOICE_FETCH_UPDATE_LIMIT]
     )
     if not invoices:
-        return
+        logger.info("No invoices need updating")
+        return result
+
+    invoice_list = list(invoices)
     billing_service_invoice_ids = [
-        invoice.billing_service_invoice_id for invoice in invoices
+        invoice.billing_service_invoice_id for invoice in invoice_list
     ]
+
+    logger.info(
+        "Fetching updates for %d invoice(s): %s",
+        len(invoice_list),
+        ", ".join(inv.invoice_number for inv in invoice_list),
+    )
+
     try:
         billing_service.update_invoices(billing_service_invoice_ids)
+        result["updated_count"] = len(invoice_list)
+        result["invoice_numbers"] = [inv.invoice_number for inv in invoice_list]
+        result["invoice_ids"] = [inv.id for inv in invoice_list]
+        logger.info(
+            "Successfully updated %d invoice(s)",
+            len(invoice_list),
+        )
     except Exception:  # broad to log traceback
         if not raise_exception:
             logger.exception("Error processing invoice updates")
         else:
             raise
+
+    return result
 
 
 def process_invoice_update_events(payload: dict[str, Any]) -> bool:
