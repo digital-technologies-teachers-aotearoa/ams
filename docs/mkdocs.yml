@@ -33,11 +33,12 @@ nav:
       - admin/theme-customization.md
   - Developer documentation:
       - developer/contributing.md
+      - developer/billing.md
       - developer/management-commands-catalog.md
       - developer/forum.md
       - developer/icons.md
       - developer/urls.md
-      - developer/permission_caching.md
+      - developer/permission-caching.md
       - developer/deployment.md
       - developer/wagtail-cms.md
       - developer/theme-system.md

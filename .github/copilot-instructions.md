@@ -29,6 +29,7 @@ This guide enables AI coding agents to work productively in the Association Mana
 - **Email:** Local SMTP via Mailpit (`http://127.0.0.1:8025`).
 - **Error Logging:** Sentry integration; set DSN in production settings.
 - **Migrations:** Standard Django migrations per app.
+- **Documentation:** Stored in `docs/docs/`.
 
 ## Integration Points
 

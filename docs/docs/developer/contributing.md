@@ -14,7 +14,6 @@ It is possible to develop the project locally, but we recommend using Dev Contai
 
 After cloning the repository to your machine:
 
-1.
 1. Start the Docker containers using Docker Compose: `docker compose up -d`.
     - The first time this runs, it may take some time to build the required images.
     - A [justfile](https://github.com/casey/just) is provided to shortcut commands, use `just up`.

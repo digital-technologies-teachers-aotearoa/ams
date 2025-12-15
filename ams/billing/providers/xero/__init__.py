@@ -1,6 +1,7 @@
 # Xero billing provider submodule
 
 from .models import XeroContact
+from .rate_limiting import XeroRateLimitError
 from .service import MockXeroBillingService
 from .service import XeroBillingService
 from .views import fetch_updated_invoice_details
@@ -10,6 +11,7 @@ __all__ = [
     "MockXeroBillingService",
     "XeroBillingService",
     "XeroContact",
+    "XeroRateLimitError",
     "fetch_updated_invoice_details",
     "xero_webhooks",
 ]

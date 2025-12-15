@@ -26,7 +26,7 @@ from xero_python.identity import IdentityApi
 from ams.billing.models import Account
 from ams.billing.models import Invoice
 from ams.billing.providers.xero.models import XeroContact
-from ams.billing.providers.xero.rate_limiting import retry_on_rate_limit
+from ams.billing.providers.xero.rate_limiting import handle_rate_limit
 from ams.billing.services import BillingService
 from ams.memberships.models import Organisation
 
@@ -117,7 +117,7 @@ class XeroBillingService(BillingService):
         connections: list[Connection] = api_instance.get_connections()
         return connections
 
-    @retry_on_rate_limit(max_retries=3)
+    @handle_rate_limit()
     def _create_xero_contact(self, contact_params: dict[str, Any]) -> str:
         """Create a new contact in Xero.
 
@@ -138,7 +138,7 @@ class XeroBillingService(BillingService):
         contact_id: str = api_response.contacts[0].contact_id
         return contact_id
 
-    @retry_on_rate_limit(max_retries=3)
+    @handle_rate_limit()
     def _update_xero_contact(
         self,
         contact_id: str,
@@ -157,7 +157,7 @@ class XeroBillingService(BillingService):
 
         api_instance.update_contact(settings.XERO_TENANT_ID, contact_id, contacts)
 
-    @retry_on_rate_limit(max_retries=3)
+    @handle_rate_limit()
     def _create_xero_invoice(
         self,
         contact_id: str,
@@ -193,7 +193,7 @@ class XeroBillingService(BillingService):
         response_invoice: AccountingInvoice = api_response.invoices[0]
         return response_invoice
 
-    @retry_on_rate_limit(max_retries=3)
+    @handle_rate_limit()
     def _email_invoice(self, billing_service_invoice_id: str) -> None:
         """Send an invoice email via Xero.
 
@@ -207,7 +207,7 @@ class XeroBillingService(BillingService):
             RequestEmpty(),
         )
 
-    @retry_on_rate_limit(max_retries=3)
+    @handle_rate_limit()
     def _get_xero_invoices(
         self,
         billing_service_invoice_ids: list[str],
