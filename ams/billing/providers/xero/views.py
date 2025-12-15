@@ -60,7 +60,7 @@ def fetch_updated_invoice_details(*, raise_exception: bool = False) -> None:
             raise
 
 
-def process_invoice_update_events(payload: dict[str, Any]) -> None:
+def process_invoice_update_events(payload: dict[str, Any]) -> bool:
     """Process invoice update events from a Xero webhook payload.
 
     Parses the webhook payload for INVOICE UPDATE events matching the configured
@@ -69,11 +69,15 @@ def process_invoice_update_events(payload: dict[str, Any]) -> None:
     Args:
         payload: The webhook payload dictionary containing an 'events' key with
             a list of event objects.
+
+    Returns:
+        True if any invoice update events were processed, False otherwise.
     """
     billing_service: BillingService | None = get_billing_service()
     if not billing_service or not isinstance(billing_service, XeroBillingService):
-        return
+        return False
     events = payload["events"]
+    processed_any = False
     for event in events:
         if (
             event["eventCategory"] == "INVOICE"
@@ -84,6 +88,8 @@ def process_invoice_update_events(payload: dict[str, Any]) -> None:
             Invoice.objects.filter(
                 billing_service_invoice_id=billing_service_invoice_id,
             ).update(update_needed=True)
+            processed_any = True
+    return processed_any
 
 
 def verify_request_signature(request: HttpRequest) -> bool:
@@ -143,7 +149,7 @@ def xero_webhooks(request: HttpRequest) -> HttpResponse:
 
     Verifies the webhook signature, processes invoice update events, and returns
     a 200 response. After the response is sent, triggers a fetch of updated
-    invoice details from Xero.
+    invoice details from Xero if any invoice updates were processed.
 
     Args:
         request: The incoming webhook HTTP request from Xero.
@@ -154,5 +160,7 @@ def xero_webhooks(request: HttpRequest) -> HttpResponse:
     if not (request.method == "POST" and verify_request_signature(request)):
         return HttpResponse(status=401)
     payload = json.loads(request.body)
-    process_invoice_update_events(payload)
-    return AfterHttpResponse(on_close=fetch_updated_invoice_details, status=200)
+    has_invoice_updates = process_invoice_update_events(payload)
+    if has_invoice_updates:
+        return AfterHttpResponse(on_close=fetch_updated_invoice_details, status=200)
+    return HttpResponse(status=200)
