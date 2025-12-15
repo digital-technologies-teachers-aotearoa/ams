@@ -74,6 +74,7 @@ Configure the following environment variables for Xero integration:
 | Variable | Description | Example | Default |
 |----------|-------------|---------|---------|
 | `AMS_BILLING_EMAIL_WHITELIST_REGEX` | Regex pattern to filter invoice email recipients (for testing) | `@example.com$` | None |
+| `XERO_EMAIL_INVOICES` | Enable sending invoice emails via Xero (set to `False` when using Xero Demo Company) | `True` or `False` | `True` |
 | `XERO_DEBUG` | Enable HTTP request/response debugging for Xero API calls | `True` or `False` | `False` |
 
 !!! warning "Security Warning"

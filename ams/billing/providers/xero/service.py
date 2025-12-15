@@ -386,8 +386,9 @@ class XeroBillingService(BillingService):
         Args:
             invoice: The Invoice to email. Must have a billing_service_invoice_id.
         """
-        self._get_authentication_token()
-        self._email_invoice(invoice.billing_service_invoice_id)
+        if settings.XERO_EMAIL_INVOICES:
+            self._get_authentication_token()
+            self._email_invoice(invoice.billing_service_invoice_id)
 
     def update_invoices(self, billing_service_invoice_ids: list[str]) -> None:
         """Update local invoice records with latest data from Xero.
