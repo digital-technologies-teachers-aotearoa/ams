@@ -7,9 +7,13 @@ from collections.abc import Callable
 from typing import Any
 
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
+from django.http.response import HttpResponseRedirect
+from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 
 from ams.billing.models import Invoice
@@ -171,6 +175,41 @@ class AfterHttpResponse(HttpResponse):
         """Close the response and execute the on_close callback."""
         super().close()
         self.on_close()
+
+
+@login_required
+def invoice_redirect(request: HttpRequest, invoice_id: int) -> HttpResponse:
+    """Redirect to the online invoice URL.
+
+    Fetches the online invoice URL and redirects the user to view
+    the invoice. Only allows access if the invoice belongs to the requesting
+    user's account.
+
+    Args:
+        request: The HTTP request.
+        invoice_id: The ID of the Invoice to redirect to.
+
+    Returns:
+        HttpResponseRedirect to the online invoice URL.
+
+    Raises:
+        PermissionDenied: If the user doesn't own the invoice.
+    """
+    invoice = get_object_or_404(Invoice, id=invoice_id)
+
+    # Check if the user owns this invoice
+    if not hasattr(request.user, "account") or invoice.account != request.user.account:
+        raise PermissionDenied
+
+    billing_service: BillingService | None = get_billing_service()
+    if not billing_service:
+        return HttpResponse("Billing service not available", status=503)
+
+    invoice_url = billing_service.get_invoice_url(invoice)
+    if not invoice_url:
+        return HttpResponse("Invoice URL not available", status=404)
+
+    return HttpResponseRedirect(invoice_url)
 
 
 @csrf_exempt

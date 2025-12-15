@@ -228,6 +228,42 @@ class XeroBillingService(BillingService):
         invoices: list[AccountingInvoice] = api_response.invoices
         return invoices
 
+    @handle_rate_limit()
+    def _get_online_invoice_url(self, billing_service_invoice_id: str) -> str:
+        """Get the online invoice URL from Xero.
+
+        Args:
+            billing_service_invoice_id: The Xero invoice ID.
+
+        Returns:
+            The online invoice URL from Xero.
+        """
+        api_instance = AccountingApi(self.api_client)
+        api_response = api_instance.get_online_invoice(
+            settings.XERO_TENANT_ID,
+            billing_service_invoice_id,
+        )
+        return api_response.online_invoices[0].online_invoice_url
+
+    def get_invoice_url(self, invoice: Invoice) -> str | None:
+        """Get the online invoice URL for viewing.
+
+        Fetches the customer-facing online invoice URL from Xero that can be
+        used to view and pay the invoice.
+
+        Args:
+            invoice: The Invoice to get the URL for.
+                     Must have a billing_service_invoice_id.
+
+        Returns:
+            The online invoice URL, or None if the invoice doesn't have
+            a billing_service_invoice_id.
+        """
+        if not invoice.billing_service_invoice_id:
+            return None
+        self._get_authentication_token()
+        return self._get_online_invoice_url(invoice.billing_service_invoice_id)
+
     def _xero_contact_name(self, account_id: int, name: str) -> str:
         """Generate a unique Xero contact name by appending the account ID.
 
@@ -480,6 +516,17 @@ class MockXeroBillingService(XeroBillingService):
 
         Args:
             billing_service_invoice_id: The invoice ID to email (ignored).
+        """
+        return
+
+    def _get_online_invoice_url(self, billing_service_invoice_id: str) -> str:
+        """Mock the online invoice URL from Xero.
+
+        Args:
+            billing_service_invoice_id: The Xero invoice ID.
+
+        Returns:
+            The online invoice URL from Xero.
         """
         return
 
