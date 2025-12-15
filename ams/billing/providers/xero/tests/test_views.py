@@ -102,11 +102,12 @@ class TestProcessInvoiceUpdateEvents:
             mock_service = Mock(spec=XeroBillingService)
             mock_get_service.return_value = mock_service
 
-            process_invoice_update_events(webhook_payload)
+            result = process_invoice_update_events(webhook_payload)
 
         # Verify invoice was marked for update
         invoice_user.refresh_from_db()
         assert invoice_user.update_needed is True
+        assert result is True
 
     def test_process_multiple_invoice_events(self, xero_settings, invoice_user):
         """Test processing multiple invoice update events."""
@@ -147,12 +148,13 @@ class TestProcessInvoiceUpdateEvents:
             mock_service = Mock(spec=XeroBillingService)
             mock_get_service.return_value = mock_service
 
-            process_invoice_update_events(payload)
+            result = process_invoice_update_events(payload)
 
         invoice_user.refresh_from_db()
         invoice_2.refresh_from_db()
         assert invoice_user.update_needed is True
         assert invoice_2.update_needed is True
+        assert result is True
 
     def test_process_ignores_non_invoice_events(self, xero_settings, invoice_user):
         """Test that non-invoice events are ignored."""
@@ -177,10 +179,11 @@ class TestProcessInvoiceUpdateEvents:
             mock_service = Mock(spec=XeroBillingService)
             mock_get_service.return_value = mock_service
 
-            process_invoice_update_events(payload)
+            result = process_invoice_update_events(payload)
 
         invoice_user.refresh_from_db()
         assert invoice_user.update_needed is False
+        assert result is False
 
     def test_process_ignores_wrong_tenant_events(self, xero_settings, invoice_user):
         """Test that events from wrong tenant are ignored."""
@@ -205,10 +208,11 @@ class TestProcessInvoiceUpdateEvents:
             mock_service = Mock(spec=XeroBillingService)
             mock_get_service.return_value = mock_service
 
-            process_invoice_update_events(payload)
+            result = process_invoice_update_events(payload)
 
         invoice_user.refresh_from_db()
         assert invoice_user.update_needed is False
+        assert result is False
 
     def test_process_with_no_billing_service(self, xero_settings):
         """Test that processing handles no billing service gracefully."""
@@ -217,8 +221,8 @@ class TestProcessInvoiceUpdateEvents:
         ) as mock_get_service:
             mock_get_service.return_value = None
 
-            # Should not raise any errors
-            process_invoice_update_events({"events": []})
+            result = process_invoice_update_events({"events": []})
+            assert result is False
 
     def test_process_with_non_xero_billing_service(self, xero_settings):
         """Test that processing handles non-Xero billing service gracefully."""
@@ -227,8 +231,8 @@ class TestProcessInvoiceUpdateEvents:
         ) as mock_get_service:
             mock_get_service.return_value = MockBillingService()
 
-            # Should not raise any errors
-            process_invoice_update_events({"events": []})
+            result = process_invoice_update_events({"events": []})
+            assert result is False
 
 
 class TestFetchUpdatedInvoiceDetails:
@@ -382,6 +386,87 @@ class TestXeroWebhooks:
         request = rf.get("/billing/xero/webhooks/")
         response = xero_webhooks(request)
         assert response.status_code == HTTPStatus.UNAUTHORIZED
+
+    def test_webhook_with_invoice_updates_returns_after_response(
+        self,
+        xero_settings,
+        rf: RequestFactory,
+        webhook_payload,
+    ):
+        """Test that webhook with invoice updates returns AfterHttpResponse."""
+        payload_bytes = json.dumps(webhook_payload).encode("utf-8")
+
+        signature = base64.b64encode(
+            hmac.new(
+                xero_settings.XERO_WEBHOOK_KEY.encode("utf-8"),
+                payload_bytes,
+                hashlib.sha256,
+            ).digest(),
+        ).decode("utf-8")
+
+        request = rf.post(
+            "/billing/xero/webhooks/",
+            data=payload_bytes,
+            content_type="application/json",
+        )
+        request.META["HTTP_X_XERO_SIGNATURE"] = signature
+        request._body = payload_bytes
+
+        with patch(
+            "ams.billing.providers.xero.views.get_billing_service",
+        ) as mock_get_service:
+            mock_service = Mock(spec=XeroBillingService)
+            mock_get_service.return_value = mock_service
+
+            response = xero_webhooks(request)
+
+        assert response.status_code == HTTPStatus.OK
+        assert isinstance(response, AfterHttpResponse)
+
+    def test_webhook_without_invoice_updates_returns_normal_response(
+        self,
+        xero_settings,
+        rf: RequestFactory,
+    ):
+        """Test that webhook without invoice updates returns normal HttpResponse."""
+        payload = {
+            "events": [
+                {
+                    "resourceId": "test-contact",
+                    "eventType": "UPDATE",
+                    "eventCategory": "CONTACT",  # Not INVOICE
+                    "tenantId": xero_settings.XERO_TENANT_ID,
+                },
+            ],
+        }
+        payload_bytes = json.dumps(payload).encode("utf-8")
+
+        signature = base64.b64encode(
+            hmac.new(
+                xero_settings.XERO_WEBHOOK_KEY.encode("utf-8"),
+                payload_bytes,
+                hashlib.sha256,
+            ).digest(),
+        ).decode("utf-8")
+
+        request = rf.post(
+            "/billing/xero/webhooks/",
+            data=payload_bytes,
+            content_type="application/json",
+        )
+        request.META["HTTP_X_XERO_SIGNATURE"] = signature
+        request._body = payload_bytes
+
+        with patch(
+            "ams.billing.providers.xero.views.get_billing_service",
+        ) as mock_get_service:
+            mock_service = Mock(spec=XeroBillingService)
+            mock_get_service.return_value = mock_service
+
+            response = xero_webhooks(request)
+
+        assert response.status_code == HTTPStatus.OK
+        assert not isinstance(response, AfterHttpResponse)
 
 
 class TestAfterHttpResponse:
