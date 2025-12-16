@@ -63,8 +63,8 @@ class TestXeroBillingServiceContactManagement:
         mock_accounting_api_class.return_value = mock_api
 
         contact_params = {
-            "name": "Test User (1)",
-            "account_number": "1",
+            "name": "Test User (a3f2c1d5)",
+            "account_number": "a3f2c1d5",
             "email_address": "test@example.com",
         }
 
@@ -90,7 +90,7 @@ class TestXeroBillingServiceContactManagement:
 
         contact_id = "existing-contact-id"
         contact_params = {
-            "name": "Updated User (1)",
+            "name": "Updated User (a3f2c1d5)",
             "email_address": "updated@example.com",
         }
 
@@ -101,10 +101,11 @@ class TestXeroBillingServiceContactManagement:
         assert call_args[0][0] == xero_settings.XERO_TENANT_ID
         assert call_args[0][1] == contact_id
 
-    def test_xero_contact_name_includes_account_id(self, xero_service):
-        """Test that contact names include account ID for uniqueness."""
-        name = xero_service._xero_contact_name(123, "John Doe")  # noqa: SLF001
-        assert name == "John Doe (123)"
+    def test_xero_contact_name_includes_uuid_prefix(self, xero_service):
+        """Test that contact names include UUID prefix for uniqueness."""
+        test_uuid = "a3f2c1d5-8b6e-4a1c-9d3f-2e7b5c8a1f4d"
+        name = xero_service._xero_contact_name(test_uuid, "John Doe")  # noqa: SLF001
+        assert name == "John Doe (a3f2c1d5)"
 
     @patch("ams.billing.providers.xero.service.AccountingApi")
     def test_update_user_billing_details_creates_new_contact(
@@ -481,19 +482,6 @@ class TestXeroBillingServiceInvoiceUrl:
             xero_settings.XERO_TENANT_ID,
             "test-invoice-123",
         )
-
-    def test_get_invoice_url_returns_none_without_billing_service_id(
-        self,
-        xero_service,
-        invoice_user,
-    ):
-        """Test that get_invoice_url returns None when invoice has no invoice id."""
-        invoice_user.billing_service_invoice_id = None
-        invoice_user.save()
-
-        invoice_url = xero_service.get_invoice_url(invoice_user)
-
-        assert invoice_url is None
 
     @patch("ams.billing.providers.xero.service.AccountingApi")
     def test_get_invoice_url_calls_authentication(

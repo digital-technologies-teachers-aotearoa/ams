@@ -5,6 +5,6 @@ from ams.billing.providers.xero.views import xero_webhooks
 
 app_name = "billing"
 urlpatterns = [
-    path("invoice/<int:invoice_id>/", invoice_redirect, name="invoice-redirect"),
+    path("invoice/<slug:invoice_number>/", invoice_redirect, name="invoice-redirect"),
     path("xero/webhooks/", xero_webhooks, name="xero-webhooks"),
 ]
