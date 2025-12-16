@@ -25,6 +25,7 @@ class MockBillingService(BillingService):
         date: date,
         due_date: date,
         line_items: list[dict[str, Any]],
+        reference: str,
     ) -> Invoice:
         total = 0
         for line_item in line_items:

@@ -43,6 +43,7 @@ class MembershipOption(Model):
     type = CharField(max_length=255, choices=MembershipOptionType)
     duration = RelativeDeltaField()
     cost = DecimalField(max_digits=10, decimal_places=2)
+    invoice_reference = CharField(max_length=25, blank=True)
 
     class Meta:
         unique_together = (("name", "type"),)

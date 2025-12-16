@@ -40,6 +40,7 @@ class BillingService:
         date: date,
         due_date: date,
         line_items: list[dict[str, Any]],
+        reference: str,
     ) -> Invoice:
         raise NotImplementedError
 

@@ -20,6 +20,7 @@ from ams.billing.exceptions import BillingDetailUpdateError
 from ams.billing.exceptions import BillingInvoiceError
 from ams.billing.services import BillingService
 from ams.billing.services import get_billing_service
+from ams.memberships.models import MembershipOption
 from ams.memberships.models import MembershipStatus
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -45,7 +46,7 @@ class MembershipBillingService:
     def create_membership_invoice(
         self,
         account: Account,
-        membership_option,
+        membership_option: MembershipOption,
     ) -> Invoice | None:
         """Create an invoice for a membership option if billable.
 
@@ -96,6 +97,7 @@ class MembershipBillingService:
                 issue_date,
                 due_date,
                 invoice_line_items,
+                membership_option.invoice_reference,
             )
 
             if self.can_send_email(email):

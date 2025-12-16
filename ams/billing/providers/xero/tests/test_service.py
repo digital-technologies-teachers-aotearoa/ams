@@ -198,6 +198,7 @@ class TestXeroBillingServiceInvoiceManagement:
                         "unit_amount": Decimal("100.00"),
                     },
                 ],
+                reference="Test Membership",
             )
 
         # Verify invoice was created in database
@@ -258,6 +259,7 @@ class TestXeroBillingServiceInvoiceManagement:
                 date=date(2024, 1, 15),
                 due_date=date(2024, 2, 15),
                 line_items=line_items,
+                reference="Test Membership",
             )
 
         assert invoice.amount == Decimal("250.0")
@@ -418,6 +420,7 @@ class TestMockXeroBillingService:
                     "unit_amount": Decimal("50.00"),
                 },
             ],
+            reference="Test Membership",
         )
 
         assert invoice.account == account_user
