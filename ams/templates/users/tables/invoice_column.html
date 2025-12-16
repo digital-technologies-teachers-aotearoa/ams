@@ -4,7 +4,7 @@
   <span class="text-secondary">Not required</span>
 {% elif value.paid_date %}
   {% if value.billing_service_invoice_id %}
-    <a href="{% url 'billing:invoice-redirect' value.id %}"
+    <a href="{% url 'billing:invoice-redirect' value.invoice_number %}"
        target="_blank"
        rel="noopener noreferrer"
        class="text-success">Paid<span class="ps-1">{% icon "box-arrow-up-right" %}</span></a>
@@ -13,7 +13,7 @@
   {% endif %}
 {% else %}
   {% if value.billing_service_invoice_id %}
-    <a href="{% url 'billing:invoice-redirect' value.id %}"
+    <a href="{% url 'billing:invoice-redirect' value.invoice_number %}"
        target="_blank"
        rel="noopener noreferrer"
        class="text-warning">Awaiting payment<span class="ps-1">{% icon "box-arrow-up-right" %}</span></a>

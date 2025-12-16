@@ -264,20 +264,22 @@ class XeroBillingService(BillingService):
         self._get_authentication_token()
         return self._get_online_invoice_url(invoice.billing_service_invoice_id)
 
-    def _xero_contact_name(self, account_id: int, name: str) -> str:
-        """Generate a unique Xero contact name by appending the account ID.
+    def _xero_contact_name(self, uuid_str: str, name: str) -> str:
+        """Generate a unique Xero contact name by appending a UUID prefix.
 
         Xero requires contact names to be unique. This method ensures uniqueness
-        by appending the account ID in parentheses to the contact's display name.
+        by appending the first 8 characters of the entity's UUID to the contact's
+        display name.
 
         Args:
-            account_id: The AMS billing Account ID.
+            uuid_str: The entity's UUID string (user or organization).
             name: The contact's display name (user full name or organization name).
 
         Returns:
-            Formatted contact name string in the format "Name (account_id)".
+            Formatted contact name string in the format "Name (uuid_prefix)".
         """
-        return f"{name} ({account_id})"
+        uuid_prefix = str(uuid_str).replace("-", "")[:8]
+        return f"{name} ({uuid_prefix})"
 
     def update_user_billing_details(self, user: User) -> None:
         """Update or create a Xero contact for a user's billing account.
@@ -289,9 +291,10 @@ class XeroBillingService(BillingService):
         Args:
             user: The Django User whose billing details should be synchronized.
         """
+        uuid_prefix = str(user.uuid).replace("-", "")[:8]
         contact_details = {
-            "name": self._xero_contact_name(user.account.pk, user.get_full_name()),
-            "account_number": str(user.account.id),
+            "name": self._xero_contact_name(str(user.uuid), user.get_full_name()),
+            "account_number": uuid_prefix,
             "email_address": user.email,
         }
         return self.update_account_billing_details(user.account, contact_details)
@@ -306,9 +309,10 @@ class XeroBillingService(BillingService):
         Args:
             organisation: The Organisation whose billing details should be synchronized.
         """
+        uuid_prefix = str(organisation.uuid).replace("-", "")[:8]
         contact_details = {
-            "name": self._xero_contact_name(organisation.account.pk, organisation.name),
-            "account_number": str(organisation.account.id),
+            "name": self._xero_contact_name(str(organisation.uuid), organisation.name),
+            "account_number": uuid_prefix,
             "email_address": organisation.email,
         }
         return self.update_account_billing_details(

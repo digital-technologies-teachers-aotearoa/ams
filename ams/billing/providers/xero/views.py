@@ -178,7 +178,7 @@ class AfterHttpResponse(HttpResponse):
 
 
 @login_required
-def invoice_redirect(request: HttpRequest, invoice_id: int) -> HttpResponse:
+def invoice_redirect(request: HttpRequest, invoice_number: str) -> HttpResponse:
     """Redirect to the online invoice URL.
 
     Fetches the online invoice URL and redirects the user to view
@@ -195,7 +195,7 @@ def invoice_redirect(request: HttpRequest, invoice_id: int) -> HttpResponse:
     Raises:
         PermissionDenied: If the user doesn't own the invoice.
     """
-    invoice = get_object_or_404(Invoice, id=invoice_id)
+    invoice = get_object_or_404(Invoice, invoice_number=invoice_number)
 
     # Check if the user owns this invoice
     if not hasattr(request.user, "account") or invoice.account != request.user.account:

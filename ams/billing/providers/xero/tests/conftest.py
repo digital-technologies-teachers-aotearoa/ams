@@ -67,9 +67,9 @@ def xero_contact_response():
     """Mock Xero Contact API response."""
     contact = XeroContactAPI(
         contact_id="test-contact-id-123",
-        name="Test User (1)",
+        name="Test User (a3f2c1d5)",
         email_address="test@example.com",
-        account_number="1",
+        account_number="a3f2c1d5",
     )
     response = Mock()
     response.contacts = [contact]

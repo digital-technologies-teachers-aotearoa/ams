@@ -519,7 +519,7 @@ class TestInvoiceRedirect:
         invoice_user.billing_service_invoice_id = "test-invoice-id-123"
         invoice_user.save()
 
-        request = rf.get(f"/billing/invoice/{invoice_user.id}/")
+        request = rf.get(f"/billing/invoice/{invoice_user.invoice_number}/")
         request.user = user
 
         mock_service = Mock(spec=XeroBillingService)
@@ -529,7 +529,7 @@ class TestInvoiceRedirect:
             "ams.billing.providers.xero.views.get_billing_service",
             return_value=mock_service,
         ):
-            response = invoice_redirect(request, invoice_user.id)
+            response = invoice_redirect(request, invoice_user.invoice_number)
 
         assert response.status_code == HTTPStatus.FOUND
         assert response.url == "https://xero.com/invoice/view/123"
@@ -541,7 +541,7 @@ class TestInvoiceRedirect:
         invoice_user,
     ):
         """Test that unauthenticated users are redirected to login."""
-        response = client.get(f"/billing/invoice/{invoice_user.id}/")
+        response = client.get(f"/billing/invoice/{invoice_user.invoice_number}/")
 
         assert response.status_code == HTTPStatus.FOUND
         assert "/accounts/login/" in response.url
@@ -556,11 +556,11 @@ class TestInvoiceRedirect:
         # Create a different user
         other_user = UserFactory()
 
-        request = rf.get(f"/billing/invoice/{invoice_user.id}/")
+        request = rf.get(f"/billing/invoice/{invoice_user.invoice_number}/")
         request.user = other_user
 
         with pytest.raises(PermissionDenied):
-            invoice_redirect(request, invoice_user.id)
+            invoice_redirect(request, invoice_user.invoice_number)
 
     def test_redirect_rejects_user_without_account(
         self,
@@ -571,11 +571,11 @@ class TestInvoiceRedirect:
         # Create a user without an account
         user_no_account = UserFactory()
 
-        request = rf.get(f"/billing/invoice/{invoice_user.id}/")
+        request = rf.get(f"/billing/invoice/{invoice_user.invoice_number}/")
         request.user = user_no_account
 
         with pytest.raises(PermissionDenied):
-            invoice_redirect(request, invoice_user.id)
+            invoice_redirect(request, invoice_user.invoice_number)
 
     def test_redirect_returns_404_for_nonexistent_invoice(
         self,
@@ -596,35 +596,33 @@ class TestInvoiceRedirect:
         invoice_user,
     ):
         """Test that unavailable billing service returns 503."""
-        request = rf.get(f"/billing/invoice/{invoice_user.id}/")
+        request = rf.get(f"/billing/invoice/{invoice_user.invoice_number}/")
         request.user = user
 
         with patch(
             "ams.billing.providers.xero.views.get_billing_service",
             return_value=None,
         ):
-            response = invoice_redirect(request, invoice_user.id)
+            response = invoice_redirect(request, invoice_user.invoice_number)
 
         assert response.status_code == HTTPStatus.SERVICE_UNAVAILABLE
         assert b"Billing service not available" in response.content
 
-    def test_redirect_returns_503_when_non_xero_billing_service(
+    def test_redirect_returns_503_when_no_billing_service(
         self,
         rf: RequestFactory,
         user,
         invoice_user,
     ):
         """Test that non-Xero billing service returns 503."""
-        request = rf.get(f"/billing/invoice/{invoice_user.id}/")
+        request = rf.get(f"/billing/invoice/{invoice_user.invoice_number}/")
         request.user = user
-
-        mock_service = Mock(spec=MockBillingService)
 
         with patch(
             "ams.billing.providers.xero.views.get_billing_service",
-            return_value=mock_service,
+            return_value=None,
         ):
-            response = invoice_redirect(request, invoice_user.id)
+            response = invoice_redirect(request, invoice_user.invoice_number)
 
         assert response.status_code == HTTPStatus.SERVICE_UNAVAILABLE
 
@@ -635,11 +633,7 @@ class TestInvoiceRedirect:
         invoice_user,
     ):
         """Test that missing invoice URL returns 404."""
-        # Invoice without billing_service_invoice_id
-        invoice_user.billing_service_invoice_id = None
-        invoice_user.save()
-
-        request = rf.get(f"/billing/invoice/{invoice_user.id}/")
+        request = rf.get(f"/billing/invoice/{invoice_user.invoice_number}/")
         request.user = user
 
         mock_service = Mock(spec=XeroBillingService)
@@ -649,7 +643,7 @@ class TestInvoiceRedirect:
             "ams.billing.providers.xero.views.get_billing_service",
             return_value=mock_service,
         ):
-            response = invoice_redirect(request, invoice_user.id)
+            response = invoice_redirect(request, invoice_user.invoice_number)
 
         assert response.status_code == HTTPStatus.NOT_FOUND
         assert b"Invoice URL not available" in response.content
@@ -666,10 +660,10 @@ class TestInvoiceRedirect:
         invoice.save()
 
         # Organisation member's user should be able to access
-        request = rf.get(f"/billing/invoice/{invoice.id}/")
+        request = rf.get(f"/billing/invoice/{invoice.invoice_number}/")
         request.user = organisation_member.user
 
         # This should fail because the user's account is different from
         # the organisation's account
         with pytest.raises(PermissionDenied):
-            invoice_redirect(request, invoice.id)
+            invoice_redirect(request, invoice.invoice_number)

@@ -1,5 +1,5 @@
 import time
-import uuid
+import uuid as uuid_lib
 from typing import ClassVar
 
 from django.contrib.auth.models import AbstractUser
@@ -57,7 +57,7 @@ class User(AbstractUser):
     check forms.SignupForm and forms.SocialSignupForms accordingly.
     """
 
-    uuid = UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    uuid = UUIDField(default=uuid_lib.uuid4, editable=False, unique=True)
     email = EmailField(_("email address"), unique=True)
     username = CharField(
         _("username"),
@@ -113,6 +113,7 @@ class OrganisationType(Model):
 
 
 class Organisation(Model):
+    uuid = UUIDField(default=uuid_lib.uuid4, editable=False, unique=True)
     name = CharField(max_length=255)
     type = ForeignKey(OrganisationType, on_delete=CASCADE, related_name="organisations")
     telephone = CharField(max_length=255)
@@ -131,6 +132,7 @@ class Organisation(Model):
 
 
 class OrganisationMember(Model):
+    uuid = UUIDField(default=uuid_lib.uuid4, editable=False, unique=True)
     user = ForeignKey(
         User,
         null=True,
@@ -138,7 +140,7 @@ class OrganisationMember(Model):
         related_name="organisation_members",
     )
     invite_email = CharField(max_length=255, blank=True)
-    invite_token = UUIDField(default=uuid.uuid4, editable=False)
+    invite_token = UUIDField(default=uuid_lib.uuid4, editable=False)
     organisation = ForeignKey(
         Organisation,
         on_delete=CASCADE,
