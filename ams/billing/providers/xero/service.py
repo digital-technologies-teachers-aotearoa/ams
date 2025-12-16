@@ -351,6 +351,7 @@ class XeroBillingService(BillingService):
         date: "date",
         due_date: "date",
         line_items: list[dict[str, Any]],
+        reference: str,
     ) -> Invoice:
         """Create a new invoice in Xero and store it locally.
 
@@ -365,6 +366,7 @@ class XeroBillingService(BillingService):
             due_date: The invoice due date.
             line_items: List of dictionaries with keys 'description', 'unit_amount',
                 and 'quantity' for each line item on the invoice.
+            reference: The reference to use for the invoice.
 
         Returns:
             The newly created Invoice model instance.
@@ -389,7 +391,7 @@ class XeroBillingService(BillingService):
             "type": "ACCREC",
             "date": date,
             "due_date": due_date,
-            "reference": str(account.pk),
+            "reference": reference,
             "currency_code": currency_code,
             "status": "AUTHORISED",
             "line_amount_types": amount_type,

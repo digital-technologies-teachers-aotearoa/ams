@@ -91,10 +91,19 @@ class MembershipOptionForm(ModelForm):
     )
     duration = MembershipDurationField(label=_("Duration"))
     cost = DecimalField(label=_("Cost"))
+    invoice_reference = CharField(
+        label=_("Invoice Reference"),
+        max_length=25,
+        required=False,
+        help_text=_(
+            "What displays as the reference for any generated invoices. "
+            "For example 'DTTA Membership'.",
+        ),
+    )
 
     class Meta:
         model = MembershipOption
-        fields = ["name", "type", "duration", "cost"]
+        fields = ["name", "type", "duration", "cost", "invoice_reference"]
 
 
 class CreateIndividualMembershipForm(ModelForm):
