@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from abc import ABC
+from abc import abstractmethod
 from typing import TYPE_CHECKING
 from typing import Any
 
@@ -19,21 +21,26 @@ if TYPE_CHECKING:  # pragma: no cover
 # to reduce risk of circular imports and lower import overhead.
 
 
-class BillingService:
+class BillingService(ABC):
     """Abstract base class for billing service implementations."""
 
+    @abstractmethod
     def update_user_billing_details(
         self,
         user: User,
     ) -> None:  # pragma: no cover - interface
-        raise NotImplementedError
+        """Update billing details for a user."""
+        ...
 
+    @abstractmethod
     def update_organisation_billing_details(
         self,
         organisation: Organisation,
     ) -> None:  # pragma: no cover - interface
-        raise NotImplementedError
+        """Update billing details for an organisation."""
+        ...
 
+    @abstractmethod
     def create_invoice(
         self,
         account: Account,
@@ -42,13 +49,16 @@ class BillingService:
         line_items: list[dict[str, Any]],
         reference: str,
     ) -> Invoice:
-        raise NotImplementedError
+        """Create an invoice in the billing system."""
+        ...
 
+    @abstractmethod
     def email_invoice(
         self,
         invoice: Invoice,
     ) -> None:  # pragma: no cover - interface
-        raise NotImplementedError
+        """Send invoice via email."""
+        ...
 
 
 def get_billing_service() -> BillingService | None:
