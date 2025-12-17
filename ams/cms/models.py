@@ -5,6 +5,7 @@ from django.db import models
 from django.http import HttpResponseForbidden
 from django.utils.translation import gettext_lazy as _
 from wagtail.admin.panels import FieldPanel
+from wagtail.admin.panels import FieldRowPanel
 from wagtail.admin.panels import MultiFieldPanel
 from wagtail.contrib.settings.models import BaseSiteSetting
 from wagtail.contrib.settings.models import register_setting
@@ -713,10 +714,18 @@ class ThemeSettings(BaseSiteSetting):
     panels = [
         MultiFieldPanel(
             [
-                FieldPanel("body_color_light"),
-                FieldPanel("body_bg_light"),
-                FieldPanel("body_color_dark"),
-                FieldPanel("body_bg_dark"),
+                FieldRowPanel(
+                    [
+                        FieldPanel("body_color_light"),
+                        FieldPanel("body_color_dark"),
+                    ],
+                ),
+                FieldRowPanel(
+                    [
+                        FieldPanel("body_bg_light"),
+                        FieldPanel("body_bg_dark"),
+                    ],
+                ),
             ],
             "Body",
             help_text=(
@@ -725,10 +734,18 @@ class ThemeSettings(BaseSiteSetting):
         ),
         MultiFieldPanel(
             [
-                FieldPanel("secondary_color_light"),
-                FieldPanel("secondary_bg_light"),
-                FieldPanel("secondary_color_dark"),
-                FieldPanel("secondary_bg_dark"),
+                FieldRowPanel(
+                    [
+                        FieldPanel("secondary_color_light"),
+                        FieldPanel("secondary_color_dark"),
+                    ],
+                ),
+                FieldRowPanel(
+                    [
+                        FieldPanel("secondary_bg_light"),
+                        FieldPanel("secondary_bg_dark"),
+                    ],
+                ),
             ],
             "Secondary",
             help_text=(
@@ -737,10 +754,18 @@ class ThemeSettings(BaseSiteSetting):
         ),
         MultiFieldPanel(
             [
-                FieldPanel("tertiary_color_light"),
-                FieldPanel("tertiary_bg_light"),
-                FieldPanel("tertiary_color_dark"),
-                FieldPanel("tertiary_bg_dark"),
+                FieldRowPanel(
+                    [
+                        FieldPanel("tertiary_color_light"),
+                        FieldPanel("tertiary_color_dark"),
+                    ],
+                ),
+                FieldRowPanel(
+                    [
+                        FieldPanel("tertiary_bg_light"),
+                        FieldPanel("tertiary_bg_dark"),
+                    ],
+                ),
             ],
             "Tertiary",
             help_text=(
@@ -750,16 +775,24 @@ class ThemeSettings(BaseSiteSetting):
         ),
         MultiFieldPanel(
             [
-                FieldPanel("emphasis_color_light"),
-                FieldPanel("emphasis_color_dark"),
+                FieldRowPanel(
+                    [
+                        FieldPanel("emphasis_color_light"),
+                        FieldPanel("emphasis_color_dark"),
+                    ],
+                ),
             ],
             "Emphasis",
             help_text="For higher contrast text. Not applicable for backgrounds.",
         ),
         MultiFieldPanel(
             [
-                FieldPanel("border_color_light"),
-                FieldPanel("border_color_dark"),
+                FieldRowPanel(
+                    [
+                        FieldPanel("border_color_light"),
+                        FieldPanel("border_color_dark"),
+                    ],
+                ),
             ],
             "Border",
             help_text="For component borders, dividers, and rules.",
@@ -767,12 +800,24 @@ class ThemeSettings(BaseSiteSetting):
         MultiFieldPanel(
             [
                 FieldPanel("primary_color"),
-                FieldPanel("primary_bg_subtle_light"),
-                FieldPanel("primary_border_subtle_light"),
-                FieldPanel("primary_text_emphasis_light"),
-                FieldPanel("primary_bg_subtle_dark"),
-                FieldPanel("primary_border_subtle_dark"),
-                FieldPanel("primary_text_emphasis_dark"),
+                FieldRowPanel(
+                    [
+                        FieldPanel("primary_bg_subtle_light"),
+                        FieldPanel("primary_bg_subtle_dark"),
+                    ],
+                ),
+                FieldRowPanel(
+                    [
+                        FieldPanel("primary_border_subtle_light"),
+                        FieldPanel("primary_border_subtle_dark"),
+                    ],
+                ),
+                FieldRowPanel(
+                    [
+                        FieldPanel("primary_text_emphasis_light"),
+                        FieldPanel("primary_text_emphasis_dark"),
+                    ],
+                ),
             ],
             "Primary",
             help_text=(
@@ -783,12 +828,24 @@ class ThemeSettings(BaseSiteSetting):
         MultiFieldPanel(
             [
                 FieldPanel("success_color"),
-                FieldPanel("success_bg_subtle_light"),
-                FieldPanel("success_border_subtle_light"),
-                FieldPanel("success_text_emphasis_light"),
-                FieldPanel("success_bg_subtle_dark"),
-                FieldPanel("success_border_subtle_dark"),
-                FieldPanel("success_text_emphasis_dark"),
+                FieldRowPanel(
+                    [
+                        FieldPanel("success_bg_subtle_light"),
+                        FieldPanel("success_bg_subtle_dark"),
+                    ],
+                ),
+                FieldRowPanel(
+                    [
+                        FieldPanel("success_border_subtle_light"),
+                        FieldPanel("success_border_subtle_dark"),
+                    ],
+                ),
+                FieldRowPanel(
+                    [
+                        FieldPanel("success_text_emphasis_light"),
+                        FieldPanel("success_text_emphasis_dark"),
+                    ],
+                ),
             ],
             "Success",
             help_text=(
@@ -798,12 +855,24 @@ class ThemeSettings(BaseSiteSetting):
         MultiFieldPanel(
             [
                 FieldPanel("danger_color"),
-                FieldPanel("danger_bg_subtle_light"),
-                FieldPanel("danger_border_subtle_light"),
-                FieldPanel("danger_text_emphasis_light"),
-                FieldPanel("danger_bg_subtle_dark"),
-                FieldPanel("danger_border_subtle_dark"),
-                FieldPanel("danger_text_emphasis_dark"),
+                FieldRowPanel(
+                    [
+                        FieldPanel("danger_bg_subtle_light"),
+                        FieldPanel("danger_bg_subtle_dark"),
+                    ],
+                ),
+                FieldRowPanel(
+                    [
+                        FieldPanel("danger_border_subtle_light"),
+                        FieldPanel("danger_border_subtle_dark"),
+                    ],
+                ),
+                FieldRowPanel(
+                    [
+                        FieldPanel("danger_text_emphasis_light"),
+                        FieldPanel("danger_text_emphasis_dark"),
+                    ],
+                ),
             ],
             "Danger",
             help_text="Theme color used for errors and dangerous actions.",
@@ -811,12 +880,24 @@ class ThemeSettings(BaseSiteSetting):
         MultiFieldPanel(
             [
                 FieldPanel("warning_color"),
-                FieldPanel("warning_bg_subtle_light"),
-                FieldPanel("warning_border_subtle_light"),
-                FieldPanel("warning_text_emphasis_light"),
-                FieldPanel("warning_bg_subtle_dark"),
-                FieldPanel("warning_border_subtle_dark"),
-                FieldPanel("warning_text_emphasis_dark"),
+                FieldRowPanel(
+                    [
+                        FieldPanel("warning_bg_subtle_light"),
+                        FieldPanel("warning_bg_subtle_dark"),
+                    ],
+                ),
+                FieldRowPanel(
+                    [
+                        FieldPanel("warning_border_subtle_light"),
+                        FieldPanel("warning_border_subtle_dark"),
+                    ],
+                ),
+                FieldRowPanel(
+                    [
+                        FieldPanel("warning_text_emphasis_light"),
+                        FieldPanel("warning_text_emphasis_dark"),
+                    ],
+                ),
             ],
             "Warning",
             help_text="Theme color used for non-destructive warning messages.",
@@ -824,12 +905,24 @@ class ThemeSettings(BaseSiteSetting):
         MultiFieldPanel(
             [
                 FieldPanel("info_color"),
-                FieldPanel("info_bg_subtle_light"),
-                FieldPanel("info_border_subtle_light"),
-                FieldPanel("info_text_emphasis_light"),
-                FieldPanel("info_bg_subtle_dark"),
-                FieldPanel("info_border_subtle_dark"),
-                FieldPanel("info_text_emphasis_dark"),
+                FieldRowPanel(
+                    [
+                        FieldPanel("info_bg_subtle_light"),
+                        FieldPanel("info_bg_subtle_dark"),
+                    ],
+                ),
+                FieldRowPanel(
+                    [
+                        FieldPanel("info_border_subtle_light"),
+                        FieldPanel("info_border_subtle_dark"),
+                    ],
+                ),
+                FieldRowPanel(
+                    [
+                        FieldPanel("info_text_emphasis_light"),
+                        FieldPanel("info_text_emphasis_dark"),
+                    ],
+                ),
             ],
             "Info",
             help_text="Theme color used for neutral and informative content.",
@@ -837,12 +930,24 @@ class ThemeSettings(BaseSiteSetting):
         MultiFieldPanel(
             [
                 FieldPanel("light_color"),
-                FieldPanel("light_bg_subtle_light"),
-                FieldPanel("light_border_subtle_light"),
-                FieldPanel("light_text_emphasis_light"),
-                FieldPanel("light_bg_subtle_dark"),
-                FieldPanel("light_border_subtle_dark"),
-                FieldPanel("light_text_emphasis_dark"),
+                FieldRowPanel(
+                    [
+                        FieldPanel("light_bg_subtle_light"),
+                        FieldPanel("light_bg_subtle_dark"),
+                    ],
+                ),
+                FieldRowPanel(
+                    [
+                        FieldPanel("light_border_subtle_light"),
+                        FieldPanel("light_border_subtle_dark"),
+                    ],
+                ),
+                FieldRowPanel(
+                    [
+                        FieldPanel("light_text_emphasis_light"),
+                        FieldPanel("light_text_emphasis_dark"),
+                    ],
+                ),
             ],
             "Light",
             help_text="Additional theme option for less contrasting colors.",
@@ -850,22 +955,42 @@ class ThemeSettings(BaseSiteSetting):
         MultiFieldPanel(
             [
                 FieldPanel("dark_color"),
-                FieldPanel("dark_bg_subtle_light"),
-                FieldPanel("dark_border_subtle_light"),
-                FieldPanel("dark_text_emphasis_light"),
-                FieldPanel("dark_bg_subtle_dark"),
-                FieldPanel("dark_border_subtle_dark"),
-                FieldPanel("dark_text_emphasis_dark"),
+                FieldRowPanel(
+                    [
+                        FieldPanel("dark_bg_subtle_light"),
+                        FieldPanel("dark_bg_subtle_dark"),
+                    ],
+                ),
+                FieldRowPanel(
+                    [
+                        FieldPanel("dark_border_subtle_light"),
+                        FieldPanel("dark_border_subtle_dark"),
+                    ],
+                ),
+                FieldRowPanel(
+                    [
+                        FieldPanel("dark_text_emphasis_light"),
+                        FieldPanel("dark_text_emphasis_dark"),
+                    ],
+                ),
             ],
             "Dark",
             help_text="Additional theme option for higher contrasting colors.",
         ),
         MultiFieldPanel(
             [
-                FieldPanel("link_color_light"),
-                FieldPanel("link_hover_color_light"),
-                FieldPanel("link_color_dark"),
-                FieldPanel("link_hover_color_dark"),
+                FieldRowPanel(
+                    [
+                        FieldPanel("link_color_light"),
+                        FieldPanel("link_color_dark"),
+                    ],
+                ),
+                FieldRowPanel(
+                    [
+                        FieldPanel("link_hover_color_light"),
+                        FieldPanel("link_hover_color_dark"),
+                    ],
+                ),
             ],
             "Links",
             help_text="Colors for hyperlinks in light and dark modes.",
