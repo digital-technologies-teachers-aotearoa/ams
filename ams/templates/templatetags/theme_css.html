@@ -1,0 +1,156 @@
+{% load theme %}
+
+<style>
+:root,
+[data-bs-theme="light"] {
+  /* Body */
+  --bs-body-color: {{ theme.body_color_light }};
+  --bs-body-color-rgb: {{ theme.body_color_light|hex_to_rgb }};
+  --bs-body-bg: {{ theme.body_bg_light }};
+  --bs-body-bg-rgb: {{ theme.body_bg_light|hex_to_rgb }};
+
+  /* Secondary */
+  --bs-secondary-color: {{ theme.secondary_color_light }};
+  --bs-secondary-color-rgb: {{ theme.secondary_color_light|hex_to_rgb }};
+  --bs-secondary-bg: {{ theme.secondary_bg_light }};
+  --bs-secondary-bg-rgb: {{ theme.secondary_bg_light|hex_to_rgb }};
+
+  /* Tertiary */
+  --bs-tertiary-color: {{ theme.tertiary_color_light }};
+  --bs-tertiary-color-rgb: {{ theme.tertiary_color_light|hex_to_rgb }};
+  --bs-tertiary-bg: {{ theme.tertiary_bg_light }};
+  --bs-tertiary-bg-rgb: {{ theme.tertiary_bg_light|hex_to_rgb }};
+
+  /* Emphasis */
+  --bs-emphasis-color: {{ theme.emphasis_color_light }};
+  --bs-emphasis-color-rgb: {{ theme.emphasis_color_light|hex_to_rgb }};
+
+  /* Border */
+  --bs-border-color: {{ theme.border_color_light }};
+  --bs-border-color-rgb: {{ theme.border_color_light|hex_to_rgb }};
+
+  /* Primary */
+  --bs-primary: {{ theme.primary_color }};
+  --bs-primary-rgb: {{ theme.primary_color|hex_to_rgb }};
+  --bs-primary-bg-subtle: {{ theme.primary_bg_subtle_light }};
+  --bs-primary-border-subtle: {{ theme.primary_border_subtle_light }};
+  --bs-primary-text-emphasis: {{ theme.primary_text_emphasis_light }};
+
+  /* Success */
+  --bs-success: {{ theme.success_color }};
+  --bs-success-rgb: {{ theme.success_color|hex_to_rgb }};
+  --bs-success-bg-subtle: {{ theme.success_bg_subtle_light }};
+  --bs-success-border-subtle: {{ theme.success_border_subtle_light }};
+  --bs-success-text-emphasis: {{ theme.success_text_emphasis_light }};
+
+  /* Danger */
+  --bs-danger: {{ theme.danger_color }};
+  --bs-danger-rgb: {{ theme.danger_color|hex_to_rgb }};
+  --bs-danger-bg-subtle: {{ theme.danger_bg_subtle_light }};
+  --bs-danger-border-subtle: {{ theme.danger_border_subtle_light }};
+  --bs-danger-text-emphasis: {{ theme.danger_text_emphasis_light }};
+
+  /* Warning */
+  --bs-warning: {{ theme.warning_color }};
+  --bs-warning-rgb: {{ theme.warning_color|hex_to_rgb }};
+  --bs-warning-bg-subtle: {{ theme.warning_bg_subtle_light }};
+  --bs-warning-border-subtle: {{ theme.warning_border_subtle_light }};
+  --bs-warning-text-emphasis: {{ theme.warning_text_emphasis_light }};
+
+  /* Info */
+  --bs-info: {{ theme.info_color }};
+  --bs-info-rgb: {{ theme.info_color|hex_to_rgb }};
+  --bs-info-bg-subtle: {{ theme.info_bg_subtle_light }};
+  --bs-info-border-subtle: {{ theme.info_border_subtle_light }};
+  --bs-info-text-emphasis: {{ theme.info_text_emphasis_light }};
+
+  /* Light */
+  --bs-light: {{ theme.light_color }};
+  --bs-light-rgb: {{ theme.light_color|hex_to_rgb }};
+  --bs-light-bg-subtle: {{ theme.light_bg_subtle_light }};
+  --bs-light-border-subtle: {{ theme.light_border_subtle_light }};
+  --bs-light-text-emphasis: {{ theme.light_text_emphasis_light }};
+
+  /* Dark */
+  --bs-dark: {{ theme.dark_color }};
+  --bs-dark-rgb: {{ theme.dark_color|hex_to_rgb }};
+  --bs-dark-bg-subtle: {{ theme.dark_bg_subtle_light }};
+  --bs-dark-border-subtle: {{ theme.dark_border_subtle_light }};
+  --bs-dark-text-emphasis: {{ theme.dark_text_emphasis_light }};
+
+  /* Links */
+  --bs-link-color: {{ theme.link_color_light }};
+  --bs-link-color-rgb: {{ theme.link_color_light|hex_to_rgb }};
+  --bs-link-hover-color: {{ theme.link_hover_color_light }};
+  --bs-link-hover-color-rgb: {{ theme.link_hover_color_light|hex_to_rgb }};
+}
+
+[data-bs-theme="dark"] {
+  /* Body */
+  --bs-body-color: {{ theme.body_color_dark }};
+  --bs-body-color-rgb: {{ theme.body_color_dark|hex_to_rgb }};
+  --bs-body-bg: {{ theme.body_bg_dark }};
+  --bs-body-bg-rgb: {{ theme.body_bg_dark|hex_to_rgb }};
+
+  /* Secondary */
+  --bs-secondary-color: {{ theme.secondary_color_dark }};
+  --bs-secondary-color-rgb: {{ theme.secondary_color_dark|hex_to_rgb }};
+  --bs-secondary-bg: {{ theme.secondary_bg_dark }};
+  --bs-secondary-bg-rgb: {{ theme.secondary_bg_dark|hex_to_rgb }};
+
+  /* Tertiary */
+  --bs-tertiary-color: {{ theme.tertiary_color_dark }};
+  --bs-tertiary-color-rgb: {{ theme.tertiary_color_dark|hex_to_rgb }};
+  --bs-tertiary-bg: {{ theme.tertiary_bg_dark }};
+  --bs-tertiary-bg-rgb: {{ theme.tertiary_bg_dark|hex_to_rgb }};
+
+  /* Emphasis */
+  --bs-emphasis-color: {{ theme.emphasis_color_dark }};
+  --bs-emphasis-color-rgb: {{ theme.emphasis_color_dark|hex_to_rgb }};
+
+  /* Border */
+  --bs-border-color: {{ theme.border_color_dark }};
+  --bs-border-color-rgb: {{ theme.border_color_dark|hex_to_rgb }};
+
+  /* Primary */
+  --bs-primary-bg-subtle: {{ theme.primary_bg_subtle_dark }};
+  --bs-primary-border-subtle: {{ theme.primary_border_subtle_dark }};
+  --bs-primary-text-emphasis: {{ theme.primary_text_emphasis_dark }};
+
+  /* Success */
+  --bs-success-bg-subtle: {{ theme.success_bg_subtle_dark }};
+  --bs-success-border-subtle: {{ theme.success_border_subtle_dark }};
+  --bs-success-text-emphasis: {{ theme.success_text_emphasis_dark }};
+
+  /* Danger */
+  --bs-danger-bg-subtle: {{ theme.danger_bg_subtle_dark }};
+  --bs-danger-border-subtle: {{ theme.danger_border_subtle_dark }};
+  --bs-danger-text-emphasis: {{ theme.danger_text_emphasis_dark }};
+
+  /* Warning */
+  --bs-warning-bg-subtle: {{ theme.warning_bg_subtle_dark }};
+  --bs-warning-border-subtle: {{ theme.warning_border_subtle_dark }};
+  --bs-warning-text-emphasis: {{ theme.warning_text_emphasis_dark }};
+
+  /* Info */
+  --bs-info-bg-subtle: {{ theme.info_bg_subtle_dark }};
+  --bs-info-border-subtle: {{ theme.info_border_subtle_dark }};
+  --bs-info-text-emphasis: {{ theme.info_text_emphasis_dark }};
+
+  /* Light */
+  --bs-light-bg-subtle: {{ theme.light_bg_subtle_dark }};
+  --bs-light-border-subtle: {{ theme.light_border_subtle_dark }};
+  --bs-light-text-emphasis: {{ theme.light_text_emphasis_dark }};
+
+  /* Dark */
+  --bs-dark-bg-subtle: {{ theme.dark_bg_subtle_dark }};
+  --bs-dark-border-subtle: {{ theme.dark_border_subtle_dark }};
+  --bs-dark-text-emphasis: {{ theme.dark_text_emphasis_dark }};
+
+  /* Links */
+  --bs-link-color: {{ theme.link_color_dark }};
+  --bs-link-color-rgb: {{ theme.link_color_dark|hex_to_rgb }};
+  --bs-link-hover-color: {{ theme.link_hover_color_dark }};
+  --bs-link-hover-color-rgb: {{ theme.link_hover_color_dark|hex_to_rgb }};
+}
+</style>

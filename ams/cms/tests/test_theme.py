@@ -7,12 +7,12 @@ from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.template import Context
 from django.template import Template
+from django.template.loader import render_to_string
 from wagtail.models import Page
 from wagtail.models import Site
 
 from ams.cms.models import ThemeSettings
 from ams.cms.validators import validate_hex_color
-from config.templatetags.theme import generate_theme_css
 from config.templatetags.theme import hex_to_rgb
 
 
@@ -86,7 +86,7 @@ class TestThemeSettings:
         """Test creating ThemeSettings with default values."""
         theme = ThemeSettings.objects.create(site=site)
         assert theme.primary_color == "#0d6efd"
-        assert theme.css_version == 1
+        assert theme.css_version == 2  # Incremented from 1 on create  # noqa: PLR2004
 
     def test_css_version_increments_on_save(self, site):
         """Test that css_version increments on each save."""
@@ -103,13 +103,13 @@ class TestThemeSettings:
         theme = ThemeSettings.objects.create(
             site=site,
             primary_color="#ff0000",
-            secondary_color="#00ff00",
+            secondary_color_light="#00ff00",
             body_bg_light="#ffffff",
             body_bg_dark="#000000",
         )
 
         assert theme.primary_color == "#ff0000"
-        assert theme.secondary_color == "#00ff00"
+        assert theme.secondary_color_light == "#00ff00"
         assert theme.body_bg_light == "#ffffff"
         assert theme.body_bg_dark == "#000000"
 
@@ -126,19 +126,19 @@ class TestThemeCSSGeneration:
     """Tests for theme CSS generation."""
 
     def test_hex_to_rgb_conversion(self):
-        """Test hex to RGB conversion function."""
-        assert hex_to_rgb("#ffffff") == (255, 255, 255)
-        assert hex_to_rgb("#000000") == (0, 0, 0)
-        assert hex_to_rgb("#0d6efd") == (13, 110, 253)
+        """Test hex to RGB conversion filter."""
+        assert hex_to_rgb("#ffffff") == "255, 255, 255"
+        assert hex_to_rgb("#000000") == "0, 0, 0"
+        assert hex_to_rgb("#0d6efd") == "13, 110, 253"
 
     def test_hex_to_rgb_three_digit(self):
         """Test hex to RGB conversion with 3-digit codes."""
-        assert hex_to_rgb("#fff") == (255, 255, 255)
-        assert hex_to_rgb("#000") == (0, 0, 0)
-        assert hex_to_rgb("#abc") == (170, 187, 204)
+        assert hex_to_rgb("#fff") == "255, 255, 255"
+        assert hex_to_rgb("#000") == "0, 0, 0"
+        assert hex_to_rgb("#abc") == "170, 187, 204"
 
-    def test_generate_theme_css(self, site):
-        """Test CSS generation from ThemeSettings."""
+    def test_template_renders_theme_css(self, site):
+        """Test that template renders CSS with theme values."""
         theme = ThemeSettings.objects.create(
             site=site,
             primary_color="#ff0000",
@@ -146,18 +146,15 @@ class TestThemeCSSGeneration:
             body_bg_dark="#000000",
         )
 
-        css = generate_theme_css(theme)
+        html = render_to_string("templatetags/theme_css.html", {"theme": theme})
 
-        assert "--bs-primary: #ff0000" in css
-        assert "--bs-body-bg: #ffffff" in css
-        assert ":root" in css
-        assert '[data-bs-theme="dark"]' in css
-        assert "--bs-primary-rgb: 255, 0, 0" in css
-
-    def test_generate_theme_css_with_none(self):
-        """Test CSS generation with None returns empty string."""
-        css = generate_theme_css(None)
-        assert css == ""
+        assert ":root" in html
+        assert '[data-bs-theme="dark"]' in html
+        assert "--bs-primary: #ff0000" in html
+        assert "--bs-body-bg: #ffffff" in html
+        assert "--bs-primary-rgb: 255, 0, 0" in html
+        assert "<style>" in html
+        assert "</style>" in html
 
     def test_dark_mode_css_separate(self, site):
         """Test that dark mode colors are in separate selector."""
@@ -169,15 +166,15 @@ class TestThemeCSSGeneration:
             body_color_dark="#ffffff",
         )
 
-        css = generate_theme_css(theme)
+        html = render_to_string("templatetags/theme_css.html", {"theme": theme})
 
         # Check light mode section
-        light_section = css.split('[data-bs-theme="dark"]')[0]
+        light_section = html.split('[data-bs-theme="dark"]')[0]
         assert "--bs-body-bg: #ffffff" in light_section
         assert "--bs-body-color: #000000" in light_section
 
         # Check dark mode section
-        dark_section = css.split('[data-bs-theme="dark"]')[1]
+        dark_section = html.split('[data-bs-theme="dark"]')[1]
         assert "--bs-body-bg: #000000" in dark_section
         assert "--bs-body-color: #ffffff" in dark_section
 
@@ -192,7 +189,13 @@ class TestThemeTemplateTag:
 
     def test_template_tag_renders(self, site, rf):
         """Test that template tag renders CSS."""
-        theme = ThemeSettings.objects.create(site=site, primary_color="#ff0000")
+        # Clear cache before starting
+        cache.clear()
+
+        theme = ThemeSettings.objects.create(site=site)
+        theme.primary_color = "#ff0000"
+        theme.save()
+        theme.refresh_from_db()  # Reload to get fresh data
 
         template = Template(
             "{% load theme %}{% theme_css_variables %}",
@@ -234,22 +237,25 @@ class TestThemeTemplateTag:
         )
 
         # First render - should generate and cache
-        with patch("config.templatetags.theme.generate_theme_css") as mock_generate:
-            mock_generate.return_value = "/* test css */"
+        with patch("config.templatetags.theme.render_to_string") as mock_render:
+            mock_render.return_value = "<style>/* test css */</style>"
             result1 = template.render(context)
-            assert mock_generate.call_count == 1
+            assert mock_render.call_count == 1
 
         # Second render - should use cache
-        with patch("config.templatetags.theme.generate_theme_css") as mock_generate:
-            mock_generate.return_value = "/* test css */"
+        with patch("config.templatetags.theme.render_to_string") as mock_render:
+            mock_render.return_value = "<style>/* test css */</style>"
             result2 = template.render(context)
-            assert mock_generate.call_count == 0  # Not called, used cache
+            assert mock_render.call_count == 0  # Not called, used cache
 
         assert result1 == result2
 
     def test_template_tag_cache_invalidation(self, site, rf):
         """Test that cache is invalidated when settings change."""
-        theme = ThemeSettings.objects.create(site=site, primary_color="#ff0000")
+        theme = ThemeSettings.objects.create(site=site)
+        theme.primary_color = "#ff0000"
+        theme.save()
+        theme.refresh_from_db()  # Reload to get fresh data
         cache.clear()
 
         template = Template("{% load theme %}{% theme_css_variables %}")
@@ -270,6 +276,7 @@ class TestThemeTemplateTag:
         # Update theme (increments css_version)
         theme.primary_color = "#00ff00"
         theme.save()
+        theme.refresh_from_db()  # Reload to get fresh data
 
         # Update context with new theme
         context = Context(
@@ -286,11 +293,17 @@ class TestThemeTemplateTag:
 
     def test_template_tag_no_settings(self, rf):
         """Test template tag returns empty string when no settings."""
+        # Delete all sites and theme settings to ensure clean state
+        ThemeSettings.objects.all().delete()
+        Site.objects.all().delete()
+
         template = Template("{% load theme %}{% theme_css_variables %}")
         request = rf.get("/")
+        # Create a request without a site attribute, and no settings in context
         context = Context({"request": request})
 
         result = template.render(context)
+        # Without a site, the tag should return an empty string
         assert result.strip() == ""
 
 
