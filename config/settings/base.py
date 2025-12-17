@@ -259,6 +259,7 @@ TEMPLATES = [
             "libraries": {
                 "icon": "config.templatetags.icon",
                 "translate_url": "config.templatetags.translate_url",
+                "theme": "config.templatetags.theme",
             },
         },
     },
