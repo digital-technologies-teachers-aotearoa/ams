@@ -1,4 +1,4 @@
-{% load static i18n wagtailcore_tags wagtailimages_tags menu_tags translate_url icon %}
+{% load static i18n wagtailcore_tags wagtailimages_tags menu_tags translate_url icon theme %}
 
 {% get_current_language as LANGUAGE_CODE %}
 <!DOCTYPE html>
@@ -20,6 +20,7 @@
     <link rel="icon" href="{{ favicon_image.url }}" />
     {% block css %}
       <link href="{% static 'css/project.min.css' %}" rel="stylesheet" />
+      {% theme_css_variables %}
     {% endblock css %}
     {# Placed at the top of the document so pages load faster with defer #}
     {% block javascript %}
