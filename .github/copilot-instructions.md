@@ -20,6 +20,7 @@ This guide enables AI coding agents to work productively in the Association Mana
   - Extract: `docker compose -f docker-compose.yml run --rm django python manage.py makemessages --all --no-location`
   - Compile: `docker compose -f docker-compose.yml run --rm django python manage.py compilemessages`
 - **Static Assets:** SASS/JS compilation via Gulp (`gulpfile.mjs`). Bootstrap customizations in `static/sass/custom_bootstrap_vars`. If SCSS files are changed, you do not need to run a workflow (such as `npm run gulp`) as this files are watched by a Node container and will automatically update and write files to `static/css/`. This Node container cannot be accessed if working in a dev container, so ask the user to check the script is working, if you cannot see the output in `static/css/`.
+- **Debugging:** If you wish to debug with a bash or Python script, it is better to run logic within the Django shell to load with valid Django settings.
 
 ## Project-Specific Conventions
 
