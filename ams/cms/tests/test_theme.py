@@ -12,7 +12,6 @@ from wagtail.models import Page
 from wagtail.models import Site
 
 from ams.cms.models import ThemeSettings
-from ams.cms.validators import validate_hex_color
 from config.templatetags.theme import hex_to_rgb
 
 
@@ -25,57 +24,6 @@ def site(db):
         root_page=root,
         is_default_site=True,
     )
-
-
-@pytest.mark.django_db
-class TestHexColorValidator:
-    """Tests for hex color validator."""
-
-    def test_valid_six_digit_hex(self):
-        """Test that 6-digit hex codes are valid."""
-        validate_hex_color("#ffffff")
-        validate_hex_color("#000000")
-        validate_hex_color("#0d6efd")
-        # Should not raise
-
-    def test_valid_three_digit_hex(self):
-        """Test that 3-digit hex codes are valid."""
-        validate_hex_color("#fff")
-        validate_hex_color("#000")
-        validate_hex_color("#abc")
-        # Should not raise
-
-    def test_valid_mixed_case(self):
-        """Test that mixed case hex codes are valid."""
-        validate_hex_color("#AbCdEf")
-        validate_hex_color("#FFFFFF")
-        # Should not raise
-
-    def test_invalid_no_hash(self):
-        """Test that hex code without # is invalid."""
-        with pytest.raises(ValidationError):
-            validate_hex_color("ffffff")
-
-    def test_invalid_wrong_length(self):
-        """Test that wrong length hex codes are invalid."""
-        with pytest.raises(ValidationError):
-            validate_hex_color("#ff")
-        with pytest.raises(ValidationError):
-            validate_hex_color("#ffff")
-        with pytest.raises(ValidationError):
-            validate_hex_color("#fffffff")
-
-    def test_invalid_non_hex_characters(self):
-        """Test that non-hex characters are invalid."""
-        with pytest.raises(ValidationError):
-            validate_hex_color("#gggggg")
-        with pytest.raises(ValidationError):
-            validate_hex_color("#zzzzzz")
-
-    def test_empty_string_allowed(self):
-        """Test that empty string is allowed (for optional fields)."""
-        validate_hex_color("")
-        # Should not raise
 
 
 @pytest.mark.django_db
@@ -117,8 +65,10 @@ class TestThemeSettings:
         """Test that invalid color values raise ValidationError."""
         theme = ThemeSettings(site=site, primary_color="invalid")
 
-        with pytest.raises(ValidationError):
+        with pytest.raises(ValidationError) as exc_info:
             theme.full_clean()
+        # ColorField should raise validation error for invalid hex colors
+        assert "primary_color" in exc_info.value.message_dict
 
 
 @pytest.mark.django_db

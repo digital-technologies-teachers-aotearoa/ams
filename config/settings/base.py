@@ -115,6 +115,7 @@ THIRD_PARTY_APPS = [
     "taggit",
     "storages",
     "imagekit",
+    "wagtail_color_panel",
 ]
 
 LOCAL_APPS = [
