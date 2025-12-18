@@ -3,6 +3,14 @@
 <style>
 :root,
 [data-bs-theme="light"] {
+  /* Fonts */
+  --bs-font-sans-serif: {{ theme.font_sans_serif|safe }};
+  --bs-font-monospace: {{ theme.font_monospace|safe }};
+  --bs-body-font-family: {{ theme.body_font_family|safe }};
+  --bs-body-font-size: {{ theme.body_font_size }};
+  --bs-body-font-weight: {{ theme.body_font_weight }};
+  --bs-body-line-height: {{ theme.body_line_height }};
+
   /* Body */
   --bs-body-color: {{ theme.body_color_light }};
   --bs-body-color-rgb: {{ theme.body_color_light|hex_to_rgb }};

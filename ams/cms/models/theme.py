@@ -549,6 +549,70 @@ class ThemeSettings(BaseSiteSetting):
             "Dark mode: Hyperlink hover color.<br>Default: <code>#8bb9fe</code>",
         ),
     )
+    # ==== FONT SETTINGS ====
+    font_sans_serif = models.CharField(
+        max_length=500,
+        default=(
+            'system-ui, -apple-system, "Segoe UI", Roboto, '
+            '"Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, '
+            'sans-serif, "Apple Color Emoji", "Segoe UI Emoji", '
+            '"Segoe UI Symbol", "Noto Color Emoji"'
+        ),
+        verbose_name="Sans-serif font stack",
+        help_text=mark_safe(
+            "Sans-serif font stack for the site.<br>"
+            'Default: system-ui, -apple-system, "Segoe UI", Roboto, '
+            '"Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, '
+            'sans-serif, "Apple Color Emoji", "Segoe UI Emoji", '
+            '"Segoe UI Symbol", "Noto Color Emoji"',
+        ),
+    )
+    font_monospace = models.CharField(
+        max_length=500,
+        default=(
+            "SFMono-Regular, Menlo, Monaco, Consolas, "
+            '"Liberation Mono", "Courier New", monospace'
+        ),
+        verbose_name="Monospace font stack",
+        help_text=mark_safe(
+            "Default monospace font stack for code and pre elements.<br>"
+            "Default: SFMono-Regular, Menlo, Monaco, Consolas, "
+            '"Liberation Mono", "Courier New", monospace',
+        ),
+    )
+    body_font_family = models.CharField(
+        max_length=100,
+        default="var(--bs-font-sans-serif)",
+        verbose_name="Body font family",
+        help_text=mark_safe(
+            "Font family for body text. Typically references --bs-font-sans-serif.<br>"
+            "Default: <code>var(--bs-font-sans-serif)</code>",
+        ),
+    )
+    body_font_size = models.CharField(
+        max_length=50,
+        default="1rem",
+        verbose_name="Body font size",
+        help_text=mark_safe(
+            "Base font size for body text.<br>Default: <code>1rem</code>",
+        ),
+    )
+    body_font_weight = models.CharField(
+        max_length=50,
+        default="400",
+        verbose_name="Body font weight",
+        help_text=mark_safe(
+            "Font weight for body text.<br>Default: <code>400</code>",
+        ),
+    )
+    body_line_height = models.CharField(
+        max_length=50,
+        default="1.5",
+        verbose_name="Body line height",
+        help_text=mark_safe(
+            "Line height for body text.<br>Default: <code>1.5</code>",
+        ),
+    )
     panels = [
         MultiFieldPanel(
             [
@@ -832,6 +896,22 @@ class ThemeSettings(BaseSiteSetting):
             ],
             "Links",
             help_text="Colors for hyperlinks in light and dark modes.",
+        ),
+        MultiFieldPanel(
+            [
+                FieldRowPanel(["font_sans_serif"]),
+                FieldRowPanel(["font_monospace"]),
+                FieldRowPanel(["body_font_family"]),
+                FieldRowPanel(
+                    [
+                        "body_font_size",
+                        "body_font_weight",
+                        "body_line_height",
+                    ],
+                ),
+            ],
+            "Fonts",
+            help_text="Typography settings for font families, sizes, and spacing.",
         ),
     ]
 
