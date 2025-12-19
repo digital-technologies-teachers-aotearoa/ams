@@ -161,4 +161,9 @@
   --bs-link-hover-color: {{ theme.link_hover_color_dark }};
   --bs-link-hover-color-rgb: {{ theme.link_hover_color_dark|hex_to_rgb }};
 }
+
+/* Custom CSS Overrides */
+{% if theme.custom_css %}
+{{ theme.custom_css|safe }}
+{% endif %}
 </style>

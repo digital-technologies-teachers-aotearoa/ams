@@ -613,6 +613,17 @@ class ThemeSettings(BaseSiteSetting):
             "Line height for body text.<br>Default: <code>1.5</code>",
         ),
     )
+    # ==== CUSTOM CSS OVERRIDES ====
+    custom_css = models.TextField(
+        blank=True,
+        default="",
+        verbose_name="Custom CSS",
+        help_text=mark_safe(
+            "<strong>⚠️ WARNING:</strong> Direct CSS overrides can break site layout "
+            "and styling. Use with caution. Invalid CSS may cause display issues. "
+            "This field accepts pure CSS code that will be injected into all pages.",
+        ),
+    )
     panels = [
         MultiFieldPanel(
             [
@@ -912,6 +923,19 @@ class ThemeSettings(BaseSiteSetting):
             ],
             "Fonts",
             help_text="Typography settings for font families, sizes, and spacing.",
+        ),
+        MultiFieldPanel(
+            [
+                FieldRowPanel(["custom_css"]),
+            ],
+            "⚠️ Advanced: Custom CSS Overrides",
+            help_text=mark_safe(
+                "<strong style='color: #dc3545;'>DANGER ZONE:</strong> "
+                "Custom CSS can override all theme settings and break site design. "
+                "Only use if you understand CSS and are prepared to troubleshoot "
+                "potential conflicts. Changes apply immediately to all site pages.",
+            ),
+            classname="collapsed",
         ),
     ]
 
