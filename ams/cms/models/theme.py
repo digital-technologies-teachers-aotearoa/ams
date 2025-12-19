@@ -1,4 +1,5 @@
 from django.db import models
+from django.forms.models import model_to_dict
 from django.utils.safestring import mark_safe
 from wagtail.admin.panels import FieldRowPanel
 from wagtail.admin.panels import MultiFieldPanel
@@ -15,10 +16,12 @@ class ThemeSettings(BaseSiteSetting):
     Allows customization of colors and appearance without code deployment.
     Organized to match Bootstrap 5.3 color documentation.
     Changes are cached for performance.
+
+    Full version history is stored in ThemeSettingsRevision model.
     """
 
-    # Version tracking for cache invalidation
-    css_version = models.IntegerField(
+    # Cache version for efficient cache invalidation
+    cache_version = models.IntegerField(
         default=1,
         editable=False,
         help_text="Auto-incremented on save to invalidate cached CSS",
@@ -940,9 +943,47 @@ class ThemeSettings(BaseSiteSetting):
     ]
 
     def save(self, *args, **kwargs):
-        """Increment CSS version on save to invalidate cached CSS."""
-        self.css_version += 1
+        """Save settings and create a revision snapshot."""
+        self.cache_version += 1
         super().save(*args, **kwargs)
+        # Create a revision snapshot after saving
+        ThemeSettingsRevision.objects.create(
+            settings=self,
+            data=model_to_dict(self, exclude=["id", "site", "cache_version"]),
+        )
 
     class Meta:
         verbose_name = "Theme Settings"
+
+
+class ThemeSettingsRevision(models.Model):
+    """Historical snapshot of ThemeSettings.
+
+    Stores every saved version of theme settings for audit trail and potential rollback.
+    """
+
+    settings = models.ForeignKey(
+        ThemeSettings,
+        on_delete=models.CASCADE,
+        related_name="revisions",
+        help_text="The theme settings this revision belongs to",
+    )
+    data = models.JSONField(
+        help_text="Snapshot of all theme settings at the time of save",
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        help_text="When this revision was created",
+        db_index=True,  # Index for efficient latest revision queries
+    )
+
+    class Meta:
+        verbose_name = "Theme Settings Revision"
+        verbose_name_plural = "Theme Settings Revisions"
+        ordering = ["-created_at"]  # Latest first
+        indexes = [
+            models.Index(fields=["settings", "-created_at"]),
+        ]
+
+    def __str__(self):
+        return f"Revision from {self.created_at.strftime('%Y-%m-%d %H:%M:%S')}"

@@ -16,6 +16,7 @@ from ams.cms.models.settings import SiteSettings
 
 # Theme models
 from ams.cms.models.theme import ThemeSettings
+from ams.cms.models.theme import ThemeSettingsRevision
 
 __all__ = [
     "AMSDocument",
@@ -24,4 +25,5 @@ __all__ = [
     "HomePage",
     "SiteSettings",
     "ThemeSettings",
+    "ThemeSettingsRevision",
 ]
