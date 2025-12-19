@@ -16,7 +16,7 @@
           content="Software for managing an association with users, memberships, forums, and more." />
     <meta name="author"
           content="{{ settings.cms.AssociationSettings.association_short_name|default:'Association Management Software' }}" />
-    {% image settings.cms.AssociationSettings.association_favicon format-ico as favicon_image %}
+    {% image settings.cms.AssociationSettings.association_favicon format-ico preserve-svg as favicon_image %}
     <link rel="icon" href="{{ favicon_image.url }}" />
     {% block css %}
       <link href="{% static 'css/project.min.css' %}" rel="stylesheet" />
