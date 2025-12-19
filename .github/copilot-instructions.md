@@ -47,3 +47,7 @@ This guide enables AI coding agents to work productively in the Association Mana
 - See `/app/locale/README.md` for translation workflow
 - See `config/settings/` for environment configs
 - See `compose/` for Docker service definitions
+
+## Other notes
+
+- After being prompted, ask the user if you have any questions.
