@@ -62,8 +62,10 @@ def theme_css_variables(context):
     if not theme_settings:
         return ""
 
-    # Create cache key including site ID and CSS version for invalidation
-    cache_key = f"theme_css_v{theme_settings.css_version}_site{theme_settings.site_id}"
+    # Create cache key using cache_version for efficient invalidation
+    cache_key = (
+        f"theme_css_v{theme_settings.cache_version}_site{theme_settings.site_id}"
+    )
 
     # Try to get from cache
     cached_html = cache.get(cache_key)

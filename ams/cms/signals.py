@@ -12,18 +12,20 @@ from ams.cms.models import ThemeSettings
 def clear_theme_cache_on_save(sender, instance, **kwargs):
     """Clear theme CSS cache when ThemeSettings is saved.
 
-    The css_version field is auto-incremented on save, so old cache keys
-    will naturally become stale. This signal clears any previous versions
+    The cache_version field is auto-incremented on save, so old cache keys
+    will naturally become stale. This signal clears the previous version
     to prevent cache bloat.
     """
     # Clear previous version cache (if it exists)
-    if instance.css_version > 1:
-        old_cache_key = f"theme_css_v{instance.css_version - 1}_site{instance.site_id}"
+    if instance.cache_version > 1:
+        old_cache_key = (
+            f"theme_css_v{instance.cache_version - 1}_site{instance.site_id}"
+        )
         cache.delete(old_cache_key)
 
 
 @receiver(post_delete, sender=ThemeSettings)
 def clear_theme_cache_on_delete(sender, instance, **kwargs):
     """Clear theme CSS cache when ThemeSettings is deleted."""
-    cache_key = f"theme_css_v{instance.css_version}_site{instance.site_id}"
+    cache_key = f"theme_css_v{instance.cache_version}_site{instance.site_id}"
     cache.delete(cache_key)

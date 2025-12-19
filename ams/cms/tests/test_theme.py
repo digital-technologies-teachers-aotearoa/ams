@@ -17,13 +17,16 @@ from config.templatetags.theme import hex_to_rgb
 
 @pytest.fixture
 def site(db):
-    """Create a test site."""
+    """Get or create a test site."""
     root = Page.get_first_root_node()
-    return Site.objects.create(
+    site, _created = Site.objects.get_or_create(
         hostname="localhost",
-        root_page=root,
-        is_default_site=True,
+        defaults={
+            "root_page": root,
+            "is_default_site": True,
+        },
     )
+    return site
 
 
 @pytest.mark.django_db
@@ -34,17 +37,29 @@ class TestThemeSettings:
         """Test creating ThemeSettings with default values."""
         theme = ThemeSettings.objects.create(site=site)
         assert theme.primary_color == "#0d6efd"
-        assert theme.css_version == 2  # Incremented from 1 on create  # noqa: PLR2004
+        # Cache version should be incremented from initial 1
+        assert theme.cache_version == 2  # noqa: PLR2004
+        # Check that a revision was created
+        assert theme.revisions.count() == 1
+        latest_revision = theme.revisions.first()
+        assert latest_revision.data["primary_color"] == "#0d6efd"
 
-    def test_css_version_increments_on_save(self, site):
-        """Test that css_version increments on each save."""
+    def test_revision_created_on_save(self, site):
+        """Test that a new revision is created on each save."""
         theme = ThemeSettings.objects.create(site=site)
-        initial_version = theme.css_version
+        initial_revision_count = theme.revisions.count()
+        initial_cache_version = theme.cache_version
 
         theme.primary_color = "#ff0000"
         theme.save()
 
-        assert theme.css_version == initial_version + 1
+        # Cache version should increment
+        assert theme.cache_version == initial_cache_version + 1
+        # Should have one more revision
+        assert theme.revisions.count() == initial_revision_count + 1
+        # Latest revision should have the new color
+        latest_revision = theme.revisions.first()
+        assert latest_revision.data["primary_color"] == "#ff0000"
 
     def test_custom_colors(self, site):
         """Test creating ThemeSettings with custom colors."""
@@ -69,6 +84,38 @@ class TestThemeSettings:
             theme.full_clean()
         # ColorField should raise validation error for invalid hex colors
         assert "primary_color" in exc_info.value.message_dict
+
+    def test_revision_stores_timestamp(self, site):
+        """Test that revisions store creation timestamp."""
+        theme = ThemeSettings.objects.create(site=site)
+
+        latest_revision = theme.revisions.first()
+        assert latest_revision is not None
+        assert latest_revision.created_at is not None
+
+    def test_multiple_revisions_stored(self, site):
+        """Test that all revisions are stored, not just the latest."""
+        theme = ThemeSettings.objects.create(site=site)
+
+        # Make multiple changes
+        theme.primary_color = "#ff0000"
+        theme.save()
+
+        theme.primary_color = "#00ff00"
+        theme.save()
+
+        theme.primary_color = "#0000ff"
+        theme.save()
+
+        # Should have 4 total revisions (1 from create + 3 from saves)
+        assert theme.revisions.count() == 4  # noqa: PLR2004
+
+        # Check that revisions are ordered by most recent first
+        revisions = list(theme.revisions.all())
+        assert revisions[0].data["primary_color"] == "#0000ff"  # Latest
+        assert revisions[1].data["primary_color"] == "#00ff00"
+        assert revisions[2].data["primary_color"] == "#ff0000"
+        assert revisions[3].data["primary_color"] == "#0d6efd"  # Original
 
 
 @pytest.mark.django_db
@@ -264,7 +311,7 @@ class TestThemeSignals:
     def test_cache_cleared_on_delete(self, site):
         """Test that cache is cleared when ThemeSettings is deleted."""
         theme = ThemeSettings.objects.create(site=site)
-        cache_key = f"theme_css_v{theme.css_version}_site{theme.site_id}"
+        cache_key = f"theme_css_v{theme.cache_version}_site{theme.site_id}"
 
         # Set something in cache
         cache.set(cache_key, "test css", None)
@@ -279,7 +326,7 @@ class TestThemeSignals:
     def test_old_cache_cleared_on_save(self, site):
         """Test that old cache version is cleared when saving."""
         theme = ThemeSettings.objects.create(site=site)
-        old_version = theme.css_version
+        old_version = theme.cache_version
         old_cache_key = f"theme_css_v{old_version}_site{theme.site_id}"
 
         # Set old cache
@@ -290,4 +337,5 @@ class TestThemeSignals:
         theme.save()
 
         # Old cache should be cleared
+        assert cache.get(old_cache_key) is None
         assert cache.get(old_cache_key) is None
