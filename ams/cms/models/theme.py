@@ -1,3 +1,6 @@
+# ruff: noqa: ERA001
+# Lines for dark mode are commented out until feature is added
+
 from django.db import models
 from django.forms.models import model_to_dict
 from django.utils.safestring import mark_safe
@@ -702,13 +705,13 @@ class ThemeSettings(BaseSiteSetting):
                 FieldRowPanel(
                     [
                         NativeColorPanel("body_color_light"),
-                        NativeColorPanel("body_color_dark"),
+                        # NativeColorPanel("body_color_dark"),
                     ],
                 ),
                 FieldRowPanel(
                     [
                         NativeColorPanel("body_bg_light"),
-                        NativeColorPanel("body_bg_dark"),
+                        # NativeColorPanel("body_bg_dark"),
                     ],
                 ),
             ],
@@ -722,13 +725,13 @@ class ThemeSettings(BaseSiteSetting):
                 FieldRowPanel(
                     [
                         NativeColorPanel("secondary_color_light"),
-                        NativeColorPanel("secondary_color_dark"),
+                        # NativeColorPanel("secondary_color_dark"),
                     ],
                 ),
                 FieldRowPanel(
                     [
                         NativeColorPanel("secondary_bg_light"),
-                        NativeColorPanel("secondary_bg_dark"),
+                        # NativeColorPanel("secondary_bg_dark"),
                     ],
                 ),
             ],
@@ -742,13 +745,13 @@ class ThemeSettings(BaseSiteSetting):
                 FieldRowPanel(
                     [
                         NativeColorPanel("tertiary_color_light"),
-                        NativeColorPanel("tertiary_color_dark"),
+                        # NativeColorPanel("tertiary_color_dark"),
                     ],
                 ),
                 FieldRowPanel(
                     [
                         NativeColorPanel("tertiary_bg_light"),
-                        NativeColorPanel("tertiary_bg_dark"),
+                        # NativeColorPanel("tertiary_bg_dark"),
                     ],
                 ),
             ],
@@ -763,7 +766,7 @@ class ThemeSettings(BaseSiteSetting):
                 FieldRowPanel(
                     [
                         NativeColorPanel("emphasis_color_light"),
-                        NativeColorPanel("emphasis_color_dark"),
+                        # NativeColorPanel("emphasis_color_dark"),
                     ],
                 ),
             ],
@@ -775,7 +778,7 @@ class ThemeSettings(BaseSiteSetting):
                 FieldRowPanel(
                     [
                         NativeColorPanel("border_color_light"),
-                        NativeColorPanel("border_color_dark"),
+                        # NativeColorPanel("border_color_dark"),
                     ],
                 ),
             ],
@@ -788,19 +791,19 @@ class ThemeSettings(BaseSiteSetting):
                 FieldRowPanel(
                     [
                         NativeColorPanel("primary_bg_subtle_light"),
-                        NativeColorPanel("primary_bg_subtle_dark"),
+                        # NativeColorPanel("primary_bg_subtle_dark"),
                     ],
                 ),
                 FieldRowPanel(
                     [
                         NativeColorPanel("primary_border_subtle_light"),
-                        NativeColorPanel("primary_border_subtle_dark"),
+                        # NativeColorPanel("primary_border_subtle_dark"),
                     ],
                 ),
                 FieldRowPanel(
                     [
                         NativeColorPanel("primary_text_emphasis_light"),
-                        NativeColorPanel("primary_text_emphasis_dark"),
+                        # NativeColorPanel("primary_text_emphasis_dark"),
                     ],
                 ),
             ],
@@ -816,19 +819,19 @@ class ThemeSettings(BaseSiteSetting):
                 FieldRowPanel(
                     [
                         NativeColorPanel("success_bg_subtle_light"),
-                        NativeColorPanel("success_bg_subtle_dark"),
+                        # NativeColorPanel("success_bg_subtle_dark"),
                     ],
                 ),
                 FieldRowPanel(
                     [
                         NativeColorPanel("success_border_subtle_light"),
-                        NativeColorPanel("success_border_subtle_dark"),
+                        # NativeColorPanel("success_border_subtle_dark"),
                     ],
                 ),
                 FieldRowPanel(
                     [
                         NativeColorPanel("success_text_emphasis_light"),
-                        NativeColorPanel("success_text_emphasis_dark"),
+                        # NativeColorPanel("success_text_emphasis_dark"),
                     ],
                 ),
             ],
@@ -843,19 +846,19 @@ class ThemeSettings(BaseSiteSetting):
                 FieldRowPanel(
                     [
                         NativeColorPanel("danger_bg_subtle_light"),
-                        NativeColorPanel("danger_bg_subtle_dark"),
+                        # NativeColorPanel("danger_bg_subtle_dark"),
                     ],
                 ),
                 FieldRowPanel(
                     [
                         NativeColorPanel("danger_border_subtle_light"),
-                        NativeColorPanel("danger_border_subtle_dark"),
+                        # NativeColorPanel("danger_border_subtle_dark"),
                     ],
                 ),
                 FieldRowPanel(
                     [
                         NativeColorPanel("danger_text_emphasis_light"),
-                        NativeColorPanel("danger_text_emphasis_dark"),
+                        # NativeColorPanel("danger_text_emphasis_dark"),
                     ],
                 ),
             ],
@@ -868,19 +871,19 @@ class ThemeSettings(BaseSiteSetting):
                 FieldRowPanel(
                     [
                         NativeColorPanel("warning_bg_subtle_light"),
-                        NativeColorPanel("warning_bg_subtle_dark"),
+                        # NativeColorPanel("warning_bg_subtle_dark"),
                     ],
                 ),
                 FieldRowPanel(
                     [
                         NativeColorPanel("warning_border_subtle_light"),
-                        NativeColorPanel("warning_border_subtle_dark"),
+                        # NativeColorPanel("warning_border_subtle_dark"),
                     ],
                 ),
                 FieldRowPanel(
                     [
                         NativeColorPanel("warning_text_emphasis_light"),
-                        NativeColorPanel("warning_text_emphasis_dark"),
+                        # NativeColorPanel("warning_text_emphasis_dark"),
                     ],
                 ),
             ],
@@ -893,19 +896,19 @@ class ThemeSettings(BaseSiteSetting):
                 FieldRowPanel(
                     [
                         NativeColorPanel("info_bg_subtle_light"),
-                        NativeColorPanel("info_bg_subtle_dark"),
+                        # NativeColorPanel("info_bg_subtle_dark"),
                     ],
                 ),
                 FieldRowPanel(
                     [
                         NativeColorPanel("info_border_subtle_light"),
-                        NativeColorPanel("info_border_subtle_dark"),
+                        # NativeColorPanel("info_border_subtle_dark"),
                     ],
                 ),
                 FieldRowPanel(
                     [
                         NativeColorPanel("info_text_emphasis_light"),
-                        NativeColorPanel("info_text_emphasis_dark"),
+                        # NativeColorPanel("info_text_emphasis_dark"),
                     ],
                 ),
             ],
@@ -918,19 +921,19 @@ class ThemeSettings(BaseSiteSetting):
                 FieldRowPanel(
                     [
                         NativeColorPanel("light_bg_subtle_light"),
-                        NativeColorPanel("light_bg_subtle_dark"),
+                        # NativeColorPanel("light_bg_subtle_dark"),
                     ],
                 ),
                 FieldRowPanel(
                     [
                         NativeColorPanel("light_border_subtle_light"),
-                        NativeColorPanel("light_border_subtle_dark"),
+                        # NativeColorPanel("light_border_subtle_dark"),
                     ],
                 ),
                 FieldRowPanel(
                     [
                         NativeColorPanel("light_text_emphasis_light"),
-                        NativeColorPanel("light_text_emphasis_dark"),
+                        # NativeColorPanel("light_text_emphasis_dark"),
                     ],
                 ),
             ],
@@ -943,19 +946,19 @@ class ThemeSettings(BaseSiteSetting):
                 FieldRowPanel(
                     [
                         NativeColorPanel("dark_bg_subtle_light"),
-                        NativeColorPanel("dark_bg_subtle_dark"),
+                        # NativeColorPanel("dark_bg_subtle_dark"),
                     ],
                 ),
                 FieldRowPanel(
                     [
                         NativeColorPanel("dark_border_subtle_light"),
-                        NativeColorPanel("dark_border_subtle_dark"),
+                        # NativeColorPanel("dark_border_subtle_dark"),
                     ],
                 ),
                 FieldRowPanel(
                     [
                         NativeColorPanel("dark_text_emphasis_light"),
-                        NativeColorPanel("dark_text_emphasis_dark"),
+                        # NativeColorPanel("dark_text_emphasis_dark"),
                     ],
                 ),
             ],
@@ -967,18 +970,18 @@ class ThemeSettings(BaseSiteSetting):
                 FieldRowPanel(
                     [
                         NativeColorPanel("link_color_light"),
-                        NativeColorPanel("link_color_dark"),
+                        # NativeColorPanel("link_color_dark"),
                     ],
                 ),
                 FieldRowPanel(
                     [
                         NativeColorPanel("link_hover_color_light"),
-                        NativeColorPanel("link_hover_color_dark"),
+                        # NativeColorPanel("link_hover_color_dark"),
                     ],
                 ),
             ],
             "Links",
-            help_text="Colors for hyperlinks in light and dark modes.",
+            help_text="Colors for hyperlinks.",
         ),
         MultiFieldPanel(
             [

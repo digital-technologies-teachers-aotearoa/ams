@@ -18,7 +18,6 @@ The theme system allows you to customize colors for:
 - **Body Colors**: Background and text colors for your pages
 - **Link Colors**: Link and hover colors
 - **Component Colors**: Borders, buttons, alerts, and other UI elements
-- **Dark Mode**: Separate color values optimized for dark mode
 - **Typography**: Font families, sizes, weights, and line heights
 - **Custom CSS**: Advanced overrides (use with caution)
 
@@ -34,7 +33,6 @@ Control the base appearance of your pages:
 
 - **Body text color**: The default color for all text
 - **Body background**: The background color of pages
-- Each has separate values for light and dark modes
 
 ### Theme Colors
 
@@ -54,7 +52,6 @@ Customize how hyperlinks appear:
 
 - **Link color**: Default link color
 - **Link hover color**: Color when hovering over links
-- Separate values for light and dark modes
 
 ### Fonts
 
@@ -66,18 +63,6 @@ Configure typography settings:
 - **Body font size**: Base font size (default: 1rem)
 - **Body font weight**: Font weight (default: 400)
 - **Body line height**: Spacing between lines (default: 1.5)
-
-## Light and Dark Mode Support
-
-!!! note "Not yet implemented"
-    The ability to switch between light and dark modes is not yet implemented.
-
-Many colors have separate values for light and dark modes. This ensures your site looks great in both modes:
-
-- Light mode: Used by default and when users select light theme
-- Dark mode: Activated when users select dark theme or use system dark mode
-
-**Tip**: When changing colors, always check both modes to ensure good contrast and readability.
 
 ## Best Practices
 
@@ -94,7 +79,6 @@ Many colors have separate values for light and dark modes. This ensures your sit
 
 - **Brand Consistency**: Use your organization's official brand colors for primary/secondary
 - **Semantic Colors**: Keep success=green, danger=red, warning=yellow for user familiarity
-- **Test Both Modes**: Always check light AND dark mode after making changes
 - **Start Small**: Change one color at a time to see its impact
 - **Save Frequently**: Changes can be reverted through the revision history
 
@@ -104,9 +88,8 @@ After saving theme changes:
 
 1. Open your website in a new browser tab
 2. Navigate to different page types (home, blog posts, forms, etc.)
-3. Toggle between light and dark modes
-4. Check on different devices (desktop, tablet, mobile)
-5. Verify links, buttons, and alerts look correct
+3. Check on different devices (desktop, tablet, mobile)
+4. Verify links, buttons, and alerts look correct
 
 ## Multi-site Configuration
 
@@ -146,12 +129,6 @@ Colors must be in hexadecimal format:
 - ❌ Invalid: `white`, `rgb(255,255,255)`, `#gggggg`
 - Always include the `#` symbol
 - Use only valid hex characters: 0-9 and A-F
-
-### Colors Look Wrong in Dark Mode
-
-- Each color section shows which fields apply to which mode
-- Look for "(light)" and "(dark)" labels in field names
-- Dark mode colors should be lighter for text, darker for backgrounds
 
 ### Need to Undo Changes?
 
