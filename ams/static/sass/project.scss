@@ -1,6 +1,17 @@
 @import 'partials/custom_bootstrap_vars';
 @import '~bootstrap/scss/bootstrap';
 @import 'partials/profile_pictures';
+@import 'partials/full_width_section_block';
+
+/* Rules as polyfill for new CSS rule: https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/margin-trim */
+.margin-trim {
+  :first-child {
+    margin-top: 0;
+  }
+  :last-child {
+    margin-bottom: 0;
+  }
+}
 
 ///////////////
 // Variables //

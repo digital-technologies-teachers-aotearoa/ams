@@ -1,0 +1,35 @@
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{# Full-width section that breaks out of the container #}
+<div class="full-width-section bg-body-tertiary text-body-tertiary mb-4"
+     data-bs-theme="{{ self.colour_mode }}">
+  {% if self.background_image %}
+    {% image self.background_image fill-2000x800 as bg_img %}
+    <div class="full-width-section__background full-width-section__background-opacity-{{ self.background_image_opacity }}"
+         style="background-image: url('{{ bg_img.url }}')"></div>
+  {% endif %}
+  <div class="container position-relative z-1 d-flex flex-column gap-3 text-center">
+    {% if self.heading %}<h2 class="full-width-section__heading mb-0">{{ self.heading }}</h2>{% endif %}
+    {% if self.text %}
+      <div class="full-width-section__intro text-center margin-trim">{{ self.text|richtext }}</div>
+    {% endif %}
+    {% if self.items %}
+      <div class="full-width-section__items full-width-section__items--{{ self.item_shape|default:'default' }}">
+        {% for item in self.items %}
+          {% if item.link_page or item.link_url %}
+            <a href="{% if item.link_page %}{% pageurl item.link_page %}{% else %}{{ item.link_url }}{% endif %}"
+               class="full-width-section__item full-width-section__item--{{ self.item_shape|default:'default' }} h-100 bg-body-tertiary text-body-tertiary"
+               data-bs-theme="{{ item.colour_mode }}">
+              {% include "cms/blocks/partials/full_width_section_item_content.html" %}
+            </a>
+          {% else %}
+            <div class="full-width-section__item full-width-section__item--{{ self.item_shape|default:'default' }} h-100 bg-body-tertiary text-body-tertiary"
+                 data-bs-theme="{{ item.colour_mode }}">
+              {% include "cms/blocks/partials/full_width_section_item_content.html" %}
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</div>

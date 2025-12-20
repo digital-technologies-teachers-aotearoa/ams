@@ -1,0 +1,13 @@
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% if item.background_image %}
+  {% image item.background_image fill-400x400 as item_bg_img %}
+  <div class="full-width-section__item-background full-width-section__item-background-opacity-{{ item.background_image_opacity }}"
+       style="background-image: url('{{ item_bg_img.url }}')"></div>
+{% else %}
+  <div class="full-width-section__item-background full-width-section__item-background-opacity-100"
+       style="background-color: {{ item.background_colour }}"></div>
+{% endif %}
+<div class="full-width-section__item-content position-relative z-1">
+  {% if item.text %}<div class="full-width-section__item-text">{{ item.text }}</div>{% endif %}
+</div>

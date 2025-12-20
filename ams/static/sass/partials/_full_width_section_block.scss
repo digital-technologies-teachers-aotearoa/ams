@@ -1,0 +1,146 @@
+.full-width-section {
+  // Break out of container to extend to page edges
+  position: relative;
+  width: 100vw;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  padding: 3rem 0;
+
+  &__background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: -1;
+  }
+  &__background-opacity-15 {
+    opacity: 0.15;
+  }
+  &__background-opacity-25 {
+    opacity: 0.25;
+  }
+  &__background-opacity-50 {
+    opacity: 0.5;
+  }
+  &__background-opacity-75 {
+    opacity: 0.75;
+  }
+  &__background-opacity-100 {
+    opacity: 1;
+  }
+
+  &__items {
+    display: grid;
+    grid-auto-flow: row;
+    grid-template-columns: 100%;
+    align-items: center;
+    gap: 1rem;
+
+    &--circle {
+      justify-items: center;
+    }
+  }
+
+  @include media-breakpoint-up(md) {
+    &__items {
+      grid-auto-flow: column;
+      justify-content: center;
+      grid-template-columns: repeat(auto-fit, 200px);
+    }
+  }
+
+  &__item {
+    position: relative;
+    padding: 2rem 1.5rem;
+    transition: transform 0.2s ease-in-out;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+
+    // Circle shape
+    &--circle {
+      border-radius: 50%;
+      aspect-ratio: 1 / 1;
+      max-height: 200px;
+      max-width: 200px;
+      width: 100%;
+    }
+
+    // Parallelogram shape
+    &--parallelogram {
+      transform: skew(-20deg);
+
+      @include media-breakpoint-down(md) {
+        margin: 0 1rem;
+      }
+
+      // Un-skew the content so text is readable
+      .full-width-section__item-content {
+        transform: skew(20deg);
+      }
+
+      &:hover {
+        transform: skew(-20deg);
+      }
+    }
+
+    // Link styling
+    &.text-decoration-none {
+      color: inherit;
+
+      &:hover {
+        color: inherit;
+      }
+    }
+  }
+
+  &__item-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 0;
+  }
+
+  &__item-background-opacity-15 {
+    opacity: 0.15;
+  }
+  &__item-background-opacity-25 {
+    opacity: 0.25;
+  }
+  &__item-background-opacity-50 {
+    opacity: 0.5;
+  }
+  &__item-background-opacity-75 {
+    opacity: 0.75;
+  }
+  &__item-background-opacity-100 {
+    opacity: 1;
+  }
+
+  &__item-content {
+    z-index: 1;
+  }
+
+  &__item-text {
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+}
