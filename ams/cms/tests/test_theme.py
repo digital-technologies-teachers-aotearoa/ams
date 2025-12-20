@@ -224,15 +224,17 @@ class TestThemeContextProcessor:
         cache.clear()
 
         request = rf.get("/")
-        request.site = site
 
-        # Call context processor
-        context = theme_settings_processor(request)
+        # Mock Site.find_for_request to return our test site
+        with patch("ams.cms.context_processors.Site.find_for_request") as mock_find:
+            mock_find.return_value = site
+            # Call context processor
+            context = theme_settings_processor(request)
 
-        assert "theme_css" in context
-        assert "<style>" in context["theme_css"]
-        assert "#ff0000" in context["theme_css"]
-        assert "</style>" in context["theme_css"]
+            assert "theme_css" in context
+            assert "<style>" in context["theme_css"]
+            assert "#ff0000" in context["theme_css"]
+            assert "</style>" in context["theme_css"]
 
     def test_context_processor_uses_two_tier_cache(self, site, rf):
         """Test that context processor uses two-tier caching strategy."""
@@ -240,21 +242,30 @@ class TestThemeContextProcessor:
         cache.clear()
 
         request = rf.get("/")
-        request.site = site
 
-        # First call - should query DB and cache both tiers
-        with patch("ams.cms.context_processors.ThemeSettings.for_site") as mock_query:
-            mock_query.return_value = theme
-            context1 = theme_settings_processor(request)
-            assert mock_query.call_count == 1
+        # Mock Site.find_for_request for all calls
+        with patch(
+            "ams.cms.context_processors.Site.find_for_request",
+        ) as mock_find_site:
+            mock_find_site.return_value = site
 
-        # Second call - should use cache, no DB query
-        with patch("ams.cms.context_processors.ThemeSettings.for_site") as mock_query:
-            context2 = theme_settings_processor(request)
-            assert mock_query.call_count == 0  # No DB query
+            # First call - should query DB and cache both tiers
+            with patch(
+                "ams.cms.context_processors.ThemeSettings.for_site",
+            ) as mock_query:
+                mock_query.return_value = theme
+                context1 = theme_settings_processor(request)
+                assert mock_query.call_count == 1
 
-        # Results should be identical
-        assert context1["theme_css"] == context2["theme_css"]
+            # Second call - should use cache, no DB query
+            with patch(
+                "ams.cms.context_processors.ThemeSettings.for_site",
+            ) as mock_query:
+                context2 = theme_settings_processor(request)
+                assert mock_query.call_count == 0  # No DB query
+
+            # Results should be identical
+            assert context1["theme_css"] == context2["theme_css"]
 
     def test_context_processor_cache_invalidation(self, site, rf):
         """Test that context processor detects version changes."""
@@ -264,21 +275,24 @@ class TestThemeContextProcessor:
         cache.clear()
 
         request = rf.get("/")
-        request.site = site
 
-        # First call - caches version 2
-        context1 = theme_settings_processor(request)
-        assert "#ff0000" in context1["theme_css"]
+        # Mock Site.find_for_request for all calls
+        with patch("ams.cms.context_processors.Site.find_for_request") as mock_find:
+            mock_find.return_value = site
 
-        # Update theme - increments to version 3
-        theme.primary_color = "#00ff00"
-        theme.save()
-        theme.refresh_from_db()
+            # First call - caches version 2
+            context1 = theme_settings_processor(request)
+            assert "#ff0000" in context1["theme_css"]
 
-        # Second call - should detect version change and update
-        context2 = theme_settings_processor(request)
-        assert "#00ff00" in context2["theme_css"]
-        assert "#ff0000" not in context2["theme_css"]
+            # Update theme - increments to version 3
+            theme.primary_color = "#00ff00"
+            theme.save()
+            theme.refresh_from_db()
+
+            # Second call - should detect version change and update
+            context2 = theme_settings_processor(request)
+            assert "#00ff00" in context2["theme_css"]
+            assert "#ff0000" not in context2["theme_css"]
 
     def test_context_processor_no_site(self, rf):
         """Test processor returns empty when Site.find_for_request returns None."""
@@ -299,20 +313,22 @@ class TestThemeContextProcessor:
         cache.clear()
 
         request = rf.get("/")
-        request.site = site
 
-        # Call context processor - should auto-create settings
-        context = theme_settings_processor(request)
+        # Mock Site.find_for_request to return our test site
+        with patch("ams.cms.context_processors.Site.find_for_request") as mock_find:
+            mock_find.return_value = site
+            # Call context processor - should auto-create settings
+            context = theme_settings_processor(request)
 
-        # Should have created settings with default values
-        assert "theme_css" in context
-        assert "<style>" in context["theme_css"]
-        assert len(context["theme_css"]) > 0
+            # Should have created settings with default values
+            assert "theme_css" in context
+            assert "<style>" in context["theme_css"]
+            assert len(context["theme_css"]) > 0
 
-        # Verify settings were created in database
-        theme = ThemeSettings.for_site(site)
-        assert theme is not None
-        assert theme.primary_color == "#0d6efd"  # Default value
+            # Verify settings were created in database
+            theme = ThemeSettings.for_site(site)
+            assert theme is not None
+            assert theme.primary_color == "#0d6efd"  # Default value
 
     def test_context_processor_performance(self, site, rf):
         """Test that context processor only queries DB once."""
@@ -320,22 +336,29 @@ class TestThemeContextProcessor:
         cache.clear()
 
         request = rf.get("/")
-        request.site = site
 
-        # First call
-        with patch("ams.cms.context_processors.ThemeSettings.for_site") as mock_query:
-            mock_query.return_value = theme
-            theme_settings_processor(request)
-            first_call_count = mock_query.call_count
+        # Mock Site.find_for_request for all calls
+        with patch("ams.cms.context_processors.Site.find_for_request") as mock_find:
+            mock_find.return_value = site
 
-        # Make 10 more calls - should all use cache
-        with patch("ams.cms.context_processors.ThemeSettings.for_site") as mock_query:
-            for _ in range(10):
+            # First call
+            with patch(
+                "ams.cms.context_processors.ThemeSettings.for_site",
+            ) as mock_query:
+                mock_query.return_value = theme
                 theme_settings_processor(request)
-            subsequent_calls = mock_query.call_count
+                first_call_count = mock_query.call_count
 
-        assert first_call_count == 1
-        assert subsequent_calls == 0  # No DB queries
+            # Make 10 more calls - should all use cache
+            with patch(
+                "ams.cms.context_processors.ThemeSettings.for_site",
+            ) as mock_query:
+                for _ in range(10):
+                    theme_settings_processor(request)
+                subsequent_calls = mock_query.call_count
+
+            assert first_call_count == 1
+            assert subsequent_calls == 0  # No DB queries
 
     def test_context_processor_cache_keys(self, site, rf):
         """Test that correct cache keys are used."""
@@ -343,15 +366,17 @@ class TestThemeContextProcessor:
         cache.clear()
 
         request = rf.get("/")
-        request.site = site
 
-        # Call context processor
-        theme_settings_processor(request)
+        # Mock Site.find_for_request to return our test site
+        with patch("ams.cms.context_processors.Site.find_for_request") as mock_find:
+            mock_find.return_value = site
+            # Call context processor
+            theme_settings_processor(request)
 
-        # Check that both cache tiers are populated
-        version_key = f"theme_version_site{site.id}"
-        css_key = f"theme_css_v{theme.cache_version}_site{site.id}"
+            # Check that both cache tiers are populated
+            version_key = f"theme_version_site{site.id}"
+            css_key = f"theme_css_v{theme.cache_version}_site{site.id}"
 
-        assert cache.get(version_key) == theme.cache_version
-        assert cache.get(css_key) is not None
-        assert "<style>" in cache.get(css_key)
+            assert cache.get(version_key) == theme.cache_version
+            assert cache.get(css_key) is not None
+            assert "<style>" in cache.get(css_key)

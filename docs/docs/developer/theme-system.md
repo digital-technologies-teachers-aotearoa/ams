@@ -12,6 +12,9 @@ The theme system allows runtime customization of Bootstrap 5.3 CSS variables thr
 4. **Template System**: Renders CSS custom properties
 5. **Signal Handlers**: Manage cache invalidation
 
+!!! note "Dark Mode Not Currently Supported"
+    The ThemeSettings model includes fields for dark mode colors (commented out), but dark mode switching is not yet implemented. Only light mode colors are currently active in the admin interface.
+
 ## Database Schema
 
 ### ThemeSettings Model
@@ -29,7 +32,8 @@ class ThemeSettings(BaseSiteSetting):
     # Examples:
     primary_color = ColorField(default="#0d6efd")
     body_bg_light = ColorField(default="#ffffff")
-    body_bg_dark = ColorField(default="#212529")
+    # Dark mode fields are commented out (not currently supported)
+    # body_bg_dark = ColorField(default="#212529")
     # ... etc
 
     # Typography
@@ -267,12 +271,11 @@ The `templatetags/theme_css.html` template generates:
   /* ... 100+ CSS variables ... */
 }
 
-[data-bs-theme="dark"] {
-  /* Dark mode overrides */
+<!-- Dark mode section currently disabled -->
+<!-- [data-bs-theme="dark"] {
   --bs-body-color: {{ theme.body_color_dark }};
   --bs-body-bg: {{ theme.body_bg_dark }};
-  /* ... */
-}
+} -->
 
 /* Custom CSS (if provided) */
 {{ theme.custom_css }}
@@ -310,7 +313,7 @@ class ThemeSettings(BaseSiteSetting):
         MultiFieldPanel([
             FieldRowPanel([
                 NativeColorPanel("body_color_light"),
-                NativeColorPanel("body_color_dark"),
+                # NativeColorPanel("body_color_dark"),  # Dark mode not supported
             ]),
             # ... more panels
         ], "Body", help_text="..."),
@@ -349,7 +352,8 @@ theme = ThemeSettings.for_site(site)
 
 # Access colors
 primary = theme.primary_color  # "#0d6efd"
-dark_bg = theme.body_bg_dark   # "#212529"
+# Note: Dark mode fields are currently commented out in the model
+# dark_bg = theme.body_bg_dark   # Not available
 
 # Update programmatically
 theme.primary_color = "#ff0000"
