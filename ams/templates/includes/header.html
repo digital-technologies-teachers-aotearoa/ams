@@ -1,0 +1,42 @@
+{% load i18n menu_tags translate_url %}
+
+<header>
+  <!-- Fixed navbar -->
+  <nav class="navbar navbar-expand-md navbar-light fixed-top bg-light">
+    <div class="container">
+      <button class="navbar-toggler"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#navbarCollapse"
+              aria-controls="navbarCollapse"
+              aria-expanded="false"
+              aria-label="Toggle navigation">
+        <span class="navbar-icon navbar-toggler-icon"></span>
+      </button>
+      <a class="navbar-brand me-0"
+         href="{% translate_url LANGUAGE_CODE '/' %}">{% include "snippets/association_logo_or_name.html" %}</a>
+      <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav ms-auto mb-2 mb-md-0 gap-2">
+          {% main_menu template="cms/menu/top_level_item.html" sub_menu_template="cms/menu/dropdown_item.html" max_levels=2 %}
+          {% if request.user.is_authenticated %}
+            {% include "includes/user_dropdown.html" %}
+          {% else %}
+            <li class="nav-item">
+              {# URL provided by django-allauth/account/urls.py #}
+              <a id="log-in-link" class="nav-link" href="{% url 'account_login' %}">{% translate "Sign In" %}</a>
+            </li>
+            {% if ACCOUNT_ALLOW_REGISTRATION %}
+              <li class="nav-item">
+                {# URL provided by django-allauth/account/urls.py #}
+                <a id="sign-up-link"
+                   class="btn btn-primary"
+                   href="{% url 'account_signup' %}">{% translate "Sign Up" %}</a>
+              </li>
+            {% endif %}
+            {% include "includes/language_dropdown.html" %}
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </nav>
+</header>
