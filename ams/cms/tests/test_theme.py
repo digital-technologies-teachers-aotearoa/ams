@@ -5,12 +5,11 @@ from unittest.mock import patch
 import pytest
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
-from django.template import Context
-from django.template import Template
 from django.template.loader import render_to_string
 from wagtail.models import Page
 from wagtail.models import Site
 
+from ams.cms.context_processors import theme_settings as theme_settings_processor
 from ams.cms.models import ThemeSettings
 from config.templatetags.theme import hex_to_rgb
 
@@ -177,134 +176,6 @@ class TestThemeCSSGeneration:
 
 
 @pytest.mark.django_db
-class TestThemeTemplateTag:
-    """Tests for theme_css_variables template tag."""
-
-    def setUp(self):
-        """Clear cache before each test."""
-        cache.clear()
-
-    def test_template_tag_renders(self, site, rf):
-        """Test that template tag renders CSS."""
-        # Clear cache before starting
-        cache.clear()
-
-        theme = ThemeSettings.objects.create(site=site)
-        theme.primary_color = "#ff0000"
-        theme.save()
-        theme.refresh_from_db()  # Reload to get fresh data
-
-        template = Template(
-            "{% load theme %}{% theme_css_variables %}",
-        )
-        request = rf.get("/")
-        request.site = site
-
-        context = Context(
-            {
-                "request": request,
-                "settings": {
-                    "cms": {
-                        "ThemeSettings": theme,
-                    },
-                },
-            },
-        )
-
-        result = template.render(context)
-
-        assert "<style>" in result
-        assert "--bs-primary: #ff0000" in result
-        assert "</style>" in result
-
-    def test_template_tag_uses_cache(self, site, rf):
-        """Test that template tag uses cache on subsequent calls."""
-        theme = ThemeSettings.objects.create(site=site)
-        cache.clear()
-
-        template = Template("{% load theme %}{% theme_css_variables %}")
-        request = rf.get("/")
-        request.site = site
-
-        context = Context(
-            {
-                "request": request,
-                "settings": {"cms": {"ThemeSettings": theme}},
-            },
-        )
-
-        # First render - should generate and cache
-        with patch("config.templatetags.theme.render_to_string") as mock_render:
-            mock_render.return_value = "<style>/* test css */</style>"
-            result1 = template.render(context)
-            assert mock_render.call_count == 1
-
-        # Second render - should use cache
-        with patch("config.templatetags.theme.render_to_string") as mock_render:
-            mock_render.return_value = "<style>/* test css */</style>"
-            result2 = template.render(context)
-            assert mock_render.call_count == 0  # Not called, used cache
-
-        assert result1 == result2
-
-    def test_template_tag_cache_invalidation(self, site, rf):
-        """Test that cache is invalidated when settings change."""
-        theme = ThemeSettings.objects.create(site=site)
-        theme.primary_color = "#ff0000"
-        theme.save()
-        theme.refresh_from_db()  # Reload to get fresh data
-        cache.clear()
-
-        template = Template("{% load theme %}{% theme_css_variables %}")
-        request = rf.get("/")
-        request.site = site
-
-        context = Context(
-            {
-                "request": request,
-                "settings": {"cms": {"ThemeSettings": theme}},
-            },
-        )
-
-        # First render
-        result1 = template.render(context)
-        assert "#ff0000" in result1
-
-        # Update theme (increments css_version)
-        theme.primary_color = "#00ff00"
-        theme.save()
-        theme.refresh_from_db()  # Reload to get fresh data
-
-        # Update context with new theme
-        context = Context(
-            {
-                "request": request,
-                "settings": {"cms": {"ThemeSettings": theme}},
-            },
-        )
-
-        # Second render should reflect changes
-        result2 = template.render(context)
-        assert "#00ff00" in result2
-        assert "#ff0000" not in result2
-
-    def test_template_tag_no_settings(self, rf):
-        """Test template tag returns empty string when no settings."""
-        # Delete all sites and theme settings to ensure clean state
-        ThemeSettings.objects.all().delete()
-        Site.objects.all().delete()
-
-        template = Template("{% load theme %}{% theme_css_variables %}")
-        request = rf.get("/")
-        # Create a request without a site attribute, and no settings in context
-        context = Context({"request": request})
-
-        result = template.render(context)
-        # Without a site, the tag should return an empty string
-        assert result.strip() == ""
-
-
-@pytest.mark.django_db
 class TestThemeSignals:
     """Tests for theme cache clearing signals."""
 
@@ -339,3 +210,148 @@ class TestThemeSignals:
         # Old cache should be cleared
         assert cache.get(old_cache_key) is None
         assert cache.get(old_cache_key) is None
+
+
+@pytest.mark.django_db
+class TestThemeContextProcessor:
+    """Tests for theme_settings context processor."""
+
+    def test_context_processor_provides_theme_css(self, site, rf):
+        """Test that context processor provides theme_css in context."""
+        theme = ThemeSettings.objects.create(site=site)
+        theme.primary_color = "#ff0000"
+        theme.save()
+        cache.clear()
+
+        request = rf.get("/")
+        request.site = site
+
+        # Call context processor
+        context = theme_settings_processor(request)
+
+        assert "theme_css" in context
+        assert "<style>" in context["theme_css"]
+        assert "#ff0000" in context["theme_css"]
+        assert "</style>" in context["theme_css"]
+
+    def test_context_processor_uses_two_tier_cache(self, site, rf):
+        """Test that context processor uses two-tier caching strategy."""
+        theme = ThemeSettings.objects.create(site=site)
+        cache.clear()
+
+        request = rf.get("/")
+        request.site = site
+
+        # First call - should query DB and cache both tiers
+        with patch("ams.cms.context_processors.ThemeSettings.for_site") as mock_query:
+            mock_query.return_value = theme
+            context1 = theme_settings_processor(request)
+            assert mock_query.call_count == 1
+
+        # Second call - should use cache, no DB query
+        with patch("ams.cms.context_processors.ThemeSettings.for_site") as mock_query:
+            context2 = theme_settings_processor(request)
+            assert mock_query.call_count == 0  # No DB query
+
+        # Results should be identical
+        assert context1["theme_css"] == context2["theme_css"]
+
+    def test_context_processor_cache_invalidation(self, site, rf):
+        """Test that context processor detects version changes."""
+        theme = ThemeSettings.objects.create(site=site)
+        theme.primary_color = "#ff0000"
+        theme.save()
+        cache.clear()
+
+        request = rf.get("/")
+        request.site = site
+
+        # First call - caches version 2
+        context1 = theme_settings_processor(request)
+        assert "#ff0000" in context1["theme_css"]
+
+        # Update theme - increments to version 3
+        theme.primary_color = "#00ff00"
+        theme.save()
+        theme.refresh_from_db()
+
+        # Second call - should detect version change and update
+        context2 = theme_settings_processor(request)
+        assert "#00ff00" in context2["theme_css"]
+        assert "#ff0000" not in context2["theme_css"]
+
+    def test_context_processor_no_site(self, rf):
+        """Test processor returns empty when Site.find_for_request returns None."""
+        # Mock Site.find_for_request to return None
+        with patch("ams.cms.context_processors.Site.find_for_request") as mock_find:
+            mock_find.return_value = None
+            request = rf.get("/")
+
+            context = theme_settings_processor(request)
+
+            assert "theme_css" in context
+            assert context["theme_css"] == ""
+
+    def test_context_processor_autocreates_settings(self, site, rf):
+        """Test that context processor auto-creates theme settings via for_site."""
+        # Ensure no theme settings exist for this site initially
+        ThemeSettings.objects.filter(site=site).delete()
+        cache.clear()
+
+        request = rf.get("/")
+        request.site = site
+
+        # Call context processor - should auto-create settings
+        context = theme_settings_processor(request)
+
+        # Should have created settings with default values
+        assert "theme_css" in context
+        assert "<style>" in context["theme_css"]
+        assert len(context["theme_css"]) > 0
+
+        # Verify settings were created in database
+        theme = ThemeSettings.for_site(site)
+        assert theme is not None
+        assert theme.primary_color == "#0d6efd"  # Default value
+
+    def test_context_processor_performance(self, site, rf):
+        """Test that context processor only queries DB once."""
+        theme = ThemeSettings.objects.create(site=site)
+        cache.clear()
+
+        request = rf.get("/")
+        request.site = site
+
+        # First call
+        with patch("ams.cms.context_processors.ThemeSettings.for_site") as mock_query:
+            mock_query.return_value = theme
+            theme_settings_processor(request)
+            first_call_count = mock_query.call_count
+
+        # Make 10 more calls - should all use cache
+        with patch("ams.cms.context_processors.ThemeSettings.for_site") as mock_query:
+            for _ in range(10):
+                theme_settings_processor(request)
+            subsequent_calls = mock_query.call_count
+
+        assert first_call_count == 1
+        assert subsequent_calls == 0  # No DB queries
+
+    def test_context_processor_cache_keys(self, site, rf):
+        """Test that correct cache keys are used."""
+        theme = ThemeSettings.objects.create(site=site)
+        cache.clear()
+
+        request = rf.get("/")
+        request.site = site
+
+        # Call context processor
+        theme_settings_processor(request)
+
+        # Check that both cache tiers are populated
+        version_key = f"theme_version_site{site.id}"
+        css_key = f"theme_css_v{theme.cache_version}_site{site.id}"
+
+        assert cache.get(version_key) == theme.cache_version
+        assert cache.get(css_key) is not None
+        assert "<style>" in cache.get(css_key)

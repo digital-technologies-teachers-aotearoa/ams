@@ -255,6 +255,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "wagtail.contrib.settings.context_processors.settings",
                 "ams.users.context_processors.allauth_settings",
+                "ams.cms.context_processors.theme_settings",
                 "wagtailmenus.context_processors.wagtailmenus",
             ],
             "libraries": {
