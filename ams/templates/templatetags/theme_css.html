@@ -162,6 +162,16 @@
   --bs-link-hover-color-rgb: {{ theme.link_hover_color_dark|hex_to_rgb }};
 }
 
+/* Navbar */
+nav.navbar {
+  background-color: {{ theme.navbar_bg_color }};
+}
+
+/* Footer */
+footer.footer {
+  background-color: {{ theme.footer_bg_color }};
+}
+
 /* Custom CSS Overrides */
 {% if theme.custom_css %}
 {{ theme.custom_css|safe }}

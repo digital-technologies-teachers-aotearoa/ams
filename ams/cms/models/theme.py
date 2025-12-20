@@ -1,12 +1,15 @@
 from django.db import models
 from django.forms.models import model_to_dict
 from django.utils.safestring import mark_safe
+from wagtail.admin.panels import FieldPanel
 from wagtail.admin.panels import FieldRowPanel
 from wagtail.admin.panels import MultiFieldPanel
 from wagtail.contrib.settings.models import BaseSiteSetting
 from wagtail.contrib.settings.models import register_setting
 from wagtail_color_panel.edit_handlers import NativeColorPanel
 from wagtail_color_panel.fields import ColorField
+
+from ams.cms.constants import ColourModes
 
 
 @register_setting
@@ -25,6 +28,40 @@ class ThemeSettings(BaseSiteSetting):
         default=1,
         editable=False,
         help_text="Auto-incremented on save to invalidate cached CSS",
+    )
+
+    # ==== NAVBAR SETTINGS ====
+    navbar_bg_color = ColorField(
+        default="#f8f9fa",
+        verbose_name="Navbar background color",
+        help_text=mark_safe(
+            "Background color for the navigation bar.<br>"
+            "Default: <code>#f8f9fa</code> (light gray)",
+        ),
+    )
+    navbar_colour_mode = models.CharField(
+        max_length=10,
+        choices=ColourModes.choices,
+        default=ColourModes.LIGHT,
+        verbose_name="Navbar color mode",
+        help_text="Color mode for the navbar (determines text color contrast)",
+    )
+
+    # ==== FOOTER SETTINGS ====
+    footer_bg_color = ColorField(
+        default="#f8f9fa",
+        verbose_name="Footer background color",
+        help_text=mark_safe(
+            "Background color for the footer.<br>"
+            "Default: <code>#f8f9fa</code> (light gray)",
+        ),
+    )
+    footer_colour_mode = models.CharField(
+        max_length=10,
+        choices=ColourModes.choices,
+        default=ColourModes.LIGHT,
+        verbose_name="Footer color mode",
+        help_text="Color mode for the footer (determines text color contrast)",
     )
 
     # ==== BODY COLORS ====
@@ -628,6 +665,38 @@ class ThemeSettings(BaseSiteSetting):
         ),
     )
     panels = [
+        MultiFieldPanel(
+            [
+                FieldRowPanel(
+                    [
+                        NativeColorPanel("navbar_bg_color"),
+                    ],
+                ),
+                FieldRowPanel(
+                    [
+                        FieldPanel("navbar_colour_mode"),
+                    ],
+                ),
+            ],
+            "Navbar",
+            help_text="Background color and color mode for the navigation bar.",
+        ),
+        MultiFieldPanel(
+            [
+                FieldRowPanel(
+                    [
+                        NativeColorPanel("footer_bg_color"),
+                    ],
+                ),
+                FieldRowPanel(
+                    [
+                        FieldPanel("footer_colour_mode"),
+                    ],
+                ),
+            ],
+            "Footer",
+            help_text="Background color and color mode for the footer.",
+        ),
         MultiFieldPanel(
             [
                 FieldRowPanel(

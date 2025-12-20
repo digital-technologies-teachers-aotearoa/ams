@@ -1,5 +1,3 @@
-from cms.constants import BackgroundOpacities
-from cms.constants import ColourModes
 from wagtail.blocks import CharBlock
 from wagtail.blocks import ChoiceBlock
 from wagtail.blocks import ListBlock
@@ -9,6 +7,9 @@ from wagtail.blocks import StructBlock
 from wagtail.blocks import URLBlock
 from wagtail.images.blocks import ImageBlock
 from wagtail_color_panel.blocks import NativeColorBlock
+
+from ams.cms.constants import BackgroundOpacities
+from ams.cms.constants import ColourModes
 
 
 class FullWidthSectionItem(StructBlock):
