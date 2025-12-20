@@ -3,8 +3,8 @@ from django.utils.translation import gettext_lazy as _
 
 
 class ColourModes(models.TextChoices):
-    LIGHT = "light", _("Light")
-    DARK = "dark", _("Dark")
+    LIGHT = "light", _("Light background, dark text")
+    DARK = "dark", _("Dark background, light text")
 
 
 class BackgroundOpacities(models.TextChoices):
