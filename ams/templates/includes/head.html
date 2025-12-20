@@ -1,0 +1,25 @@
+{% load static i18n wagtailimages_tags %}
+
+<meta charset="utf-8" />
+<meta http-equiv="x-ua-compatible" content="ie=edge" />
+<title>
+  {% block title %}
+    {{ settings.cms.AssociationSettings.association_short_name|default:'Association Management Software' }}
+  {% endblock title %}
+</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description"
+      content="Software for managing an association with users, memberships, forums, and more." />
+<meta name="author"
+      content="{{ settings.cms.AssociationSettings.association_short_name|default:'Association Management Software' }}" />
+{% image settings.cms.AssociationSettings.association_favicon format-ico preserve-svg as favicon_image %}
+<link rel="icon" href="{{ favicon_image.url }}" />
+{% block css %}
+  <link href="{% static 'css/project.min.css' %}" rel="stylesheet" />
+  {{ theme_css|safe }}
+{% endblock css %}
+{# Placed at the top of the document so pages load faster with defer #}
+{% block javascript %}
+  <script defer src="{% static 'js/vendors.min.js' %}"></script>
+  <script defer src="{% static 'js/project.min.js' %}"></script>
+{% endblock javascript %}
