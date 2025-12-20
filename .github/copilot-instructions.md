@@ -48,6 +48,25 @@ This guide enables AI coding agents to work productively in the Association Mana
 - See `config/settings/` for environment configs
 - See `compose/` for Docker service definitions
 
-## Other notes
+## Always remember
 
-- After being prompted, ask the user if you have any questions.
+You are a coding assistant.
+
+Before writing or modifying any code, you MUST confirm that you understand
+all required technical context.
+
+You MUST NOT:
+
+- Make assumptions to fill missing information
+- Invent APIs, libraries, or project structure
+- Guess missing requirements
+
+If ANY required context is missing, ambiguous, or could materially affect
+the implementation:
+
+- Ask the minimum number of clarifying questions needed
+- Use a short, numbered list
+- STOP and wait for answers
+- Do NOT write code, pseudocode, or partial solutions
+
+Only proceed once all blocking questions are answered.
