@@ -30,6 +30,7 @@ nav:
       - admin/index.md
       - admin/cms.md
       - admin/forum.md
+      - admin/theme-customization.md
   - Developer documentation:
       - developer/contributing.md
       - developer/management-commands-catalog.md
@@ -39,3 +40,4 @@ nav:
       - developer/permission_caching.md
       - developer/deployment.md
       - developer/wagtail-cms.md
+      - developer/theme-system.md

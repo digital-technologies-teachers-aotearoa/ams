@@ -1,152 +1,166 @@
 # Theme Customization
 
-The AMS platform provides a powerful theme customization system that allows Wagtail administrators to customize the website's appearance without requiring code changes or deployments.
+Customize your website's colors and appearance directly from the Wagtail admin interface—no code changes or technical knowledge required.
 
-## Overview
-
-The theme system allows customization of Bootstrap 5.3 CSS variables including:
-
-- **Theme colors**: Primary, secondary, success, info, warning, danger, light, dark
-- **Body colors**: Background and text colors for both light and dark modes
-- **Link colors**: Link and hover colors for both light and dark modes
-- **Border colors**: Default border colors for both light and dark modes
-
-All changes apply instantly across the entire website without requiring a server restart or code deployment.
-
-## Accessing Theme Settings
+## Quick Start
 
 1. Log into the Wagtail admin at `/cms/`
 2. Navigate to **Settings** in the left sidebar
 3. Select **Theme Settings**
 4. Adjust colors using the color picker fields
-5. Click **Save** to apply changes site-wide
+5. Click **Save** to apply changes instantly across your entire site
 
-## Features
+## What You Can Customize
 
-### Color Customization
+The theme system allows you to customize colors for:
 
-Each color can be customized with a simple color picker interface:
+- **Brand Colors**: Primary, secondary, success, info, warning, danger, light, and dark theme colors
+- **Body Colors**: Background and text colors for your pages
+- **Link Colors**: Link and hover colors
+- **Component Colors**: Borders, buttons, alerts, and other UI elements
+- **Dark Mode**: Separate color values optimized for dark mode
+- **Typography**: Font families, sizes, weights, and line heights
+- **Custom CSS**: Advanced overrides (use with caution)
 
-- **Theme Colors**: Define your brand colors that are used throughout the site
-- **Light/Dark Mode Support**: Separate color values for light and dark modes ensure optimal readability
-- **Validation**: All color values are validated to ensure they are proper hex color codes (`#rrggbb`)
+All changes apply **instantly** across the entire website without requiring a server restart or code deployment.
 
-### Performance
+## Understanding Color Sections
 
-The theme system is designed for zero performance impact:
+The theme settings are organized into logical groups:
 
-- **Caching**: Generated CSS is cached indefinitely in memory
-- **Cache Invalidation**: Automatic invalidation when settings change
-- **Single Query**: Settings loaded once per request via Wagtail's built-in caching
-- **CSS Injection**: Theme CSS injected inline in the HTML head for immediate application
+### Body Colors
 
-### Dark Mode Support
+Control the base appearance of your pages:
 
-Bootstrap 5.3's dark mode is fully supported with separate color values:
+- **Body text color**: The default color for all text
+- **Body background**: The background color of pages
+- Each has separate values for light and dark modes
 
-- Colors automatically switch based on `[data-bs-theme="dark"]` attribute
-- Separate fields for light and dark mode variants of colors that differ
-- Theme colors (primary, secondary, etc.) work automatically in both modes
+### Theme Colors
 
-## Technical Details
+Define your brand identity:
 
-### How It Works
+- **Primary**: Your main brand color (used for links, buttons, focus states)
+- **Success**: For positive actions (green by default)
+- **Info**: For informational content (blue by default)
+- **Warning**: For cautionary content (yellow by default)
+- **Danger**: For errors and dangerous actions (red by default)
 
-1. **Model**: `ThemeSettings` stores color values in the database
-2. **Template Tag**: `{% theme_css_variables %}` generates CSS custom properties
-3. **Caching**: Generated CSS is cached with a version key for invalidation
-4. **Bootstrap Integration**: CSS variables override Bootstrap's defaults
+Each theme color includes subtle background, border, and text emphasis variants.
 
-### CSS Variables Generated
+### Link Colors
 
-The system generates CSS custom properties in two scopes:
+Customize how hyperlinks appear:
 
-```css
-:root,
-[data-bs-theme="light"] {
-  --bs-primary: #0d6efd;
-  --bs-body-bg: #ffffff;
-  --bs-body-color: #212529;
-  --bs-link-color: #0d6efd;
-  /* ... and more */
-}
+- **Link color**: Default link color
+- **Link hover color**: Color when hovering over links
+- Separate values for light and dark modes
 
-[data-bs-theme="dark"] {
-  --bs-body-bg: #212529;
-  --bs-body-color: #dee2e6;
-  --bs-link-color: #6ea8fe;
-  /* ... and more */
-}
-```
+### Fonts
 
-### Cache Strategy
+Configure typography settings:
 
-- **Cache Key**: `theme_css_v{version}_site{site_id}`
-- **Version Tracking**: `css_version` field auto-increments on save
-- **Invalidation**: Old cache automatically cleared on save
-- **TTL**: Infinite (manual invalidation only)
+- **Sans-serif font stack**: Font family for most text
+- **Monospace font stack**: Font family for code
+- **Body font family**: Which font stack to use for body text
+- **Body font size**: Base font size (default: 1rem)
+- **Body font weight**: Font weight (default: 400)
+- **Body line height**: Spacing between lines (default: 1.5)
 
-## Default Colors
+## Light and Dark Mode Support
 
-The system ships with Bootstrap 5.3's default color palette:
+!!! note "Not yet implemented"
+    The ability to switch between light and dark modes is not yet implemented.
 
-| Color | Light Mode | Dark Mode (if different) |
-|-------|------------|--------------------------|
-| Primary | `#0d6efd` | - |
-| Secondary | `#6c757d` | - |
-| Success | `#198754` | - |
-| Info | `#0dcaf0` | - |
-| Warning | `#ffc107` | - |
-| Danger | `#dc3545` | - |
-| Body Background | `#ffffff` | `#212529` |
-| Body Text | `#212529` | `#dee2e6` |
-| Link | `#0d6efd` | `#6ea8fe` |
-| Link Hover | `#0a58ca` | `#8bb9fe` |
-| Border | `#dee2e6` | `#495057` |
+Many colors have separate values for light and dark modes. This ensures your site looks great in both modes:
+
+- Light mode: Used by default and when users select light theme
+- Dark mode: Activated when users select dark theme or use system dark mode
+
+**Tip**: When changing colors, always check both modes to ensure good contrast and readability.
 
 ## Best Practices
 
-### Color Selection
+### Accessibility and Contrast
 
-- **Contrast**: Ensure sufficient contrast between text and background colors (WCAG AA: 4.5:1 minimum)
-- **Consistency**: Use your brand colors consistently across primary/secondary themes
-- **Testing**: Test both light and dark modes after making changes
-- **Accessibility**: Consider color blindness when selecting warning/danger colors
+**Always ensure sufficient contrast between text and backgrounds:**
 
-### Performance Considerations
+- Minimum contrast ratio: 4.5:1 (WCAG AA standard)
+- Preferred contrast ratio: 7:1 (WCAG AAA standard)
+- Use online contrast checkers to verify your color combinations
+- Consider users with color blindness when selecting colors
 
-- Changes are cached automatically - no performance impact after first page load
-- CSS is inlined in the HTML head (< 2KB typical)
-- No external requests or file I/O on page render
-- Cache cleared automatically when settings change
+### Color Selection Tips
 
-### Multi-site Considerations
+- **Brand Consistency**: Use your organization's official brand colors for primary/secondary
+- **Semantic Colors**: Keep success=green, danger=red, warning=yellow for user familiarity
+- **Test Both Modes**: Always check light AND dark mode after making changes
+- **Start Small**: Change one color at a time to see its impact
+- **Save Frequently**: Changes can be reverted through the revision history
 
-Each Wagtail site can have its own theme settings:
+### Testing Your Changes
 
-- Settings are per-site, not global
-- Use the site switcher in admin to configure different sites
-- Each site maintains its own cache
+After saving theme changes:
+
+1. Open your website in a new browser tab
+2. Navigate to different page types (home, blog posts, forms, etc.)
+3. Toggle between light and dark modes
+4. Check on different devices (desktop, tablet, mobile)
+5. Verify links, buttons, and alerts look correct
+
+## Multi-site Configuration
+
+If your AMS installation manages multiple websites:
+
+- Each site has its own independent theme settings
+- Use the site switcher in the Wagtail admin to configure different sites
+- Changes to one site don't affect others
+
+## Advanced: Custom CSS
+
+!!! warning "Use with Caution"
+    Custom CSS can override all theme settings and potentially break your site's design. Only use this feature if you understand CSS.
+
+The Custom CSS field allows you to add arbitrary CSS code that will be applied to all pages. This is useful for:
+
+- Fine-tuning specific elements not covered by color settings
+- Adding custom animations or transitions
+- Overriding specific Bootstrap components
+
+Changes apply immediately but can cause unexpected behavior if not tested thoroughly.
 
 ## Troubleshooting
 
 ### Changes Not Appearing
 
-1. Clear your browser cache (Ctrl+F5 / Cmd+Shift+R)
-2. Check that you saved the settings in admin
-3. Verify you're viewing the correct site
-4. Check browser console for CSS errors
+1. **Hard refresh your browser**: Press Ctrl+F5 (Windows/Linux) or Cmd+Shift+R (Mac)
+2. **Verify you saved**: Check for the "Theme Settings updated" success message
+3. **Check the correct site**: Ensure you're viewing the site you edited
+4. **Try incognito mode**: Opens a fresh browser session without cached data
 
 ### Invalid Color Error
 
-- Colors must be in hex format: `#rrggbb` or `#rgb`
-- Include the `#` symbol
-- Use valid hex characters (0-9, A-F)
+Colors must be in hexadecimal format:
 
-### Performance Issues
+- ✅ Valid: `#ffffff`, `#fff`, `#0d6efd`
+- ❌ Invalid: `white`, `rgb(255,255,255)`, `#gggggg`
+- Always include the `#` symbol
+- Use only valid hex characters: 0-9 and A-F
 
-If you experience performance issues:
+### Colors Look Wrong in Dark Mode
 
-1. Check your cache backend configuration in settings
-2. Consider upgrading to Redis for production (currently using locmem)
-3. Monitor cache hit rates
+- Each color section shows which fields apply to which mode
+- Look for "(light)" and "(dark)" labels in field names
+- Dark mode colors should be lighter for text, darker for backgrounds
+
+### Need to Undo Changes?
+
+Theme settings are automatically saved with revision history, however a website administrator or developer is required to restore a previous version.
+You can also export settings as make changes, which is a great way to keep a backup in case a reset is needed.
+
+## Getting Help
+
+If you need assistance:
+
+- Contact your site administrator
+- Review Bootstrap 5.3 color documentation for design inspiration
