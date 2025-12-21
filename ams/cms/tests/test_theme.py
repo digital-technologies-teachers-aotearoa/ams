@@ -5,13 +5,14 @@ from unittest.mock import patch
 import pytest
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
+from django.template import RequestContext
+from django.template import Template
 from django.template.loader import render_to_string
 from wagtail.models import Page
 from wagtail.models import Site
 
-from ams.cms.context_processors import theme_settings as theme_settings_processor
 from ams.cms.models import ThemeSettings
-from config.templatetags.theme import hex_to_rgb
+from ams.cms.templatetags.theme import hex_to_rgb
 
 
 @pytest.fixture
@@ -213,11 +214,11 @@ class TestThemeSignals:
 
 
 @pytest.mark.django_db
-class TestThemeContextProcessor:
-    """Tests for theme_settings context processor."""
+class TestThemeTemplateTag:
+    """Tests for theme_css template tag."""
 
-    def test_context_processor_provides_theme_css(self, site, rf):
-        """Test that context processor provides theme_css in context."""
+    def test_template_tag_renders_theme_css(self, site, rf):
+        """Test that template tag renders theme_css."""
         theme = ThemeSettings.objects.create(site=site)
         theme.primary_color = "#ff0000"
         theme.save()
@@ -226,18 +227,19 @@ class TestThemeContextProcessor:
         request = rf.get("/")
 
         # Mock Site.find_for_request to return our test site
-        with patch("ams.cms.context_processors.Site.find_for_request") as mock_find:
+        with patch("ams.cms.templatetags.theme.Site.find_for_request") as mock_find:
             mock_find.return_value = site
-            # Call context processor
-            context = theme_settings_processor(request)
+            # Render template tag
+            template = Template("{% load theme %}{% theme_css %}")
+            context = RequestContext(request, {})
+            output = template.render(context)
 
-            assert "theme_css" in context
-            assert "<style>" in context["theme_css"]
-            assert "#ff0000" in context["theme_css"]
-            assert "</style>" in context["theme_css"]
+            assert "<style>" in output
+            assert "#ff0000" in output
+            assert "</style>" in output
 
-    def test_context_processor_uses_two_tier_cache(self, site, rf):
-        """Test that context processor uses two-tier caching strategy."""
+    def test_template_tag_uses_two_tier_cache(self, site, rf):
+        """Test that template tag uses two-tier caching strategy."""
         theme = ThemeSettings.objects.create(site=site)
         cache.clear()
 
@@ -245,30 +247,34 @@ class TestThemeContextProcessor:
 
         # Mock Site.find_for_request for all calls
         with patch(
-            "ams.cms.context_processors.Site.find_for_request",
+            "ams.cms.templatetags.theme.Site.find_for_request",
         ) as mock_find_site:
             mock_find_site.return_value = site
 
             # First call - should query DB and cache both tiers
             with patch(
-                "ams.cms.context_processors.ThemeSettings.for_site",
+                "ams.cms.templatetags.theme.ThemeSettings.for_site",
             ) as mock_query:
                 mock_query.return_value = theme
-                context1 = theme_settings_processor(request)
+                template = Template("{% load theme %}{% theme_css %}")
+                context = RequestContext(request, {})
+                output1 = template.render(context)
                 assert mock_query.call_count == 1
 
             # Second call - should use cache, no DB query
             with patch(
-                "ams.cms.context_processors.ThemeSettings.for_site",
+                "ams.cms.templatetags.theme.ThemeSettings.for_site",
             ) as mock_query:
-                context2 = theme_settings_processor(request)
+                template = Template("{% load theme %}{% theme_css %}")
+                context = RequestContext(request, {})
+                output2 = template.render(context)
                 assert mock_query.call_count == 0  # No DB query
 
             # Results should be identical
-            assert context1["theme_css"] == context2["theme_css"]
+            assert output1 == output2
 
-    def test_context_processor_cache_invalidation(self, site, rf):
-        """Test that context processor detects version changes."""
+    def test_template_tag_cache_invalidation(self, site, rf):
+        """Test that template tag detects version changes."""
         theme = ThemeSettings.objects.create(site=site)
         theme.primary_color = "#ff0000"
         theme.save()
@@ -277,12 +283,14 @@ class TestThemeContextProcessor:
         request = rf.get("/")
 
         # Mock Site.find_for_request for all calls
-        with patch("ams.cms.context_processors.Site.find_for_request") as mock_find:
+        with patch("ams.cms.templatetags.theme.Site.find_for_request") as mock_find:
             mock_find.return_value = site
 
             # First call - caches version 2
-            context1 = theme_settings_processor(request)
-            assert "#ff0000" in context1["theme_css"]
+            template = Template("{% load theme %}{% theme_css %}")
+            context = RequestContext(request, {})
+            output1 = template.render(context)
+            assert "#ff0000" in output1
 
             # Update theme - increments to version 3
             theme.primary_color = "#00ff00"
@@ -290,24 +298,27 @@ class TestThemeContextProcessor:
             theme.refresh_from_db()
 
             # Second call - should detect version change and update
-            context2 = theme_settings_processor(request)
-            assert "#00ff00" in context2["theme_css"]
-            assert "#ff0000" not in context2["theme_css"]
+            template = Template("{% load theme %}{% theme_css %}")
+            context = RequestContext(request, {})
+            output2 = template.render(context)
+            assert "#00ff00" in output2
+            assert "#ff0000" not in output2
 
-    def test_context_processor_no_site(self, rf):
-        """Test processor returns empty when Site.find_for_request returns None."""
+    def test_template_tag_no_site(self, rf):
+        """Test template tag returns empty when Site.find_for_request returns None."""
         # Mock Site.find_for_request to return None
-        with patch("ams.cms.context_processors.Site.find_for_request") as mock_find:
+        with patch("ams.cms.templatetags.theme.Site.find_for_request") as mock_find:
             mock_find.return_value = None
             request = rf.get("/")
 
-            context = theme_settings_processor(request)
+            template = Template("{% load theme %}{% theme_css %}")
+            context = RequestContext(request, {})
+            output = template.render(context)
 
-            assert "theme_css" in context
-            assert context["theme_css"] == ""
+            assert output == ""
 
-    def test_context_processor_autocreates_settings(self, site, rf):
-        """Test that context processor auto-creates theme settings via for_site."""
+    def test_template_tag_autocreates_settings(self, site, rf):
+        """Test that template tag auto-creates theme settings via for_site."""
         # Ensure no theme settings exist for this site initially
         ThemeSettings.objects.filter(site=site).delete()
         cache.clear()
@@ -315,52 +326,57 @@ class TestThemeContextProcessor:
         request = rf.get("/")
 
         # Mock Site.find_for_request to return our test site
-        with patch("ams.cms.context_processors.Site.find_for_request") as mock_find:
+        with patch("ams.cms.templatetags.theme.Site.find_for_request") as mock_find:
             mock_find.return_value = site
-            # Call context processor - should auto-create settings
-            context = theme_settings_processor(request)
+            # Render template tag - should auto-create settings
+            template = Template("{% load theme %}{% theme_css %}")
+            context = RequestContext(request, {})
+            output = template.render(context)
 
             # Should have created settings with default values
-            assert "theme_css" in context
-            assert "<style>" in context["theme_css"]
-            assert len(context["theme_css"]) > 0
+            assert "<style>" in output
+            assert len(output) > 0
 
             # Verify settings were created in database
             theme = ThemeSettings.for_site(site)
             assert theme is not None
             assert theme.primary_color == "#0d6efd"  # Default value
 
-    def test_context_processor_performance(self, site, rf):
-        """Test that context processor only queries DB once."""
+    def test_template_tag_performance(self, site, rf):
+        """Test that template tag only queries DB once."""
         theme = ThemeSettings.objects.create(site=site)
         cache.clear()
 
         request = rf.get("/")
 
         # Mock Site.find_for_request for all calls
-        with patch("ams.cms.context_processors.Site.find_for_request") as mock_find:
+        with patch("ams.cms.templatetags.theme.Site.find_for_request") as mock_find:
             mock_find.return_value = site
 
             # First call
             with patch(
-                "ams.cms.context_processors.ThemeSettings.for_site",
+                "ams.cms.templatetags.theme.ThemeSettings.for_site",
             ) as mock_query:
                 mock_query.return_value = theme
-                theme_settings_processor(request)
+                template = Template("{% load theme %}{% theme_css %}")
+                context = RequestContext(request, {})
+                template.render(context)
                 first_call_count = mock_query.call_count
 
             # Make 10 more calls - should all use cache
             with patch(
-                "ams.cms.context_processors.ThemeSettings.for_site",
+                "ams.cms.templatetags.theme.ThemeSettings.for_site",
             ) as mock_query:
                 for _ in range(10):
-                    theme_settings_processor(request)
+                    template = Template("{% load theme %}{% theme_css %}")
+                    context = RequestContext(request, {})
+                    template.render(context)
                 subsequent_calls = mock_query.call_count
 
             assert first_call_count == 1
             assert subsequent_calls == 0  # No DB queries
 
-    def test_context_processor_cache_keys(self, site, rf):
+    def test_template_tag_cache_keys(self, site, rf):
         """Test that correct cache keys are used."""
         theme = ThemeSettings.objects.create(site=site)
         cache.clear()
@@ -368,10 +384,12 @@ class TestThemeContextProcessor:
         request = rf.get("/")
 
         # Mock Site.find_for_request to return our test site
-        with patch("ams.cms.context_processors.Site.find_for_request") as mock_find:
+        with patch("ams.cms.templatetags.theme.Site.find_for_request") as mock_find:
             mock_find.return_value = site
-            # Call context processor
-            theme_settings_processor(request)
+            # Render template tag
+            template = Template("{% load theme %}{% theme_css %}")
+            context = RequestContext(request, {})
+            template.render(context)
 
             # Check that both cache tiers are populated
             version_key = f"theme_version_site{site.id}"

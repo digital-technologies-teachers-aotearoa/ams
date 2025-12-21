@@ -1,14 +1,38 @@
-"""Context processors for CMS app."""
+"""Template tags for theme customization."""
 
+from django import template
 from django.core.cache import cache
 from django.template.loader import render_to_string
 from wagtail.models import Site
 
 from ams.cms.models import ThemeSettings
 
+register = template.Library()
 
-def theme_settings(request):
-    """Provide theme CSS to all templates with optimized caching.
+
+@register.filter
+def hex_to_rgb(hex_color):
+    """Convert hex color to RGB string for CSS.
+
+    Args:
+        hex_color: Hex color string (e.g., "#ffffff" or "#fff")
+
+    Returns:
+        String of "r, g, b" format for CSS rgb values
+    """
+    hex_color = hex_color.lstrip("#")
+
+    # Handle 3-digit hex codes
+    if len(hex_color) == 3:  # noqa: PLR2004
+        hex_color = "".join([c * 2 for c in hex_color])
+
+    rgb = tuple(int(hex_color[i : i + 2], 16) for i in (0, 2, 4))
+    return f"{rgb[0]}, {rgb[1]}, {rgb[2]}"
+
+
+@register.simple_tag(takes_context=True)
+def theme_css(context):
+    """Render theme CSS with optimized caching.
 
     Uses a two-tier caching strategy for maximum performance:
     1. Check cache for version info (lightweight, fast)
@@ -21,12 +45,16 @@ def theme_settings(request):
     - Immediate propagation of theme changes (no staleness)
 
     Returns:
-        dict: Context with 'theme_css' key containing rendered CSS
+        str: Rendered CSS styles in <style> tags
     """
-    # Get current site
+    # Get current site from request
+    request = context.get("request")
+    if not request:
+        return ""
+
     site = Site.find_for_request(request)
     if not site:
-        return {"theme_css": ""}
+        return ""
 
     # Two-tier cache keys
     version_cache_key = f"theme_version_site{site.id}"
@@ -45,16 +73,16 @@ def theme_settings(request):
 
         if cached_css is not None:
             # Cache hit - return immediately without DB query
-            return {"theme_css": cached_css}
+            return cached_css
 
     # Step 3: Cache miss or version mismatch - query database
     try:
         theme_settings_obj = ThemeSettings.for_site(site)
     except ThemeSettings.DoesNotExist:
-        return {"theme_css": ""}
+        return ""
 
     if not theme_settings_obj:
-        return {"theme_css": ""}
+        return ""
 
     # Step 4: Render the CSS
     html = render_to_string(
@@ -72,4 +100,4 @@ def theme_settings(request):
     cache.set(version_cache_key, theme_settings_obj.cache_version, None)
     cache.set(css_cache_key, html, None)
 
-    return {"theme_css": html}
+    return html
