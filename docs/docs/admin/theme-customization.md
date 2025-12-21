@@ -17,7 +17,7 @@ The theme system allows you to customize colors for:
 - **Brand Colors**: Primary, secondary, success, info, warning, danger, light, and dark theme colors
 - **Body Colors**: Background and text colors for your pages
 - **Link Colors**: Link and hover colors
-- **Component Colors**: Borders, buttons, alerts, and other UI elements
+- **Navbar and Footer Colors**: Background colours
 - **Typography**: Font families, sizes, weights, and line heights
 - **Custom CSS**: Advanced overrides (use with caution)
 
