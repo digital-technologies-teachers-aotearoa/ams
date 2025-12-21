@@ -7,7 +7,7 @@ This document provides technical details about the AMS theme customization syste
 The theme system allows runtime customization of Bootstrap 5.3 CSS variables through Django/Wagtail admin without code deployments. It consists of:
 
 1. **Database Model**: `ThemeSettings` (Wagtail site setting)
-2. **Context Processor**: Provides theme CSS to all templates
+2. **Template Tag**: Renders theme CSS on demand
 3. **Caching Layer**: Two-tier cache for optimal performance
 4. **Template System**: Renders CSS custom properties
 5. **Signal Handlers**: Manage cache invalidation
@@ -73,7 +73,7 @@ The system uses an optimized two-tier caching approach to minimize database quer
 
 ```text
 ┌─────────────────────────────────────────┐
-│ Request → Context Processor             │
+│ Request → Template Tag                  │
 └──────────────┬──────────────────────────┘
                ▼
     ┌───────────────────────┐
@@ -148,16 +148,21 @@ Two types of cache keys are used:
 | Cache invalidation delay | Immediate |
 | Memory per site | ~5-10 KB |
 
-## Context Processor
+## Template Tag
 
-Located in `ams/cms/context_processors.py`:
+Located in `ams/cms/templatetags/cms_tags.py`:
 
 ```python
-def theme_settings(request):
-    """Provide theme CSS to all templates with optimized caching."""
+@register.simple_tag(takes_context=True)
+def theme_css(context):
+    """Render theme CSS with optimized caching."""
+    request = context.get("request")
+    if not request:
+        return ""
+
     site = Site.find_for_request(request)
     if not site:
-        return {"theme_css": ""}
+        return ""
 
     # Two-tier cache keys
     version_cache_key = f"theme_version_site{site.id}"
@@ -175,7 +180,7 @@ def theme_settings(request):
         cached_css = cache.get(css_cache_key)
 
         if cached_css is not None:
-            return {"theme_css": cached_css}
+            return cached_css
 
     # Step 3: Cache miss - query and render
     theme_settings_obj = ThemeSettings.for_site(site)
@@ -186,20 +191,14 @@ def theme_settings(request):
     cache.set(version_cache_key, theme_settings_obj.cache_version, None)
     cache.set(css_cache_key, html, None)
 
-    return {"theme_css": html}
+    return html
 ```
 
-**Registration** in `config/settings/base.py`:
+**Usage** - The template tag must be loaded in templates where it's used:
 
-```python
-TEMPLATES = [{
-    "OPTIONS": {
-        "context_processors": [
-            # ... other processors
-            "ams.cms.context_processors.theme_settings",
-        ],
-    },
-}]
+```django
+{% load cms_tags %}
+{% theme_css %}
 ```
 
 ## Signal Handlers
@@ -238,17 +237,19 @@ def clear_theme_cache_on_delete(sender, instance, **kwargs):
 
 ### Base Template
 
-In `ams/templates/base.html`:
+In `ams/templates/includes/head.html`:
 
 ```django
+{% load static i18n wagtailimages_tags cms_tags %}
+
 <head>
   <!-- ... -->
   <link href="{% static 'css/project.min.css' %}" rel="stylesheet" />
-  {{ theme_css|safe }}
+  {% theme_css %}
 </head>
 ```
 
-The `theme_css` variable is automatically available from the context processor.
+The `theme_css` template tag is called explicitly where needed. It automatically retrieves the request from the template context.
 
 ### Generated CSS Structure
 
@@ -383,21 +384,22 @@ Key test areas (see `ams/cms/tests/test_theme.py`):
 1. **Model Tests**: Creation, saving, validation, revisions
 2. **CSS Generation Tests**: Template rendering, color conversion
 3. **Signal Tests**: Cache clearing on save/delete
-4. **Context Processor Tests**: Caching behavior, performance, edge cases
+4. **Template Tag Tests**: Caching behavior, performance, edge cases
 
 Example test:
 
 ```python
-def test_context_processor_uses_two_tier_cache(site, rf):
+def test_template_tag_uses_two_tier_cache(site, rf):
     theme = ThemeSettings.objects.create(site=site)
     cache.clear()
     request = rf.get("/")
-    request.site = site
 
     # First call - should query DB
-    with patch("ams.cms.context_processors.ThemeSettings.for_site") as mock:
+    with patch("ams.cms.templatetags.cms_tags.ThemeSettings.for_site") as mock:
         mock.return_value = theme
-        context1 = theme_settings_processor(request)
+        template = Template("{% load cms_tags %}{% theme_css %}")
+        context = RequestContext(request, {})
+        output1 = template.render(context)
         assert mock.call_count == 1
 
     # Second call - should use cache
