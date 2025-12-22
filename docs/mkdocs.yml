@@ -30,6 +30,7 @@ nav:
       - admin/index.md
       - admin/cms.md
       - admin/forum.md
+      - admin/xero-billing.md
       - admin/theme-customization.md
   - Developer documentation:
       - developer/contributing.md

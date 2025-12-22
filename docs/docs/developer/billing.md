@@ -80,77 +80,300 @@ Configure the following environment variables for Xero integration:
 !!! warning "Security Warning"
     Setting `XERO_DEBUG=True` will log all HTTP requests and responses, including sensitive credentials and bearer tokens. Only enable this for debugging specific API issues in isolated development environments. Never enable in production.
 
+### Deployment Configuration
+
+When deploying AMS with Xero integration, configure these environment variables in your deployment platform.
+
+#### Required Environment Variables
+
+These variables must be set for production deployments:
+
+```bash
+# Billing Provider Selection
+AMS_BILLING_SERVICE_CLASS=ams.billing.providers.xero.XeroBillingService
+
+# Xero API Credentials (from Custom Connection)
+XERO_CLIENT_ID=your-client-id-here
+XERO_CLIENT_SECRET=your-client-secret-here
+XERO_TENANT_ID=your-tenant-id-here
+
+# Webhook Configuration
+XERO_WEBHOOK_KEY=your-webhook-key-here
+
+# Xero Organization Settings
+XERO_ACCOUNT_CODE=200
+XERO_AMOUNT_TYPE=INCLUSIVE
+XERO_CURRENCY_CODE=NZD
+```
+
+#### Optional Environment Variables
+
+```bash
+# Email Configuration
+XERO_EMAIL_INVOICES=True  # Set to False for Xero Demo Company
+AMS_BILLING_EMAIL_WHITELIST_REGEX=  # Leave empty for production
+
+# Debugging (NEVER enable in production)
+XERO_DEBUG=False
+```
+
+#### Security Best Practices
+
+1. **Never commit credentials to version control**
+2. **Use secret management** provided by your platform
+3. **Rotate credentials periodically** (generate new client secrets in Xero)
+4. **Restrict access** to production credentials
+5. **Use different Xero apps** for development, staging, and production environments
+
 ### Webhook Configuration
 
 AMS receives webhook notifications from Xero when invoice status changes (e.g., paid, voided).
+The webhook endpoint uses HMAC-SHA256 signature verification:
 
-1. **Configure the webhook endpoint** in your Xero app settings:
-    - Webhook URL: `https://your-domain.com/billing/xero/webhooks/`
-    - Generate a webhook key and set it as `XERO_WEBHOOK_KEY`
+**Webhook Endpoint:** `https://your-domain.com/billing/xero/webhooks/`
 
-2. **Webhook Events Handled:**
-    - Invoice creation
-    - Invoice updates
-    - Invoice payments
+#### Setting Up Webhooks in Xero
 
-The webhook endpoint automatically verifies requests using HMAC-SHA256 signature validation.
+1. Navigate to your Xero app in the Developer Portal
+2. Go to the **Webhooks** section: `https://developer.xero.com/app/manage/app/YOUR_APP_ID/webhooks`
+3. Configure the webhook:
+    - **Delivery URL:** `https://your-domain.com/billing/xero/webhooks/`
+    - Xero will generate a **Webhook Key** - save this as `XERO_WEBHOOK_KEY`
+4. Save the configuration
 
-### Local Development
+#### Webhook Events Handled
 
-For local development with webhooks:
+Currently, AMS processes these Xero webhook events:
 
-1. Use [ngrok](https://ngrok.com/) or similar tool to expose your local server:
+```python
+{
+    "eventCategory": "INVOICE",
+    "eventType": "UPDATE",
+    "tenantId": "your-tenant-id",
+    "resourceId": "invoice-id-here"
+}
+```
 
-    ```bash
-    ngrok http 8000
-    ```
+**Processing Flow:**
 
-2. Set the `NGROK_HOST` variable in your `.envs/.local/django-private.ini`:
+1. Webhook received → Signature verified
+2. Invoice UPDATE events extracted
+3. Matching invoices marked with `update_needed=True`
+4. Response sent (200 OK)
+5. After response, `fetch_updated_invoice_details()` triggered
+6. Invoice details fetched from Xero API
+7. Local database updated with latest payment status
 
-    ```ini
-    NGROK_HOST = "your-subdomain.ngrok-free.dev"
-    ```
+#### Testing Webhooks
 
-3. Update your Xero app webhook URL to point to your ngrok URL:
+**Local Development:**
 
-    ```text
-    https://your-subdomain.ngrok-free.dev/billing/xero/webhooks/
-    ```
+Use ngrok or similar tool:
 
-### API Operations
+```bash
+ngrok http 8000
+```
 
-The Xero billing service performs the following operations:
+Configure in your `.envs/.local/django-private.ini`:
 
-#### Contact Management
+```ini
+NGROK_HOST=your-subdomain.ngrok-free.dev
+```
 
-- **Create Contact:** Creates a new contact in Xero when a user or organization account is created
-- **Update Contact:** Updates contact details (name, email, account number) when account information changes
+Update your Xero app webhook URL:
 
-#### Invoice Management
+```text
+https://your-subdomain.ngrok-free.dev/billing/xero/webhooks/
+```
 
-- **Create Invoice:** Generates an ACCREC (accounts receivable) invoice with line items in AUTHORISED status
-- **Email Invoice:** Sends invoice email to the contact via Xero's email service
-- **Retrieve Invoices:** Fetches invoice details including payment status and amounts
-- **Update Invoices:** Synchronizes invoice data from Xero to AMS database
+**Manual Testing:**
+
+Trigger webhook events by making changes in Xero:
+
+1. Mark an invoice as paid in Xero
+2. Check AMS logs for webhook receipt
+3. Verify invoice status updated in AMS admin
+
+### Architecture
+
+#### Service Class Hierarchy
+
+```
+BillingService (ABC)
+    ├── XeroBillingService
+    │   └── MockXeroBillingService (for testing)
+    └── MockBillingService (generic mock)
+```
+
+#### Models
+
+**Account:**
+```python
+class Account(Model):
+    organisation = OneToOneField(Organisation, ...)
+    user = OneToOneField(User, ...)
+    # Either organisation or user must be set
+```
+
+**XeroContact:**
+```python
+class XeroContact(Model):
+    account = OneToOneField(Account, ...)
+    contact_id = CharField(max_length=255)  # Xero's contact ID
+```
+
+**Invoice:**
+```python
+class Invoice(Model):
+    account = ForeignKey(Account, ...)
+    invoice_number = CharField(max_length=255, unique=True)
+    billing_service_invoice_id = CharField(...)  # Xero's invoice ID
+    update_needed = BooleanField(default=False)
+    # Amount fields, dates, etc.
+```
+
+#### Key Service Methods
+
+**Contact Management:**
+
+```python
+def update_user_billing_details(user: User) -> None:
+    """Create or update Xero contact for a user."""
+
+def update_organisation_billing_details(organisation: Organisation) -> None:
+    """Create or update Xero contact for an organisation."""
+```
+
+**Invoice Management:**
+
+```python
+def create_invoice(
+    account: Account,
+    date: date,
+    due_date: date,
+    line_items: list[dict[str, Any]],
+    reference: str,
+) -> Invoice:
+    """Create invoice in Xero and local DB."""
+
+def email_invoice(invoice: Invoice) -> None:
+    """Send invoice email via Xero."""
+
+def update_invoices(billing_service_invoice_ids: list[str]) -> None:
+    """Fetch latest invoice data from Xero."""
+
+def get_invoice_url(invoice: Invoice) -> str | None:
+    """Get customer-facing online invoice URL."""
+```
 
 ### Rate Limiting
 
-The integration includes fail-fast rate limit handling:
+Xero enforces API rate limits to prevent abuse and ensure service stability. Understanding and handling these limits is crucial for reliable operation.
 
-- API calls are decorated with `@handle_rate_limit()`
-- When rate limits are exceeded, `XeroRateLimitError` is raised
-- Error includes retry-after information when available
-- Automatic retry is not implemented; manual intervention or scheduled retry is required
+#### Xero Rate Limit Details
+
+- **Rate Limit:** 60 requests per minute per organization
+- **Limit Window:** Rolling 60-second window
+- **Headers:** Xero returns rate limit information in response headers:
+    - `X-Rate-Limit-Limit`: Maximum requests allowed (60)
+    - `X-Rate-Limit-Remaining`: Requests remaining in current window
+    - `X-Rate-Limit-Problem`: Returned when limit is exceeded
+
+#### AMS Rate Limit Handling
+
+The integration uses a fail-fast approach with the `@handle_rate_limit()` decorator:
+
+```python
+from ams.billing.providers.xero.rate_limiting import handle_rate_limit
+
+@handle_rate_limit()
+def _create_xero_invoice(self, ...):
+    # API call here
+    pass
+```
+
+**Behavior:**
+
+1. API calls are wrapped with rate limit detection
+2. When rate limits are exceeded (HTTP 429), `XeroRateLimitError` is raised
+3. The error includes `retry_after` seconds when available from Xero's response
+4. **No automatic retry** - operations fail immediately to prevent cascading delays
+
+#### Handling Rate Limit Errors
+
+**During Webhook Processing:**
+
+- Webhook handlers mark invoices as `update_needed=True` instead of fetching immediately
+- The `fetch_invoice_updates` command processes updates in batches
+- Limits processing to 30 invoices per run to avoid hitting rate limits
+
+**During Bulk Operations:**
+
+If performing bulk operations (e.g., importing many members):
+
+```python
+from ams.billing.providers.xero.rate_limiting import XeroRateLimitError
+import time
+
+for member in members:
+    try:
+        billing_service.update_user_billing_details(member)
+    except XeroRateLimitError as e:
+        # Wait for the retry_after period
+        time.sleep(e.retry_after or 60)
+        # Retry or defer to next run
+        continue
+```
+
+**Recommended Strategies:**
+
+1. **Batch Processing:** Process records in small batches with delays between batches
+2. **Scheduled Jobs:** Spread bulk operations across multiple cron runs
+3. **Queue-based Processing:** Use a task queue (e.g., Celery) with rate limiting
+4. **Monitor Remaining Requests:** Check `X-Rate-Limit-Remaining` header to throttle proactively
+
+#### Rate Limit Monitoring
+
+Log rate limit errors to track API usage patterns:
+
+```python
+import logging
+logger = logging.getLogger(__name__)
+
+try:
+    billing_service.create_invoice(...)
+except XeroRateLimitError as e:
+    logger.warning(
+        "Xero rate limit exceeded. Retry after %s seconds",
+        e.retry_after
+    )
+```
+
+Configure Sentry or your monitoring system to alert on rate limit errors for proactive response.
 
 ### Testing
 
-#### Mock Service
+#### Unit Tests
+
+Run billing tests:
+
+```bash
+pytest ams/billing/tests/
+```
+
+Key test files:
+
+- `test_invoice_model.py` - Invoice model tests
+- `test_account_model.py` - Account model tests
+- `test_fetch_invoice_updates_command.py` - Management command tests
+
+#### Mock Service for Testing
 
 For testing without connecting to Xero, use `MockXeroBillingService`:
 
 ```python
-# In your test settings
-AMS_BILLING_SERVICE_CLASS = "ams.billing.providers.xero.MockXeroBillingService"
+# In config/settings/test.py
+BILLING_SERVICE_CLASS = "ams.billing.providers.xero.MockXeroBillingService"
 ```
 
 The mock service:
@@ -158,19 +381,11 @@ The mock service:
 - Returns dummy data for all operations
 - Does not make external API calls
 - Useful for unit testing and CI/CD pipelines
-
-#### Integration Testing
-
-To test with the actual Xero API:
-
-1. Use the Xero Demo Company (free for development)
-2. Create a Custom Connection with demo company authorization
-3. Configure credentials in `.envs/.local/django-private.ini`
-4. Run the development server and test invoice creation
+- Creates predictable invoice IDs and numbers
 
 ### Management Commands
 
-#### Fetch Invoice Updates
+#### fetch_invoice_updates
 
 Manually fetch and update invoice details from Xero:
 
@@ -178,47 +393,131 @@ Manually fetch and update invoice details from Xero:
 python manage.py fetch_invoice_updates
 ```
 
-This command:
+**Purpose:**
 
-- Queries invoices marked as needing updates
-- Fetches latest data from Xero
-- Updates local database with payment status and amounts
-- Limits to 20 invoices per run to avoid rate limits
+- Queries local invoices marked with `update_needed=True`
+- Fetches latest data from Xero API (payment status, amounts, dates)
+- Updates local database with current information
+- Marks invoices as no longer needing updates
+
+**Behavior:**
+
+- Processes up to 30 invoices per run (to avoid rate limits)
+- Only works with `XeroBillingService` (skips mock services)
+- Logs progress and results to stdout
+- Raises exceptions for debugging when called manually
+
+**When to Use:**
+
+- After webhook outages or delivery failures
+- During initial data migration from Xero
+- For manual invoice status verification
+- In scheduled cron jobs to catch missed webhook events
 
 ### Troubleshooting
 
-#### Common Issues
+#### Authentication Issues
 
-**Authentication Errors:**
+**Symptom:** "Invalid credentials" or "Unauthorized" errors
 
-- Verify `XERO_CLIENT_ID` and `XERO_CLIENT_SECRET` are correct
-- Ensure the Custom Connection is authorized in Xero
-- Check that `XERO_TENANT_ID` matches your connected organization
+**Possible Causes:**
 
-**Webhook Verification Failed:**
+- Incorrect `XERO_CLIENT_ID` or `XERO_CLIENT_SECRET`
+- Custom Connection not authorized or authorization expired
+- Incorrect `XERO_TENANT_ID`
 
-- Verify `XERO_WEBHOOK_KEY` matches the key in your Xero app settings
-- Check that the webhook URL is publicly accessible
-- Ensure the webhook endpoint is receiving POST requests
+**Solutions:**
 
-**Rate Limit Errors:**
+1. Verify credentials in Xero Developer Portal match environment variables
+2. Check Custom Connection is still authorized (hasn't been revoked)
+3. Confirm `XERO_TENANT_ID` matches the connected organization
+4. Try regenerating client secret and updating `XERO_CLIENT_SECRET`
 
-- Xero has API rate limits (60 requests per minute per organization)
-- Implement retry logic or scheduled jobs for bulk operations
-- Monitor rate limit exceptions in your logs
+#### Webhook Verification Failures
 
-**Invoice Creation Fails:**
+**Symptom:** Webhooks return 401 Unauthorized
 
-- Verify the account has an associated `XeroContact`
-- Check `XERO_ACCOUNT_CODE` is valid for your Xero organization
-- Ensure `XERO_CURRENCY_CODE` is supported by your Xero organization
-- Verify scopes include `accounting.transactions`
+**Possible Causes:**
 
-**Contact Creation Fails:**
+- Incorrect `XERO_WEBHOOK_KEY`
+- Webhook key changed in Xero but not updated in AMS
+- Request not actually from Xero (spoofing attempt)
 
-- Ensure scopes include `accounting.contacts`
-- Verify contact details (name, email) are valid
-- Check for duplicate contact names (AMS appends account ID to ensure uniqueness)
+**Solutions:**
+
+1. Verify `XERO_WEBHOOK_KEY` matches the key shown in Xero Developer Portal
+2. Check Xero's webhook delivery logs for signature details
+3. Test webhook signature locally
+
+#### Rate Limit Errors
+
+**Symptom:** `XeroRateLimitError` raised during operations
+
+**Cause:** Exceeded Xero's 60 requests per minute limit
+
+**Solutions:**
+
+1. **Immediate:** Wait for the `retry_after` period before retrying
+2. **Short-term:** Reduce concurrent operations or add delays between requests
+3. **Long-term:** Implement queueing system with rate limiting
+
+#### Invoice Creation Failures
+
+**Symptom:** Invoice creation fails or returns errors
+
+**Possible Causes:**
+
+1. Account missing associated `XeroContact`
+2. Invalid `XERO_ACCOUNT_CODE` for the organization
+3. Unsupported `XERO_CURRENCY_CODE`
+4. Missing `accounting.transactions` scope
+5. Invalid line item data
+
+#### Contact Creation or Update Failures
+
+**Symptom:** Contact operations fail
+
+**Possible Causes:**
+
+- Missing `accounting.contacts` scope
+- Duplicate contact name (shouldn't happen with UUID prefix)
+- Invalid email address format
+
+#### Invoice Status Not Updating
+
+**Symptom:** Invoice paid in Xero but still shows as unpaid in AMS
+
+**Possible Causes:**
+
+1. Webhook not configured or failing
+2. `fetch_invoice_updates` command not running
+3. `update_needed` flag not being set
+
+#### Email Invoices Not Sending
+
+**Symptom:** Invoices created but emails not received
+
+**Possible Causes:**
+
+1. `XERO_EMAIL_INVOICES=False` in settings
+2. Using Xero Demo Company (emails disabled)
+3. Invalid contact email address
+4. `AMS_BILLING_EMAIL_WHITELIST_REGEX` filtering recipient
+
+#### Getting Help
+
+If issues persist:
+
+1. **Check Xero API Status:** [status.xero.com](https://status.xero.com)
+2. **Review Xero API Logs:** Developer Portal → Your App → API Logs
+3. **Enable Debug Logging:** Set `XERO_DEBUG=True` (development only)
+4. **Check Django Logs:** Review application logs for detailed error messages
+5. **Consult Xero Documentation:** [developer.xero.com](https://developer.xero.com)
+6. **Contact Support:** Reach out to your AMS implementation team with:
+    - Error messages (sanitize any credentials)
+    - Steps to reproduce
+    - Django and Xero API logs
+    - Environment details (development/staging/production)
 
 ### Further Reading
 
