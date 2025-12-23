@@ -34,6 +34,8 @@ class MembershipOptionFactory(DjangoModelFactory[MembershipOption]):
         ],
     )
     cost = Faker("pydecimal", left_digits=3, right_digits=2, positive=True)
+    max_seats = None
+    archived = False
 
     class Meta:
         model = MembershipOption
@@ -41,7 +43,10 @@ class MembershipOptionFactory(DjangoModelFactory[MembershipOption]):
 
     class Params:
         individual = Trait(type=MembershipOptionType.INDIVIDUAL)
-        organisation = Trait(type=MembershipOptionType.ORGANISATION)
+        organisation = Trait(
+            type=MembershipOptionType.ORGANISATION,
+            max_seats=10,
+        )
 
     @classmethod
     def _create(cls, model_class, *args, **kwargs):

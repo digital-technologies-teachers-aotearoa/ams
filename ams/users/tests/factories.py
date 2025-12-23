@@ -9,7 +9,6 @@ from factory.django import DjangoModelFactory
 
 from ams.users.models import Organisation
 from ams.users.models import OrganisationMember
-from ams.users.models import OrganisationType
 from ams.users.models import User
 
 
@@ -47,34 +46,8 @@ class UserFactory(DjangoModelFactory[User]):
         django_get_or_create = ["email"]
 
 
-class OrganisationTypeFactory(DjangoModelFactory[OrganisationType]):
-    # Faker doesn't expose 'unique.word' as a single provider string; emulate uniqueness
-    name = Faker("word")
-
-    @classmethod
-    def _create(cls, model_class, *args, **kwargs):
-        # Ensure uniqueness by appending a sequence number if collision occurs
-        base_name = kwargs.get("name") or Faker("word").evaluate(
-            None,
-            None,
-            extra={"locale": None},
-        )
-        candidate = base_name
-        counter = 1
-        while OrganisationType.objects.filter(name=candidate).exists():
-            candidate = f"{base_name}-{counter}"
-            counter += 1
-        kwargs["name"] = candidate
-        return super()._create(model_class, *args, **kwargs)
-
-    class Meta:
-        model = OrganisationType
-        django_get_or_create = ["name"]
-
-
 class OrganisationFactory(DjangoModelFactory[Organisation]):
     name = Faker("company")
-    type = SubFactory(OrganisationTypeFactory)
     telephone = Faker("phone_number")
     email = Faker("company_email")
     contact_name = Faker("name")
@@ -96,12 +69,12 @@ class OrganisationMemberFactory(DjangoModelFactory[OrganisationMember]):
     invite_email = Faker("email")
     created_datetime = Faker("date_time_this_year")
     accepted_datetime = None
-    is_admin = False
+    role = OrganisationMember.Role.MEMBER
 
     class Params:
         invite = Trait(user=None)
         accepted = Trait(accepted_datetime=Faker("date_time_this_year"))
-        admin = Trait(is_admin=True)
+        admin = Trait(role=OrganisationMember.Role.ADMIN)
 
     class Meta:
         model = OrganisationMember

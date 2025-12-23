@@ -7,6 +7,7 @@ from crispy_forms.layout import Layout
 from crispy_forms.layout import Submit
 from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
+from django.forms import BooleanField
 from django.forms import CharField
 from django.forms import ChoiceField
 from django.forms import DateField
@@ -82,12 +83,7 @@ class MembershipOptionForm(ModelForm):
     name = CharField(label=_("Name"), max_length=255)
     type = ChoiceField(
         label=_("Type"),
-        choices=[
-            (
-                MembershipOptionType.INDIVIDUAL.value,
-                MembershipOptionType.INDIVIDUAL.label,
-            ),
-        ],
+        choices=MembershipOptionType.choices,
     )
     duration = MembershipDurationField(label=_("Duration"))
     cost = DecimalField(label=_("Cost"))
@@ -100,10 +96,30 @@ class MembershipOptionForm(ModelForm):
             "For example 'DTTA Membership'.",
         ),
     )
+    max_seats = DecimalField(
+        max_digits=10,
+        decimal_places=0,
+        required=False,
+        help_text=_(
+            "Maximum number of seats for organisation memberships (optional limit)",
+        ),
+    )
+    archived = BooleanField(
+        required=False,
+        help_text=_("Mark as archived to prevent new signups"),
+    )
 
     class Meta:
         model = MembershipOption
-        fields = ["name", "type", "duration", "cost", "invoice_reference"]
+        fields = [
+            "name",
+            "type",
+            "duration",
+            "cost",
+            "invoice_reference",
+            "max_seats",
+            "archived",
+        ]
 
 
 class CreateIndividualMembershipForm(ModelForm):

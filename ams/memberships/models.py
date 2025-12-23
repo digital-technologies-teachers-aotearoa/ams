@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db.models import CASCADE
 from django.db.models import SET_NULL
+from django.db.models import BooleanField
 from django.db.models import CharField
 from django.db.models import DateField
 from django.db.models import DateTimeField
@@ -18,6 +19,7 @@ from relativedeltafield import RelativeDeltaField
 
 from ams.memberships.duration import format_membership_duration
 from ams.users.models import Organisation
+from ams.users.models import OrganisationMember
 
 User = get_user_model()
 
@@ -44,6 +46,19 @@ class MembershipOption(Model):
     duration = RelativeDeltaField()
     cost = DecimalField(max_digits=10, decimal_places=2)
     invoice_reference = CharField(max_length=25, blank=True)
+    max_seats = DecimalField(
+        max_digits=10,
+        decimal_places=0,
+        null=True,
+        blank=True,
+        help_text=_(
+            "Maximum number of seats for organisation memberships (optional limit)",
+        ),
+    )
+    archived = BooleanField(
+        default=False,
+        help_text=_("Mark as archived to prevent new signups"),
+    )
 
     class Meta:
         unique_together = (("name", "type"),)
@@ -57,6 +72,20 @@ class MembershipOption(Model):
     @property
     def duration_display(self):
         return format_membership_duration(self.duration)
+
+    def delete(self, *args, **kwargs):
+        """Prevent deletion if there are related memberships."""
+        if (
+            self.individual_memberships.exists()
+            or self.organisation_memberships.exists()
+        ):
+            raise ValidationError(
+                _(
+                    "Cannot delete membership option with existing memberships. "
+                    "Archive it instead.",
+                ),
+            )
+        return super().delete(*args, **kwargs)
 
 
 class BaseMembership(Model):
@@ -175,3 +204,19 @@ class OrganisationMembership(BaseMembership):
             return MembershipStatus.EXPIRED
 
         return MembershipStatus.ACTIVE
+
+    @property
+    def occupied_seats(self) -> int:
+        """Calculate the number of seats currently occupied by active members.
+
+        Only counts seats if this membership is currently active.
+        """
+        # Only count occupied seats if this membership is active
+        if self.status() != MembershipStatus.ACTIVE:
+            return 0
+
+        return OrganisationMember.objects.filter(
+            organisation=self.organisation,
+            accepted_datetime__isnull=False,
+            user__is_active=True,
+        ).count()

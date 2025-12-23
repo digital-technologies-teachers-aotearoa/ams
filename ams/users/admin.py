@@ -8,7 +8,6 @@ from ams.users.forms import UserAdminChangeForm
 from ams.users.forms import UserAdminCreationForm
 from ams.users.models import Organisation
 from ams.users.models import OrganisationMember
-from ams.users.models import OrganisationType
 from ams.users.models import User
 
 if settings.DJANGO_ADMIN_FORCE_ALLAUTH:
@@ -62,17 +61,10 @@ class UserAdmin(auth_admin.UserAdmin):
     )
 
 
-@admin.register(OrganisationType)
-class OrganisationTypeAdmin(admin.ModelAdmin):
-    list_display = ("name",)
-    search_fields = ("name",)
-
-
 @admin.register(Organisation)
 class OrganisationAdmin(admin.ModelAdmin):
-    list_display = ("name", "type", "telephone", "email", "contact_name")
+    list_display = ("name", "telephone", "email", "contact_name")
     search_fields = ("name", "email", "contact_name")
-    list_filter = ("type",)
 
 
 @admin.register(OrganisationMember)
@@ -81,8 +73,8 @@ class OrganisationMemberAdmin(admin.ModelAdmin):
         "user",
         "organisation",
         "invite_email",
-        "is_admin",
+        "role",
         "accepted_datetime",
     )
     search_fields = ("user__email", "organisation__name", "invite_email")
-    list_filter = ("organisation", "is_admin")
+    list_filter = ("organisation", "role")

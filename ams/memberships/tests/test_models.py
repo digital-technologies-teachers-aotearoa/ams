@@ -4,11 +4,12 @@ import pytest
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
+from ams.memberships.models import MembershipOption
 from ams.memberships.models import MembershipStatus
-
-from .factories import IndividualMembershipFactory
-from .factories import MembershipOptionFactory
-from .factories import OrganisationMembershipFactory
+from ams.memberships.tests.factories import IndividualMembershipFactory
+from ams.memberships.tests.factories import MembershipOptionFactory
+from ams.memberships.tests.factories import OrganisationMembershipFactory
+from ams.users.tests.factories import OrganisationMemberFactory
 
 pytestmark = pytest.mark.django_db
 
@@ -29,6 +30,70 @@ class TestMembershipOption:
         assert "Individual" in result_str
         assert "1 month" in result_str
         assert "$49.99" in result_str
+
+    def test_max_seats_optional(self):
+        # Arrange & Act
+        option = MembershipOptionFactory(
+            individual=True,
+            max_seats=None,
+        )
+        # Assert
+        assert option.max_seats is None
+
+    def test_max_seats_with_value(self):
+        # Arrange & Act
+        option = MembershipOptionFactory(
+            organisation=True,
+            max_seats=20,
+        )
+        # Assert
+        assert option.max_seats == 20  # noqa: PLR2004
+
+    def test_archived_defaults_false(self):
+        # Arrange & Act
+        option = MembershipOptionFactory()
+        # Assert
+        assert option.archived is False
+
+    def test_archived_can_be_set_true(self):
+        # Arrange & Act
+        option = MembershipOptionFactory(archived=True)
+        # Assert
+        assert option.archived is True
+
+    def test_delete_with_no_memberships_succeeds(self):
+        # Arrange
+        option = MembershipOptionFactory()
+        option_id = option.id
+        # Act
+        option.delete()
+        # Assert
+
+        assert not MembershipOption.objects.filter(id=option_id).exists()
+
+    def test_delete_with_individual_memberships_raises(self):
+        # Arrange
+        option = MembershipOptionFactory(individual=True)
+        IndividualMembershipFactory(membership_option=option)
+        # Act & Assert
+        with pytest.raises(ValidationError) as exc:
+            option.delete()
+        assert "Cannot delete membership option with existing memberships" in str(
+            exc.value,
+        )
+        assert "Archive it instead" in str(exc.value)
+
+    def test_delete_with_organisation_memberships_raises(self):
+        # Arrange
+        option = MembershipOptionFactory(organisation=True)
+        OrganisationMembershipFactory(membership_option=option)
+        # Act & Assert
+        with pytest.raises(ValidationError) as exc:
+            option.delete()
+        assert "Cannot delete membership option with existing memberships" in str(
+            exc.value,
+        )
+        assert "Archive it instead" in str(exc.value)
 
 
 class TestIndividualMembership:
@@ -168,3 +233,67 @@ class TestOrganisationMembership:
         assert calculated == (
             membership.start_date + membership.membership_option.duration
         )
+
+    def test_occupied_seats_active_membership(self):
+        # Arrange
+        membership = OrganisationMembershipFactory(active=True)
+        # Create 3 accepted, active members
+        OrganisationMemberFactory.create_batch(
+            3,
+            organisation=membership.organisation,
+            accepted_datetime=timezone.now(),
+            user__is_active=True,
+        )
+        # Create 1 pending invite (not accepted)
+        OrganisationMemberFactory(
+            organisation=membership.organisation,
+            accepted_datetime=None,
+        )
+        # Create 1 accepted but inactive user
+        OrganisationMemberFactory(
+            organisation=membership.organisation,
+            accepted_datetime=timezone.now(),
+            user__is_active=False,
+        )
+        # Act
+        seats = membership.occupied_seats
+        # Assert - only the 3 accepted + active should count
+        assert seats == 3  # noqa: PLR2004
+
+    def test_occupied_seats_expired_membership_returns_zero(self):
+        # Arrange
+        membership = OrganisationMembershipFactory(expired=True)
+        # Create accepted, active members
+        OrganisationMemberFactory.create_batch(
+            5,
+            organisation=membership.organisation,
+            accepted_datetime=timezone.now(),
+            user__is_active=True,
+        )
+        # Act
+        seats = membership.occupied_seats
+        # Assert - expired membership shows 0 occupied seats
+        assert seats == 0
+
+    def test_occupied_seats_cancelled_membership_returns_zero(self):
+        # Arrange
+        membership = OrganisationMembershipFactory(cancelled=True)
+        # Create accepted, active members
+        OrganisationMemberFactory.create_batch(
+            2,
+            organisation=membership.organisation,
+            accepted_datetime=timezone.now(),
+            user__is_active=True,
+        )
+        # Act
+        seats = membership.occupied_seats
+        # Assert - cancelled membership shows 0 occupied seats
+        assert seats == 0
+
+    def test_occupied_seats_no_members(self):
+        # Arrange
+        membership = OrganisationMembershipFactory(active=True)
+        # Act
+        seats = membership.occupied_seats
+        # Assert
+        assert seats == 0
