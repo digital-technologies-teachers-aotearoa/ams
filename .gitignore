@@ -288,3 +288,6 @@ docs/site/
 
 # Local secrets
 .envs/.local/django-private.ini
+
+# AI plans
+.ai/
