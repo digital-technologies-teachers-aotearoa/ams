@@ -9,9 +9,9 @@ from ams.memberships.models import OrganisationMembership
 @admin.register(MembershipOption)
 class MembershipOptionAdmin(admin.ModelAdmin):
     form = MembershipOptionForm
-    list_display = ("name", "type", "duration_display", "cost")
+    list_display = ("name", "type", "duration_display", "cost", "max_seats", "archived")
     search_fields = ("name",)
-    list_filter = ("type",)
+    list_filter = ("type", "archived")
 
 
 @admin.register(IndividualMembership)
@@ -61,6 +61,7 @@ class OrganisationMembershipAdmin(admin.ModelAdmin):
         "status_display",
         "start_date",
         "expiry_date",
+        "occupied_seats_display",
         "invoice",
     )
     search_fields = ("organisation__name", "membership_option__name")
@@ -85,3 +86,13 @@ class OrganisationMembershipAdmin(admin.ModelAdmin):
             if hasattr(obj, "get_status_display")
             else obj.status()
         )
+
+    @admin.display(
+        description="Occupied Seats",
+    )
+    def occupied_seats_display(self, obj):
+        max_seats = obj.membership_option.max_seats
+        occupied = obj.occupied_seats
+        if max_seats:
+            return f"{occupied}/{int(max_seats)}"
+        return str(occupied)

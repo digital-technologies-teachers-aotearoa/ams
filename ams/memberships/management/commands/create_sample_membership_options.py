@@ -52,6 +52,8 @@ class Command(management.base.BaseCommand):
                 "duration": relativedelta(months=1),
                 "cost": 99.99,
                 "invoice_reference": "AMS Membership",
+                "max_seats": 5,
+                "archived": False,
             },
         )
         MembershipOption.objects.update_or_create(
@@ -61,6 +63,19 @@ class Command(management.base.BaseCommand):
                 "duration": relativedelta(years=1),
                 "cost": 999.99,
                 "invoice_reference": "AMS Membership",
+                "max_seats": 10,
+                "archived": False,
+            },
+        )
+        MembershipOption.objects.update_or_create(
+            name="Sample Organisation Membership - Unlimited",
+            type=MembershipOptionType.ORGANISATION,
+            defaults={
+                "duration": relativedelta(years=1),
+                "cost": 2499.99,
+                "invoice_reference": "AMS Membership",
+                "max_seats": None,  # No limit
+                "archived": False,
             },
         )
 
