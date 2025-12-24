@@ -1,0 +1,7 @@
+{% load icon %}
+
+{% if record.organisation.organisation_memberships.exists %}
+  <span class="text-success">{% icon "check-circle-fill" %} Active</span>
+{% else %}
+  <span class="text-secondary">{% icon "dash-circle" %} None</span>
+{% endif %}

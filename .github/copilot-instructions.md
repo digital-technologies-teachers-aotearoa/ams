@@ -13,7 +13,7 @@ This guide enables AI coding agents to work productively in the Association Mana
 
 - **Run Server:** `python manage.py runserver 0.0.0.0:8000` (local dev)
 - **Create Superuser:** `python manage.py createsuperuser`
-- **Run Tests:** `pytest` (all tests), or `pytest ams/<app>/tests/` for app-specific tests. There is no need to create a virtual environment manually, it already exists.
+- **Run Tests:** `pytest` (all tests), or `pytest ams/<app>/tests/` for app-specific tests. There is no need to create a virtual environment manually, it already exists. When wanting to run the tests in bash, there is no need to cd /app, the terminal defaults there.
 - **Type Checks:** `mypy ams`
 - **Coverage:** `coverage run -m pytest && coverage html` (view at `htmlcov/index.html`)
 - **Translations:**
@@ -30,6 +30,7 @@ This guide enables AI coding agents to work productively in the Association Mana
 - **Error Logging:** Sentry integration; set DSN in production settings.
 - **Migrations:** Standard Django migrations per app.
 - **Documentation:** Stored in `docs/docs/`.
+- **Forms**: Use crispy forms tag in templates, with a FormHelper in the form class.
 
 ## Integration Points
 

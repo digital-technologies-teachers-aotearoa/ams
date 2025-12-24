@@ -4,15 +4,18 @@ from io import BytesIO
 from unittest.mock import Mock
 
 import pytest
+from crispy_forms.utils import render_crispy_form
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.utils.translation import gettext_lazy as _
 from PIL import Image
 
+from ams.users.forms import OrganisationForm
 from ams.users.forms import UserAdminCreationForm
 from ams.users.forms import UserSignupForm
 from ams.users.forms import UserUpdateForm
 from ams.users.models import User
+from ams.users.tests.factories import OrganisationFactory
 
 
 class TestUserAdminCreationForm:
@@ -342,3 +345,178 @@ class TestUserUpdateForm:
             },
         )
         assert form.is_valid(), f"Form errors: {form.errors}"
+
+
+class TestOrganisationForm:
+    """Test class for all tests related to the OrganisationForm"""
+
+    @pytest.mark.django_db
+    def test_valid_organisation_form(self):
+        """Test that valid organisation data is accepted."""
+        form = OrganisationForm(
+            data={
+                "name": "Test Organisation",
+                "telephone": "021234567",
+                "email": "test@example.com",
+                "contact_name": "John Doe",
+                "postal_address": "123 Test St",
+                "postal_suburb": "Suburb",
+                "postal_city": "City",
+                "postal_code": "1234",
+                "street_address": "456 Street",
+                "suburb": "Downtown",
+                "city": "Metropolis",
+            },
+        )
+        assert form.is_valid(), f"Form errors: {form.errors}"
+
+    @pytest.mark.django_db
+    def test_organisation_form_with_optional_fields_empty(self):
+        """Test that optional fields can be left blank."""
+        form = OrganisationForm(
+            data={
+                "name": "Test Organisation",
+                "telephone": "021234567",
+                "email": "test@example.com",
+                "contact_name": "John Doe",
+                "postal_address": "123 Test St",
+                "postal_suburb": "",  # Optional
+                "postal_city": "City",
+                "postal_code": "1234",
+                "street_address": "",  # Optional
+                "suburb": "",  # Optional
+                "city": "",  # Optional
+            },
+        )
+        assert form.is_valid(), f"Form errors: {form.errors}"
+
+    @pytest.mark.django_db
+    def test_organisation_form_invalid_email(self):
+        """Test that invalid email format is rejected."""
+        form = OrganisationForm(
+            data={
+                "name": "Test Organisation",
+                "telephone": "021234567",
+                "email": "invalid-email",  # Invalid email
+                "contact_name": "John Doe",
+                "postal_address": "123 Test St",
+                "postal_city": "City",
+                "postal_code": "1234",
+            },
+        )
+        assert not form.is_valid()
+        assert "email" in form.errors
+
+    @pytest.mark.django_db
+    def test_organisation_form_missing_required_fields(self):
+        """Test that required fields must be filled."""
+        form = OrganisationForm(
+            data={
+                "name": "Test Organisation",
+                # Missing required fields
+            },
+        )
+        assert not form.is_valid()
+        # Should have errors for required fields
+        assert "telephone" in form.errors
+        assert "email" in form.errors
+        assert "contact_name" in form.errors
+        assert "postal_address" in form.errors
+
+    @pytest.mark.django_db
+    def test_organisation_form_email_lowercase(self):
+        """Test that email is converted to lowercase."""
+        form = OrganisationForm(
+            data={
+                "name": "Test Organisation",
+                "telephone": "021234567",
+                "email": "TEST@EXAMPLE.COM",
+                "contact_name": "John Doe",
+                "postal_address": "123 Test St",
+                "postal_city": "City",
+                "postal_code": "1234",
+            },
+        )
+        assert form.is_valid()
+        assert form.cleaned_data["email"] == "test@example.com"
+
+    @pytest.mark.django_db
+    def test_organisation_form_with_cancel_url(self):
+        """Test that cancel_url is properly passed to the form helper."""
+        cancel_url = "/test/cancel/url/"
+        form = OrganisationForm(
+            cancel_url=cancel_url,
+            data={
+                "name": "Test Organisation",
+                "telephone": "021234567",
+                "email": "test@example.com",
+                "contact_name": "John Doe",
+                "postal_address": "123 Test St",
+                "postal_city": "City",
+                "postal_code": "1234",
+            },
+        )
+        assert form.is_valid()
+        # Render the form using crispy forms to check if cancel_url is in the output
+        rendered = render_crispy_form(form)
+        assert cancel_url in rendered
+        assert "Cancel" in rendered
+
+    @pytest.mark.django_db
+    def test_organisation_form_without_cancel_url(self):
+        """Test that form works when cancel_url is not provided."""
+        form = OrganisationForm(
+            data={
+                "name": "Test Organisation",
+                "telephone": "021234567",
+                "email": "test@example.com",
+                "contact_name": "John Doe",
+                "postal_address": "123 Test St",
+                "postal_city": "City",
+                "postal_code": "1234",
+            },
+        )
+        assert form.is_valid()
+        # Form should still render without error
+        rendered = str(form)
+        assert "Test Organisation" in rendered
+
+    @pytest.mark.django_db
+    def test_organisation_form_create_has_create_text(self):
+        """Test that form shows 'Create Organisation' for new instances."""
+        form = OrganisationForm(
+            cancel_url="/test/",
+            data={
+                "name": "Test Organisation",
+                "telephone": "021234567",
+                "email": "test@example.com",
+                "contact_name": "John Doe",
+                "postal_address": "123 Test St",
+                "postal_city": "City",
+                "postal_code": "1234",
+            },
+        )
+        assert form.is_valid()
+        rendered = render_crispy_form(form)
+        assert "Create Organisation" in rendered
+
+    @pytest.mark.django_db
+    def test_organisation_form_update_has_update_text(self):
+        """Test that form shows 'Update Organisation' for existing instances."""
+        org = OrganisationFactory()
+        form = OrganisationForm(
+            cancel_url="/test/",
+            instance=org,
+            data={
+                "name": "Updated Organisation",
+                "telephone": org.telephone,
+                "email": org.email,
+                "contact_name": org.contact_name,
+                "postal_address": org.postal_address,
+                "postal_city": org.postal_city,
+                "postal_code": org.postal_code,
+            },
+        )
+        assert form.is_valid()
+        rendered = render_crispy_form(form)
+        assert "Update Organisation" in rendered

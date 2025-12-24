@@ -1,7 +1,13 @@
 from allauth.account.forms import SignupForm
 from allauth.socialaccount.forms import SignupForm as SocialSignupForm
+from crispy_forms.bootstrap import FormActions
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Fieldset
+from crispy_forms.layout import Layout
+from crispy_forms.layout import Submit
 from django.contrib.auth import forms as admin_forms
 from django.core.exceptions import ValidationError
+from django.core.validators import EmailValidator
 from django.forms import CharField
 from django.forms import EmailField
 from django.forms import ImageField
@@ -9,7 +15,9 @@ from django.forms import ModelForm
 from django.forms import TextInput
 from django.utils.translation import gettext_lazy as _
 
-from .models import User
+from ams.users.models import Organisation
+from ams.users.models import User
+from ams.utils.crispy_forms import Cancel
 
 
 class UserAdminChangeForm(admin_forms.UserChangeForm):
@@ -126,3 +134,76 @@ class UserUpdateForm(ModelForm):
                 )
 
         return picture
+
+
+class OrganisationForm(ModelForm):
+    """
+    Form for creating and editing organisations.
+    Validates email format and ensures required fields are filled.
+    """
+
+    email = EmailField(
+        label=_("Email"),
+        required=True,
+        validators=[EmailValidator()],
+        help_text=_("Organisation contact email address."),
+    )
+
+    class Meta:
+        model = Organisation
+        fields = [
+            "name",
+            "telephone",
+            "email",
+            "contact_name",
+            "postal_address",
+            "postal_suburb",
+            "postal_city",
+            "postal_code",
+            "street_address",
+            "suburb",
+            "city",
+        ]
+
+    def __init__(self, cancel_url=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = "post"
+        # Determine if we're creating or updating based on instance
+        if self.instance and self.instance.pk:
+            submit_text = _("Update Organisation")
+        else:
+            submit_text = _("Create Organisation")
+        self.helper.add_layout(
+            Layout(
+                "name",
+                "telephone",
+                "contact_name",
+                "email",
+                Fieldset(
+                    _("Physical address"),
+                    "street_address",
+                    "suburb",
+                    "city",
+                ),
+                Fieldset(
+                    _("Postal address"),
+                    "postal_address",
+                    "postal_suburb",
+                    "postal_city",
+                    "postal_code",
+                ),
+                FormActions(
+                    Submit("submit", submit_text, css_class="btn btn-primary"),
+                    Cancel(cancel_url),
+                ),
+            ),
+        )
+
+    def clean_email(self):
+        """Validate that email is in correct format."""
+        email = self.cleaned_data.get("email")
+        if email:
+            # EmailValidator already validates, convert to lowercase
+            return email.lower()
+        return email

@@ -6,6 +6,7 @@ from django_tables2.columns import DateColumn
 from django_tables2.tables import Table
 
 from ams.memberships.models import IndividualMembership
+from ams.users.models import OrganisationMember
 
 
 class StatusBadgeColumn(Column):
@@ -42,4 +43,37 @@ class MembershipTable(Table):
             "start_date",
             "expiry_date",
             "invoice",
+        )
+
+
+class OrganisationTable(Table):
+    organisation_name = Column(
+        accessor="organisation__name",
+        verbose_name="Organisation",
+    )
+    role = Column(
+        accessor="role",
+        verbose_name="Role",
+    )
+    join_date = DateColumn(
+        accessor="accepted_datetime",
+        verbose_name="Join Date",
+    )
+    has_membership = TemplateColumn(
+        template_name="users/tables/organisation_membership_column.html",
+        verbose_name="Organisation Membership",
+    )
+    actions = TemplateColumn(
+        template_name="users/tables/organisation_actions_column.html",
+        verbose_name="Actions",
+    )
+
+    class Meta:
+        model = OrganisationMember
+        fields = (
+            "organisation_name",
+            "role",
+            "join_date",
+            "has_membership",
+            "actions",
         )

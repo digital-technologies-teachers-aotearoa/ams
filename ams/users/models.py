@@ -22,8 +22,10 @@ from imagekit.processors import ResizeToFill
 from .managers import UserManager
 
 # Custom username validator
+USERNAME_REGEX = r"^[a-zA-ZāēīōūĀĒĪŌŪ0-9._-]+$"
+
 username_validator = RegexValidator(
-    regex=r"^[a-zA-ZāēīōūĀĒĪŌŪ0-9._-]+$",
+    regex=USERNAME_REGEX,
     message=_(
         "Username must only include numbers, letters (including macrons), "
         "dashes, dots, and underscores.",

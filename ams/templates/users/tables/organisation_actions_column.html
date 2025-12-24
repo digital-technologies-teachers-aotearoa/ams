@@ -1,0 +1,8 @@
+{% load icon %}
+
+{% if record.role == "ADMIN" %}
+  <a href="{% url 'users:organisation_update' record.organisation.uuid %}"
+     class="btn btn-sm btn-primary">{% icon "pencil" %} Edit</a>
+{% else %}
+  <span class="text-muted">—</span>
+{% endif %}

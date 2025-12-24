@@ -1,3 +1,4 @@
+import uuid as uuid_lib
 from unittest.mock import Mock
 from unittest.mock import patch
 
@@ -12,6 +13,7 @@ from ams.users.models import OrganisationMember
 from ams.users.models import User
 from ams.users.models import user_profile_picture_path
 from ams.users.models import username_validator
+from ams.users.tests.factories import OrganisationFactory
 from ams.users.tests.factories import OrganisationMemberFactory
 
 
@@ -464,3 +466,25 @@ class TestOrganisationMember:
         assert "test@example.com" in result
         assert "Test Corp" in result
         assert "Invite Pending" in result
+
+
+@pytest.mark.django_db
+class TestOrganisation:
+    """Test class for Organisation model."""
+
+    def test_uuid_auto_generated(self):
+        """Test that UUID is automatically generated on creation."""
+        org = OrganisationFactory(name="Test Organisation")
+        assert org.uuid is not None
+        assert isinstance(org.uuid, uuid_lib.UUID)
+
+    def test_uuid_unique(self):
+        """Test that each organisation gets a unique UUID."""
+        org1 = OrganisationFactory()
+        org2 = OrganisationFactory()
+        assert org1.uuid != org2.uuid
+
+    def test_str_returns_name(self):
+        """Test that string representation returns organisation name."""
+        org = OrganisationFactory(name="Test Company")
+        assert str(org) == "Test Company"
