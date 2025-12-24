@@ -134,6 +134,7 @@ class CreateIndividualMembershipForm(ModelForm):
         label=_("Membership option"),
         queryset=MembershipOption.objects.filter(
             type=MembershipOptionType.INDIVIDUAL,
+            archived=False,
         ).order_by("cost"),
         empty_label=None,
     )
