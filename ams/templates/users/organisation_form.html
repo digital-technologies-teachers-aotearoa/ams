@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% load crispy_forms_tags i18n %}
+
+{% block title %}
+  {% if object %}
+    {% translate "Edit Organisation" %}
+  {% else %}
+    {% translate "Create Organisation" %}
+  {% endif %}
+{% endblock title %}
+{% block content %}
+  <div class="row">
+    <div class="col-md-8 offset-md-2">
+      <h1>
+        {% if object %}
+          {% translate "Edit Organisation" %}
+        {% else %}
+          {% translate "Create Organisation" %}
+        {% endif %}
+      </h1>
+      {% crispy form %}
+    </div>
+  </div>
+{% endblock content %}

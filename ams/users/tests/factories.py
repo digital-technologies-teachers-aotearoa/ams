@@ -1,7 +1,9 @@
 from collections.abc import Sequence
 from typing import Any
 
+from django.utils import timezone
 from factory import Faker
+from factory import LazyFunction
 from factory import SubFactory
 from factory import Trait
 from factory import post_generation
@@ -67,13 +69,13 @@ class OrganisationMemberFactory(DjangoModelFactory[OrganisationMember]):
     user = SubFactory(UserFactory)
     organisation = SubFactory(OrganisationFactory)
     invite_email = Faker("email")
-    created_datetime = Faker("date_time_this_year")
+    created_datetime = LazyFunction(timezone.now)
     accepted_datetime = None
     role = OrganisationMember.Role.MEMBER
 
     class Params:
         invite = Trait(user=None)
-        accepted = Trait(accepted_datetime=Faker("date_time_this_year"))
+        accepted = Trait(accepted_datetime=LazyFunction(timezone.now))
         admin = Trait(role=OrganisationMember.Role.ADMIN)
 
     class Meta:
