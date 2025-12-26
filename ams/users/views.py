@@ -1,8 +1,6 @@
-from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import QuerySet
-from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -14,10 +12,12 @@ from django.views.generic import UpdateView
 from ams.memberships.models import MembershipStatus
 from ams.users.forms import OrganisationForm
 from ams.users.forms import UserUpdateForm
+from ams.users.mixins import OrganisationAdminMixin
 from ams.users.models import Organisation
 from ams.users.models import OrganisationMember
 from ams.users.models import User
 from ams.users.tables import MembershipTable
+from ams.users.tables import OrganisationMemberTable
 from ams.users.tables import OrganisationTable
 
 
@@ -93,7 +93,10 @@ class OrganisationCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView
     success_message = _("Organisation created successfully")
 
     def get_success_url(self) -> str:
-        return reverse("users:detail", kwargs={"username": self.request.user.username})
+        return reverse(
+            "users:organisation_detail",
+            kwargs={"uuid": self.object.uuid},
+        )
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -124,7 +127,12 @@ class OrganisationCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView
 organisation_create_view = OrganisationCreateView.as_view()
 
 
-class OrganisationUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+class OrganisationUpdateView(
+    LoginRequiredMixin,
+    OrganisationAdminMixin,
+    SuccessMessageMixin,
+    UpdateView,
+):
     """
     View for editing an existing organisation.
     Only staff/admin or organisation admins can edit.
@@ -143,43 +151,79 @@ class OrganisationUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
+        organisation = self.get_object()
         kwargs["cancel_url"] = reverse(
-            "users:detail",
-            kwargs={"username": self.request.user.username},
+            "users:organisation_detail",
+            kwargs={"uuid": organisation.uuid},
         )
         return kwargs
 
     def get_success_url(self) -> str:
-        """Redirect to home page after successful update."""
-        return reverse("users:detail", kwargs={"username": self.request.user.username})
-
-    def dispatch(self, request, *args, **kwargs):
-        """
-        Check permissions before allowing access.
-        Only staff/admin or organisation admins can edit.
-        """
-        organisation = self.get_object()
-
-        # Allow staff/admin
-        if request.user.is_staff or request.user.is_superuser:
-            return super().dispatch(request, *args, **kwargs)
-
-        # Check if user is an organisation admin
-        is_org_admin = OrganisationMember.objects.filter(
-            organisation=organisation,
-            user=request.user,
-            role=OrganisationMember.Role.ADMIN,
-        ).exists()
-
-        if is_org_admin:
-            return super().dispatch(request, *args, **kwargs)
-
-        # Deny access
-        messages.error(
-            request,
-            _("You do not have permission to edit this organisation."),
+        """Redirect to organisation detail page after successful update."""
+        return reverse(
+            "users:organisation_detail",
+            kwargs={"uuid": self.object.uuid},
         )
-        return redirect("root_redirect")
 
 
 organisation_update_view = OrganisationUpdateView.as_view()
+
+
+class OrganisationDetailView(
+    LoginRequiredMixin,
+    OrganisationAdminMixin,
+    DetailView,
+):
+    """
+    View for displaying organisation details and members.
+    Only staff/admin or organisation admins can view.
+    """
+
+    model = Organisation
+    template_name = "users/organisation_detail.html"
+    pk_url_kwarg = "uuid"
+
+    def get_object(self, queryset=None):
+        """Get organisation by UUID."""
+        uuid = self.kwargs.get(self.pk_url_kwarg)
+        return Organisation.objects.get(uuid=uuid)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        organisation = self.object
+
+        # Get organisation members
+        members = organisation.organisation_members.select_related(
+            "user",
+        ).order_by("-accepted_datetime")
+        context["member_table"] = OrganisationMemberTable(members)
+
+        # Get active organisation membership for seats summary
+
+        active_membership = (
+            organisation.organisation_memberships.filter(
+                cancelled_datetime__isnull=True,
+                start_date__lte=timezone.now().date(),
+                expiry_date__gte=timezone.now().date(),
+            )
+            .select_related("membership_option")
+            .first()
+        )
+
+        if active_membership:
+            context["active_membership"] = active_membership
+            context["seat_limit"] = (
+                int(active_membership.membership_option.max_seats)
+                if active_membership.membership_option.max_seats
+                else None
+            )
+            context["occupied_seats"] = active_membership.occupied_seats
+        else:
+            context["active_membership"] = None
+            context["seat_limit"] = None
+            context["occupied_seats"] = 0
+
+        return context
+
+
+organisation_detail_view = OrganisationDetailView.as_view()
