@@ -1,6 +1,7 @@
 from django.urls import path
 
 from .views import organisation_create_view
+from .views import organisation_detail_view
 from .views import organisation_update_view
 from .views import user_detail_view
 from .views import user_redirect_view
@@ -16,6 +17,11 @@ urlpatterns = [
         "organisations/create/",
         view=organisation_create_view,
         name="organisation_create",
+    ),
+    path(
+        "organisations/view/<uuid:uuid>/",
+        view=organisation_detail_view,
+        name="organisation_detail",
     ),
     path(
         "organisations/edit/<uuid:uuid>/",
