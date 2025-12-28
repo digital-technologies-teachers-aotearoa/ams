@@ -1,0 +1,98 @@
+<!-- djlint:off -->
+
+{% load i18n %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% trans "Organisation Invitation" %}</title>
+  </head>
+  <body style="font-family: Arial, sans-serif;
+               line-height: 1.6;
+               color: #333;
+               max-width: 600px;
+               margin: 0 auto;
+               padding: 20px">
+    <div style="background-color: #f8f9fa;
+                border-radius: 8px;
+                padding: 30px;
+                margin-bottom: 20px">
+      <h1 style="color: #0056b3; margin-top: 0;">{% trans "You've been invited!" %}</h1>
+      <p style="font-size: 16px;">
+        {% blocktrans with org_name=organisation.name %}
+            You have been invited to join <strong>{{ org_name }}</strong> as a member.
+            {% endblocktrans %}
+      </p>
+    </div>
+    <div style="background-color: #ffffff;
+                border: 1px solid #dee2e6;
+                border-radius: 8px;
+                padding: 20px;
+                margin-bottom: 20px">
+      <h2 style="color: #495057; font-size: 18px; margin-top: 0;">{% trans "Organisation Details" %}</h2>
+      <table style="width: 100%; border-collapse: collapse;">
+        <tr>
+          <td style="padding: 8px 0; font-weight: bold; width: 40%;">{% trans "Name:" %}</td>
+          <td style="padding: 8px 0;">{{ organisation.name }}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-weight: bold;">{% trans "Contact:" %}</td>
+          <td style="padding: 8px 0;">{{ organisation.contact_name }}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-weight: bold;">{% trans "Email:" %}</td>
+          <td style="padding: 8px 0;">{{ organisation.email }}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-weight: bold;">{% trans "Phone:" %}</td>
+          <td style="padding: 8px 0;">{{ organisation.telephone }}</td>
+        </tr>
+        {% if organisation.city %}
+          <tr>
+            <td style="padding: 8px 0; font-weight: bold;">{% trans "Location:" %}</td>
+            <td style="padding: 8px 0;">{{ organisation.city }}</td>
+          </tr>
+        {% endif %}
+      </table>
+    </div>
+    <div style="text-align: center; margin: 30px 0;">
+      <a href="{{ accept_url }}"
+         style="display: inline-block;
+                background-color: #0056b3;
+                color: #ffffff;
+                text-decoration: none;
+                padding: 12px 30px;
+                border-radius: 5px;
+                font-size: 16px;
+                font-weight: bold">{% trans "Accept Invitation" %}</a>
+    </div>
+    <div style="background-color: #f8f9fa;
+                border-left: 4px solid #17a2b8;
+                padding: 15px;
+                margin-bottom: 20px">
+      {% if user_exists %}
+        <p style="margin: 0; font-size: 14px;">
+          {% trans "Click the button above to accept this invitation and join the organisation." %}
+        </p>
+      {% else %}
+        <p style="margin: 0 0 10px 0; font-size: 14px;">
+          {% trans "You'll need to create an account to accept this invitation." %}
+        </p>
+        <p style="margin: 0; font-size: 14px;">{% trans "Click the button above to get started." %}</p>
+      {% endif %}
+    </div>
+    <div style="border-top: 1px solid #dee2e6;
+                padding-top: 20px;
+                margin-top: 30px;
+                font-size: 12px;
+                color: #6c757d">
+      <p>{% trans "If you did not expect this invitation, you can safely ignore this email." %}</p>
+      <p>{% trans "If the button above doesn't work, copy and paste this link into your browser:" %}</p>
+      <p style="word-break: break-all;">
+        <a href="{{ accept_url }}" style="color: #0056b3;">{{ accept_url }}</a>
+      </p>
+    </div>
+  </body>
+</html>

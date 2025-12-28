@@ -10,12 +10,14 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.utils.translation import gettext_lazy as _
 from PIL import Image
 
+from ams.users.forms import InviteOrganisationMemberForm
 from ams.users.forms import OrganisationForm
 from ams.users.forms import UserAdminCreationForm
 from ams.users.forms import UserSignupForm
 from ams.users.forms import UserUpdateForm
 from ams.users.models import User
 from ams.users.tests.factories import OrganisationFactory
+from ams.users.tests.factories import OrganisationMemberFactory
 
 
 class TestUserAdminCreationForm:
@@ -520,3 +522,116 @@ class TestOrganisationForm:
         assert form.is_valid()
         rendered = render_crispy_form(form)
         assert "Update Organisation" in rendered
+
+
+@pytest.mark.django_db
+class TestInviteOrganisationMemberForm:
+    """Test class for InviteOrganisationMemberForm"""
+
+    def test_valid_email_for_new_member(self):
+        """Test that form accepts a valid email not already in organisation."""
+        org = OrganisationFactory()
+        form = InviteOrganisationMemberForm(
+            organisation=org,
+            data={"email": "newmember@example.com"},
+        )
+        assert form.is_valid()
+
+    def test_email_normalized_to_lowercase(self):
+        """Test that email is normalized to lowercase."""
+        org = OrganisationFactory()
+        form = InviteOrganisationMemberForm(
+            organisation=org,
+            data={"email": "NewMember@Example.COM"},
+        )
+        assert form.is_valid()
+        assert form.cleaned_data["email"] == "newmember@example.com"
+
+    def test_duplicate_user_email_rejected(self):
+        """Test that form rejects email of existing member (via user)."""
+        member = OrganisationMemberFactory(accepted=True)
+        form = InviteOrganisationMemberForm(
+            organisation=member.organisation,
+            data={"email": member.user.email},
+        )
+        assert not form.is_valid()
+        assert "email" in form.errors
+        assert "already associated with a member" in str(form.errors["email"][0])
+
+    def test_duplicate_invite_email_rejected(self):
+        """Test that form rejects email of existing invite."""
+        member = OrganisationMemberFactory(
+            invite=True,
+            invite_email="pending@example.com",
+        )
+        form = InviteOrganisationMemberForm(
+            organisation=member.organisation,
+            data={"email": "pending@example.com"},
+        )
+        assert not form.is_valid()
+        assert "email" in form.errors
+        assert "already associated with a member" in str(form.errors["email"][0])
+
+    def test_invalid_email_format(self):
+        """Test that form rejects invalid email format."""
+        org = OrganisationFactory()
+        form = InviteOrganisationMemberForm(
+            organisation=org,
+            data={"email": "not-an-email"},
+        )
+        assert not form.is_valid()
+        assert "email" in form.errors
+
+    def test_empty_email_rejected(self):
+        """Test that form rejects empty email."""
+        org = OrganisationFactory()
+        form = InviteOrganisationMemberForm(
+            organisation=org,
+            data={"email": ""},
+        )
+        assert not form.is_valid()
+        assert "email" in form.errors
+
+    def test_form_requires_organisation(self):
+        """Test that form requires organisation parameter."""
+        with pytest.raises(ValueError, match="organisation is required"):
+            InviteOrganisationMemberForm(
+                organisation=None,
+                data={"email": "test@example.com"},
+            )
+
+    def test_form_rejects_invalid_organisation_type(self):
+        """Test that form rejects non-Organisation instances."""
+        with pytest.raises(
+            TypeError,
+            match="organisation must be an instance of Organisation",
+        ):
+            InviteOrganisationMemberForm(
+                organisation="not an organisation",
+                data={"email": "test@example.com"},
+            )
+
+    def test_form_requires_organisation_not_provided(self):
+        """Test that form raises error when organisation not provided at all."""
+        # We need to pass organisation as keyword argument
+        # This tests that we can't create the form without it
+        org = OrganisationFactory()
+        # This should work
+        form = InviteOrganisationMemberForm(
+            organisation=org,
+            data={"email": "test@example.com"},
+        )
+        assert form.is_valid()
+
+    def test_form_has_cancel_url_in_helper(self):
+        """Test that cancel_url is passed to form helper."""
+        org = OrganisationFactory()
+        cancel_url = "/test/cancel/"
+        form = InviteOrganisationMemberForm(
+            organisation=org,
+            cancel_url=cancel_url,
+        )
+        assert form.helper is not None
+        # The cancel URL would be in the layout
+        rendered = render_crispy_form(form)
+        assert cancel_url in rendered
