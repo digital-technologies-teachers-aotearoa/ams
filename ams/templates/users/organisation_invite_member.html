@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+  {% trans "Invite Member" %} - {{ organisation.name }}
+{% endblock title %}
+{% block content %}
+  <div class="container my-5">
+    <div class="row">
+      <div class="col-12 col-md-8 offset-md-2">
+        <h1>{% trans "Invite Member to" %} {{ organisation.name }}</h1>
+        <p class="text-muted">
+          {% trans "Enter the email address of the person you'd like to invite to this organisation." %}
+        </p>
+        {% crispy form %}
+      </div>
+    </div>
+  </div>
+{% endblock content %}

@@ -1,0 +1,26 @@
+{% load i18n %}
+{% trans "You've been invited!" %}
+
+{% blocktrans with org_name=organisation.name %}You have been invited to join {{ org_name }} as a member.{% endblocktrans %}
+
+{% trans "Organisation Details" %}
+------------------------
+{% trans "Name:" %} {{ organisation.name }}
+{% trans "Contact:" %} {{ organisation.contact_name }}
+{% trans "Email:" %} {{ organisation.email }}
+{% trans "Phone:" %} {{ organisation.telephone }}
+{% if organisation.city %}{% trans "Location:" %} {{ organisation.city }}{% endif %}
+
+{% trans "Accept Invitation" %}
+------------------------
+{% trans "Click the link below to accept this invitation:" %}
+
+{{ accept_url }}
+
+{% if user_exists %}
+{% trans "Click the link above to accept this invitation and join the organisation." %}
+{% else %}
+{% trans "You'll need to create an account to accept this invitation. Click the link above to get started." %}
+{% endif %}
+
+{% trans "If you did not expect this invitation, you can safely ignore this email." %}

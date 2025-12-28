@@ -1,15 +1,21 @@
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import QuerySet
+from django.shortcuts import get_object_or_404
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView
 from django.views.generic import DetailView
+from django.views.generic import FormView
 from django.views.generic import RedirectView
 from django.views.generic import UpdateView
 
 from ams.memberships.models import MembershipStatus
+from ams.users.email_utils import send_organisation_invite_email
+from ams.users.forms import InviteOrganisationMemberForm
 from ams.users.forms import OrganisationForm
 from ams.users.forms import UserUpdateForm
 from ams.users.mixins import OrganisationAdminMixin
@@ -227,3 +233,200 @@ class OrganisationDetailView(
 
 
 organisation_detail_view = OrganisationDetailView.as_view()
+
+
+class OrganisationInviteMemberView(
+    LoginRequiredMixin,
+    OrganisationAdminMixin,
+    FormView,
+):
+    """
+    View for inviting members to an organisation.
+    Only staff/admin or organisation admins can invite members.
+    """
+
+    form_class = InviteOrganisationMemberForm
+    template_name = "users/organisation_invite_member.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        """Store the organisation for use in get_form_kwargs and form_valid."""
+        self.organisation = get_object_or_404(Organisation, uuid=kwargs.get("uuid"))
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_object(self):
+        """Required by OrganisationAdminMixin."""
+        return self.organisation
+
+    def get_form_kwargs(self):
+        """Pass organisation and cancel_url to the form."""
+        kwargs = super().get_form_kwargs()
+        kwargs["organisation"] = self.organisation
+        kwargs["cancel_url"] = reverse(
+            "users:organisation_detail",
+            kwargs={"uuid": self.organisation.uuid},
+        )
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        """Add organisation to context."""
+        context = super().get_context_data(**kwargs)
+        context["organisation"] = self.organisation
+        return context
+
+    def form_valid(self, form):
+        """Create the invite and send the email."""
+        email = form.cleaned_data["email"]
+
+        # Check seat availability and add warning if needed
+        active_membership = (
+            self.organisation.organisation_memberships.filter(
+                cancelled_datetime__isnull=True,
+                start_date__lte=timezone.now().date(),
+                expiry_date__gte=timezone.now().date(),
+            )
+            .select_related("membership_option")
+            .first()
+        )
+
+        if active_membership:
+            max_seats = active_membership.membership_option.max_seats
+            occupied_seats = active_membership.occupied_seats
+
+            if max_seats and occupied_seats >= int(max_seats):
+                # Seats are full - add warning
+                messages.warning(
+                    self.request,
+                    _(
+                        "All membership seats are currently occupied. "
+                        "The invitee will not be able to accept until a seat "
+                        "becomes available.",
+                    ),
+                )
+
+        # Check if user exists
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            user = None
+
+        # Create the organisation member invite
+        member = OrganisationMember.objects.create(
+            organisation=self.organisation,
+            user=user,
+            invite_email=email,
+            created_datetime=timezone.now(),
+            role=OrganisationMember.Role.MEMBER,
+        )
+
+        # Send invite email using utility function
+        send_organisation_invite_email(self.request, member)
+
+        # Add success message
+        messages.success(
+            self.request,
+            _("Invitation sent successfully to %(email)s.") % {"email": email},
+        )
+
+        # Redirect to organisation detail
+        return redirect(
+            reverse(
+                "users:organisation_detail",
+                kwargs={"uuid": self.organisation.uuid},
+            ),
+        )
+
+
+organisation_invite_member_view = OrganisationInviteMemberView.as_view()
+
+
+class AcceptOrganisationInviteView(LoginRequiredMixin, RedirectView):
+    """
+    View for accepting an organisation invite.
+    User must be logged in and the invite must be for their email.
+    """
+
+    permanent = False
+
+    def get_redirect_url(self, *args, **kwargs):
+        """Accept the invite and redirect to organisation detail."""
+        invite_token = kwargs.get("invite_token")
+
+        # Get the invite
+        member = get_object_or_404(
+            OrganisationMember,
+            invite_token=invite_token,
+        )
+
+        # Verify the logged-in user matches the invite
+        if member.user and member.user != self.request.user:
+            # Invite is for a specific user but logged-in user doesn't match
+            messages.error(
+                self.request,
+                _("This invitation is for a different user."),
+            )
+            return reverse("users:redirect")
+
+        # Check if already accepted
+        if member.accepted_datetime:
+            # Already accepted, inform user
+            messages.info(
+                self.request,
+                _("You have already accepted this invitation."),
+            )
+            return reverse(
+                "users:organisation_detail",
+                kwargs={"uuid": member.organisation.uuid},
+            )
+
+        # Check seat availability
+        active_membership = (
+            member.organisation.organisation_memberships.filter(
+                cancelled_datetime__isnull=True,
+                start_date__lte=timezone.now().date(),
+                expiry_date__gte=timezone.now().date(),
+            )
+            .select_related("membership_option")
+            .first()
+        )
+
+        if active_membership:
+            max_seats = active_membership.membership_option.max_seats
+            occupied_seats = active_membership.occupied_seats
+
+            if max_seats and occupied_seats >= int(max_seats):
+                # Seats are full - cannot accept
+                messages.error(
+                    self.request,
+                    _(
+                        "Unable to accept invitation: all membership seats are "
+                        "currently occupied.",
+                    ),
+                )
+                return reverse(
+                    "users:organisation_detail",
+                    kwargs={"uuid": member.organisation.uuid},
+                )
+
+        # Accept the invite
+        member.accepted_datetime = timezone.now()
+        if not member.user:
+            member.user = self.request.user
+        member.save()
+
+        # Add success message
+        messages.success(
+            self.request,
+            _(
+                "Welcome! You have successfully joined %(organisation)s.",
+            )
+            % {"organisation": member.organisation.name},
+        )
+
+        # Redirect to organisation detail
+        return reverse(
+            "users:organisation_detail",
+            kwargs={"uuid": member.organisation.uuid},
+        )
+
+
+accept_organisation_invite_view = AcceptOrganisationInviteView.as_view()
