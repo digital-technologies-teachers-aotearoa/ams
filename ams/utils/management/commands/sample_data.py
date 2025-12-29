@@ -25,7 +25,7 @@ class Command(management.base.BaseCommand):
 
         # Create accounts
         management.call_command("create_sample_admin")
-        management.call_command("create_sample_user")
+        management.call_command("create_sample_users")
 
         # Create membership options
         management.call_command("create_sample_membership_options")

@@ -62,7 +62,9 @@
         "monosans.djlint",
         // formatting
         "editorconfig.editorconfig",
-        "esbenp.prettier-vscode"
+        "esbenp.prettier-vscode",
+        // ai
+        "anthropic.claude-code"
       ]
     }
   },
