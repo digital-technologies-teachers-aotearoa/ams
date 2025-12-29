@@ -44,6 +44,14 @@
               <a class="btn btn-success" href="{% url 'memberships:apply' %}">Register for a new individual membership</a>
             </div>
           </div>
+          <!-- Pending Organisation Invitations Section -->
+          {% if has_pending_invitations %}
+            <div class="mt-4">
+              <h3 class="mb-3">Pending Organisation Invitations</h3>
+              <p class="text-muted">You have been invited to join the following organisations. Click "Accept" to join.</p>
+              {% render_table pending_invitation_table %}
+            </div>
+          {% endif %}
           <!-- Organisations Section -->
           <div class="mt-4">
             <h3 class="mb-3">Organisations</h3>

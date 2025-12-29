@@ -25,6 +25,7 @@ from ams.users.models import User
 from ams.users.tables import MembershipTable
 from ams.users.tables import OrganisationMemberTable
 from ams.users.tables import OrganisationTable
+from ams.users.tables import PendingInvitationTable
 
 
 class UserDetailView(LoginRequiredMixin, DetailView):
@@ -42,14 +43,26 @@ class UserDetailView(LoginRequiredMixin, DetailView):
             m.status() == MembershipStatus.ACTIVE for m in memberships
         )
 
-        # Organizations
-        organisations = (
-            user.organisation_members.select_related("organisation")
-            .prefetch_related("organisation__organisation_memberships")
-            .order_by("-accepted_datetime")
+        # Organizations - separate pending invitations from accepted memberships
+        all_org_members = user.organisation_members.select_related(
+            "organisation",
+        ).prefetch_related("organisation__organisation_memberships")
+
+        # Pending invitations (not yet accepted)
+        pending_invitations = all_org_members.filter(
+            accepted_datetime__isnull=True,
+        ).order_by("-created_datetime")
+        context["pending_invitation_table"] = PendingInvitationTable(
+            pending_invitations,
         )
-        context["organisation_table"] = OrganisationTable(organisations)
-        context["has_organisations"] = organisations.exists()
+        context["has_pending_invitations"] = pending_invitations.exists()
+
+        # Accepted organisations
+        accepted_organisations = all_org_members.filter(
+            accepted_datetime__isnull=False,
+        ).order_by("-accepted_datetime")
+        context["organisation_table"] = OrganisationTable(accepted_organisations)
+        context["has_organisations"] = accepted_organisations.exists()
 
         return context
 
@@ -365,6 +378,15 @@ class AcceptOrganisationInviteView(LoginRequiredMixin, RedirectView):
                 _("This invitation is for a different user."),
             )
             return reverse("users:redirect")
+
+        # For invites sent to non-users (user=None), verify email matches
+        if not member.user and member.invite_email:
+            if self.request.user.email.lower() != member.invite_email.lower():
+                messages.error(
+                    self.request,
+                    _("This invitation is not valid for your account."),
+                )
+                return reverse("users:redirect")
 
         # Check if already accepted
         if member.accepted_datetime:

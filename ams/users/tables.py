@@ -46,6 +46,36 @@ class MembershipTable(Table):
         )
 
 
+class PendingInvitationTable(Table):
+    """Table for displaying pending organisation invitations."""
+
+    organisation_name = Column(
+        accessor="organisation__name",
+        verbose_name="Organisation",
+    )
+    role = Column(
+        accessor="role",
+        verbose_name="Role",
+    )
+    invited_date = DateColumn(
+        accessor="created_datetime",
+        verbose_name="Invited Date",
+    )
+    actions = TemplateColumn(
+        template_name="users/tables/pending_invitation_actions_column.html",
+        verbose_name="Actions",
+    )
+
+    class Meta:
+        model = OrganisationMember
+        fields = (
+            "organisation_name",
+            "role",
+            "invited_date",
+            "actions",
+        )
+
+
 class OrganisationTable(Table):
     organisation_name = Column(
         accessor="organisation__name",
