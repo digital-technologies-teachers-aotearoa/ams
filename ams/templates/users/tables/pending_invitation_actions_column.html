@@ -2,3 +2,5 @@
 
 <a href="{% url 'users:accept_organisation_invite' record.invite_token %}"
    class="btn btn-sm btn-success">{% icon "check" %} Accept</a>
+<a href="{% url 'users:decline_organisation_invite' record.invite_token %}"
+   class="btn btn-sm btn-secondary">{% icon "x" %} Decline</a>

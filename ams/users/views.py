@@ -48,9 +48,10 @@ class UserDetailView(LoginRequiredMixin, DetailView):
             "organisation",
         ).prefetch_related("organisation__organisation_memberships")
 
-        # Pending invitations (not yet accepted)
+        # Pending invitations (not yet accepted or declined)
         pending_invitations = all_org_members.filter(
             accepted_datetime__isnull=True,
+            declined_datetime__isnull=True,
         ).order_by("-created_datetime")
         context["pending_invitation_table"] = PendingInvitationTable(
             pending_invitations,
@@ -400,6 +401,14 @@ class AcceptOrganisationInviteView(LoginRequiredMixin, RedirectView):
                 kwargs={"uuid": member.organisation.uuid},
             )
 
+        # Check if already declined
+        if member.declined_datetime:
+            messages.error(
+                self.request,
+                _("This invitation has been declined and cannot be accepted."),
+            )
+            return reverse("users:redirect")
+
         # Check seat availability
         active_membership = (
             member.organisation.organisation_memberships.filter(
@@ -452,3 +461,83 @@ class AcceptOrganisationInviteView(LoginRequiredMixin, RedirectView):
 
 
 accept_organisation_invite_view = AcceptOrganisationInviteView.as_view()
+
+
+class DeclineOrganisationInviteView(LoginRequiredMixin, RedirectView):
+    """
+    View for declining an organisation invite.
+    User must be logged in and the invite must be for their email.
+    """
+
+    permanent = False
+
+    def get_redirect_url(self, *args, **kwargs):
+        """Decline the invite and redirect to user detail page."""
+        invite_token = kwargs.get("invite_token")
+
+        # Get the invite
+        member = get_object_or_404(
+            OrganisationMember,
+            invite_token=invite_token,
+        )
+
+        # Verify the logged-in user matches the invite
+        if member.user and member.user != self.request.user:
+            # Invite is for a specific user but logged-in user doesn't match
+            messages.error(
+                self.request,
+                _("This invitation is for a different user."),
+            )
+            return reverse("users:redirect")
+
+        # For invites sent to non-users (user=None), verify email matches
+        if not member.user and member.invite_email:
+            if self.request.user.email.lower() != member.invite_email.lower():
+                messages.error(
+                    self.request,
+                    _("This invitation is not valid for your account."),
+                )
+                return reverse("users:redirect")
+
+        # Check if already accepted
+        if member.accepted_datetime:
+            messages.info(
+                self.request,
+                _("You have already accepted this invitation."),
+            )
+            return reverse(
+                "users:organisation_detail",
+                kwargs={"uuid": member.organisation.uuid},
+            )
+
+        # Check if already declined
+        if member.declined_datetime:
+            messages.info(
+                self.request,
+                _("You have already declined this invitation."),
+            )
+            return reverse("users:redirect")
+
+        # Decline the invite
+        member.declined_datetime = timezone.now()
+        if not member.user:
+            member.user = self.request.user
+        member.save()
+
+        # Add success message
+        messages.success(
+            self.request,
+            _(
+                "You have declined the invitation to join %(organisation)s.",
+            )
+            % {"organisation": member.organisation.name},
+        )
+
+        # Redirect to user detail
+        return reverse(
+            "users:detail",
+            kwargs={"username": self.request.user.username},
+        )
+
+
+decline_organisation_invite_view = DeclineOrganisationInviteView.as_view()

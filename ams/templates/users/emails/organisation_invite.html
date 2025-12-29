@@ -4,21 +4,21 @@
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{% trans "Organisation Invitation" %}</title>
-  </head>
-  <body style="font-family: Arial, sans-serif;
-               line-height: 1.6;
-               color: #333;
-               max-width: 600px;
-               margin: 0 auto;
-               padding: 20px">
-    <div style="background-color: #f8f9fa;
-                border-radius: 8px;
-                padding: 30px;
-                margin-bottom: 20px">
+  <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>{% trans "Organisation Invitation" %}</title>
+    </head>
+    <body style="font-family: Arial, sans-serif;
+                 line-height: 1.6;
+                 color: #333;
+                 max-width: 600px;
+                 margin: 0 auto;
+                 padding: 20px">
+      <div style="background-color: #f8f9fa;
+                  border-radius: 8px;
+                  padding: 30px;
+                  margin-bottom: 20px">
       <h1 style="color: #0056b3; margin-top: 0;">{% trans "You've been invited!" %}</h1>
       <p style="font-size: 16px;">
         {% blocktrans with org_name=organisation.name %}
@@ -60,13 +60,23 @@
     <div style="text-align: center; margin: 30px 0;">
       <a href="{{ accept_url }}"
          style="display: inline-block;
-                background-color: #0056b3;
+                background-color: #28a745;
                 color: #ffffff;
                 text-decoration: none;
                 padding: 12px 30px;
                 border-radius: 5px;
                 font-size: 16px;
-                font-weight: bold">{% trans "Accept Invitation" %}</a>
+                font-weight: bold;
+                margin-right: 10px">{% trans "Accept Invitation" %}</a>
+      <a href="{{ decline_url }}"
+         style="display: inline-block;
+                background-color: #6c757d;
+                color: #ffffff;
+                text-decoration: none;
+                padding: 12px 30px;
+                border-radius: 5px;
+                font-size: 16px;
+                font-weight: bold">{% trans "Decline" %}</a>
     </div>
     <div style="background-color: #f8f9fa;
                 border-left: 4px solid #17a2b8;
@@ -88,10 +98,13 @@
                 margin-top: 30px;
                 font-size: 12px;
                 color: #6c757d">
-      <p>{% trans "If you did not expect this invitation, you can safely ignore this email." %}</p>
-      <p>{% trans "If the button above doesn't work, copy and paste this link into your browser:" %}</p>
+      <p>{% trans "If you did not expect this invitation, you can decline it or safely ignore this email." %}</p>
+      <p>{% trans "If the buttons above don't work, copy and paste these links into your browser:" %}</p>
       <p style="word-break: break-all;">
-        <a href="{{ accept_url }}" style="color: #0056b3;">{{ accept_url }}</a>
+        <strong>{% trans "Accept:" %}</strong> <a href="{{ accept_url }}" style="color: #28a745;">{{ accept_url }}</a>
+      </p>
+      <p style="word-break: break-all;">
+        <strong>{% trans "Decline:" %}</strong> <a href="{{ decline_url }}" style="color: #6c757d;">{{ decline_url }}</a>
       </p>
     </div>
   </body>
