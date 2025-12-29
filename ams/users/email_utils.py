@@ -20,10 +20,16 @@ def send_organisation_invite_email(request, member: OrganisationMember):
     invite_token = member.invite_token
     email = member.invite_email
 
-    # Build the acceptance URL
+    # Build the acceptance and decline URLs
     accept_url = request.build_absolute_uri(
         reverse(
             "users:accept_organisation_invite",
+            kwargs={"invite_token": invite_token},
+        ),
+    )
+    decline_url = request.build_absolute_uri(
+        reverse(
+            "users:decline_organisation_invite",
             kwargs={"invite_token": invite_token},
         ),
     )
@@ -39,6 +45,7 @@ def send_organisation_invite_email(request, member: OrganisationMember):
         {
             "organisation": organisation,
             "accept_url": accept_url,
+            "decline_url": decline_url,
             "user_exists": member.user is not None,
         },
     )
@@ -49,6 +56,7 @@ def send_organisation_invite_email(request, member: OrganisationMember):
         {
             "organisation": organisation,
             "accept_url": accept_url,
+            "decline_url": decline_url,
             "user_exists": member.user is not None,
         },
     )

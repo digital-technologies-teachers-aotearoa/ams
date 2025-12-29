@@ -146,6 +146,7 @@ class OrganisationMember(Model):
     )
     created_datetime = DateTimeField()
     accepted_datetime = DateTimeField(null=True)
+    declined_datetime = DateTimeField(null=True)
     role = CharField(
         max_length=10,
         choices=Role.choices,

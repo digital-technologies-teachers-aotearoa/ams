@@ -11,16 +11,18 @@
 {% trans "Phone:" %} {{ organisation.telephone }}
 {% if organisation.city %}{% trans "Location:" %} {{ organisation.city }}{% endif %}
 
-{% trans "Accept Invitation" %}
+{% trans "Accept or Decline" %}
 ------------------------
-{% trans "Click the link below to accept this invitation:" %}
-
+{% trans "Accept this invitation:" %}
 {{ accept_url }}
 
+{% trans "Decline this invitation:" %}
+{{ decline_url }}
+
 {% if user_exists %}
-{% trans "Click the link above to accept this invitation and join the organisation." %}
+{% trans "Click the accept link above to join the organisation, or the decline link if you're not interested." %}
 {% else %}
-{% trans "You'll need to create an account to accept this invitation. Click the link above to get started." %}
+{% trans "You'll need to create an account to accept this invitation. Click the accept link above to get started, or the decline link if you're not interested." %}
 {% endif %}
 
-{% trans "If you did not expect this invitation, you can safely ignore this email." %}
+{% trans "If you did not expect this invitation, you can decline it or safely ignore this email." %}

@@ -1,6 +1,7 @@
 from django.urls import path
 
 from ams.users.views import accept_organisation_invite_view
+from ams.users.views import decline_organisation_invite_view
 from ams.users.views import organisation_create_view
 from ams.users.views import organisation_detail_view
 from ams.users.views import organisation_invite_member_view
@@ -35,10 +36,15 @@ urlpatterns = [
         view=organisation_invite_member_view,
         name="organisation_invite_member",
     ),
-    # Organisation invite acceptance
+    # Organisation invite acceptance/decline
     path(
         "accept-invite/<uuid:invite_token>/",
         view=accept_organisation_invite_view,
         name="accept_organisation_invite",
+    ),
+    path(
+        "decline-invite/<uuid:invite_token>/",
+        view=decline_organisation_invite_view,
+        name="decline_organisation_invite",
     ),
 ]

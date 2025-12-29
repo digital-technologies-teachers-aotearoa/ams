@@ -119,6 +119,33 @@ class TestAcceptOrganisationInviteView:
         assert response.status_code == HTTPStatus.FOUND
         assert f"/users/organisations/view/{org.uuid}/" in response.url
 
+    def test_accept_already_declined_invite(self, user: User, client):
+        """Test that accepting a declined invite is not allowed."""
+        org = OrganisationFactory()
+        member = OrganisationMemberFactory(
+            organisation=org,
+            user=user,
+            accepted_datetime=None,
+            declined_datetime=timezone.now(),  # Already declined
+        )
+
+        client.force_login(user)
+        url = reverse(
+            "users:accept_organisation_invite",
+            kwargs={"invite_token": member.invite_token},
+        )
+
+        response = client.get(url)
+
+        # Should redirect to user redirect page
+        assert response.status_code == HTTPStatus.FOUND
+        assert response.url == reverse("users:redirect")
+
+        # Member should still be declined, not accepted
+        member.refresh_from_db()
+        assert member.accepted_datetime is None
+        assert member.declined_datetime is not None
+
     def test_accept_invite_not_authenticated(self, client):
         """Test that unauthenticated users are redirected to login."""
         org = OrganisationFactory()
