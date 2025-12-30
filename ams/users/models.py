@@ -12,7 +12,9 @@ from django.db.models import EmailField
 from django.db.models import ForeignKey
 from django.db.models import ImageField
 from django.db.models import Model
+from django.db.models import Q
 from django.db.models import TextChoices
+from django.db.models import UniqueConstraint
 from django.db.models import UUIDField
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -155,7 +157,13 @@ class OrganisationMember(Model):
     )
 
     class Meta:
-        unique_together = (("user", "organisation"),)
+        constraints = [
+            UniqueConstraint(
+                fields=["user", "organisation"],
+                condition=Q(declined_datetime__isnull=True),
+                name="unique_active_org_member",
+            ),
+        ]
 
     def __str__(self):
         if self.user:

@@ -271,14 +271,17 @@ class InviteOrganisationMemberForm(Form):
             return email
 
         # Check if user or invite_email already exists for this organisation
+        # Exclude declined invites (they can be re-invited)
         existing_member = OrganisationMember.objects.filter(
             organisation=self.organisation,
+            declined_datetime__isnull=True,
         ).filter(
             # Check both user email and invite_email
             user__email=email,
         ) | OrganisationMember.objects.filter(
             organisation=self.organisation,
             invite_email=email,
+            declined_datetime__isnull=True,
         )
 
         if existing_member.exists():
