@@ -1,5 +1,8 @@
 FROM docker.io/node:25.2-bookworm-slim
 
+# Allow conditional user setting (default to node, can override with --build-arg RUN_USER=root)
+ARG RUN_USER=node
+
 WORKDIR /app
 
 # Change ownership of the working directory to the existing node user (uid 1000, gid 1000)
@@ -17,7 +20,7 @@ COPY --chown=node:node ./compose/local/node/entrypoint.sh /entrypoint.sh
 # Switch to root temporarily to chmod the entrypoint
 USER root
 RUN chmod +x /entrypoint.sh
-USER node
+USER ${RUN_USER}
 
 ENV PATH=./node_modules/.bin/:$PATH
 
