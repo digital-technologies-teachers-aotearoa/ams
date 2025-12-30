@@ -55,12 +55,13 @@ jobs:
           push: false
           load: true
           files: docker-compose.yml
-          targets: django
+          targets: django, node
           set: |
             django.cache-from=type=gha,scope=django-cached-tests
             django.cache-to=type=gha,scope=django-cached-tests,mode=max
             node.cache-from=type=gha,scope=node-cached-tests
             node.cache-to=type=gha,scope=node-cached-tests,mode=max
+            node.args.RUN_USER=root
 
       - name: Check database migrations
         run: docker compose run --rm django python manage.py makemigrations --check

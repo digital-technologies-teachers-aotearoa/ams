@@ -5,6 +5,7 @@
 // Gulp and package
 import { src, dest, parallel, series, task, watch } from 'gulp';
 import pjson from './package.json' with { type: 'json' };
+import { mkdirSync } from 'fs';
 
 // Plugins
 import autoprefixer from 'autoprefixer';
@@ -55,6 +56,9 @@ const paths = pathsConfig();
 
 // Styles autoprefixing and minification
 function styles() {
+  // Ensure output directory exists
+  mkdirSync(paths.css, { recursive: true });
+
   const processCss = [
     autoprefixer(), // adds vendor prefixes
     pixrem(), // add fallbacks for rem units
@@ -83,6 +87,9 @@ function styles() {
 
 // Javascript minification
 function scripts() {
+  // Ensure output directory exists
+  mkdirSync(paths.js, { recursive: true });
+
   // Minify all top-level JS files that do not start with an underscore and are not already minified.
   return src([
     `${paths.js}/*.js`,
@@ -97,6 +104,9 @@ function scripts() {
 
 // Vendor Javascript minification
 function vendorScripts() {
+  // Ensure output directory exists
+  mkdirSync(paths.js, { recursive: true });
+
   return src(paths.vendorsJs, { sourcemaps: true })
     .pipe(concat('vendors.js'))
     .pipe(dest(paths.js))
@@ -116,6 +126,9 @@ async function imgCompression() {
 
 // Copy all Bootstrap icons
 function copyIcons() {
+  // Ensure output directory exists
+  mkdirSync(paths.icons, { recursive: true });
+
   return src(`${paths.bootstrapIcons}/*.svg`, { allowEmpty: true }).pipe(
     dest(paths.icons),
   );
