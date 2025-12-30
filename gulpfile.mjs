@@ -35,8 +35,10 @@ function pathsConfig() {
       `${vendorsRoot}/@popperjs/core/dist/umd/popper.js`,
       `${vendorsRoot}/bootstrap/dist/js/bootstrap.js`,
     ],
+    bootstrapIcons: `${vendorsRoot}/bootstrap-icons/icons`,
     app: appName,
     templates: `${appName}/templates`,
+    icons: `${appName}/templates/icons`,
     css: `${appName}/static/css`,
     sass: `${appName}/static/sass`,
     fonts: `${appName}/static/fonts`,
@@ -112,6 +114,13 @@ async function imgCompression() {
     .pipe(dest(paths.images));
 }
 
+// Copy all Bootstrap icons
+function copyIcons() {
+  return src(`${paths.bootstrapIcons}/*.svg`, { allowEmpty: true }).pipe(
+    dest(paths.icons),
+  );
+}
+
 // Browser sync server for live reload
 function initBrowserSync() {
   browserSync.init(
@@ -146,7 +155,13 @@ function watchPaths() {
 }
 
 // Generate all assets
-const build = parallel(styles, scripts, vendorScripts, imgCompression);
+const build = parallel(
+  styles,
+  scripts,
+  vendorScripts,
+  imgCompression,
+  copyIcons,
+);
 
 // Set up dev environment
 const dev = parallel(initBrowserSync, watchPaths);
@@ -154,3 +169,4 @@ const dev = parallel(initBrowserSync, watchPaths);
 task('default', series(build, dev));
 task('build', build);
 task('dev', dev);
+task('icons', copyIcons);

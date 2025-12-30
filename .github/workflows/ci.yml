@@ -68,6 +68,9 @@ jobs:
       - name: Run database migrations
         run: docker compose run --rm django python manage.py migrate
 
+      - name: Generate static files for tests
+        run: docker compose run --rm node npm run build
+
       - name: Run Django tests
         run: docker compose run django pytest
 
