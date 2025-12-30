@@ -253,3 +253,53 @@ class TestOrganisationDetailView:
 
         assert response.status_code == HTTPStatus.OK
         assert response.context["active_membership"] == active_membership
+
+    def test_declined_invites_not_in_member_list(self, user: User, client):
+        """Test that declined invites are excluded from the member list."""
+
+        org = OrganisationFactory()
+        # Admin user
+        OrganisationMemberFactory(
+            organisation=org,
+            user=user,
+            role=OrganisationMember.Role.ADMIN,
+            accepted_datetime=timezone.now(),
+        )
+        client.force_login(user)
+
+        # Create an accepted member
+        accepted_member = OrganisationMemberFactory(
+            organisation=org,
+            accepted_datetime=timezone.now(),
+        )
+
+        # Create a pending invite
+        pending_member = OrganisationMemberFactory(
+            organisation=org,
+            accepted_datetime=None,
+            declined_datetime=None,
+        )
+
+        # Create a declined invite
+        declined_member = OrganisationMemberFactory(
+            organisation=org,
+            accepted_datetime=None,
+            declined_datetime=timezone.now(),
+        )
+
+        url = reverse("users:organisation_detail", kwargs={"uuid": org.uuid})
+        response = client.get(url)
+
+        assert response.status_code == HTTPStatus.OK
+
+        # Get the member table data
+        member_table = response.context["member_table"]
+        member_ids = [member.id for member in member_table.data]
+
+        # Accepted and pending members should be in the list
+        assert user.organisation_members.first().id in member_ids
+        assert accepted_member.id in member_ids
+        assert pending_member.id in member_ids
+
+        # Declined member should NOT be in the list
+        assert declined_member.id not in member_ids

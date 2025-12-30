@@ -212,10 +212,16 @@ class OrganisationDetailView(
         context = super().get_context_data(**kwargs)
         organisation = self.object
 
-        # Get organisation members
-        members = organisation.organisation_members.select_related(
-            "user",
-        ).order_by("-accepted_datetime")
+        # Get organisation members (exclude declined invites)
+        members = (
+            organisation.organisation_members.filter(
+                declined_datetime__isnull=True,
+            )
+            .select_related(
+                "user",
+            )
+            .order_by("-accepted_datetime")
+        )
         context["member_table"] = OrganisationMemberTable(members)
 
         # Get active organisation membership for seats summary
@@ -324,6 +330,8 @@ class OrganisationInviteMemberView(
             user = None
 
         # Create the organisation member invite
+        # Note: Partial unique constraint allows multiple declined invites
+        # but only one active/pending invite per user+organisation
         member = OrganisationMember.objects.create(
             organisation=self.organisation,
             user=user,
