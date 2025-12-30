@@ -273,6 +273,7 @@ ams/media/
 .pytest_cache/
 .ipython/
 ams/static/css/
+ams/templates/icons/*.svg
 vendors.js
 *.min.js
 *.min.js.map
