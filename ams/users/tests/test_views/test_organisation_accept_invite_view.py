@@ -37,9 +37,8 @@ class TestAcceptOrganisationInviteView:
 
         response = client.get(url)
 
-        # Should redirect to organisation detail
+        # Should redirect
         assert response.status_code == HTTPStatus.FOUND
-        assert f"/users/organisations/view/{org.uuid}/" in response.url
 
         # Member should be accepted
         member.refresh_from_db()
@@ -90,9 +89,8 @@ class TestAcceptOrganisationInviteView:
 
         response = client.get(url)
 
-        # Should redirect to organisation detail
+        # Should redirect
         assert response.status_code == HTTPStatus.FOUND
-        assert f"/users/organisations/view/{org.uuid}/" in response.url
 
         # Member should NOT be accepted
         member.refresh_from_db()
@@ -115,9 +113,8 @@ class TestAcceptOrganisationInviteView:
 
         response = client.get(url)
 
-        # Should redirect to organisation detail
+        # Should redirect
         assert response.status_code == HTTPStatus.FOUND
-        assert f"/users/organisations/view/{org.uuid}/" in response.url
 
     def test_accept_already_declined_invite(self, user: User, client):
         """Test that accepting a declined invite is not allowed."""
@@ -218,9 +215,8 @@ class TestAcceptOrganisationInviteView:
 
         response = client.get(url)
 
-        # Should redirect to organisation detail
+        # Should redirect
         assert response.status_code == HTTPStatus.FOUND
-        assert f"/users/organisations/view/{org.uuid}/" in response.url
 
         # Member should be accepted and linked to user
         member.refresh_from_db()
@@ -251,9 +247,8 @@ class TestAcceptOrganisationInviteView:
 
         response = client.get(url)
 
-        # Should redirect to organisation detail (success)
+        # Should redirect (success)
         assert response.status_code == HTTPStatus.FOUND
-        assert f"/users/organisations/view/{org.uuid}/" in response.url
 
         # Member should be accepted and linked to user
         member.refresh_from_db()
@@ -317,9 +312,107 @@ class TestAcceptOrganisationInviteView:
 
         # Should allow acceptance (no email validation when invite_email is empty)
         assert response.status_code == HTTPStatus.FOUND
-        assert f"/users/organisations/view/{org.uuid}/" in response.url
 
         # Member should be accepted
         member.refresh_from_db()
         assert member.accepted_datetime is not None
         assert member.user == new_user
+
+    def test_accept_invite_redirects_to_user_page(self, user: User, client):
+        """Test that accepting an invite redirects to the user detail page."""
+        org = OrganisationFactory()
+        member = OrganisationMemberFactory(
+            organisation=org,
+            user=user,
+            invite_email=user.email,
+            accepted_datetime=None,
+        )
+
+        client.force_login(user)
+        url = reverse(
+            "users:accept_organisation_invite",
+            kwargs={"invite_token": member.invite_token},
+        )
+
+        response = client.get(url)
+
+        # Should redirect to user detail page
+        expected_url = reverse("users:detail", kwargs={"username": user.username})
+        assert response.url == expected_url
+
+    def test_accept_already_accepted_invite_redirects_to_user_page(
+        self,
+        user: User,
+        client,
+    ):
+        """Test that re-accepting an invite redirects to the user detail page."""
+        org = OrganisationFactory()
+        member = OrganisationMemberFactory(
+            organisation=org,
+            user=user,
+            accepted_datetime=timezone.now(),  # Already accepted
+        )
+
+        client.force_login(user)
+        url = reverse(
+            "users:accept_organisation_invite",
+            kwargs={"invite_token": member.invite_token},
+        )
+
+        response = client.get(url)
+
+        # Should redirect to user detail page
+        expected_url = reverse("users:detail", kwargs={"username": user.username})
+        assert response.url == expected_url
+
+    def test_accept_invite_when_seats_full_redirects_to_user_page(
+        self,
+        user: User,
+        client,
+    ):
+        """Test that seats full error redirects to the user detail page."""
+        org = OrganisationFactory()
+
+        # Create membership with 2 seats
+        membership_option = MembershipOptionFactory(
+            type="ORGANISATION",
+            max_seats=2,
+        )
+        OrganisationMembershipFactory(
+            organisation=org,
+            membership_option=membership_option,
+            start_date=timezone.now().date(),
+            expiry_date=timezone.now().date() + timedelta(days=365),
+        )
+
+        # Fill both seats
+        OrganisationMemberFactory(
+            organisation=org,
+            user=UserFactory(),
+            accepted_datetime=timezone.now(),
+        )
+        OrganisationMemberFactory(
+            organisation=org,
+            user=UserFactory(),
+            accepted_datetime=timezone.now(),
+        )
+
+        # Try to accept invite
+        member = OrganisationMemberFactory(
+            organisation=org,
+            user=user,
+            invite_email=user.email,
+            accepted_datetime=None,
+        )
+
+        client.force_login(user)
+        url = reverse(
+            "users:accept_organisation_invite",
+            kwargs={"invite_token": member.invite_token},
+        )
+
+        response = client.get(url)
+
+        # Should redirect to user detail page
+        expected_url = reverse("users:detail", kwargs={"username": user.username})
+        assert response.url == expected_url

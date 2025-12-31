@@ -405,8 +405,8 @@ class AcceptOrganisationInviteView(LoginRequiredMixin, RedirectView):
                 _("You have already accepted this invitation."),
             )
             return reverse(
-                "users:organisation_detail",
-                kwargs={"uuid": member.organisation.uuid},
+                "users:detail",
+                kwargs={"username": self.request.user.username},
             )
 
         # Check if already declined
@@ -442,8 +442,8 @@ class AcceptOrganisationInviteView(LoginRequiredMixin, RedirectView):
                     ),
                 )
                 return reverse(
-                    "users:organisation_detail",
-                    kwargs={"uuid": member.organisation.uuid},
+                    "users:detail",
+                    kwargs={"username": self.request.user.username},
                 )
 
         # Accept the invite
@@ -461,10 +461,10 @@ class AcceptOrganisationInviteView(LoginRequiredMixin, RedirectView):
             % {"organisation": member.organisation.name},
         )
 
-        # Redirect to organisation detail
+        # Redirect to user detail
         return reverse(
-            "users:organisation_detail",
-            kwargs={"uuid": member.organisation.uuid},
+            "users:detail",
+            kwargs={"username": self.request.user.username},
         )
 
 
