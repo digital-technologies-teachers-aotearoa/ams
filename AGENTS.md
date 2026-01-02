@@ -8,7 +8,7 @@ This guide enables AI coding agents to work productively in the Association Mana
 
 1. Read ALL relevant files first - NEVER propose changes to code you haven't read
 2. Understand the existing architecture and patterns
-3. Ask clarifying questions if ANY context is missing or ambiguous
+3. Ask clarifying questions if ANY context is missing or ambiguous. Use the askquestion tool to clarify requirements.
 4. Wait for answers before proceeding
 
 **YOU MUST NOT:**
@@ -161,7 +161,8 @@ Available in `ams/utils/views.py`:
 2. **Tests:** Place in `tests/` subfolder, NOT in app root
 3. **Settings:** Use appropriate override file for environment-specific settings
 4. **Migrations:** One migration per app, use descriptive names
-5. **Auth:** Use `AUTH_USER_MODEL = "users.User"` (NOT "ams.users.User")
+5. **Auth:** Use `User = get_user_model()"` (NOT "ams.users.User")
+6. **Imports:** Imports only can occur at the top of a file.
 
 ### NEVER Do
 
