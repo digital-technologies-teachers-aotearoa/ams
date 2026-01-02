@@ -75,10 +75,14 @@ Once the connection is authorized, you need to collect several pieces of informa
 
 Webhooks allow Xero to notify AMS when invoice status changes (e.g., when an invoice is paid).
 
+!!! tip "Webhook URL Requirements"
+    - Make sure your AMS deployment is accessible before configuring the webhook
+    - The webhook URL must be HTTPS (secure connection)
+    - Xero will send a test request to verify the endpoint during setup
+
 1. In the Xero Developer Portal, go to your app's configuration page
-2. Navigate to the **"Webhooks"** section or tab
-    - You can also access this directly at: `https://developer.xero.com/app/manage/app/YOUR_APP_ID/webhooks`
-3. Click **"Add Webhook"** or configure the webhook endpoint
+2. Navigate to the **"Webhooks"** section.
+3. For the 'Notify this app about changes to' field, select 'Contacts' and 'Invoices'.
 4. Enter your webhook URL:
     - Format: `https://YOUR_DOMAIN/billing/xero/webhooks/`
     - Example: `https://members.example.org/billing/xero/webhooks/`
@@ -86,18 +90,12 @@ Webhooks allow Xero to notify AMS when invoice status changes (e.g., when an inv
 6. Copy this webhook key and store it securely
 7. Click **"Save"**
 
-!!! tip "Webhook URL Requirements"
-    - The webhook URL must be HTTPS (secure connection)
-    - Xero will send a test request to verify the endpoint during setup
-    - Make sure your AMS deployment is accessible before configuring the webhook
-
 ## Step 6: Collect Required Values
 
 ### Tenant ID (Organization ID)
 
-We are currently unsure on how to obtain this without using the Xero API.
-Approaches to test including asking Xero support or the Xero AI.
-Documentation will be updated when an approach is determined.
+1. Within your app on the Xero Developer Portal, select "Connection management"
+2. The Tenant ID will be listed here - this is your `XERO_TENANT_ID`
 
 ### Account Code
 
@@ -128,6 +126,7 @@ Once you've collected all the required information, you need to provide it to yo
 
 | Variable Name | Description | Your Value |
 |---------------|-------------|------------|
+| `AMS_BILLING_SERVICE_CLASS ` | Required to use Xero billing | `ams.billing.providers.xero.XeroBillingService` |
 | `XERO_CLIENT_ID` | OAuth2 Client ID from Step 4 | |
 | `XERO_CLIENT_SECRET` | OAuth2 Client Secret from Step 4 | |
 | `XERO_TENANT_ID` | Organization/Tenant ID from Step 4 | |
