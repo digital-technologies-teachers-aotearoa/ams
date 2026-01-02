@@ -11,7 +11,7 @@ from ams.memberships.models import IndividualMembership
 from ams.memberships.models import MembershipOption
 from ams.memberships.models import MembershipOptionType
 from ams.memberships.models import OrganisationMembership
-from ams.users.tests.factories import OrganisationFactory
+from ams.organisations.tests.factories import OrganisationFactory
 from ams.users.tests.factories import UserFactory
 
 

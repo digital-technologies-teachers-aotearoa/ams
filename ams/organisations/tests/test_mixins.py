@@ -9,12 +9,12 @@ from django.test import RequestFactory
 from django.utils import timezone
 from django.views.generic import DetailView
 
-from ams.users.mixins import OrganisationAdminMixin
-from ams.users.mixins import user_is_organisation_admin
-from ams.users.models import Organisation
-from ams.users.models import OrganisationMember
-from ams.users.tests.factories import OrganisationFactory
-from ams.users.tests.factories import OrganisationMemberFactory
+from ams.organisations.mixins import OrganisationAdminMixin
+from ams.organisations.mixins import user_is_organisation_admin
+from ams.organisations.models import Organisation
+from ams.organisations.models import OrganisationMember
+from ams.organisations.tests.factories import OrganisationFactory
+from ams.organisations.tests.factories import OrganisationMemberFactory
 from ams.users.tests.factories import UserFactory
 
 

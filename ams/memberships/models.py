@@ -12,14 +12,15 @@ from django.db.models import DateTimeField
 from django.db.models import DecimalField
 from django.db.models import ForeignKey
 from django.db.models import Model
+from django.db.models import QuerySet
 from django.db.models import TextChoices
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from relativedeltafield import RelativeDeltaField
 
 from ams.memberships.duration import format_membership_duration
-from ams.users.models import Organisation
-from ams.users.models import OrganisationMember
+from ams.organisations.models import Organisation
+from ams.organisations.models import OrganisationMember
 
 User = get_user_model()
 
@@ -163,6 +164,16 @@ class IndividualMembership(BaseMembership):
         return MembershipStatus.ACTIVE
 
 
+class OrganisationMembershipQuerySet(QuerySet):
+    def active(self):
+        today = timezone.localdate()
+        return self.filter(
+            cancelled_datetime__isnull=True,
+            start_date__lte=today,
+            expiry_date__gte=today,
+        )
+
+
 class OrganisationMembership(BaseMembership):
     organisation = ForeignKey(
         Organisation,
@@ -181,6 +192,8 @@ class OrganisationMembership(BaseMembership):
         blank=True,
         related_name="organisation_memberships",
     )
+
+    objects = OrganisationMembershipQuerySet.as_manager()
 
     class Meta:
         verbose_name = "Membership: Organisation"
@@ -220,3 +233,30 @@ class OrganisationMembership(BaseMembership):
             accepted_datetime__isnull=False,
             user__is_active=True,
         ).count()
+
+    @property
+    def has_seat_limit(self) -> bool:
+        """Check if this membership has a seat limit configured."""
+        return bool(self.membership_option.max_seats)
+
+    @property
+    def seats_available(self) -> int | None:
+        """
+        Calculate number of available seats.
+
+        Returns:
+            int: Number of available seats (0 if full)
+            None: If no seat limit configured
+        """
+        if not self.has_seat_limit:
+            return None
+
+        max_seats = int(self.membership_option.max_seats)
+        return max(0, max_seats - self.occupied_seats)
+
+    @property
+    def is_full(self) -> bool:
+        """Check if all membership seats are occupied."""
+        if not self.has_seat_limit:
+            return False
+        return self.occupied_seats >= int(self.membership_option.max_seats)

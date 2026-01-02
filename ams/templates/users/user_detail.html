@@ -61,7 +61,7 @@
               <p>No organisations found.</p>
             {% endif %}
             <div class="mt-3">
-              <a class="btn btn-success" href="{% url 'users:organisation_create' %}">Create a new organisation</a>
+              <a class="btn btn-success" href="{% url 'organisations:create' %}">Create a new organisation</a>
             </div>
           </div>
           {% if request.user.is_staff or perms.wagtailadmin.access_admin %}

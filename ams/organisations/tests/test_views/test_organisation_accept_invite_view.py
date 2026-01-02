@@ -7,9 +7,9 @@ from django.utils import timezone
 
 from ams.memberships.tests.factories import MembershipOptionFactory
 from ams.memberships.tests.factories import OrganisationMembershipFactory
+from ams.organisations.tests.factories import OrganisationFactory
+from ams.organisations.tests.factories import OrganisationMemberFactory
 from ams.users.models import User
-from ams.users.tests.factories import OrganisationFactory
-from ams.users.tests.factories import OrganisationMemberFactory
 from ams.users.tests.factories import UserFactory
 
 pytestmark = pytest.mark.django_db
@@ -31,7 +31,7 @@ class TestAcceptOrganisationInviteView:
 
         client.force_login(user)
         url = reverse(
-            "users:accept_organisation_invite",
+            "organisations:accept_invite",
             kwargs={"invite_token": member.invite_token},
         )
 
@@ -83,7 +83,7 @@ class TestAcceptOrganisationInviteView:
 
         client.force_login(user)
         url = reverse(
-            "users:accept_organisation_invite",
+            "organisations:accept_invite",
             kwargs={"invite_token": member.invite_token},
         )
 
@@ -107,7 +107,7 @@ class TestAcceptOrganisationInviteView:
 
         client.force_login(user)
         url = reverse(
-            "users:accept_organisation_invite",
+            "organisations:accept_invite",
             kwargs={"invite_token": member.invite_token},
         )
 
@@ -128,7 +128,7 @@ class TestAcceptOrganisationInviteView:
 
         client.force_login(user)
         url = reverse(
-            "users:accept_organisation_invite",
+            "organisations:accept_invite",
             kwargs={"invite_token": member.invite_token},
         )
 
@@ -152,7 +152,7 @@ class TestAcceptOrganisationInviteView:
         )
 
         url = reverse(
-            "users:accept_organisation_invite",
+            "organisations:accept_invite",
             kwargs={"invite_token": member.invite_token},
         )
 
@@ -177,7 +177,7 @@ class TestAcceptOrganisationInviteView:
 
         client.force_login(wrong_user)  # But wrong_user tries to accept
         url = reverse(
-            "users:accept_organisation_invite",
+            "organisations:accept_invite",
             kwargs={"invite_token": member.invite_token},
         )
 
@@ -209,7 +209,7 @@ class TestAcceptOrganisationInviteView:
         client.force_login(new_user)
 
         url = reverse(
-            "users:accept_organisation_invite",
+            "organisations:accept_invite",
             kwargs={"invite_token": member.invite_token},
         )
 
@@ -241,7 +241,7 @@ class TestAcceptOrganisationInviteView:
         client.force_login(new_user)
 
         url = reverse(
-            "users:accept_organisation_invite",
+            "organisations:accept_invite",
             kwargs={"invite_token": member.invite_token},
         )
 
@@ -273,7 +273,7 @@ class TestAcceptOrganisationInviteView:
         client.force_login(wrong_user)
 
         url = reverse(
-            "users:accept_organisation_invite",
+            "organisations:accept_invite",
             kwargs={"invite_token": member.invite_token},
         )
 
@@ -304,7 +304,7 @@ class TestAcceptOrganisationInviteView:
         client.force_login(new_user)
 
         url = reverse(
-            "users:accept_organisation_invite",
+            "organisations:accept_invite",
             kwargs={"invite_token": member.invite_token},
         )
 
@@ -330,7 +330,7 @@ class TestAcceptOrganisationInviteView:
 
         client.force_login(user)
         url = reverse(
-            "users:accept_organisation_invite",
+            "organisations:accept_invite",
             kwargs={"invite_token": member.invite_token},
         )
 
@@ -355,7 +355,7 @@ class TestAcceptOrganisationInviteView:
 
         client.force_login(user)
         url = reverse(
-            "users:accept_organisation_invite",
+            "organisations:accept_invite",
             kwargs={"invite_token": member.invite_token},
         )
 
@@ -407,7 +407,7 @@ class TestAcceptOrganisationInviteView:
 
         client.force_login(user)
         url = reverse(
-            "users:accept_organisation_invite",
+            "organisations:accept_invite",
             kwargs={"invite_token": member.invite_token},
         )
 

@@ -4,10 +4,10 @@ import pytest
 from django.conf import settings
 from django.urls import reverse
 
-from ams.users.models import Organisation
-from ams.users.models import OrganisationMember
+from ams.organisations.models import Organisation
+from ams.organisations.models import OrganisationMember
+from ams.organisations.views import OrganisationCreateView
 from ams.users.models import User
-from ams.users.views import OrganisationCreateView
 
 pytestmark = pytest.mark.django_db
 
@@ -18,7 +18,7 @@ class TestOrganisationCreateView:
     def test_create_organisation_authenticated(self, user: User, client):
         """Test that authenticated users can create organisations."""
         client.force_login(user)
-        url = reverse("users:organisation_create")
+        url = reverse("organisations:create")
 
         data = {
             "name": "New Organisation",
@@ -49,7 +49,7 @@ class TestOrganisationCreateView:
 
     def test_create_organisation_not_authenticated(self, client):
         """Test that unauthenticated users cannot create organisations."""
-        url = reverse("users:organisation_create")
+        url = reverse("organisations:create")
 
         data = {
             "name": "New Organisation",
@@ -71,7 +71,7 @@ class TestOrganisationCreateView:
     def test_create_organisation_has_cancel_url(self, user: User, client):
         """Test that OrganisationCreateView provides cancel_url to the form."""
         client.force_login(user)
-        url = reverse("users:organisation_create")
+        url = reverse("organisations:create")
 
         response = client.get(url)
 

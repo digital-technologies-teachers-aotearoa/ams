@@ -1,9 +1,9 @@
-"""View mixins for user and organisation permission checking."""
+"""View mixins for organisation permission checking."""
 
 from django.core.exceptions import PermissionDenied
 from django.utils.translation import gettext_lazy as _
 
-from ams.users.models import OrganisationMember
+from ams.organisations.models import OrganisationMember
 
 
 def user_is_organisation_admin(user, organisation):

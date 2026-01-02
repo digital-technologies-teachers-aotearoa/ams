@@ -9,9 +9,9 @@ from ams.billing.tests.factories import InvoiceFactory
 from ams.memberships.tests.factories import IndividualMembershipFactory
 from ams.memberships.tests.factories import MembershipOptionFactory
 from ams.memberships.tests.factories import OrganisationMembershipFactory
+from ams.organisations.tests.factories import OrganisationFactory
+from ams.organisations.tests.factories import OrganisationMemberFactory
 from ams.users.models import User
-from ams.users.tests.factories import OrganisationFactory
-from ams.users.tests.factories import OrganisationMemberFactory
 from ams.users.tests.factories import UserFactory
 
 

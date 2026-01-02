@@ -4,10 +4,10 @@ import pytest
 from django.urls import reverse
 from django.utils import timezone
 
-from ams.users.models import OrganisationMember
+from ams.organisations.models import OrganisationMember
+from ams.organisations.tests.factories import OrganisationFactory
+from ams.organisations.tests.factories import OrganisationMemberFactory
 from ams.users.models import User
-from ams.users.tests.factories import OrganisationFactory
-from ams.users.tests.factories import OrganisationMemberFactory
 from ams.users.tests.factories import UserFactory
 
 pytestmark = pytest.mark.django_db
@@ -28,14 +28,14 @@ class TestOrganisationInviteMemberView:
         )
         client.force_login(user)
 
-        url = reverse("users:organisation_invite_member", kwargs={"uuid": org.uuid})
+        url = reverse("organisations:invite_member", kwargs={"uuid": org.uuid})
         data = {"email": "newmember@example.com"}
 
         response = client.post(url, data=data)
 
         # Should redirect to organisation detail
         assert response.status_code == HTTPStatus.FOUND
-        assert f"/users/organisations/view/{org.uuid}/" in response.url
+        assert f"/organisations/{org.uuid}/" in response.url
 
         # Member invite should be created
         member = OrganisationMember.objects.get(
@@ -63,7 +63,7 @@ class TestOrganisationInviteMemberView:
         )
         client.force_login(user)
 
-        url = reverse("users:organisation_invite_member", kwargs={"uuid": org.uuid})
+        url = reverse("organisations:invite_member", kwargs={"uuid": org.uuid})
         data = {"email": "existing@example.com"}
 
         response = client.post(url, data=data)
@@ -99,7 +99,7 @@ class TestOrganisationInviteMemberView:
         )
 
         client.force_login(user)
-        url = reverse("users:organisation_invite_member", kwargs={"uuid": org.uuid})
+        url = reverse("organisations:invite_member", kwargs={"uuid": org.uuid})
         data = {"email": "duplicate@example.com"}
 
         response = client.post(url, data=data)
@@ -119,7 +119,7 @@ class TestOrganisationInviteMemberView:
         )
         client.force_login(user)
 
-        url = reverse("users:organisation_invite_member", kwargs={"uuid": org.uuid})
+        url = reverse("organisations:invite_member", kwargs={"uuid": org.uuid})
         response = client.get(url)
 
         # Should be forbidden
@@ -128,7 +128,7 @@ class TestOrganisationInviteMemberView:
     def test_invite_member_not_authenticated(self, client):
         """Test that unauthenticated users cannot invite."""
         org = OrganisationFactory()
-        url = reverse("users:organisation_invite_member", kwargs={"uuid": org.uuid})
+        url = reverse("organisations:invite_member", kwargs={"uuid": org.uuid})
 
         response = client.get(url)
 
@@ -156,14 +156,14 @@ class TestOrganisationInviteMemberView:
         declined_member_id = declined_member.id
 
         client.force_login(user)
-        url = reverse("users:organisation_invite_member", kwargs={"uuid": org.uuid})
+        url = reverse("organisations:invite_member", kwargs={"uuid": org.uuid})
         data = {"email": "declined@example.com"}
 
         response = client.post(url, data=data)
 
         # Should redirect to organisation detail (successful invite)
         assert response.status_code == HTTPStatus.FOUND
-        assert f"/users/organisations/view/{org.uuid}/" in response.url
+        assert f"/organisations/{org.uuid}/" in response.url
 
         # Old declined invite should still exist (not deleted)
         assert OrganisationMember.objects.filter(id=declined_member_id).exists()
@@ -214,7 +214,7 @@ class TestOrganisationInviteMemberView:
         declined_member_id = declined_member.id
 
         client.force_login(user)
-        url = reverse("users:organisation_invite_member", kwargs={"uuid": org.uuid})
+        url = reverse("organisations:invite_member", kwargs={"uuid": org.uuid})
         data = {"email": "existing@example.com"}
 
         response = client.post(url, data=data)

@@ -9,7 +9,7 @@ from ams.memberships.models import MembershipStatus
 from ams.memberships.tests.factories import IndividualMembershipFactory
 from ams.memberships.tests.factories import MembershipOptionFactory
 from ams.memberships.tests.factories import OrganisationMembershipFactory
-from ams.users.tests.factories import OrganisationMemberFactory
+from ams.organisations.tests.factories import OrganisationMemberFactory
 
 pytestmark = pytest.mark.django_db
 

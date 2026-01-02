@@ -1,6 +1,6 @@
 {% load icon %}
 
 {% if record.role == "ADMIN" %}
-  <a href="{% url 'users:organisation_detail' record.organisation.uuid %}"
+  <a href="{% url 'organisations:detail' record.organisation.uuid %}"
      class="btn btn-sm btn-secondary">{% icon "eye" %} View</a>
 {% endif %}
