@@ -15,7 +15,7 @@ if TYPE_CHECKING:  # pragma: no cover
 
     from ams.billing.models import Account
     from ams.billing.models import Invoice
-    from ams.users.models import Organisation
+    from ams.organisations.models import Organisation
 
 # NOTE: We intentionally avoid importing heavy application models when not type checking
 # to reduce risk of circular imports and lower import overhead.

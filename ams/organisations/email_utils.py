@@ -1,11 +1,11 @@
-"""Email utilities for user-related notifications."""
+"""Email utilities for organisation-related notifications."""
 
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from ams.users.models import OrganisationMember
+from ams.organisations.models import OrganisationMember
 
 
 def send_organisation_invite_email(request, member: OrganisationMember):
@@ -23,13 +23,13 @@ def send_organisation_invite_email(request, member: OrganisationMember):
     # Build the acceptance and decline URLs
     accept_url = request.build_absolute_uri(
         reverse(
-            "users:accept_organisation_invite",
+            "organisations:accept_invite",
             kwargs={"invite_token": invite_token},
         ),
     )
     decline_url = request.build_absolute_uri(
         reverse(
-            "users:decline_organisation_invite",
+            "organisations:decline_invite",
             kwargs={"invite_token": invite_token},
         ),
     )
@@ -41,7 +41,7 @@ def send_organisation_invite_email(request, member: OrganisationMember):
 
     # Render HTML email
     html_message = render_to_string(
-        "users/emails/organisation_invite.html",
+        "organisations/emails/organisation_invite.html",
         {
             "organisation": organisation,
             "accept_url": accept_url,
@@ -52,7 +52,7 @@ def send_organisation_invite_email(request, member: OrganisationMember):
 
     # Render plain text email
     text_message = render_to_string(
-        "users/emails/organisation_invite.txt",
+        "organisations/emails/organisation_invite.txt",
         {
             "organisation": organisation,
             "accept_url": accept_url,

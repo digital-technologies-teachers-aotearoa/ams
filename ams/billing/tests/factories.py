@@ -9,7 +9,7 @@ from factory.django import DjangoModelFactory
 
 from ams.billing.models import Account
 from ams.billing.models import Invoice
-from ams.users.tests.factories import OrganisationFactory
+from ams.organisations.tests.factories import OrganisationFactory
 from ams.users.tests.factories import UserFactory
 
 

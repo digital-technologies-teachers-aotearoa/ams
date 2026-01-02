@@ -109,6 +109,7 @@ THIRD_PARTY_APPS = [
     "wagtail.images",
     "wagtail.search",
     "wagtail.admin",
+    "wagtail.locales",
     "wagtail",
     "wagtailmenus",
     "modelcluster",
@@ -120,6 +121,7 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     "ams.users",
+    "ams.organisations",
     "ams.cms",
     "ams.memberships",
     "ams.billing",

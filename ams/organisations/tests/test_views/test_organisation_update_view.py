@@ -4,12 +4,12 @@ import pytest
 from django.urls import reverse
 from django.utils import timezone
 
-from ams.users.models import OrganisationMember
+from ams.organisations.models import OrganisationMember
+from ams.organisations.tests.factories import OrganisationFactory
+from ams.organisations.tests.factories import OrganisationMemberFactory
+from ams.organisations.views import OrganisationUpdateView
 from ams.users.models import User
-from ams.users.tests.factories import OrganisationFactory
-from ams.users.tests.factories import OrganisationMemberFactory
 from ams.users.tests.factories import UserFactory
-from ams.users.views import OrganisationUpdateView
 
 pytestmark = pytest.mark.django_db
 
@@ -30,7 +30,7 @@ class TestOrganisationUpdateView:
             accepted_datetime=timezone.now(),
         )
 
-        url = reverse("users:organisation_update", kwargs={"uuid": org.uuid})
+        url = reverse("organisations:update", kwargs={"uuid": org.uuid})
 
         data = {
             "name": "Updated Organisation",
@@ -59,7 +59,7 @@ class TestOrganisationUpdateView:
 
         org = OrganisationFactory()
 
-        url = reverse("users:organisation_update", kwargs={"uuid": org.uuid})
+        url = reverse("organisations:update", kwargs={"uuid": org.uuid})
 
         data = {
             "name": "Updated by Staff",
@@ -87,7 +87,7 @@ class TestOrganisationUpdateView:
 
         org = OrganisationFactory()
 
-        url = reverse("users:organisation_update", kwargs={"uuid": org.uuid})
+        url = reverse("organisations:update", kwargs={"uuid": org.uuid})
 
         data = {
             "name": "Unauthorized Update",
@@ -121,7 +121,7 @@ class TestOrganisationUpdateView:
             accepted_datetime=timezone.now(),
         )
 
-        url = reverse("users:organisation_update", kwargs={"uuid": org.uuid})
+        url = reverse("organisations:update", kwargs={"uuid": org.uuid})
 
         response = client.get(url)
 
@@ -156,7 +156,7 @@ class TestOrganisationUpdateView:
         form_kwargs = view.get_form_kwargs()
 
         expected_cancel_url = reverse(
-            "users:organisation_detail",
+            "organisations:detail",
             kwargs={"uuid": org.uuid},
         )
         assert "cancel_url" in form_kwargs

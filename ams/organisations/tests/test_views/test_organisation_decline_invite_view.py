@@ -6,8 +6,8 @@ import pytest
 from django.urls import reverse
 from django.utils import timezone
 
-from ams.users.tests.factories import OrganisationFactory
-from ams.users.tests.factories import OrganisationMemberFactory
+from ams.organisations.tests.factories import OrganisationFactory
+from ams.organisations.tests.factories import OrganisationMemberFactory
 from ams.users.tests.factories import UserFactory
 
 pytestmark = pytest.mark.django_db
@@ -31,7 +31,7 @@ class TestDeclineOrganisationInviteView:
 
         client.force_login(user)
         url = reverse(
-            "users:decline_organisation_invite",
+            "organisations:decline_invite",
             kwargs={"invite_token": member.invite_token},
         )
 
@@ -69,7 +69,7 @@ class TestDeclineOrganisationInviteView:
         # Try to decline as user2
         client.force_login(user2)
         url = reverse(
-            "users:decline_organisation_invite",
+            "organisations:decline_invite",
             kwargs={"invite_token": member.invite_token},
         )
 
@@ -100,7 +100,7 @@ class TestDeclineOrganisationInviteView:
 
         client.force_login(user)
         url = reverse(
-            "users:decline_organisation_invite",
+            "organisations:decline_invite",
             kwargs={"invite_token": member.invite_token},
         )
 
@@ -109,7 +109,7 @@ class TestDeclineOrganisationInviteView:
         # Should redirect to organisation detail
         assert response.status_code == HTTPStatus.FOUND
         assert response.url == reverse(
-            "users:organisation_detail",
+            "organisations:detail",
             kwargs={"uuid": org.uuid},
         )
 
@@ -135,7 +135,7 @@ class TestDeclineOrganisationInviteView:
 
         client.force_login(user)
         url = reverse(
-            "users:decline_organisation_invite",
+            "organisations:decline_invite",
             kwargs={"invite_token": member.invite_token},
         )
 
@@ -163,7 +163,7 @@ class TestDeclineOrganisationInviteView:
         )
 
         url = reverse(
-            "users:decline_organisation_invite",
+            "organisations:decline_invite",
             kwargs={"invite_token": member.invite_token},
         )
 
@@ -192,7 +192,7 @@ class TestDeclineOrganisationInviteView:
         client.force_login(user)
 
         url = reverse(
-            "users:decline_organisation_invite",
+            "organisations:decline_invite",
             kwargs={"invite_token": member.invite_token},
         )
 
@@ -231,7 +231,7 @@ class TestDeclineOrganisationInviteView:
         client.force_login(user)
 
         url = reverse(
-            "users:decline_organisation_invite",
+            "organisations:decline_invite",
             kwargs={"invite_token": member.invite_token},
         )
 

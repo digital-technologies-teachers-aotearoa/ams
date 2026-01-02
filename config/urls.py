@@ -43,6 +43,10 @@ urlpatterns += i18n_patterns(
     ),
     path("accounts/", include("allauth.urls")),
     path("users/", include("ams.users.urls", namespace="users")),
+    path(
+        "organisations/",
+        include("ams.organisations.urls", namespace="organisations"),
+    ),
     # CMS pages are handled by Wagtail
     path("", include(wagtail_urls)),
 )

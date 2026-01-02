@@ -7,10 +7,10 @@ from django.utils import timezone
 
 from ams.memberships.models import MembershipOptionType
 from ams.memberships.tests.factories import OrganisationMembershipFactory
-from ams.users.models import OrganisationMember
+from ams.organisations.models import OrganisationMember
+from ams.organisations.tests.factories import OrganisationFactory
+from ams.organisations.tests.factories import OrganisationMemberFactory
 from ams.users.models import User
-from ams.users.tests.factories import OrganisationFactory
-from ams.users.tests.factories import OrganisationMemberFactory
 
 pytestmark = pytest.mark.django_db
 
@@ -41,7 +41,7 @@ class TestOrganisationDetailView:
             membership_option__max_seats=10,
         )
 
-        url = reverse("users:organisation_detail", kwargs={"uuid": org.uuid})
+        url = reverse("organisations:detail", kwargs={"uuid": org.uuid})
         response = client.get(url)
 
         assert response.status_code == HTTPStatus.OK
@@ -71,7 +71,7 @@ class TestOrganisationDetailView:
             cancelled_datetime=None,
         )
 
-        url = reverse("users:organisation_detail", kwargs={"uuid": org.uuid})
+        url = reverse("organisations:detail", kwargs={"uuid": org.uuid})
         response = client.get(url)
 
         assert response.status_code == HTTPStatus.OK
@@ -99,7 +99,7 @@ class TestOrganisationDetailView:
             cancelled_datetime=None,
         )
 
-        url = reverse("users:organisation_detail", kwargs={"uuid": org.uuid})
+        url = reverse("organisations:detail", kwargs={"uuid": org.uuid})
         response = client.get(url)
 
         assert response.status_code == HTTPStatus.OK
@@ -127,7 +127,7 @@ class TestOrganisationDetailView:
             cancelled_datetime=timezone.now(),
         )
 
-        url = reverse("users:organisation_detail", kwargs={"uuid": org.uuid})
+        url = reverse("organisations:detail", kwargs={"uuid": org.uuid})
         response = client.get(url)
 
         assert response.status_code == HTTPStatus.OK
@@ -173,7 +173,7 @@ class TestOrganisationDetailView:
             cancelled_datetime=None,
         )
 
-        url = reverse("users:organisation_detail", kwargs={"uuid": org.uuid})
+        url = reverse("organisations:detail", kwargs={"uuid": org.uuid})
         response = client.get(url)
 
         assert response.status_code == HTTPStatus.OK
@@ -194,7 +194,7 @@ class TestOrganisationDetailView:
         )
         client.force_login(user)
 
-        url = reverse("users:organisation_detail", kwargs={"uuid": org.uuid})
+        url = reverse("organisations:detail", kwargs={"uuid": org.uuid})
         response = client.get(url)
 
         assert response.status_code == HTTPStatus.OK
@@ -222,7 +222,7 @@ class TestOrganisationDetailView:
             cancelled_datetime=None,
         )
 
-        url = reverse("users:organisation_detail", kwargs={"uuid": org.uuid})
+        url = reverse("organisations:detail", kwargs={"uuid": org.uuid})
         response = client.get(url)
 
         assert response.status_code == HTTPStatus.OK
@@ -248,7 +248,7 @@ class TestOrganisationDetailView:
             cancelled_datetime=None,
         )
 
-        url = reverse("users:organisation_detail", kwargs={"uuid": org.uuid})
+        url = reverse("organisations:detail", kwargs={"uuid": org.uuid})
         response = client.get(url)
 
         assert response.status_code == HTTPStatus.OK
@@ -287,7 +287,7 @@ class TestOrganisationDetailView:
             declined_datetime=timezone.now(),
         )
 
-        url = reverse("users:organisation_detail", kwargs={"uuid": org.uuid})
+        url = reverse("organisations:detail", kwargs={"uuid": org.uuid})
         response = client.get(url)
 
         assert response.status_code == HTTPStatus.OK

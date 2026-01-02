@@ -10,7 +10,7 @@ from django.db.models import Model
 from django.db.models import OneToOneField
 from django.db.models import Q
 
-from ams.users.models import Organisation
+from ams.organisations.models import Organisation
 
 User = get_user_model()
 

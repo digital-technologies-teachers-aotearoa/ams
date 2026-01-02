@@ -10,14 +10,14 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.utils.translation import gettext_lazy as _
 from PIL import Image
 
-from ams.users.forms import InviteOrganisationMemberForm
-from ams.users.forms import OrganisationForm
+from ams.organisations.forms import InviteOrganisationMemberForm
+from ams.organisations.forms import OrganisationForm
+from ams.organisations.tests.factories import OrganisationFactory
+from ams.organisations.tests.factories import OrganisationMemberFactory
 from ams.users.forms import UserAdminCreationForm
 from ams.users.forms import UserSignupForm
 from ams.users.forms import UserUpdateForm
 from ams.users.models import User
-from ams.users.tests.factories import OrganisationFactory
-from ams.users.tests.factories import OrganisationMemberFactory
 
 
 class TestUserAdminCreationForm:
