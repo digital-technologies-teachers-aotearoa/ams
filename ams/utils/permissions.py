@@ -2,30 +2,49 @@
 
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
+from django.utils import timezone
 
 from ams.memberships.models import MembershipStatus
+from ams.organisations.models import Organisation
 
 User = get_user_model()
 
 
 def _check_user_membership_core(user: User) -> bool:
     """
-    Core logic to check if a user has an active individual membership.
+    Core logic to check if a user has an active membership.
 
     This internal function contains the shared business logic without any caching.
     It assumes the user is authenticated and is NOT a superuser.
     It should not be called directly - use one of the public wrapper functions.
 
+    Checks for:
+    - Active individual membership
+    - Active membership in any organization the user belongs to
+
     Args:
         user: The authenticated, non-superuser to check permissions for
 
     Returns:
-        bool: True if user has active individual membership, False otherwise
+        bool: True if user has active individual or organization membership,
+              False otherwise
     """
     # Check for active individual membership
-    return any(
+    if any(
         m.status() == MembershipStatus.ACTIVE for m in user.individual_memberships.all()
-    )
+    ):
+        return True
+
+    # Check if user is an active member of any organization with an active membership
+    # This uses a single database query with joins instead of N+1 queries
+    return user.organisation_members.filter(
+        accepted_datetime__isnull=False,
+        declined_datetime__isnull=True,
+        user__is_active=True,
+        organisation__organisation_memberships__cancelled_datetime__isnull=True,
+        organisation__organisation_memberships__start_date__lte=timezone.localdate(),
+        organisation__organisation_memberships__expiry_date__gte=timezone.localdate(),
+    ).exists()
 
 
 def user_has_active_membership(user: User) -> bool:
@@ -35,6 +54,7 @@ def user_has_active_membership(user: User) -> bool:
     Returns True if the user is either:
     - A superuser
     - Has an active individual membership
+    - Is an active member of an organization with an active membership
 
     This function uses Django's cache framework to avoid repeated database queries
     across multiple requests.
@@ -75,6 +95,11 @@ def user_has_active_membership_request_cached(user: User) -> bool:
     """
     Check if a user has an active membership with per-request caching.
 
+    Returns True if the user is either:
+    - A superuser
+    - Has an active individual membership
+    - Is an active member of an organization with an active membership
+
     This version caches the result for the duration of a single request only.
     Use this if you need very fresh data but want to avoid multiple DB queries
     within the same request.
@@ -105,3 +130,24 @@ def user_has_active_membership_request_cached(user: User) -> bool:
     setattr(user, cache_attr, has_active)
 
     return has_active
+
+
+def organisation_has_active_membership(organisation: Organisation) -> bool:
+    """
+    Check if an organisation has an active membership.
+
+    An organisation membership is considered active if:
+    - It has not been cancelled
+    - The start date is today or in the past
+    - The expiry date is today or in the future
+
+    This function does not use caching as it's typically called as part of
+    user permission checks which are already cached.
+
+    Args:
+        organisation: The organisation to check membership status for
+
+    Returns:
+        bool: True if organisation has an active membership, False otherwise
+    """
+    return organisation.organisation_memberships.active().exists()

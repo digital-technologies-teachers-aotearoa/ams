@@ -62,3 +62,29 @@ def test_start_date_no_overlap():
     assert form.is_valid()
     # Should not raise
     form.save(user=user)
+
+
+def test_start_date_on_expiry_day_allowed():
+    """Test that a new membership can start on the same day another expires."""
+    user = UserFactory()
+    option = MembershipOptionFactory(type=MembershipOptionType.INDIVIDUAL)
+    today = timezone.localdate()
+    expiry_day = today + timedelta(days=30)
+    IndividualMembership.objects.create(
+        user=user,
+        membership_option=option,
+        start_date=today,
+        expiry_date=expiry_day,
+        created_datetime=timezone.now(),
+    )
+    # New membership starts on the day the previous one expires (should be allowed)
+    form = CreateIndividualMembershipForm(
+        data={
+            "membership_option": option.id,
+            "start_date": expiry_day,
+        },
+        user=user,
+    )
+    assert form.is_valid()
+    # Should not raise
+    form.save(user=user)

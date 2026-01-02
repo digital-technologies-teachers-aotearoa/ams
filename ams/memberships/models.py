@@ -109,10 +109,26 @@ class BaseMembership(Model):
             )
         super().clean()
 
+    def calculate_expiry_date(self) -> date:
+        # Calculate expiry date based on start_date and membership_option.duration
+        return self.start_date + self.membership_option.duration
+
     def is_expired(self) -> bool:
         if self.expiry_date is None:
             return False
         return timezone.localdate() >= self.expiry_date
+
+    def status(self) -> Any:
+        if self.cancelled_datetime:
+            return MembershipStatus.CANCELLED
+
+        if self.is_expired():
+            return MembershipStatus.EXPIRED
+
+        if self.approved_datetime is None or self.start_date > timezone.localdate():
+            return MembershipStatus.PENDING
+
+        return MembershipStatus.ACTIVE
 
     def get_status_display(self) -> str:
         # Always use MembershipStatus display name
@@ -151,18 +167,6 @@ class IndividualMembership(BaseMembership):
             f"Status: {self.status()}"
         )
 
-    def status(self) -> Any:
-        if self.cancelled_datetime:
-            return MembershipStatus.CANCELLED
-
-        if self.is_expired():
-            return MembershipStatus.EXPIRED
-
-        if self.approved_datetime is None or self.start_date > timezone.localdate():
-            return MembershipStatus.PENDING
-
-        return MembershipStatus.ACTIVE
-
 
 class OrganisationMembershipQuerySet(QuerySet):
     def active(self):
@@ -170,7 +174,7 @@ class OrganisationMembershipQuerySet(QuerySet):
         return self.filter(
             cancelled_datetime__isnull=True,
             start_date__lte=today,
-            expiry_date__gte=today,
+            expiry_date__gt=today,
         )
 
 
@@ -192,6 +196,17 @@ class OrganisationMembership(BaseMembership):
         blank=True,
         related_name="organisation_memberships",
     )
+    max_seats = DecimalField(
+        max_digits=10,
+        decimal_places=0,
+        null=True,
+        blank=True,
+        help_text=_(
+            "Number of seats for this membership instance. "
+            "Copied from membership option at creation and can "
+            "be increased via seat top-ups.",
+        ),
+    )
 
     objects = OrganisationMembershipQuerySet.as_manager()
 
@@ -205,27 +220,15 @@ class OrganisationMembership(BaseMembership):
             f"Status: {self.status()}"
         )
 
-    def calculate_expiry_date(self) -> date:
-        # Calculate expiry date based on start_date and membership_option.duration
-        return self.start_date + self.membership_option.duration
-
-    def status(self) -> Any:
-        if self.cancelled_datetime:
-            return MembershipStatus.CANCELLED
-
-        if self.is_expired():
-            return MembershipStatus.EXPIRED
-
-        return MembershipStatus.ACTIVE
-
     @property
     def occupied_seats(self) -> int:
         """Calculate the number of seats currently occupied by active members.
 
         Only counts seats if this membership is currently active.
         """
-        # Only count occupied seats if this membership is active
-        if self.status() != MembershipStatus.ACTIVE:
+        # Only count occupied seats if this membership is active or pending
+        current_status = self.status()
+        if current_status not in (MembershipStatus.ACTIVE, MembershipStatus.PENDING):
             return 0
 
         return OrganisationMember.objects.filter(
@@ -237,7 +240,7 @@ class OrganisationMembership(BaseMembership):
     @property
     def has_seat_limit(self) -> bool:
         """Check if this membership has a seat limit configured."""
-        return bool(self.membership_option.max_seats)
+        return bool(self.max_seats)
 
     @property
     def seats_available(self) -> int | None:
@@ -251,7 +254,7 @@ class OrganisationMembership(BaseMembership):
         if not self.has_seat_limit:
             return None
 
-        max_seats = int(self.membership_option.max_seats)
+        max_seats = int(self.max_seats)
         return max(0, max_seats - self.occupied_seats)
 
     @property
@@ -259,4 +262,4 @@ class OrganisationMembership(BaseMembership):
         """Check if all membership seats are occupied."""
         if not self.has_seat_limit:
             return False
-        return self.occupied_seats >= int(self.membership_option.max_seats)
+        return self.occupied_seats >= int(self.max_seats)

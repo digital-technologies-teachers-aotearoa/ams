@@ -58,21 +58,24 @@ class OrganisationMembershipAdmin(admin.ModelAdmin):
     list_display = (
         "organisation",
         "membership_option",
-        "status_display",
+        "status",
+        "occupied_seats_display",
         "start_date",
         "expiry_date",
-        "occupied_seats_display",
+        "approved_datetime",
         "invoice",
     )
     search_fields = ("organisation__name", "membership_option__name")
     list_filter = ("membership_option", "start_date")
     autocomplete_fields = ["organisation", "membership_option", "invoice"]
+    readonly_fields = ("organisation", "status")
 
     fields = (
         "organisation",
         "membership_option",
         "start_date",
         "expiry_date",
+        "approved_datetime",
         "invoice",
         "status",
     )
@@ -80,12 +83,8 @@ class OrganisationMembershipAdmin(admin.ModelAdmin):
     @admin.display(
         description="Status",
     )
-    def status_display(self, obj):
-        return (
-            obj.get_status_display()
-            if hasattr(obj, "get_status_display")
-            else obj.status()
-        )
+    def status(self, obj):
+        return obj.get_status_display()
 
     @admin.display(
         description="Occupied Seats",

@@ -18,6 +18,7 @@ from ams.organisations.forms import OrganisationForm
 from ams.organisations.mixins import OrganisationAdminMixin
 from ams.organisations.models import Organisation
 from ams.organisations.models import OrganisationMember
+from ams.organisations.tables import OrganisationMembershipTable
 from ams.organisations.tables import OrganisationMemberTable
 from ams.users.models import User
 
@@ -145,6 +146,13 @@ class OrganisationDetailView(
         )
         context["member_table"] = OrganisationMemberTable(members)
 
+        # Get organisation memberships
+        memberships = organisation.organisation_memberships.select_related(
+            "membership_option",
+            "invoice",
+        ).order_by("-start_date")
+        context["membership_table"] = OrganisationMembershipTable(memberships)
+
         # Get active organisation membership for seats summary
         active_membership = (
             organisation.organisation_memberships.active()
@@ -155,8 +163,8 @@ class OrganisationDetailView(
         if active_membership:
             context["active_membership"] = active_membership
             context["seat_limit"] = (
-                int(active_membership.membership_option.max_seats)
-                if active_membership.membership_option.max_seats
+                int(active_membership.max_seats)
+                if active_membership.max_seats
                 else None
             )
             context["occupied_seats"] = active_membership.occupied_seats
@@ -331,6 +339,7 @@ class AcceptOrganisationInviteView(LoginRequiredMixin, RedirectView):
             .first()
         )
 
+        # Do not accept invite if full
         if active_membership and active_membership.is_full:
             messages.error(
                 self.request,

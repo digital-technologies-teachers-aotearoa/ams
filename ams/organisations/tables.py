@@ -2,7 +2,10 @@ from django_tables2.columns import Column
 from django_tables2.columns import DateColumn
 from django_tables2.tables import Table
 
+from ams.memberships.models import OrganisationMembership
 from ams.organisations.models import OrganisationMember
+from ams.utils.tables import MembershipStatusBadgeColumn
+from ams.utils.tables import MemberStatusBadgeColumn
 
 
 class OrganisationMemberTable(Table):
@@ -18,7 +21,8 @@ class OrganisationMemberTable(Table):
         empty_values=(),
         orderable=False,
     )
-    status = Column(
+    status = MemberStatusBadgeColumn(
+        accessor="is_active",
         verbose_name="Status",
         empty_values=(),
         orderable=False,
@@ -61,12 +65,68 @@ class OrganisationMemberTable(Table):
             return record.user.email
         return record.invite_email
 
-    def render_status(self, record):
-        """Render the member's status (Active or Invited)."""
-        if record.is_active():
-            return "Active"
-        return "Invited"
-
     def render_actions(self, record):
         """Render actions column (empty for now as per step 4)."""
         return ""
+
+
+class OrganisationMembershipTable(Table):
+    """Table for displaying memberships within an organisation detail page."""
+
+    membership = Column(
+        accessor="membership_option__name",
+        verbose_name="Membership",
+    )
+    duration = Column(
+        accessor="membership_option__duration_display",
+        verbose_name="Duration",
+        orderable=False,
+    )
+    status = MembershipStatusBadgeColumn(
+        verbose_name="Status",
+        empty_values=(),
+        orderable=False,
+    )
+    start_date = DateColumn(
+        accessor="start_date",
+        verbose_name="Start Date",
+    )
+    expiry_date = DateColumn(
+        accessor="expiry_date",
+        verbose_name="Expires Date",
+    )
+    seats = Column(
+        verbose_name="Seats",
+        empty_values=(),
+        orderable=False,
+    )
+    invoice = Column(
+        verbose_name="Invoice",
+        empty_values=(),
+        orderable=False,
+    )
+
+    class Meta:
+        model = OrganisationMembership
+        fields = (
+            "membership",
+            "duration",
+            "status",
+            "start_date",
+            "expiry_date",
+            "seats",
+            "invoice",
+        )
+        order_by = ("-start_date",)
+
+    def render_seats(self, record):
+        """Render seats occupied vs limit."""
+        if record.max_seats:
+            return f"{record.occupied_seats} / {int(record.max_seats)}"
+        return f"{record.occupied_seats} (Unlimited)"
+
+    def render_invoice(self, record):
+        """Render invoice number if available."""
+        if record.invoice:
+            return record.invoice.invoice_number
+        return "—"

@@ -1,0 +1,13 @@
+{% load icon %}
+
+{% if status == "ACTIVE" %}
+  <span class="text-success">{% icon "check-circle-fill" %} Active</span>
+{% elif status == "PENDING" %}
+  <span class="text-primary">{% icon "hourglass-split" %} Pending</span>
+{% elif status == "EXPIRED" %}
+  <span class="text-secondary">{% icon "slash-circle" %} Expired</span>
+{% elif status == "CANCELLED" %}
+  <span class="text-danger">{% icon "calendar-x" %} Cancelled</span>
+{% else %}
+  <span class="text-secondary">None</span>
+{% endif %}

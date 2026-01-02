@@ -6,9 +6,8 @@ from django.utils import timezone
 
 from ams.memberships.models import IndividualMembership
 from ams.memberships.models import MembershipOptionType
+from ams.memberships.tests.factories import MembershipOptionFactory
 from ams.users.tests.factories import UserFactory
-
-from .factories import MembershipOptionFactory
 
 pytestmark = pytest.mark.django_db
 
@@ -23,7 +22,7 @@ def test_zero_cost_membership_auto_approved(client):
     client.force_login(user)
 
     resp = client.post(
-        reverse("memberships:apply"),
+        reverse("memberships:apply-individual"),
         data={
             "membership_option": option.id,
             "start_date": timezone.localdate(),
@@ -49,7 +48,7 @@ def test_paid_membership_not_auto_approved(client):
     client.force_login(user)
 
     resp = client.post(
-        reverse("memberships:apply"),
+        reverse("memberships:apply-individual"),
         data={
             "membership_option": option.id,
             "start_date": timezone.localdate(),

@@ -3,9 +3,8 @@ from django.utils import timezone
 
 from ams.memberships.forms import CreateIndividualMembershipForm
 from ams.memberships.models import MembershipOptionType
+from ams.memberships.tests.factories import MembershipOptionFactory
 from ams.users.tests.factories import UserFactory
-
-from .factories import MembershipOptionFactory
 
 pytestmark = pytest.mark.django_db
 

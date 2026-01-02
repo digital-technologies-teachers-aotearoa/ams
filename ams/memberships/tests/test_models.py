@@ -198,6 +198,34 @@ class TestOrganisationMembership:
         # Assert - membership without expiry_date should not be considered expired
         assert result is False
 
+    def test_membership_expiring_tomorrow_is_not_expired(self):
+        # Arrange
+        today = timezone.localdate()
+        membership = OrganisationMembershipFactory(
+            start_date=today - timedelta(days=365),
+            expiry_date=today + timedelta(days=1),
+            approved_datetime=timezone.now(),
+            cancelled_datetime=None,
+        )
+        # Act
+        result = membership.is_expired()
+        # Assert - membership expiring tomorrow should not be expired
+        assert result is False
+
+    def test_membership_expiring_today_is_expired(self):
+        # Arrange
+        today = timezone.localdate()
+        membership = OrganisationMembershipFactory(
+            start_date=today - timedelta(days=365),
+            expiry_date=today,
+            approved_datetime=timezone.now(),
+            cancelled_datetime=None,
+        )
+        # Act
+        result = membership.is_expired()
+        # Assert - membership expiring today should be expired
+        assert result is True
+
     def test_status_cancelled(self):
         # Arrange
         membership = OrganisationMembershipFactory(cancelled=True)
@@ -218,7 +246,7 @@ class TestOrganisationMembership:
 
     def test_status_active(self):
         # Arrange
-        membership = OrganisationMembershipFactory()
+        membership = OrganisationMembershipFactory(active=True)
         # Act
         status = membership.status()
         # Assert
@@ -259,6 +287,22 @@ class TestOrganisationMembership:
         seats = membership.occupied_seats
         # Assert - only the 3 accepted + active should count
         assert seats == 3  # noqa: PLR2004
+
+    def test_occupied_seats_pending_membership_counts(self):
+        # Arrange - pending membership (not yet approved)
+        membership = OrganisationMembershipFactory(pending=True)
+        # Create 2 accepted, active members
+        OrganisationMemberFactory.create_batch(
+            2,
+            organisation=membership.organisation,
+            accepted_datetime=timezone.now(),
+            user__is_active=True,
+        )
+        # Act
+        seats = membership.occupied_seats
+        # Assert - pending membership should count occupied seats
+        expected_seats = 2
+        assert seats == expected_seats
 
     def test_occupied_seats_expired_membership_returns_zero(self):
         # Arrange

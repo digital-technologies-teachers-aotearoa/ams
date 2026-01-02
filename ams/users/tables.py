@@ -7,13 +7,8 @@ from django_tables2.tables import Table
 
 from ams.memberships.models import IndividualMembership
 from ams.organisations.models import OrganisationMember
-
-
-class StatusBadgeColumn(Column):
-    def render(self, value):
-        return mark_safe(  # noqa: S308
-            render_to_string("snippets/status_badge.html", {"status": value}),
-        )
+from ams.utils.permissions import organisation_has_active_membership
+from ams.utils.tables import MembershipStatusBadgeColumn
 
 
 class MembershipTable(Table):
@@ -25,7 +20,7 @@ class MembershipTable(Table):
         accessor="membership_option__duration_display",
         verbose_name="Duration",
     )
-    status = StatusBadgeColumn(accessor="status", verbose_name="Status")
+    status = MembershipStatusBadgeColumn(accessor="status", verbose_name="Status")
     start_date = DateColumn(verbose_name="Start Date")
     expiry_date = DateColumn(verbose_name="End Date")
     invoice = TemplateColumn(
@@ -89,14 +84,27 @@ class OrganisationTable(Table):
         accessor="accepted_datetime",
         verbose_name="Join Date",
     )
-    has_membership = TemplateColumn(
-        template_name="users/tables/organisation_membership_column.html",
-        verbose_name="Organisation Membership",
+    membership = Column(
+        empty_values=(),
+        verbose_name="Membership",
     )
     actions = TemplateColumn(
         template_name="users/tables/organisation_actions_column.html",
         verbose_name="Actions",
     )
+
+    def render_membership(self, record):
+        """Render the membership status badge."""
+        return mark_safe(  # noqa: S308
+            render_to_string(
+                "users/tables/organisation_membership_column.html",
+                {
+                    "active_membership": organisation_has_active_membership(
+                        record.organisation,
+                    ),
+                },
+            ),
+        )
 
     class Meta:
         model = OrganisationMember
@@ -104,6 +112,6 @@ class OrganisationTable(Table):
             "organisation_name",
             "role",
             "join_date",
-            "has_membership",
+            "membership",
             "actions",
         )

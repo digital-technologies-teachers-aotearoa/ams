@@ -1,7 +1,7 @@
 {% load icon %}
 
-{% if active_membership %}
+{% if is_active %}
   <span class="text-success">{% icon "check-circle-fill" %} Active</span>
 {% else %}
-  <span class="text-secondary">None</span>
+  <span class="text-secondary">{% icon "envelope-plus" %} Invited</span>
 {% endif %}

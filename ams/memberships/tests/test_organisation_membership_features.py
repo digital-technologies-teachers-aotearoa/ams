@@ -93,6 +93,7 @@ class TestOrganisationMembershipProperties:
             expiry_date=timezone.now().date() + relativedelta(years=1),
             approved_datetime=timezone.now(),
             created_datetime=timezone.now(),
+            max_seats=10,  # Set max_seats on the membership instance
         )
 
         assert membership.has_seat_limit is True
@@ -135,6 +136,7 @@ class TestOrganisationMembershipProperties:
             expiry_date=timezone.now().date() + relativedelta(years=1),
             approved_datetime=timezone.now(),
             created_datetime=timezone.now(),
+            max_seats=10,  # Set max_seats on the membership instance
         )
 
         # With 0 occupied seats, should have 10 available

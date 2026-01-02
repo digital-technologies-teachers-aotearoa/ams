@@ -18,7 +18,7 @@ def test_get_application_form(client):
     MembershipOptionFactory(type=MembershipOptionType.INDIVIDUAL)
     client.force_login(user)
 
-    resp = client.get(reverse("memberships:apply"))
+    resp = client.get(reverse("memberships:apply-individual"))
     assert resp.status_code == HTTPStatus.OK
     assert b"Apply for Membership" in resp.content
     # Start date should be present
@@ -33,7 +33,7 @@ def test_post_application_creates_membership(client):
     client.force_login(user)
 
     resp = client.post(
-        reverse("memberships:apply"),
+        reverse("memberships:apply-individual"),
         data={
             "membership_option": option.id,
             "start_date": timezone.localdate(),
@@ -54,7 +54,7 @@ def test_user_cannot_set_user_field(client):
 
     # Attempt to spoof by submitting extra field (ignored by form)
     resp = client.post(
-        reverse("memberships:apply"),
+        reverse("memberships:apply-individual"),
         data={
             "membership_option": option.id,
             "start_date": timezone.localdate(),

@@ -34,8 +34,8 @@ class TestOrganisationDetailView:
         # Create an active membership (started 30 days ago, expires in 335 days)
         active_membership = OrganisationMembershipFactory(
             organisation=org,
-            start_date=timezone.now().date() - timedelta(days=30),
-            expiry_date=timezone.now().date() + timedelta(days=335),
+            start_date=timezone.localdate() - timedelta(days=30),
+            expiry_date=timezone.localdate() + timedelta(days=335),
             cancelled_datetime=None,
             membership_option__type=MembershipOptionType.ORGANISATION,
             membership_option__max_seats=10,
@@ -66,8 +66,8 @@ class TestOrganisationDetailView:
         # Create an expired membership (expired yesterday)
         OrganisationMembershipFactory(
             organisation=org,
-            start_date=timezone.now().date() - timedelta(days=365),
-            expiry_date=timezone.now().date() - timedelta(days=1),
+            start_date=timezone.localdate() - timedelta(days=365),
+            expiry_date=timezone.localdate() - timedelta(days=1),
             cancelled_datetime=None,
         )
 
@@ -94,8 +94,8 @@ class TestOrganisationDetailView:
         # Create a future membership (starts tomorrow)
         OrganisationMembershipFactory(
             organisation=org,
-            start_date=timezone.now().date() + timedelta(days=1),
-            expiry_date=timezone.now().date() + timedelta(days=366),
+            start_date=timezone.localdate() + timedelta(days=1),
+            expiry_date=timezone.localdate() + timedelta(days=366),
             cancelled_datetime=None,
         )
 
@@ -122,8 +122,8 @@ class TestOrganisationDetailView:
         # Create a cancelled membership (would be active otherwise)
         OrganisationMembershipFactory(
             organisation=org,
-            start_date=timezone.now().date() - timedelta(days=30),
-            expiry_date=timezone.now().date() + timedelta(days=335),
+            start_date=timezone.localdate() - timedelta(days=30),
+            expiry_date=timezone.localdate() + timedelta(days=335),
             cancelled_datetime=timezone.now(),
         )
 
@@ -150,16 +150,16 @@ class TestOrganisationDetailView:
         # Create past membership
         OrganisationMembershipFactory(
             organisation=org,
-            start_date=timezone.now().date() - timedelta(days=730),
-            expiry_date=timezone.now().date() - timedelta(days=365),
+            start_date=timezone.localdate() - timedelta(days=730),
+            expiry_date=timezone.localdate() - timedelta(days=365),
             cancelled_datetime=None,
         )
 
         # Create active membership
         active_membership = OrganisationMembershipFactory(
             organisation=org,
-            start_date=timezone.now().date() - timedelta(days=30),
-            expiry_date=timezone.now().date() + timedelta(days=335),
+            start_date=timezone.localdate() - timedelta(days=30),
+            expiry_date=timezone.localdate() + timedelta(days=335),
             cancelled_datetime=None,
             membership_option__type=MembershipOptionType.ORGANISATION,
             membership_option__max_seats=10,
@@ -168,8 +168,8 @@ class TestOrganisationDetailView:
         # Create future membership
         OrganisationMembershipFactory(
             organisation=org,
-            start_date=timezone.now().date() + timedelta(days=335),
-            expiry_date=timezone.now().date() + timedelta(days=700),
+            start_date=timezone.localdate() + timedelta(days=335),
+            expiry_date=timezone.localdate() + timedelta(days=700),
             cancelled_datetime=None,
         )
 
@@ -217,8 +217,8 @@ class TestOrganisationDetailView:
         # Create a membership starting today
         active_membership = OrganisationMembershipFactory(
             organisation=org,
-            start_date=timezone.now().date(),
-            expiry_date=timezone.now().date() + timedelta(days=365),
+            start_date=timezone.localdate(),
+            expiry_date=timezone.localdate() + timedelta(days=365),
             cancelled_datetime=None,
         )
 
@@ -228,8 +228,8 @@ class TestOrganisationDetailView:
         assert response.status_code == HTTPStatus.OK
         assert response.context["active_membership"] == active_membership
 
-    def test_membership_expiring_today(self, user: User, client):
-        """Test that a membership expiring today is still considered active."""
+    def test_membership_expiring_tomorrow(self, user: User, client):
+        """Test that a membership expiring tomorrow is considered active."""
 
         org = OrganisationFactory()
         OrganisationMemberFactory(
@@ -243,8 +243,8 @@ class TestOrganisationDetailView:
         # Create a membership expiring today
         active_membership = OrganisationMembershipFactory(
             organisation=org,
-            start_date=timezone.now().date() - timedelta(days=365),
-            expiry_date=timezone.now().date(),
+            start_date=timezone.localdate() - timedelta(days=365),
+            expiry_date=timezone.localdate() + timedelta(days=1),
             cancelled_datetime=None,
         )
 
@@ -253,6 +253,32 @@ class TestOrganisationDetailView:
 
         assert response.status_code == HTTPStatus.OK
         assert response.context["active_membership"] == active_membership
+
+    def test_membership_expiring_today(self, user: User, client):
+        """Test that a membership expiring today is considered expired."""
+
+        org = OrganisationFactory()
+        OrganisationMemberFactory(
+            organisation=org,
+            user=user,
+            role=OrganisationMember.Role.ADMIN,
+            accepted_datetime=timezone.now(),
+        )
+        client.force_login(user)
+
+        # Create a membership expiring today
+        OrganisationMembershipFactory(
+            organisation=org,
+            start_date=timezone.localdate() - timedelta(days=365),
+            expiry_date=timezone.localdate(),
+            cancelled_datetime=None,
+        )
+
+        url = reverse("organisations:detail", kwargs={"uuid": org.uuid})
+        response = client.get(url)
+
+        assert response.status_code == HTTPStatus.OK
+        assert response.context["active_membership"] is None
 
     def test_declined_invites_not_in_member_list(self, user: User, client):
         """Test that declined invites are excluded from the member list."""

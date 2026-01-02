@@ -47,8 +47,14 @@ class MembershipBillingService:
         self,
         account: Account,
         membership_option: MembershipOption,
+        seat_count: int = 1,
     ) -> Invoice | None:
         """Create an invoice for a membership option if billable.
+
+        Args:
+            account: The billing account for the invoice.
+            membership_option: The membership option being invoiced.
+            seat_count: Number of seats/quantity for the membership (default: 1).
 
         Raises:
             BillingDetailUpdateError: If billing details update fails.
@@ -86,7 +92,7 @@ class MembershipBillingService:
                 {
                     "description": str(membership_option),
                     "unit_amount": membership_option.cost,
-                    "quantity": 1,
+                    "quantity": seat_count,
                 },
             ]
             issue_date = timezone.localdate()

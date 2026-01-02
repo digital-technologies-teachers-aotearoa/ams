@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% load i18n static %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+  {% trans "Add Membership" %} - {{ organisation.name }}
+{% endblock title %}
+{% block content %}
+  <div class="container my-5">
+    <div class="row">
+      <div class="col-12 col-md-8 offset-md-2">
+        <h1>{% trans "Add Membership to" %} {{ organisation.name }}</h1>
+        <p class="text-muted">{% trans "Select a membership option and the number of seats for this organisation." %}</p>
+        {% crispy form %}
+      </div>
+    </div>
+  </div>
+  {{ membership_data_json|json_script:"membership-data" }}
+  <script src="{% static 'js/organisation_membership_add.js' %}"></script>
+{% endblock content %}
