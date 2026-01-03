@@ -1,6 +1,8 @@
 """Tests for organisation email utilities."""
 
+from decimal import Decimal
 from smtplib import SMTPException
+from unittest.mock import Mock
 from unittest.mock import patch
 
 import pytest
@@ -13,6 +15,9 @@ from ams.memberships.tests.factories import OrganisationMembershipFactory
 from ams.organisations.email_utils import send_staff_organisation_created_notification
 from ams.organisations.email_utils import (
     send_staff_organisation_membership_notification,
+)
+from ams.organisations.email_utils import (
+    send_staff_organisation_seats_added_notification,
 )
 from ams.organisations.tests.factories import OrganisationFactory
 from ams.users.models import User
@@ -265,6 +270,192 @@ class TestSendStaffOrganisationMembershipNotification:
 
         # Send notification (should not raise exception)
         send_staff_organisation_membership_notification(membership)
+
+        # Assert logger.exception was called
+        assert mock_logger.exception.called
+
+
+@pytest.mark.django_db
+class TestSendStaffOrganisationSeatsAddedNotification:
+    """Tests for send_staff_organisation_seats_added_notification function."""
+
+    def test_send_notification_success(self, mailoutbox):
+        """Test that notification is sent successfully to all staff users."""
+        # Create staff users
+        staff1 = UserFactory(is_staff=True, email="staff1@example.com")
+        staff2 = UserFactory(is_staff=True, email="staff2@example.com")
+
+        # Create organisation and membership
+        organisation = OrganisationFactory(name="Test Organisation")
+        membership_option = MembershipOptionFactory(
+            type=MembershipOptionType.ORGANISATION,
+            name="Annual Membership",
+            cost=Decimal("1000.00"),
+        )
+        membership = OrganisationMembershipFactory(
+            organisation=organisation,
+            membership_option=membership_option,
+            max_seats=15,  # New total after adding 5 seats
+            start_date=timezone.localdate(),
+            expiry_date=timezone.localdate(),
+        )
+
+        # Create mock invoice
+        mock_invoice = Mock()
+        mock_invoice.invoice_number = "INV-12345"
+
+        # Send notification
+        send_staff_organisation_seats_added_notification(
+            organisation=organisation,
+            membership=membership,
+            seats_added=5,
+            prorata_cost=Decimal("500.00"),
+            invoice=mock_invoice,
+        )
+
+        # Assert email was sent
+        assert len(mailoutbox) == 1
+        email = mailoutbox[0]
+
+        # Check recipients
+        assert set(email.to) == {staff1.email, staff2.email}
+
+        # Check subject
+        assert "Test Organisation" in email.subject
+        assert "Seats Added" in email.subject
+
+        # Check body contains seat details
+        assert organisation.name in email.body
+        assert "5" in email.body  # seats_added
+        assert "15" in email.body  # new_total_seats
+        assert "500.00" in email.body  # prorata_cost
+        assert "INV-12345" in email.body  # invoice number
+
+    @override_settings(NOTIFY_STAFF_ORG_EVENTS=False)
+    def test_notification_disabled(self, mailoutbox):
+        """Test that notification is not sent when feature flag is disabled."""
+        # Create staff user
+        UserFactory(is_staff=True, email="staff@example.com")
+
+        # Create organisation and membership
+        organisation = OrganisationFactory()
+        membership_option = MembershipOptionFactory(
+            type=MembershipOptionType.ORGANISATION,
+        )
+        membership = OrganisationMembershipFactory(
+            organisation=organisation,
+            membership_option=membership_option,
+        )
+
+        # Create mock invoice
+        mock_invoice = Mock()
+        mock_invoice.invoice_number = "INV-12345"
+
+        # Send notification
+        send_staff_organisation_seats_added_notification(
+            organisation=organisation,
+            membership=membership,
+            seats_added=5,
+            prorata_cost=Decimal("500.00"),
+            invoice=mock_invoice,
+        )
+
+        # Assert no email was sent
+        assert len(mailoutbox) == 0
+
+    def test_no_staff_users(self, mailoutbox):
+        """Test that no email is sent when there are no staff users."""
+        # Ensure no staff users exist
+        User.objects.filter(is_staff=True).delete()
+
+        # Create organisation and membership
+        organisation = OrganisationFactory()
+        membership_option = MembershipOptionFactory(
+            type=MembershipOptionType.ORGANISATION,
+        )
+        membership = OrganisationMembershipFactory(
+            organisation=organisation,
+            membership_option=membership_option,
+        )
+
+        # Create mock invoice
+        mock_invoice = Mock()
+        mock_invoice.invoice_number = "INV-12345"
+
+        # Send notification (should not raise exception)
+        send_staff_organisation_seats_added_notification(
+            organisation=organisation,
+            membership=membership,
+            seats_added=5,
+            prorata_cost=Decimal("500.00"),
+            invoice=mock_invoice,
+        )
+
+        # Assert no email was sent
+        assert len(mailoutbox) == 0
+
+    def test_notification_without_invoice(self, mailoutbox):
+        """Test notification when no invoice is provided."""
+        # Create staff user
+        UserFactory(is_staff=True, email="staff@example.com")
+
+        # Create organisation and membership
+        organisation = OrganisationFactory()
+        membership_option = MembershipOptionFactory(
+            type=MembershipOptionType.ORGANISATION,
+            cost=Decimal("0.00"),  # Free membership
+        )
+        membership = OrganisationMembershipFactory(
+            organisation=organisation,
+            membership_option=membership_option,
+            invoice=None,
+        )
+
+        # Send notification without invoice
+        send_staff_organisation_seats_added_notification(
+            organisation=organisation,
+            membership=membership,
+            seats_added=5,
+            prorata_cost=Decimal("0.00"),
+            invoice=None,
+        )
+
+        # Assert email was sent
+        assert len(mailoutbox) == 1
+        # Email should not crash due to missing invoice
+
+    @patch("ams.organisations.email_utils.send_mail")
+    @patch("ams.organisations.email_utils.logger")
+    def test_email_failure_graceful_handling(self, mock_logger, mock_send_mail):
+        """Test that email failures are handled gracefully without raising."""
+        # Create staff user
+        UserFactory(is_staff=True, email="staff@example.com")
+
+        # Create organisation and membership
+        organisation = OrganisationFactory()
+        membership_option = MembershipOptionFactory(
+            type=MembershipOptionType.ORGANISATION,
+        )
+        membership = OrganisationMembershipFactory(
+            organisation=organisation,
+            membership_option=membership_option,
+        )
+
+        # Create mock invoice
+        mock_invoice = Mock()
+        mock_invoice.invoice_number = "INV-12345"
+
+        # Mock send_mail to raise exception
+        mock_send_mail.side_effect = SMTPException("SMTP server error")
+
+        # Send notification (should not raise exception)
+        send_staff_organisation_seats_added_notification(
+            organisation=organisation,
+            membership=membership,
+            seats_added=5,
+            prorata_cost=Decimal("500.00"),
+            invoice=mock_invoice,
+        )
 
         # Assert logger.exception was called
         assert mock_logger.exception.called

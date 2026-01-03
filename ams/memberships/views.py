@@ -6,12 +6,17 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 
+from ams.memberships.forms import AddOrganisationSeatsForm
 from ams.memberships.forms import CreateIndividualMembershipForm
 from ams.memberships.forms import CreateOrganisationMembershipForm
 from ams.memberships.models import MembershipOption
 from ams.memberships.models import MembershipOptionType
+from ams.memberships.services import calculate_prorata_seat_cost
 from ams.organisations.email_utils import (
     send_staff_organisation_membership_notification,
+)
+from ams.organisations.email_utils import (
+    send_staff_organisation_seats_added_notification,
 )
 from ams.organisations.mixins import OrganisationAdminMixin
 from ams.organisations.models import Organisation
@@ -162,3 +167,123 @@ class CreateOrganisationMembershipView(
 
 
 add_organisation_membership_view = CreateOrganisationMembershipView.as_view()
+
+
+class AddOrganisationSeatsView(
+    LoginRequiredMixin,
+    OrganisationAdminMixin,
+    FormView,
+):
+    """
+    View for purchasing additional seats mid-term with pro-rata pricing.
+    Only staff/admin or organisation admins can purchase seats.
+    Requires an active organisation membership to exist.
+    """
+
+    form_class = AddOrganisationSeatsForm
+    template_name = "memberships/organisation_add_seats.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        """Store the organisation and active membership for use in the view."""
+        self.organisation = get_object_or_404(Organisation, uuid=kwargs.get("uuid"))
+
+        # Get active membership
+        self.active_membership = (
+            self.organisation.organisation_memberships.active()
+            .select_related("membership_option")
+            .first()
+        )
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_object(self):
+        """Required by OrganisationAdminMixin."""
+        return self.organisation
+
+    def get(self, request, *args, **kwargs):
+        """Check if active membership exists before displaying form."""
+        if not self.active_membership:
+            messages.error(
+                request,
+                _(
+                    "This organisation does not have an active membership. "
+                    "Please add a membership first.",
+                ),
+            )
+            return redirect(
+                reverse(
+                    "organisations:detail",
+                    kwargs={"uuid": self.organisation.uuid},
+                ),
+            )
+
+        return super().get(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        """Pass organisation, active_membership, and cancel_url to the form."""
+        kwargs = super().get_form_kwargs()
+        kwargs["organisation"] = self.organisation
+        kwargs["active_membership"] = self.active_membership
+        kwargs["cancel_url"] = reverse(
+            "organisations:detail",
+            kwargs={"uuid": self.organisation.uuid},
+        )
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        """Add organisation and membership details to context."""
+        context = super().get_context_data(**kwargs)
+        context["organisation"] = self.organisation
+        context["active_membership"] = self.active_membership
+
+        # Add seat information for display
+        if self.active_membership:
+            context["current_seats"] = self.active_membership.max_seats
+            context["occupied_seats"] = self.active_membership.occupied_seats
+            context["seats_available"] = self.active_membership.seats_available
+
+            # Pre-calculate pro-rata cost for 1 seat for JavaScript
+            context["prorata_cost_per_seat"] = str(
+                calculate_prorata_seat_cost(self.active_membership, 1),
+            )
+
+        return context
+
+    def form_valid(self, form):
+        """Process the seat purchase, send notification, and redirect."""
+        # Save the form (creates invoice and updates max_seats)
+        membership, invoice = form.save()
+
+        # Get seats added from form
+        seats_added = form.cleaned_data["seats_to_add"]
+        prorata_cost = form.calculate_prorata_cost(seats_added)
+
+        # Send staff notification
+        send_staff_organisation_seats_added_notification(
+            organisation=self.organisation,
+            membership=membership,
+            seats_added=seats_added,
+            prorata_cost=prorata_cost,
+            invoice=invoice,
+        )
+
+        # Add success message
+        messages.success(
+            self.request,
+            _(
+                "Successfully added %(seats)d seat(s) to your membership. "
+                "Total seats: %(total)s.",
+            )
+            % {
+                "seats": seats_added,
+                "total": membership.max_seats,
+            },
+        )
+
+        # Redirect to organisation detail
+        return redirect(
+            reverse("organisations:detail", kwargs={"uuid": self.organisation.uuid}),
+        )
+
+
+add_organisation_seats_view = AddOrganisationSeatsView.as_view()

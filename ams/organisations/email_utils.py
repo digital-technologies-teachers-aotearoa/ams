@@ -210,3 +210,80 @@ def send_staff_organisation_membership_notification(membership):
             membership.organisation.uuid,
         )
         # Do not re-raise - allow user action to succeed
+
+
+def send_staff_organisation_seats_added_notification(
+    organisation,
+    membership,
+    seats_added,
+    prorata_cost,
+    invoice,
+):
+    """
+    Send notification to staff when additional seats are purchased for an organisation.
+
+    Args:
+        organisation: The Organisation instance.
+        membership: The OrganisationMembership instance.
+        seats_added: Number of seats that were added (int).
+        prorata_cost: The pro-rated cost calculated (Decimal).
+        invoice: The Invoice instance (or None if no invoice created).
+    """
+    # Check feature flag
+    if not settings.NOTIFY_STAFF_ORG_EVENTS:
+        return
+
+    # Get staff emails
+    staff_emails = list(
+        User.objects.filter(is_staff=True).values_list("email", flat=True),
+    )
+
+    # Early return if no staff
+    if not staff_emails:
+        return
+
+    # Build subject
+    subject = _("Seats Added to Organisation: %(organisation_name)s") % {
+        "organisation_name": organisation.name,
+    }
+
+    # Build context
+    context = {
+        "organisation": organisation,
+        "membership": membership,
+        "membership_option": membership.membership_option,
+        "seats_added": seats_added,
+        "new_total_seats": membership.max_seats,
+        "prorata_cost": prorata_cost,
+        "invoice_number": invoice.invoice_number if invoice else None,
+        "expiry_date": membership.expiry_date,
+    }
+
+    # Render HTML email
+    html_message = render_to_string(
+        "organisations/emails/staff_organisation_seats_added.html",
+        context,
+    )
+
+    # Render plain text email
+    text_message = render_to_string(
+        "organisations/emails/staff_organisation_seats_added.txt",
+        context,
+    )
+
+    # Send email with error handling
+    try:
+        send_mail(
+            subject=subject,
+            message=text_message,
+            from_email=None,  # Use DEFAULT_FROM_EMAIL
+            recipient_list=staff_emails,
+            html_message=html_message,
+            fail_silently=False,
+        )
+    except Exception:
+        logger.exception(
+            "Failed to send staff notification for seats added to organisation: %s",
+            organisation.uuid,
+        )
+        # Do not re-raise - allow user action to succeed
