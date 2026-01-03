@@ -1,0 +1,76 @@
+{# djlint:off #}
+
+{% load i18n %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>{% trans "New Organisation Membership" %}</title>
+    </head>
+    <body style="font-family: Arial, sans-serif;
+                 line-height: 1.6;
+                 color: #333;
+                 max-width: 600px;
+                 margin: 0 auto;
+                 padding: 20px">
+      <div style="background-color: #f8f9fa;
+                  border-radius: 8px;
+                  padding: 30px;
+                  margin-bottom: 20px">
+      <h1 style="color: #0056b3; margin-top: 0;">{% trans "New Organisation Membership" %}</h1>
+      <p style="font-size: 16px;">
+        {% blocktrans with org_name=organisation.name %}
+            A new membership has been purchased for <strong>{{ org_name }}</strong>.
+            {% endblocktrans %}
+      </p>
+    </div>
+    <div style="background-color: #ffffff;
+                border: 1px solid #dee2e6;
+                border-radius: 8px;
+                padding: 20px;
+                margin-bottom: 20px">
+      <h2 style="color: #495057; font-size: 18px; margin-top: 0;">{% trans "Membership Details" %}</h2>
+      <table style="width: 100%; border-collapse: collapse;">
+        <tr>
+          <td style="padding: 8px 0; font-weight: bold; width: 40%;">{% trans "Organisation:" %}</td>
+          <td style="padding: 8px 0;">{{ organisation.name }}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-weight: bold;">{% trans "Membership Type:" %}</td>
+          <td style="padding: 8px 0;">{{ membership_option.name }}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-weight: bold;">{% trans "Seats:" %}</td>
+          <td style="padding: 8px 0;">{{ seats }}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-weight: bold;">{% trans "Start Date:" %}</td>
+          <td style="padding: 8px 0;">{{ start_date|date:"d/m/Y" }}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-weight: bold;">{% trans "Expiry Date:" %}</td>
+          <td style="padding: 8px 0;">{{ expiry_date|date:"d/m/Y" }}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-weight: bold;">{% trans "Cost:" %}</td>
+          <td style="padding: 8px 0;">${{ cost }}</td>
+        </tr>
+        {% if invoice_number %}
+          <tr>
+            <td style="padding: 8px 0; font-weight: bold;">{% trans "Invoice Number:" %}</td>
+            <td style="padding: 8px 0;">{{ invoice_number }}</td>
+          </tr>
+        {% endif %}
+      </table>
+    </div>
+    <div style="border-top: 1px solid #dee2e6;
+                padding-top: 20px;
+                margin-top: 30px;
+                font-size: 12px;
+                color: #6c757d">
+      <p>{% trans "You're receiving this because you are a staff member. Contact your administrator to change notification settings." %}</p>
+    </div>
+  </body>
+</html>

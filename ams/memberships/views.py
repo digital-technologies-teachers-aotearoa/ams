@@ -10,6 +10,9 @@ from ams.memberships.forms import CreateIndividualMembershipForm
 from ams.memberships.forms import CreateOrganisationMembershipForm
 from ams.memberships.models import MembershipOption
 from ams.memberships.models import MembershipOptionType
+from ams.organisations.email_utils import (
+    send_staff_organisation_membership_notification,
+)
 from ams.organisations.mixins import OrganisationAdminMixin
 from ams.organisations.models import Organisation
 
@@ -132,6 +135,9 @@ class CreateOrganisationMembershipView(
         """Create the membership and redirect with success message."""
         # Save the form (creates membership and invoice)
         membership = form.save()
+
+        # Send staff notification
+        send_staff_organisation_membership_notification(membership)
 
         # Add success message
         messages.success(

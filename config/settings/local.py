@@ -17,6 +17,7 @@ ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1"]  # noqa: S104
 NGROK_HOST = env("NGROK_HOST", default=None)
 if NGROK_HOST:
     ALLOWED_HOSTS.append(NGROK_HOST)
+    CSRF_TRUSTED_ORIGINS = [f"https://{NGROK_HOST}"]
 
 # CACHES
 # ------------------------------------------------------------------------------
