@@ -1,4 +1,5 @@
 import json
+import logging
 from contextlib import suppress
 from typing import TYPE_CHECKING
 from typing import Any
@@ -20,6 +21,7 @@ from xero_python.api_client import ApiClient
 from xero_python.api_client.configuration import Configuration
 from xero_python.api_client.oauth2 import OAuth2Token
 from xero_python.api_client.serializer import serialize
+from xero_python.exceptions import AccountingBadRequestException
 from xero_python.identity import Connection
 from xero_python.identity import IdentityApi
 
@@ -32,6 +34,8 @@ from ams.memberships.models import Organisation
 
 if TYPE_CHECKING:  # pragma: no cover
     from datetime import date
+
+logger = logging.getLogger(__name__)
 
 
 class XeroBillingService(BillingService):
@@ -158,6 +162,36 @@ class XeroBillingService(BillingService):
         api_instance.update_contact(settings.XERO_TENANT_ID, contact_id, contacts)
 
     @handle_rate_limit()
+    def _get_xero_contact_by_account_number(
+        self,
+        account_number: str,
+    ) -> str | None:
+        """Search for a Xero contact by account number.
+
+        Args:
+            account_number: The account number to search for.
+
+        Returns:
+            The Xero contact ID if found, None otherwise.
+        """
+        api_instance = AccountingApi(self.api_client)
+
+        try:
+            # Use where clause to search by AccountNumber field
+            where = f'AccountNumber=="{account_number}"'
+            api_response = api_instance.get_contacts(
+                settings.XERO_TENANT_ID,
+                where=where,
+            )
+            if api_response.contacts:
+                contact_id: str = api_response.contacts[0].contact_id
+                return contact_id
+        except Exception:  # noqa: BLE001
+            # Contact not found or other error
+            return None
+        return None
+
+    @handle_rate_limit()
     def _create_xero_invoice(
         self,
         contact_id: str,
@@ -265,21 +299,19 @@ class XeroBillingService(BillingService):
         return self._get_online_invoice_url(invoice.billing_service_invoice_id)
 
     def _xero_contact_name(self, uuid_str: str, name: str) -> str:
-        """Generate a unique Xero contact name by appending a UUID prefix.
+        """Generate a unique Xero contact name by appending a UUID.
 
         Xero requires contact names to be unique. This method ensures uniqueness
-        by appending the first 8 characters of the entity's UUID to the contact's
-        display name.
+        by appending the entity's UUID to the contact's display name.
 
         Args:
             uuid_str: The entity's UUID string (user or organization).
             name: The contact's display name (user full name or organization name).
 
         Returns:
-            Formatted contact name string in the format "Name (uuid_prefix)".
+            Formatted contact name string in the format "Name (uuid)".
         """
-        uuid_prefix = str(uuid_str).replace("-", "")[:8]
-        return f"{name} ({uuid_prefix})"
+        return f"{name} ({uuid_str})"
 
     def update_user_billing_details(self, user: User) -> None:
         """Update or create a Xero contact for a user's billing account.
@@ -291,10 +323,9 @@ class XeroBillingService(BillingService):
         Args:
             user: The Django User whose billing details should be synchronized.
         """
-        uuid_prefix = str(user.uuid).replace("-", "")[:8]
         contact_details = {
             "name": self._xero_contact_name(str(user.uuid), user.get_full_name()),
-            "account_number": uuid_prefix,
+            "account_number": str(user.uuid),
             "email_address": user.email,
         }
         return self.update_account_billing_details(user.account, contact_details)
@@ -309,10 +340,9 @@ class XeroBillingService(BillingService):
         Args:
             organisation: The Organisation whose billing details should be synchronized.
         """
-        uuid_prefix = str(organisation.uuid).replace("-", "")[:8]
         contact_details = {
             "name": self._xero_contact_name(str(organisation.uuid), organisation.name),
-            "account_number": uuid_prefix,
+            "account_number": str(organisation.uuid),
             "email_address": organisation.email,
         }
         return self.update_account_billing_details(
@@ -331,6 +361,10 @@ class XeroBillingService(BillingService):
         creates a new one. If creating, also stores the new XeroContact mapping
         in the database.
 
+        This method handles sync issues gracefully: if Xero already has a contact
+        with the same account number or name but it's not linked in our database,
+        it will find the existing contact and link it instead of raising an error.
+
         Args:
             account: The billing Account to update in Xero.
             contact_details: Dictionary of contact attributes (name, email_address,
@@ -346,8 +380,62 @@ class XeroBillingService(BillingService):
         if contact_id:
             self._update_xero_contact(contact_id, contact_details)
         else:
-            contact_id = self._create_xero_contact(contact_details)
-            XeroContact.objects.create(account=account, contact_id=contact_id)
+            try:
+                contact_id = self._create_xero_contact(contact_details)
+                XeroContact.objects.create(account=account, contact_id=contact_id)
+            except AccountingBadRequestException as e:
+                # Handle case where contact already exists in Xero but not in database
+                error_message = str(e)
+                account_number = contact_details.get("account_number")
+
+                if (
+                    "already assigned to another contact" in error_message
+                    or "Account Number already exists" in error_message
+                ):
+                    logger.warning(
+                        "Contact with account number %s already exists in Xero but "
+                        "not linked to account %s. Attempting to find and link it.",
+                        account_number,
+                        account.pk,
+                    )
+
+                    # Try to find the existing contact by account number
+                    if account_number:
+                        contact_id = self._get_xero_contact_by_account_number(
+                            account_number,
+                        )
+
+                        if contact_id:
+                            logger.info(
+                                "Found existing Xero contact %s for account number %s. "
+                                "Linking to account %s and updating details.",
+                                contact_id,
+                                account_number,
+                                account.pk,
+                            )
+                            # Link the existing contact to our account
+                            XeroContact.objects.create(
+                                account=account,
+                                contact_id=contact_id,
+                            )
+                            # Update the contact with current details
+                            self._update_xero_contact(contact_id, contact_details)
+                        else:
+                            logger.exception(
+                                "Could not find existing Xero contact for account "
+                                "number %s despite duplicate error. Raising exception.",
+                                account_number,
+                            )
+                            raise
+                    else:
+                        logger.exception(
+                            "No account number provided to search for existing contact."
+                            " Re-raising exception.",
+                        )
+                        raise
+                else:
+                    # Different error, re-raise
+                    raise
 
     def create_invoice(
         self,
