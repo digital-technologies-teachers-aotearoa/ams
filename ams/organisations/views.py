@@ -15,6 +15,7 @@ from django.views.generic import RedirectView
 from django.views.generic import UpdateView
 
 from ams.organisations.email_utils import send_organisation_invite_email
+from ams.organisations.email_utils import send_staff_organisation_created_notification
 from ams.organisations.forms import InviteOrganisationMemberForm
 from ams.organisations.forms import OrganisationForm
 from ams.organisations.mixins import OrganisationAdminMixin
@@ -64,6 +65,9 @@ class OrganisationCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView
             created_datetime=timezone.now(),
             accepted_datetime=timezone.now(),  # Auto-accept for creator
         )
+
+        # Send staff notification
+        send_staff_organisation_created_notification(self.object, self.request.user)
 
         return response
 

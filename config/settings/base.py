@@ -440,3 +440,4 @@ SITE_PORT = env.int("SITE_PORT", default=80)
 IMAGEKIT_CACHEFILE_DIR = "imagekit-modified"
 XERO_DEBUG = env.bool("XERO_DEBUG", default=False)
 XERO_EMAIL_INVOICES = env.bool("XERO_EMAIL_INVOICES", default=True)
+NOTIFY_STAFF_ORG_EVENTS = env.bool("AMS_NOTIFY_STAFF_ORG_EVENTS", default=True)

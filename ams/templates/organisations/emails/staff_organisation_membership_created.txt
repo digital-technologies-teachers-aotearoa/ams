@@ -1,0 +1,17 @@
+{% load i18n %}
+{% trans "New Organisation Membership" %}
+
+{% blocktrans with org_name=organisation.name %}A new membership has been purchased for {{ org_name }}.{% endblocktrans %}
+
+{% trans "Membership Details" %}
+------------------------
+{% trans "Organisation:" %} {{ organisation.name }}
+{% trans "Membership Type:" %} {{ membership_option.name }}
+{% trans "Seats:" %} {{ seats }}
+{% trans "Start Date:" %} {{ start_date|date:"d/m/Y" }}
+{% trans "Expiry Date:" %} {{ expiry_date|date:"d/m/Y" }}
+{% trans "Cost:" %} ${{ cost }}
+{% if invoice_number %}{% trans "Invoice Number:" %} {{ invoice_number }}{% endif %}
+
+------------------------
+{% trans "You're receiving this because you are a staff member. Contact your administrator to change notification settings." %}

@@ -1,6 +1,7 @@
 from http import HTTPStatus
 
 import pytest
+from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 
@@ -11,6 +12,7 @@ from ams.organisations.models import OrganisationMember
 from ams.organisations.tests.factories import OrganisationFactory
 from ams.organisations.tests.factories import OrganisationMemberFactory
 from ams.users.models import User
+from ams.users.tests.factories import UserFactory
 
 pytestmark = pytest.mark.django_db
 
@@ -238,3 +240,88 @@ class TestCreateOrganisationMembershipView:
         # Membership should be created without invoice
         membership = OrganisationMembership.objects.get(organisation=org)
         assert membership.invoice is None
+
+    def test_add_membership_sends_staff_notification(
+        self,
+        user: User,
+        client,
+        mailoutbox,
+    ):
+        """Test that creating organisation membership sends notification to staff."""
+        # Create staff users
+        staff1 = UserFactory(is_staff=True, email="staff1@example.com")
+        staff2 = UserFactory(is_staff=True, email="staff2@example.com")
+
+        # Create organisation and admin member
+        org = OrganisationFactory(name="Test Org")
+        OrganisationMemberFactory(
+            organisation=org,
+            user=user,
+            role=OrganisationMember.Role.ADMIN,
+            accepted_datetime=timezone.now(),
+        )
+
+        # Create membership option
+        option = MembershipOptionFactory(
+            type=MembershipOptionType.ORGANISATION,
+            name="Annual Membership",
+            max_seats=10,
+            cost=0,  # Use zero cost to avoid billing setup
+        )
+
+        client.force_login(user)
+        url = reverse("memberships:apply-organisation", kwargs={"uuid": org.uuid})
+        data = {
+            "membership_option": option.id,
+            "start_date": timezone.localdate(),
+            "seat_count": 5,
+        }
+
+        response = client.post(url, data=data)
+
+        assert response.status_code == HTTPStatus.FOUND
+
+        # Staff notification should be sent
+        assert len(mailoutbox) == 1
+        email = mailoutbox[0]
+        assert "New Organisation Membership" in email.subject
+        assert "Test Org" in email.subject
+        assert set(email.to) == {staff1.email, staff2.email}
+        assert "Annual Membership" in email.body
+
+    @override_settings(NOTIFY_STAFF_ORG_EVENTS=False)
+    def test_add_membership_no_notification_when_disabled(
+        self,
+        user: User,
+        client,
+        mailoutbox,
+    ):
+        """Test that notification is not sent when feature is disabled."""
+        UserFactory(is_staff=True, email="staff@example.com")
+
+        org = OrganisationFactory()
+        OrganisationMemberFactory(
+            organisation=org,
+            user=user,
+            role=OrganisationMember.Role.ADMIN,
+            accepted_datetime=timezone.now(),
+        )
+
+        option = MembershipOptionFactory(
+            type=MembershipOptionType.ORGANISATION,
+            max_seats=10,
+            cost=0,
+        )
+
+        client.force_login(user)
+        url = reverse("memberships:apply-organisation", kwargs={"uuid": org.uuid})
+        data = {
+            "membership_option": option.id,
+            "start_date": timezone.localdate(),
+            "seat_count": 5,
+        }
+
+        response = client.post(url, data=data)
+
+        assert response.status_code == HTTPStatus.FOUND
+        assert len(mailoutbox) == 0  # No notification sent

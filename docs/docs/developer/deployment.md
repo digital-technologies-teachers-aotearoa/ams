@@ -63,6 +63,7 @@ The following environment variables are available, with some required for runnin
 | `DJANGO_MEDIA_PRIVATE_REGION_NAME` | ⚪ Optional | `syd1` | Name of the region to use  for private media storage |
 | `DJANGO_MEDIA_PRIVATE_CUSTOM_DOMAIN` | ⚪ Optional | `https://private-media.ams.com` | Custom URL to use when connecting to private media storage, including scheme. |
 | `DJANGO_WAGTAIL_AMS_ADMIN_HELPERS` | ⚪ Optional | `True` | Shows helper text within the Wagtail CMS admin. |
+| `AMS_NOTIFY_STAFF_ORG_EVENTS` | ⚪ Optional | `True` | Notifies staff of organisation creation and membership creation events. |
 
 ## Deployment steps
 
