@@ -41,6 +41,7 @@ def _check_user_membership_core(user: User) -> bool:
         accepted_datetime__isnull=False,
         declined_datetime__isnull=True,
         user__is_active=True,
+        organisation__is_active=True,
         organisation__organisation_memberships__cancelled_datetime__isnull=True,
         organisation__organisation_memberships__start_date__lte=timezone.localdate(),
         organisation__organisation_memberships__expiry_date__gte=timezone.localdate(),

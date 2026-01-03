@@ -6,8 +6,21 @@ from ams.organisations.models import OrganisationMember
 
 @admin.register(Organisation)
 class OrganisationAdmin(admin.ModelAdmin):
-    list_display = ("name", "telephone", "email", "contact_name")
+    list_display = ("name", "telephone", "email", "contact_name", "is_active")
     search_fields = ("name", "email", "contact_name")
+    list_filter = ("is_active",)
+    actions = ["activate_organisations", "deactivate_organisations"]
+
+    @admin.action(description="Activate selected organisations")
+    def activate_organisations(self, request, queryset):
+        queryset.update(is_active=True)
+
+    @admin.action(description="Deactivate selected organisations")
+    def deactivate_organisations(self, request, queryset):
+        # Use save() to trigger auto-cancellation logic
+        for org in queryset:
+            org.is_active = False
+            org.save()
 
 
 @admin.register(OrganisationMember)

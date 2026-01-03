@@ -36,11 +36,11 @@
                class="btn btn-primary">{% trans "Edit Organisation" %}</a>
             {% if user_is_only_member %}
               <form method="post"
-                    action="{% url 'organisations:delete' uuid=object.uuid %}"
-                    onsubmit="return confirm('{% trans 'Are you sure you want to delete this organisation? This action cannot be undone.' %}');">
+                    action="{% url 'organisations:deactivate' uuid=object.uuid %}"
+                    onsubmit="return confirm('{% trans 'Are you sure you want to deactivate this organisation? This will cancel all memberships and revoke pending invites.' %}');">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-danger">
-                  <i class="bi bi-trash"></i> {% trans "Delete Organisation" %}
+                  <i class="bi bi-archive"></i> {% trans "Deactivate Organisation" %}
                 </button>
               </form>
             {% endif %}
