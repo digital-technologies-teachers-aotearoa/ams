@@ -7,6 +7,7 @@ from unittest.mock import patch
 
 import pytest
 from xero_python.accounting import Invoice as XeroInvoiceModel
+from xero_python.exceptions import AccountingBadRequestException
 
 from ams.billing.providers.xero.models import XeroContact
 from ams.billing.providers.xero.service import MockXeroBillingService
@@ -105,7 +106,7 @@ class TestXeroBillingServiceContactManagement:
         """Test that contact names include UUID prefix for uniqueness."""
         test_uuid = "a3f2c1d5-8b6e-4a1c-9d3f-2e7b5c8a1f4d"
         name = xero_service._xero_contact_name(test_uuid, "John Doe")  # noqa: SLF001
-        assert name == "John Doe (a3f2c1d5)"
+        assert name == "John Doe (a3f2c1d5-8b6e-4a1c-9d3f-2e7b5c8a1f4d)"
 
     @patch("ams.billing.providers.xero.service.AccountingApi")
     def test_update_user_billing_details_creates_new_contact(
@@ -167,6 +168,177 @@ class TestXeroBillingServiceContactManagement:
         # Verify contact was created
         xero_contact = XeroContact.objects.get(account=account_organisation)
         assert xero_contact.contact_id == "test-contact-id-123"
+
+    @patch("ams.billing.providers.xero.service.AccountingApi")
+    def test_update_billing_details_recovers_from_duplicate_contact_name(
+        self,
+        mock_accounting_api_class,
+        xero_service,
+        user,
+        account_user,
+        xero_contact_response,
+    ):
+        """Test recovery when contact name already exists in Xero."""
+        mock_api = Mock()
+
+        # First call to create_contacts raises duplicate name error
+        # Mock the HTTP response that Xero returns
+        mock_http_resp = Mock()
+        mock_http_resp.text = (
+            '{"ErrorNumber": 10, "Type": "ValidationException", '
+            '"Message": "A validation exception occurred"}'
+        )
+        mock_http_resp.status = 400
+        mock_http_resp.reason = (
+            "The contact name Admin Account (2dc1bdf5) is already "
+            "assigned to another contact."
+        )
+
+        duplicate_error = AccountingBadRequestException(http_resp=mock_http_resp)
+        mock_api.create_contacts.side_effect = duplicate_error
+
+        # get_contacts with where clause finds the existing contact
+        existing_contact_response = Mock()
+        existing_contact_response.contacts = [
+            Mock(contact_id="existing-contact-id-789"),
+        ]
+        mock_api.get_contacts.return_value = existing_contact_response
+
+        mock_accounting_api_class.return_value = mock_api
+
+        with patch.object(xero_service, "_get_authentication_token"):
+            # Should not raise an exception
+            xero_service.update_user_billing_details(user)
+
+        # Verify the existing contact was linked to our account
+        xero_contact = XeroContact.objects.get(account=account_user)
+        assert xero_contact.contact_id == "existing-contact-id-789"
+
+        # Verify update was called to sync the details
+        mock_api.update_contact.assert_called_once()
+
+    @patch("ams.billing.providers.xero.service.AccountingApi")
+    def test_update_billing_details_recovers_from_duplicate_account_number(
+        self,
+        mock_accounting_api_class,
+        xero_service,
+        user,
+        account_user,
+    ):
+        """Test recovery when account number already exists in Xero."""
+        mock_api = Mock()
+
+        # First call to create_contacts raises duplicate account number error
+        mock_http_resp = Mock()
+        mock_http_resp.text = (
+            '{"ErrorNumber": 10, "Type": "ValidationException", '
+            '"Message": "A validation exception occurred"}'
+        )
+        mock_http_resp.status = 400
+        mock_http_resp.reason = (
+            "The Account Number already exists. Please enter a "
+            "different Account Number."
+        )
+
+        duplicate_error = AccountingBadRequestException(http_resp=mock_http_resp)
+        mock_api.create_contacts.side_effect = duplicate_error
+
+        # get_contacts with where clause finds the existing contact
+        existing_contact_response = Mock()
+        existing_contact_response.contacts = [
+            Mock(contact_id="existing-contact-id-456"),
+        ]
+        mock_api.get_contacts.return_value = existing_contact_response
+
+        mock_accounting_api_class.return_value = mock_api
+
+        with patch.object(xero_service, "_get_authentication_token"):
+            # Should not raise an exception
+            xero_service.update_user_billing_details(user)
+
+        # Verify the existing contact was linked to our account
+        xero_contact = XeroContact.objects.get(account=account_user)
+        assert xero_contact.contact_id == "existing-contact-id-456"
+
+        # Verify update was called to sync the details
+        mock_api.update_contact.assert_called_once()
+
+    @patch("ams.billing.providers.xero.service.AccountingApi")
+    def test_update_billing_details_raises_other_errors(
+        self,
+        mock_accounting_api_class,
+        xero_service,
+        user,
+        account_user,
+    ):
+        """Test that non-duplicate errors are raised normally."""
+        mock_api = Mock()
+
+        # Create a different error that should be raised
+        mock_http_resp = Mock()
+        mock_http_resp.text = (
+            '{"ErrorNumber": 10, "Type": "ValidationException", '
+            '"Message": "A validation exception occurred"}'
+        )
+        mock_http_resp.status = 400
+        mock_http_resp.reason = "Some other validation error"
+
+        other_error = AccountingBadRequestException(http_resp=mock_http_resp)
+        mock_api.create_contacts.side_effect = other_error
+
+        mock_accounting_api_class.return_value = mock_api
+
+        with (
+            patch.object(xero_service, "_get_authentication_token"),
+            pytest.raises(AccountingBadRequestException),
+        ):
+            xero_service.update_user_billing_details(user)
+
+        # Verify no contact was created in our database
+        assert not XeroContact.objects.filter(account=account_user).exists()
+
+    @patch("ams.billing.providers.xero.service.AccountingApi")
+    def test_update_billing_details_raises_when_contact_not_found(
+        self,
+        mock_accounting_api_class,
+        xero_service,
+        user,
+        account_user,
+    ):
+        """Test that error is raised when contact can't be found despite duplicate
+        error."""
+        mock_api = Mock()
+
+        # First call to create_contacts raises duplicate error
+        mock_http_resp = Mock()
+        mock_http_resp.text = (
+            '{"ErrorNumber": 10, "Type": "ValidationException", '
+            '"Message": "A validation exception occurred"}'
+        )
+        mock_http_resp.status = 400
+        mock_http_resp.reason = (
+            "The Account Number already exists. Please enter a "
+            "different Account Number."
+        )
+
+        duplicate_error = AccountingBadRequestException(http_resp=mock_http_resp)
+        mock_api.create_contacts.side_effect = duplicate_error
+
+        # But get_contacts returns no contacts
+        empty_response = Mock()
+        empty_response.contacts = []
+        mock_api.get_contacts.return_value = empty_response
+
+        mock_accounting_api_class.return_value = mock_api
+
+        with (
+            patch.object(xero_service, "_get_authentication_token"),
+            pytest.raises(AccountingBadRequestException),
+        ):
+            xero_service.update_user_billing_details(user)
+
+        # Verify no contact was created in our database
+        assert not XeroContact.objects.filter(account=account_user).exists()
 
 
 class TestXeroBillingServiceInvoiceManagement:
