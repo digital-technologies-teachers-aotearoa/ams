@@ -1,11 +1,13 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
+from django.http import HttpResponseBadRequest
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from django.views import View
 from django.views.generic import CreateView
 from django.views.generic import DetailView
 from django.views.generic import FormView
@@ -134,17 +136,41 @@ class OrganisationDetailView(
         context = super().get_context_data(**kwargs)
         organisation = self.object
 
-        # Get organisation members (exclude declined invites)
+        # Check if current user is a member of this organisation
+        context["user_is_member"] = OrganisationMember.objects.filter(
+            organisation=organisation,
+            user=self.request.user,
+            declined_datetime__isnull=True,
+            revoked_datetime__isnull=True,
+        ).exists()
+
+        # Check if user is the only member (to enable delete button)
+        active_members = OrganisationMember.objects.filter(
+            organisation=organisation,
+            declined_datetime__isnull=True,
+            revoked_datetime__isnull=True,
+        )
+        context["user_is_only_member"] = (
+            active_members.count() == 1
+            and active_members.first().user == self.request.user
+        )
+
+        # Get organisation members (exclude declined and revoked invites)
         members = (
             organisation.organisation_members.filter(
                 declined_datetime__isnull=True,
+                revoked_datetime__isnull=True,
             )
             .select_related(
                 "user",
             )
             .order_by("-accepted_datetime")
         )
-        context["member_table"] = OrganisationMemberTable(members)
+        context["member_table"] = OrganisationMemberTable(
+            members,
+            request=self.request,
+            organisation=organisation,
+        )
 
         # Get organisation memberships
         memberships = organisation.organisation_memberships.select_related(
@@ -276,6 +302,92 @@ class OrganisationInviteMemberView(
 organisation_invite_member_view = OrganisationInviteMemberView.as_view()
 
 
+def _validate_invite(member, request, action: str):  # noqa: PLR0911
+    """
+    Validate whether the invite can be accepted or declined.
+
+    Returns:
+        None if valid
+        (message, level, redirect_url) otherwise
+    """
+    redirect_url = reverse("users:redirect")
+    user_detail_url = reverse(
+        "users:detail",
+        kwargs={"username": request.user.username},
+    )
+    organisation_detail_url = reverse(
+        "organisations:detail",
+        kwargs={"uuid": member.organisation.uuid},
+    )
+
+    # Ownership / email validation (shared logic)
+    if member.user and member.user != request.user:
+        return (
+            _("This invitation is for a different user."),
+            messages.ERROR,
+            redirect_url,
+        )
+
+    if not member.user and member.invite_email:
+        if request.user.email.lower() != member.invite_email.lower():
+            return (
+                _("This invitation is not valid for your account."),
+                messages.ERROR,
+                redirect_url,
+            )
+
+    # Revoked (shared logic)
+    if member.revoked_datetime:
+        message = (
+            _("This invitation has been revoked and can no longer be accepted.")
+            if action == "accept"
+            else _("This invitation has been revoked and can no longer be declined.")
+        )
+        return (message, messages.ERROR, redirect_url)
+
+    # Already accepted
+    if member.accepted_datetime:
+        message = _("You have already accepted this invitation.")
+        return (
+            message,
+            messages.INFO,
+            organisation_detail_url if action == "decline" else user_detail_url,
+        )
+
+    # Already declined
+    if member.declined_datetime:
+        message = (
+            _("You have already declined this invitation.")
+            if action == "decline"
+            else _("This invitation has been declined and cannot be accepted.")
+        )
+        return (
+            message,
+            messages.INFO if action == "decline" else messages.ERROR,
+            redirect_url,
+        )
+
+    # Accept-specific validation
+    if action == "accept":
+        active_membership = (
+            member.organisation.organisation_memberships.active()
+            .select_related("membership_option")
+            .first()
+        )
+
+        if active_membership and active_membership.is_full:
+            return (
+                _(
+                    "Unable to accept invitation: all membership seats are "
+                    "currently occupied.",
+                ),
+                messages.ERROR,
+                user_detail_url,
+            )
+
+    return None
+
+
 class AcceptOrganisationInviteView(LoginRequiredMixin, RedirectView):
     """
     View for accepting an organisation invite.
@@ -285,73 +397,19 @@ class AcceptOrganisationInviteView(LoginRequiredMixin, RedirectView):
     permanent = False
 
     def get_redirect_url(self, *args, **kwargs):
-        """Accept the invite and redirect to organisation detail."""
         invite_token = kwargs.get("invite_token")
 
-        # Get the invite
         member = get_object_or_404(
             OrganisationMember,
             invite_token=invite_token,
         )
 
-        # Verify the logged-in user matches the invite
-        if member.user and member.user != self.request.user:
-            # Invite is for a specific user but logged-in user doesn't match
-            messages.error(
-                self.request,
-                _("This invitation is for a different user."),
-            )
-            return reverse("users:redirect")
+        validation_result = _validate_invite(member, self.request, action="accept")
 
-        # For invites sent to non-users (user=None), verify email matches
-        if not member.user and member.invite_email:
-            if self.request.user.email.lower() != member.invite_email.lower():
-                messages.error(
-                    self.request,
-                    _("This invitation is not valid for your account."),
-                )
-                return reverse("users:redirect")
-
-        # Check if already accepted
-        if member.accepted_datetime:
-            # Already accepted, inform user
-            messages.info(
-                self.request,
-                _("You have already accepted this invitation."),
-            )
-            return reverse(
-                "users:detail",
-                kwargs={"username": self.request.user.username},
-            )
-
-        # Check if already declined
-        if member.declined_datetime:
-            messages.error(
-                self.request,
-                _("This invitation has been declined and cannot be accepted."),
-            )
-            return reverse("users:redirect")
-
-        # Check seat availability
-        active_membership = (
-            member.organisation.organisation_memberships.active()
-            .select_related("membership_option")
-            .first()
-        )
-
-        # Do not accept invite if full
-        if active_membership and active_membership.is_full:
-            messages.error(
-                self.request,
-                _(
-                    "Unable to accept invitation: all membership seats are "
-                    "currently occupied.",
-                ),
-            )
-            return reverse(
-                "users:detail",
-                kwargs={"username": self.request.user.username},
-            )
+        if validation_result:
+            message, level, redirect_url = validation_result
+            messages.add_message(self.request, level, message)
+            return redirect_url
 
         # Accept the invite
         member.accepted_datetime = timezone.now()
@@ -359,7 +417,6 @@ class AcceptOrganisationInviteView(LoginRequiredMixin, RedirectView):
             member.user = self.request.user
         member.save()
 
-        # Add success message
         messages.success(
             self.request,
             _(
@@ -368,7 +425,6 @@ class AcceptOrganisationInviteView(LoginRequiredMixin, RedirectView):
             % {"organisation": member.organisation.name},
         )
 
-        # Redirect to user detail
         return reverse(
             "users:detail",
             kwargs={"username": self.request.user.username},
@@ -396,42 +452,12 @@ class DeclineOrganisationInviteView(LoginRequiredMixin, RedirectView):
             invite_token=invite_token,
         )
 
-        # Verify the logged-in user matches the invite
-        if member.user and member.user != self.request.user:
-            # Invite is for a specific user but logged-in user doesn't match
-            messages.error(
-                self.request,
-                _("This invitation is for a different user."),
-            )
-            return reverse("users:redirect")
+        validation_result = _validate_invite(member, self.request, action="decline")
 
-        # For invites sent to non-users (user=None), verify email matches
-        if not member.user and member.invite_email:
-            if self.request.user.email.lower() != member.invite_email.lower():
-                messages.error(
-                    self.request,
-                    _("This invitation is not valid for your account."),
-                )
-                return reverse("users:redirect")
-
-        # Check if already accepted
-        if member.accepted_datetime:
-            messages.info(
-                self.request,
-                _("You have already accepted this invitation."),
-            )
-            return reverse(
-                "organisations:detail",
-                kwargs={"uuid": member.organisation.uuid},
-            )
-
-        # Check if already declined
-        if member.declined_datetime:
-            messages.info(
-                self.request,
-                _("You have already declined this invitation."),
-            )
-            return reverse("users:redirect")
+        if validation_result:
+            message, level, redirect_url = validation_result
+            messages.add_message(self.request, level, message)
+            return redirect_url
 
         # Decline the invite
         member.declined_datetime = timezone.now()
@@ -439,7 +465,6 @@ class DeclineOrganisationInviteView(LoginRequiredMixin, RedirectView):
             member.user = self.request.user
         member.save()
 
-        # Add success message
         messages.success(
             self.request,
             _(
@@ -448,7 +473,6 @@ class DeclineOrganisationInviteView(LoginRequiredMixin, RedirectView):
             % {"organisation": member.organisation.name},
         )
 
-        # Redirect to user detail
         return reverse(
             "users:detail",
             kwargs={"username": self.request.user.username},
@@ -456,3 +480,423 @@ class DeclineOrganisationInviteView(LoginRequiredMixin, RedirectView):
 
 
 decline_organisation_invite_view = DeclineOrganisationInviteView.as_view()
+
+
+class RemoveOrganisationMemberView(LoginRequiredMixin, OrganisationAdminMixin, View):
+    """
+    View for removing a member from an organisation.
+    Only staff/admin or organisation admins can remove members.
+    Admins cannot remove themselves (use LeaveOrganisationView instead).
+    Ensures at least one admin remains in the organisation.
+    """
+
+    def get_object(self):
+        """Get the organisation by UUID for permission checking."""
+        uuid = self.kwargs.get("uuid")
+        return get_object_or_404(Organisation, uuid=uuid)
+
+    def post(self, request, *args, **kwargs):
+        """Remove the specified member from the organisation."""
+        organisation = self.get_object()
+        member_uuid = kwargs.get("member_uuid")
+
+        # Get the member to remove
+        member = get_object_or_404(
+            OrganisationMember,
+            uuid=member_uuid,
+            organisation=organisation,
+            declined_datetime__isnull=True,
+            revoked_datetime__isnull=True,
+        )
+
+        # Prevent removing yourself through this action
+        if member.user == request.user:
+            return HttpResponseBadRequest(
+                "Cannot remove yourself. Use the Leave Organisation action instead.",
+            )
+
+        # If removing an admin, ensure at least one admin will remain
+        if member.role == OrganisationMember.Role.ADMIN:
+            admin_count = OrganisationMember.objects.filter(
+                organisation=organisation,
+                role=OrganisationMember.Role.ADMIN,
+                declined_datetime__isnull=True,
+                revoked_datetime__isnull=True,
+            ).count()
+
+            if admin_count <= 1:
+                messages.error(
+                    request,
+                    _(
+                        "Cannot remove the last admin. "
+                        "Please promote another member to admin first.",
+                    ),
+                )
+                return redirect(
+                    reverse("organisations:detail", kwargs={"uuid": organisation.uuid}),
+                )
+
+        # Remove the member
+        member_name = member.user.get_full_name()
+        member.delete()
+
+        messages.success(
+            request,
+            _("Successfully removed %(name)s from the organisation.")
+            % {"name": member_name},
+        )
+
+        return redirect(
+            reverse("organisations:detail", kwargs={"uuid": organisation.uuid}),
+        )
+
+
+remove_organisation_member_view = RemoveOrganisationMemberView.as_view()
+
+
+class MakeOrganisationAdminView(LoginRequiredMixin, OrganisationAdminMixin, View):
+    """
+    View for promoting a member to admin role.
+    Only staff/admin or organisation admins can promote members.
+    Can only promote active members (not pending invites).
+    Admins cannot promote themselves (they're already admins).
+    """
+
+    def get_object(self):
+        """Get the organisation by UUID for permission checking."""
+        uuid = self.kwargs.get("uuid")
+        return get_object_or_404(Organisation, uuid=uuid)
+
+    def post(self, request, *args, **kwargs):
+        """Promote the specified member to admin role."""
+        organisation = self.get_object()
+        member_uuid = kwargs.get("member_uuid")
+
+        # Get the member to promote
+        member = get_object_or_404(
+            OrganisationMember,
+            uuid=member_uuid,
+            organisation=organisation,
+            declined_datetime__isnull=True,
+            revoked_datetime__isnull=True,
+        )
+
+        # Validate that the member is active (not a pending invite)
+        if not member.is_active():
+            return HttpResponseBadRequest(
+                "Only active members can be promoted to admin.",
+            )
+
+        # Check if already an admin
+        if member.role == OrganisationMember.Role.ADMIN:
+            messages.info(
+                request,
+                _("%(name)s is already an admin.")
+                % {"name": member.user.get_full_name()},
+            )
+            return redirect(
+                reverse("organisations:detail", kwargs={"uuid": organisation.uuid}),
+            )
+
+        # Promote to admin
+        member.role = OrganisationMember.Role.ADMIN
+        member.save()
+
+        messages.success(
+            request,
+            _("Successfully promoted %(name)s to admin.")
+            % {"name": member.user.get_full_name()},
+        )
+
+        return redirect(
+            reverse("organisations:detail", kwargs={"uuid": organisation.uuid}),
+        )
+
+
+make_organisation_admin_view = MakeOrganisationAdminView.as_view()
+
+
+class RevokeOrganisationAdminView(LoginRequiredMixin, OrganisationAdminMixin, View):
+    """
+    View for revoking admin role from a member.
+    Only staff/admin or organisation admins can revoke admin status.
+    Admins cannot revoke their own admin status.
+    Ensures at least one admin remains in the organisation.
+    """
+
+    def get_object(self):
+        """Get the organisation by UUID for permission checking."""
+        uuid = self.kwargs.get("uuid")
+        return get_object_or_404(Organisation, uuid=uuid)
+
+    def post(self, request, *args, **kwargs):
+        """Revoke admin role from the specified member."""
+        organisation = self.get_object()
+        member_uuid = kwargs.get("member_uuid")
+
+        # Get the member to demote
+        member = get_object_or_404(
+            OrganisationMember,
+            uuid=member_uuid,
+            organisation=organisation,
+            declined_datetime__isnull=True,
+            revoked_datetime__isnull=True,
+        )
+
+        # Prevent revoking yourself through this action
+        if member.user == request.user:
+            return HttpResponseBadRequest(
+                "Cannot revoke your own admin status. "
+                "Use the Leave Organisation action if you want to leave.",
+            )
+
+        # Check if already a regular member
+        if member.role == OrganisationMember.Role.MEMBER:
+            messages.info(
+                request,
+                _("%(name)s is already a regular member.")
+                % {"name": member.user.get_full_name()},
+            )
+            return redirect(
+                reverse("organisations:detail", kwargs={"uuid": organisation.uuid}),
+            )
+
+        # Ensure at least one admin will remain
+        admin_count = OrganisationMember.objects.filter(
+            organisation=organisation,
+            role=OrganisationMember.Role.ADMIN,
+            declined_datetime__isnull=True,
+            revoked_datetime__isnull=True,
+        ).count()
+
+        if admin_count <= 1:
+            messages.error(
+                request,
+                _(
+                    "Cannot revoke admin status from the last admin. "
+                    "Please promote another member to admin first.",
+                ),
+            )
+            return redirect(
+                reverse("organisations:detail", kwargs={"uuid": organisation.uuid}),
+            )
+
+        # Revoke admin status
+        member.role = OrganisationMember.Role.MEMBER
+        member.save()
+
+        messages.success(
+            request,
+            _("Successfully revoked admin status from %(name)s.")
+            % {"name": member.user.get_full_name()},
+        )
+
+        return redirect(
+            reverse("organisations:detail", kwargs={"uuid": organisation.uuid}),
+        )
+
+
+revoke_organisation_admin_view = RevokeOrganisationAdminView.as_view()
+
+
+class LeaveOrganisationView(LoginRequiredMixin, View):
+    """
+    View for leaving an organisation (removing yourself as a member).
+    Any member can leave an organisation.
+    If you're an admin, ensures at least one admin remains.
+    """
+
+    def post(self, request, *args, **kwargs):
+        """Remove the current user from the organisation."""
+        uuid = kwargs.get("uuid")
+        organisation = get_object_or_404(Organisation, uuid=uuid)
+
+        # Get the current user's membership
+        try:
+            member = OrganisationMember.objects.get(
+                organisation=organisation,
+                user=request.user,
+                declined_datetime__isnull=True,
+                revoked_datetime__isnull=True,
+            )
+        except OrganisationMember.DoesNotExist:
+            return HttpResponseBadRequest("You are not a member of this organisation.")
+
+        # If user is an admin, ensure at least one admin will remain
+        if member.role == OrganisationMember.Role.ADMIN:
+            admin_count = OrganisationMember.objects.filter(
+                organisation=organisation,
+                role=OrganisationMember.Role.ADMIN,
+                declined_datetime__isnull=True,
+                revoked_datetime__isnull=True,
+            ).count()
+
+            if admin_count <= 1:
+                messages.error(
+                    request,
+                    _(
+                        "You are the last admin of this organisation. "
+                        "Please promote another member to admin before leaving.",
+                    ),
+                )
+                return redirect(
+                    reverse("organisations:detail", kwargs={"uuid": organisation.uuid}),
+                )
+
+        # Remove the member
+        member.delete()
+
+        messages.success(
+            request,
+            _("You have successfully left %(organisation)s.")
+            % {"organisation": organisation.name},
+        )
+
+        # Redirect to user detail page
+        return redirect(
+            reverse("users:detail", kwargs={"username": request.user.username}),
+        )
+
+
+leave_organisation_view = LeaveOrganisationView.as_view()
+
+
+class DeleteOrganisationView(LoginRequiredMixin, OrganisationAdminMixin, View):
+    """
+    View for deleting an organisation.
+    Only staff/admin or organisation admins can delete.
+    The organisation must contain only the requesting user as a member.
+    """
+
+    def get_object(self):
+        """Get the organisation by UUID for permission checking."""
+        uuid = self.kwargs.get("uuid")
+        return get_object_or_404(Organisation, uuid=uuid)
+
+    def post(self, request, *args, **kwargs):
+        """Delete the organisation if the user is the only member."""
+        organisation = self.get_object()
+
+        # Get all active members (not declined or revoked)
+        active_members = OrganisationMember.objects.filter(
+            organisation=organisation,
+            declined_datetime__isnull=True,
+            revoked_datetime__isnull=True,
+        )
+
+        # Check if there is exactly one member
+        if active_members.count() != 1:
+            messages.error(
+                request,
+                _(
+                    "Cannot delete organisation with multiple members. "
+                    "You must be the only member to delete this organisation.",
+                ),
+            )
+            return redirect(
+                reverse("organisations:detail", kwargs={"uuid": organisation.uuid}),
+            )
+
+        # Check if the only member is the requesting user
+        only_member = active_members.first()
+        if only_member.user != request.user:
+            messages.error(
+                request,
+                _(
+                    "You are not a member of this organisation and cannot delete it.",
+                ),
+            )
+            return redirect(
+                reverse("organisations:detail", kwargs={"uuid": organisation.uuid}),
+            )
+
+        # Store organisation name for success message
+        org_name = organisation.name
+
+        # Delete the organisation (CASCADE will handle related objects)
+        organisation.delete()
+
+        messages.success(
+            request,
+            _("Successfully deleted %(organisation)s.") % {"organisation": org_name},
+        )
+
+        # Redirect to user detail page
+        return redirect(
+            reverse("users:detail", kwargs={"username": request.user.username}),
+        )
+
+
+delete_organisation_view = DeleteOrganisationView.as_view()
+
+
+class RevokeOrganisationInviteView(LoginRequiredMixin, OrganisationAdminMixin, View):
+    """
+    View for revoking a pending organisation invite.
+    Only staff/admin or organisation admins can revoke invites.
+    Can only revoke invites that haven't been accepted, declined, or already revoked.
+    """
+
+    def get_object(self):
+        """Get the organisation by UUID for permission checking."""
+        uuid = self.kwargs.get("uuid")
+        return get_object_or_404(Organisation, uuid=uuid)
+
+    def post(self, request, *args, **kwargs):
+        """Revoke the specified invite."""
+        organisation = self.get_object()
+        member_uuid = kwargs.get("member_uuid")
+
+        # Get the member invite
+        member = get_object_or_404(
+            OrganisationMember,
+            uuid=member_uuid,
+            organisation=organisation,
+        )
+
+        # Check if already accepted
+        if member.accepted_datetime:
+            messages.error(
+                request,
+                _("Cannot revoke an invite that has already been accepted."),
+            )
+            return redirect(
+                reverse("organisations:detail", kwargs={"uuid": organisation.uuid}),
+            )
+
+        # Check if already declined
+        if member.declined_datetime:
+            messages.error(
+                request,
+                _("Cannot revoke an invite that has already been declined."),
+            )
+            return redirect(
+                reverse("organisations:detail", kwargs={"uuid": organisation.uuid}),
+            )
+
+        # Check if already revoked
+        if member.revoked_datetime:
+            messages.info(
+                request,
+                _("This invite has already been revoked."),
+            )
+            return redirect(
+                reverse("organisations:detail", kwargs={"uuid": organisation.uuid}),
+            )
+
+        # Revoke the invite
+        member.revoked_datetime = timezone.now()
+        member.save()
+
+        messages.success(
+            request,
+            _("Successfully revoked invite to %(email)s.")
+            % {"email": member.invite_email or member.user.email},
+        )
+
+        return redirect(
+            reverse("organisations:detail", kwargs={"uuid": organisation.uuid}),
+        )
+
+
+revoke_organisation_invite_view = RevokeOrganisationInviteView.as_view()

@@ -416,3 +416,26 @@ class TestAcceptOrganisationInviteView:
         # Should redirect to user detail page
         expected_url = reverse("users:detail", kwargs={"username": user.username})
         assert response.url == expected_url
+
+    def test_accept_revoked_invite(self, user: User, client):
+        """Test that revoked invites cannot be accepted."""
+        org = OrganisationFactory()
+        member = OrganisationMemberFactory(
+            organisation=org,
+            user=user,
+            accepted_datetime=None,
+            revoked_datetime=timezone.now(),
+        )
+
+        client.force_login(user)
+        url = reverse(
+            "organisations:accept_invite",
+            kwargs={"invite_token": member.invite_token},
+        )
+        response = client.get(url, follow=True)
+
+        assert response.status_code == HTTPStatus.OK
+        messages = list(response.context["messages"])
+        assert any("revoked" in str(m).lower() for m in messages)
+        member.refresh_from_db()
+        assert member.accepted_datetime is None

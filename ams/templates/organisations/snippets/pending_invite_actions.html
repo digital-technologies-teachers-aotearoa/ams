@@ -1,0 +1,15 @@
+{% load i18n %}
+
+<div class="btn-group btn-group-sm" role="group">
+  <form method="post"
+        action="{{ revoke_invite_url }}"
+        style="display: inline"
+        onsubmit="return confirm('{% trans 'Are you sure you want to revoke this invitation?' %}');">
+    {% csrf_token %}
+    <button type="submit"
+            class="btn btn-outline-danger btn-sm"
+            title="{% trans 'Revoke Invite' %}">
+      <i class="bi bi-x-circle"></i> {% trans "Revoke" %}
+    </button>
+  </form>
+</div>
