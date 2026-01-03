@@ -1,6 +1,8 @@
 {% load icon %}
 
-<a href="{% url 'organisations:accept_invite' record.invite_token %}"
-   class="btn btn-sm btn-success">{% icon "check" %} Accept</a>
-<a href="{% url 'organisations:decline_invite' record.invite_token %}"
-   class="btn btn-sm btn-secondary">{% icon "x" %} Decline</a>
+<div class="d-flex gap-3">
+  <a href="{% url 'organisations:accept_invite' record.invite_token %}"
+     class="btn btn-sm btn-success">{% icon "check" %} Accept</a>
+  <a href="{% url 'organisations:decline_invite' record.invite_token %}"
+     class="btn btn-sm btn-secondary">{% icon "x" %} Decline</a>
+</div>

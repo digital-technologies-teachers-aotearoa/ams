@@ -12,16 +12,6 @@
       <div class="col-12">
         <div class="d-flex justify-content-between align-items-start mb-3">
           <h1>{{ object.name }}</h1>
-          {% if user_is_member %}
-            <form method="post"
-                  action="{% url 'organisations:leave' uuid=object.uuid %}"
-                  onsubmit="return confirm('{% trans 'Are you sure you want to leave this organisation?' %}');">
-              {% csrf_token %}
-              <button type="submit" class="btn btn-outline-danger btn-sm">
-                <i class="bi bi-box-arrow-right"></i> {% trans "Leave Organisation" %}
-              </button>
-            </form>
-          {% endif %}
         </div>
         <div class="mb-4">
           <p>
@@ -34,16 +24,18 @@
           <div class="d-flex gap-2">
             <a href="{% url 'organisations:update' uuid=object.uuid %}"
                class="btn btn-primary">{% trans "Edit Organisation" %}</a>
-            {% if user_is_only_member %}
-              <form method="post"
-                    action="{% url 'organisations:deactivate' uuid=object.uuid %}"
-                    onsubmit="return confirm('{% trans 'Are you sure you want to deactivate this organisation? This will cancel all memberships and revoke pending invites.' %}');">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-danger">
-                  <i class="bi bi-archive"></i> {% trans "Deactivate Organisation" %}
-                </button>
-              </form>
-            {% endif %}
+            <button type="button"
+                    class="btn btn-danger"
+                    title="{% trans 'Deactivate Organisation' %}"
+                    data-bs-toggle="modal"
+                    data-bs-target="#actionModal"
+                    data-action-url="{% url 'organisations:deactivate' uuid=object.uuid %}"
+                    data-action-title="{% trans 'Deactivate Organisation' %}"
+                    data-action-message="{% trans 'Are you sure you want to deactivate this organisation? You must be the only user within the organisation, and this will cancel all memberships.' %}"
+                    data-action-confirm="{% trans 'Deactivate Organisation' %}"
+                    data-action-style="btn-danger">
+              <i class="bi bi-archive"></i> {% trans "Deactivate Organisation" %}
+            </button>
           </div>
         </div>
         {% if active_membership %}

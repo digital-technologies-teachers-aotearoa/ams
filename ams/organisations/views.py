@@ -136,25 +136,6 @@ class OrganisationDetailView(
         context = super().get_context_data(**kwargs)
         organisation = self.object
 
-        # Check if current user is a member of this organisation
-        context["user_is_member"] = OrganisationMember.objects.filter(
-            organisation=organisation,
-            user=self.request.user,
-            declined_datetime__isnull=True,
-            revoked_datetime__isnull=True,
-        ).exists()
-
-        # Check if user is the only member (to enable delete button)
-        active_members = OrganisationMember.objects.filter(
-            organisation=organisation,
-            declined_datetime__isnull=True,
-            revoked_datetime__isnull=True,
-        )
-        context["user_is_only_member"] = (
-            active_members.count() == 1
-            and active_members.first().user == self.request.user
-        )
-
         # Get organisation members (exclude declined and revoked invites)
         members = (
             organisation.organisation_members.filter(
