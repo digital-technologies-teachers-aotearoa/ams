@@ -1,5 +1,6 @@
 from django.template.loader import render_to_string
 from django.urls import reverse
+from django_tables2 import TemplateColumn
 from django_tables2.columns import Column
 from django_tables2.columns import DateColumn
 from django_tables2.tables import Table
@@ -167,10 +168,10 @@ class OrganisationMembershipTable(Table):
         empty_values=(),
         orderable=False,
     )
-    invoice = Column(
+    invoice = TemplateColumn(
+        template_name="users/tables/invoice_column.html",
+        accessor="invoice",
         verbose_name="Invoice",
-        empty_values=(),
-        orderable=False,
     )
 
     class Meta:
@@ -191,9 +192,3 @@ class OrganisationMembershipTable(Table):
         if record.max_seats:
             return f"{record.occupied_seats} / {int(record.max_seats)}"
         return f"{record.occupied_seats} (Unlimited)"
-
-    def render_invoice(self, record):
-        """Render invoice number if available."""
-        if record.invoice:
-            return record.invoice.invoice_number
-        return "—"

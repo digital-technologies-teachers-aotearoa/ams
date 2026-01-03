@@ -25,6 +25,8 @@ from ams.billing.providers.xero.views import process_invoice_update_events
 from ams.billing.providers.xero.views import verify_request_signature
 from ams.billing.providers.xero.views import xero_webhooks
 from ams.billing.tests.factories import InvoiceFactory
+from ams.organisations.models import OrganisationMember
+from ams.organisations.tests.factories import OrganisationMemberFactory
 from ams.users.tests.factories import UserFactory
 
 pytestmark = pytest.mark.django_db
@@ -648,22 +650,116 @@ class TestInvoiceRedirect:
         assert response.status_code == HTTPStatus.NOT_FOUND
         assert b"Invoice URL not available" in response.content
 
-    def test_organisation_invoice_access(
+    def test_organisation_admin_can_access_organisation_invoice(
         self,
         rf: RequestFactory,
-        organisation_member,
+        organisation,
         account_organisation,
+        xero_settings,
     ):
-        """Test that organisation members can access organisation invoices."""
+        """Test that organisation admins can access organisation invoices."""
+        # Create an organisation admin
+        admin_user = UserFactory()
+        OrganisationMemberFactory(
+            user=admin_user,
+            organisation=organisation,
+            role=OrganisationMember.Role.ADMIN,
+        )
+
+        # Create invoice for the organisation
         invoice = InvoiceFactory(account=account_organisation)
         invoice.billing_service_invoice_id = "test-invoice-id-org"
         invoice.save()
 
-        # Organisation member's user should be able to access
         request = rf.get(f"/billing/invoice/{invoice.invoice_number}/")
-        request.user = organisation_member.user
+        request.user = admin_user
 
-        # This should fail because the user's account is different from
-        # the organisation's account
+        mock_service = Mock(spec=XeroBillingService)
+        mock_service.get_invoice_url.return_value = "https://xero.com/invoice/view/123"
+
+        with patch(
+            "ams.billing.providers.xero.views.get_billing_service",
+            return_value=mock_service,
+        ):
+            response = invoice_redirect(request, invoice.invoice_number)
+
+        # Admin should be able to access
+        assert response.status_code == HTTPStatus.FOUND
+        assert response.url == "https://xero.com/invoice/view/123"
+
+    def test_organisation_regular_member_cannot_access_organisation_invoice(
+        self,
+        rf: RequestFactory,
+        organisation,
+        account_organisation,
+    ):
+        """Test that non-admin organisation members cannot access organisation
+        invoices."""
+        # Create a regular (non-admin) organisation member
+        regular_user = UserFactory()
+        OrganisationMemberFactory(
+            user=regular_user,
+            organisation=organisation,
+            role=OrganisationMember.Role.MEMBER,  # Regular member, not admin
+        )
+
+        # Create invoice for the organisation
+        invoice = InvoiceFactory(account=account_organisation)
+        invoice.billing_service_invoice_id = "test-invoice-id-org"
+        invoice.save()
+
+        request = rf.get(f"/billing/invoice/{invoice.invoice_number}/")
+        request.user = regular_user
+
+        # Regular member should NOT be able to access
         with pytest.raises(PermissionDenied):
             invoice_redirect(request, invoice.invoice_number)
+
+    def test_non_member_cannot_access_organisation_invoice(
+        self,
+        rf: RequestFactory,
+        organisation,
+        account_organisation,
+    ):
+        """Test that non-members cannot access organisation invoices."""
+        # Create a user who is not a member of the organisation
+        non_member_user = UserFactory()
+
+        # Create invoice for the organisation
+        invoice = InvoiceFactory(account=account_organisation)
+        invoice.billing_service_invoice_id = "test-invoice-id-org"
+        invoice.save()
+
+        request = rf.get(f"/billing/invoice/{invoice.invoice_number}/")
+        request.user = non_member_user
+
+        # Non-member should NOT be able to access
+        with pytest.raises(PermissionDenied):
+            invoice_redirect(request, invoice.invoice_number)
+
+    def test_user_can_access_own_individual_invoice(
+        self,
+        rf: RequestFactory,
+        user,
+        invoice_user,
+        xero_settings,
+    ):
+        """Test that users can access their own individual membership invoices."""
+        invoice_user.billing_service_invoice_id = "test-invoice-id-individual"
+        invoice_user.save()
+
+        request = rf.get(f"/billing/invoice/{invoice_user.invoice_number}/")
+        request.user = user
+
+        mock_service = Mock(spec=XeroBillingService)
+        mock_service.get_invoice_url.return_value = "https://xero.com/invoice/view/456"
+
+        with patch(
+            "ams.billing.providers.xero.views.get_billing_service",
+            return_value=mock_service,
+        ):
+            response = invoice_redirect(request, invoice_user.invoice_number)
+
+        # User should be able to access their own invoice
+        assert response.status_code == HTTPStatus.FOUND
+        assert response.url == "https://xero.com/invoice/view/456"
