@@ -2,34 +2,37 @@
 
 <div class="btn-group btn-group-sm" role="group">
   {% if make_admin_url %}
-    <form method="post" action="{{ make_admin_url }}">
-      {% csrf_token %}
-      <button type="submit"
-              class="btn btn-outline-primary btn-sm"
-              title="{% trans 'Make Admin' %}">
-        <i class="bi bi-shield-check"></i>
-      </button>
-    </form>
+    <button type="button"
+            class="btn btn-outline-primary btn-sm"
+            data-bs-toggle="modal"
+            data-bs-target="#actionModal"
+            data-action-url="{{ make_admin_url }}"
+            data-action-title="{% trans 'Make Admin' %}"
+            data-action-message=""
+            data-action-confirm="{% trans 'Make Admin' %}">
+      <i class="bi bi-shield-check"></i> {% trans 'Make Admin' %}
+    </button>
   {% endif %}
   {% if revoke_admin_url %}
-    <form method="post" action="{{ revoke_admin_url }}">
-      {% csrf_token %}
-      <button type="submit"
-              class="btn btn-outline-warning btn-sm"
-              title="{% trans 'Revoke Admin' %}">
-        <i class="bi bi-shield-x"></i>
-      </button>
-    </form>
-  {% endif %}
-  <form method="post"
-        action="{{ remove_url }}"
-        style="display: inline"
-        onsubmit="return confirm('{% trans 'Are you sure you want to remove this member?' %}');">
-    {% csrf_token %}
-    <button type="submit"
-            class="btn btn-outline-danger btn-sm"
-            title="{% trans 'Remove Member' %}">
-      <i class="bi bi-person-x"></i>
+    <button type="button"
+            class="btn btn-outline-warning btn-sm"
+            data-bs-toggle="modal"
+            data-bs-target="#actionModal"
+            data-action-url="{{ revoke_admin_url }}"
+            data-action-title="{% trans 'Revoke Admin' %}"
+            data-action-message="{% trans 'Are you sure you want to demote this admin to a member?' %}"
+            data-action-confirm="{% trans 'Revoke Admin' %}">
+      <i class="bi bi-shield-x"></i> {% trans 'Revoke Admin' %}
     </button>
-  </form>
+  {% endif %}
+  <button type="button"
+          class="btn btn-outline-danger btn-sm"
+          data-bs-toggle="modal"
+          data-bs-target="#actionModal"
+          data-action-url="{{ remove_url }}"
+          data-action-title="{% trans 'Remove Member' %}"
+          data-action-message="{% trans 'Are you sure you want to remove this member?' %}"
+          data-action-confirm="{% trans 'Remove' %}">
+    <i class="bi bi-person-x"></i> {% trans 'Remove Member' %}
+  </button>
 </div>

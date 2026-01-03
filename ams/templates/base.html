@@ -17,8 +17,10 @@
       {% include "includes/footer.html" %}
     {% endblock body %}
     {% block modal %}
+      {% include "includes/action_modal.html" %}
     {% endblock modal %}
     {% block inline_javascript %}
+      <script src="{% static 'js/action-modal.js' %}"></script>
     {% endblock inline_javascript %}
   </body>
 </html>

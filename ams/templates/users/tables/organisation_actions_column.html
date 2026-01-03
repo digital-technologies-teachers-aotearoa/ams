@@ -1,6 +1,19 @@
-{% load icon %}
+{% load icon i18n %}
 
-{% if record.role == "ADMIN" %}
-  <a href="{% url 'organisations:detail' record.organisation.uuid %}"
-     class="btn btn-sm btn-secondary">{% icon "eye" %} View</a>
-{% endif %}
+<div class="d-flex gap-3">
+  {% if record.role == "ADMIN" %}
+    <a href="{% url 'organisations:detail' record.organisation.uuid %}"
+       class="btn btn-sm btn-secondary">{% icon "eye" %} View</a>
+  {% endif %}
+  <button type="button"
+          class="btn btn-outline-danger btn-sm"
+          title="{% trans 'Leave Organisation' %}"
+          data-bs-toggle="modal"
+          data-bs-target="#actionModal"
+          data-action-url="{% url 'organisations:leave' uuid=record.organisation.uuid %}"
+          data-action-title="{% trans 'Leave Organisation' %}"
+          data-action-message="{% trans 'Are you sure you want to leave this organisation?' %}"
+          data-action-confirm="{% trans 'Leave Organisation' %}">
+    <i class="bi bi-box-arrow-right"></i> {% trans "Leave Organisation" %}
+  </button>
+</div>
