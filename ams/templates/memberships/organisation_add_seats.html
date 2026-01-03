@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+  {% trans "Add Seats" %} - {{ organisation.name }}
+{% endblock title %}
+{% block content %}
+  <div class="container my-5">
+    <div class="row">
+      <div class="col-12 col-md-8 offset-md-2">
+        <h1>{% trans "Add Seats to" %} {{ organisation.name }}</h1>
+        <!-- Current Membership Info -->
+        <div class="alert alert-info mb-4">
+          <h5 class="alert-heading">{% trans "Current Membership" %}</h5>
+          <div class="row">
+            <div class="col-12 col-md-6">
+              <p class="mb-1">
+                <strong>{% trans "Type:" %}</strong> {{ active_membership.membership_option.name }}
+              </p>
+              <p class="mb-1">
+                <strong>{% trans "Expiry:" %}</strong> {{ active_membership.expiry_date|date:"d/m/Y" }}
+              </p>
+            </div>
+            <div class="col-12 col-md-6">
+              <p class="mb-1">
+                <strong>{% trans "Current Seats:" %}</strong> {{ current_seats }}
+              </p>
+              <p class="mb-1">
+                <strong>{% trans "Occupied:" %}</strong> {{ occupied_seats }}
+              </p>
+              {% if seats_available is not None %}
+                <p class="mb-1">
+                  <strong>{% trans "Available:" %}</strong> {{ seats_available }}
+                </p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        <!-- Pro-Rata Info -->
+        <div class="alert alert-warning mb-4">
+          <h5 class="alert-heading">{% trans "Pro-Rata Pricing" %}</h5>
+          <p class="mb-2">{% trans "Additional seats will be charged pro-rata based on the remaining membership period." %}</p>
+          <p id="prorata-preview" class="mb-0 fs-5 fw-bold">{% trans "Enter number of seats to see the cost." %}</p>
+        </div>
+        <!-- Form -->
+        {% crispy form %}
+      </div>
+    </div>
+  </div>
+  <!-- JavaScript for live pro-rata calculation -->
+  <script>
+    (function() {
+      // Get pre-calculated pro-rata cost for 1 seat from server
+      const prorataCostPerSeat = parseFloat('{{ prorata_cost_per_seat }}');
+
+      // Get form elements
+      const seatsInput = document.getElementById('id_seats_to_add');
+      const previewElement = document.getElementById('prorata-preview');
+
+      if (!seatsInput || !previewElement) {
+        return;
+      }
+
+      // Function to calculate and display pro-rata cost
+      function updateProrataPreview() {
+        const seats = parseInt(seatsInput.value) || 0;
+
+        if (seats <= 0) {
+          previewElement.textContent = '{% trans "Enter number of seats to see the cost." %}';
+          return;
+        }
+
+        // Multiply pre-calculated cost per seat by number of seats
+        const prorataCost = (prorataCostPerSeat * seats).toFixed(2);
+
+        // Format as currency
+        const formattedCost = '$' + prorataCost;
+
+        // Update preview
+        previewElement.textContent = '{% trans "Estimated cost:" %} ' + formattedCost +
+          ' {% trans "for" %} ' + seats + ' {% trans "seat(s)" %}';
+      }
+
+      // Add event listener
+      seatsInput.addEventListener('input', updateProrataPreview);
+
+      // Initial calculation if value exists
+      updateProrataPreview();
+    })();
+  </script>
+{% endblock content %}

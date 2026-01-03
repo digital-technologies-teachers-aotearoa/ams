@@ -1,4 +1,5 @@
 import logging
+from decimal import Decimal
 from typing import Any
 
 from crispy_forms.bootstrap import FormActions
@@ -8,23 +9,27 @@ from crispy_forms.layout import Layout
 from crispy_forms.layout import Submit
 from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
+from django.db import transaction
 from django.forms import BooleanField
 from django.forms import CharField
 from django.forms import ChoiceField
 from django.forms import DateField
 from django.forms import DateInput
 from django.forms import DecimalField
+from django.forms import Form
 from django.forms import IntegerField
 from django.forms import ModelChoiceField
 from django.forms import ModelForm
 from django.forms import MultiValueField
 from django.forms import MultiWidget
+from django.forms import NumberInput
 from django.forms import Select
 from django.forms import TextInput
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from ams.billing.models import Account
+from ams.billing.services import get_billing_service
 from ams.billing.services.membership import MembershipBillingService
 from ams.memberships.duration import compose_membership_duration
 from ams.memberships.duration import decompose_membership_duration
@@ -32,6 +37,7 @@ from ams.memberships.models import IndividualMembership
 from ams.memberships.models import MembershipOption
 from ams.memberships.models import MembershipOptionType
 from ams.memberships.models import OrganisationMembership
+from ams.memberships.services import calculate_prorata_seat_cost
 from ams.organisations.models import Organisation
 from ams.utils.crispy_forms import Cancel
 
@@ -469,3 +475,213 @@ class CreateOrganisationMembershipForm(ModelForm):
             instance.save()
 
         return instance
+
+
+class AddOrganisationSeatsForm(Form):
+    """
+    Form for purchasing additional seats mid-term with pro-rata pricing.
+    Calculates pro-rated cost based on remaining membership period.
+    """
+
+    seats_to_add = IntegerField(
+        label=_("Number of Seats to Add"),
+        required=True,
+        min_value=1,
+        help_text=_("Enter the number of additional seats to purchase."),
+        widget=NumberInput(
+            attrs={
+                "min": "1",
+                "class": "form-control",
+            },
+        ),
+    )
+
+    def __init__(
+        self,
+        organisation,
+        active_membership,
+        cancel_url=None,
+        *args,
+        **kwargs,
+    ):
+        super().__init__(*args, **kwargs)
+
+        # Validate parameters
+        if organisation is None:
+            message = "organisation is required and cannot be None"
+            raise ValueError(message)
+
+        if not isinstance(organisation, Organisation):
+            message = (
+                f"organisation must be an instance of Organisation, "
+                f"got {type(organisation).__name__}"
+            )
+            raise TypeError(message)
+
+        if active_membership is None:
+            message = "active_membership is required and cannot be None"
+            raise ValueError(message)
+
+        self.organisation = organisation
+        self.active_membership = active_membership
+        self.helper = FormHelper()
+        self.helper.form_method = "post"
+        self.helper.add_layout(
+            Layout(
+                "seats_to_add",
+                FormActions(
+                    Submit("submit", _("Purchase Seats"), css_class="btn btn-success"),
+                    Cancel(cancel_url),
+                ),
+            ),
+        )
+
+    def clean_seats_to_add(self):
+        """Validate seats_to_add is positive and membership has sufficient time
+        remaining."""
+        seats_to_add = self.cleaned_data.get("seats_to_add")
+
+        if seats_to_add is None:
+            return seats_to_add
+
+        if seats_to_add <= 0:
+            raise ValidationError(
+                _("Number of seats must be greater than zero."),
+                code="invalid_seat_count",
+            )
+
+        # Check if membership has at least 1 day remaining
+        today = timezone.localdate()
+        days_remaining = (self.active_membership.expiry_date - today).days
+
+        if days_remaining < 1:
+            raise ValidationError(
+                _(
+                    "Cannot add seats - membership expires too soon. "
+                    "Please renew your membership first.",
+                ),
+                code="membership_expiring",
+            )
+
+        return seats_to_add
+
+    def calculate_prorata_cost(self, seats_to_add):
+        """
+        Calculate the pro-rata cost for additional seats.
+
+        This is a wrapper around the calculate_prorata_seat_cost service function.
+
+        Args:
+            seats_to_add: Number of seats to add (int)
+
+        Returns:
+            Decimal: Pro-rated cost rounded to 2 decimal places
+        """
+        return calculate_prorata_seat_cost(self.active_membership, seats_to_add)
+
+    def save(self):
+        """
+        Process the seat purchase by creating an invoice and updating max_seats.
+
+        Returns:
+            tuple: (membership, invoice) where invoice may be None if billing not
+                   configured or membership is free
+
+        Raises:
+            ValidationError: If billing account or invoice creation fails
+        """
+        logger = logging.getLogger(__name__)
+
+        seats_to_add = self.cleaned_data["seats_to_add"]
+        membership = self.active_membership
+        membership_option = membership.membership_option
+
+        # Calculate pro-rata cost
+        prorata_cost = self.calculate_prorata_cost(seats_to_add)
+
+        invoice = None
+
+        # Only create invoice if there's a cost
+        if prorata_cost > 0:
+            # Get or create billing account for the organisation
+            try:
+                account, _created = Account.objects.get_or_create(
+                    organisation=self.organisation,
+                )
+            except Exception as e:
+                logger.exception(
+                    "Failed to get or create billing account for organisation %s",
+                    self.organisation.uuid,
+                )
+                raise ValidationError(
+                    _("Could not create billing account. Please contact us."),
+                ) from e
+
+            # Create invoice using billing service
+            billing_service = get_billing_service()
+            if billing_service:
+                try:
+                    # Prepare invoice line items
+                    invoice_line_items = [
+                        {
+                            "description": _(
+                                "Additional %(seats)d seat(s) (pro-rata) "
+                                "- %(membership)s",
+                            )
+                            % {
+                                "seats": seats_to_add,
+                                "membership": str(membership_option),
+                            },
+                            "unit_amount": prorata_cost / Decimal(seats_to_add),
+                            "quantity": seats_to_add,
+                        },
+                    ]
+
+                    # Set invoice dates
+                    issue_date = timezone.localdate()
+                    due_date = issue_date + relativedelta(months=1)
+
+                    # Create invoice
+                    invoice = billing_service.create_invoice(
+                        account,
+                        issue_date,
+                        due_date,
+                        invoice_line_items,
+                        membership_option.invoice_reference or "Additional Seats",
+                    )
+
+                    if invoice:
+                        logger.info(
+                            "Created invoice %s for additional %d seats for "
+                            "organisation %s",
+                            invoice.invoice_number,
+                            seats_to_add,
+                            self.organisation.uuid,
+                        )
+                except Exception as e:
+                    logger.exception(
+                        "Failed to create invoice for organisation %s",
+                        self.organisation.uuid,
+                    )
+                    raise ValidationError(
+                        _(
+                            "Could not create invoice for the seat purchase. "
+                            "Please contact us.",
+                        ),
+                    ) from e
+
+        # Update max_seats immediately (within transaction)
+        with transaction.atomic():
+            old_max_seats = membership.max_seats
+            membership.max_seats = old_max_seats + Decimal(seats_to_add)
+            membership.save(update_fields=["max_seats"])
+
+            logger.info(
+                "Updated max_seats from %s to %s for membership %s (organisation %s)",
+                old_max_seats,
+                membership.max_seats,
+                membership.pk,
+                self.organisation.uuid,
+            )
+
+        return (membership, invoice)

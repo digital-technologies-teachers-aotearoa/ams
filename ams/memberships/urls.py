@@ -1,5 +1,6 @@
 from django.urls import path
 
+from ams.memberships.views import AddOrganisationSeatsView
 from ams.memberships.views import CreateIndividualMembershipView
 from ams.memberships.views import CreateOrganisationMembershipView
 
@@ -14,5 +15,10 @@ urlpatterns = [
         "apply-organisation/<uuid:uuid>/",
         CreateOrganisationMembershipView.as_view(),
         name="apply-organisation",
+    ),
+    path(
+        "add-seats/<uuid:uuid>/",
+        AddOrganisationSeatsView.as_view(),
+        name="add_seats",
     ),
 ]
