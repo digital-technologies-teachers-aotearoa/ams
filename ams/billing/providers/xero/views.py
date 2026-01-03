@@ -20,6 +20,7 @@ from ams.billing.models import Invoice
 from ams.billing.providers.xero.service import XeroBillingService
 from ams.billing.services import BillingService
 from ams.billing.services import get_billing_service
+from ams.organisations.mixins import user_is_organisation_admin
 
 logger = logging.getLogger(__name__)
 
@@ -182,23 +183,37 @@ def invoice_redirect(request: HttpRequest, invoice_number: str) -> HttpResponse:
     """Redirect to the online invoice URL.
 
     Fetches the online invoice URL and redirects the user to view
-    the invoice. Only allows access if the invoice belongs to the requesting
-    user's account.
+    the invoice. Only allows access if:
+    1. The invoice belongs to the requesting user's account, OR
+    2. The invoice belongs to an organisation where the user is an admin
 
     Args:
         request: The HTTP request.
-        invoice_id: The ID of the Invoice to redirect to.
+        invoice_number: The invoice number to redirect to.
 
     Returns:
         HttpResponseRedirect to the online invoice URL.
 
     Raises:
-        PermissionDenied: If the user doesn't own the invoice.
+        PermissionDenied: If the user doesn't have permission to view the invoice.
     """
     invoice = get_object_or_404(Invoice, invoice_number=invoice_number)
 
-    # Check if the user owns this invoice
-    if not hasattr(request.user, "account") or invoice.account != request.user.account:
+    # Check if the user owns this invoice (individual membership)
+    user_owns_invoice = (
+        hasattr(request.user, "account") and invoice.account == request.user.account
+    )
+
+    # Check if the invoice belongs to an organisation where the user is an admin
+    user_is_org_admin = False
+    if hasattr(invoice.account, "organisation") and invoice.account.organisation:
+        user_is_org_admin = user_is_organisation_admin(
+            request.user,
+            invoice.account.organisation,
+        )
+
+    # Deny access if user doesn't own the invoice and isn't an org admin
+    if not user_owns_invoice and not user_is_org_admin:
         raise PermissionDenied
 
     billing_service: BillingService | None = get_billing_service()
