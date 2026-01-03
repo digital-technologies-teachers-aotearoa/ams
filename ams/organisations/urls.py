@@ -44,9 +44,9 @@ urlpatterns = [
         name="leave",
     ),
     path(
-        "<uuid:uuid>/delete/",
-        views.delete_organisation_view,
-        name="delete",
+        "<uuid:uuid>/deactivate/",
+        views.deactivate_organisation_view,
+        name="deactivate",
     ),
     path(
         "<uuid:uuid>/member/<uuid:member_uuid>/revoke-invite/",

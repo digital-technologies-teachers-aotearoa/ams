@@ -1,15 +1,23 @@
 import uuid as uuid_lib
 
 from django.db.models import CASCADE
+from django.db.models import BooleanField
 from django.db.models import CharField
 from django.db.models import DateTimeField
 from django.db.models import ForeignKey
 from django.db.models import Model
 from django.db.models import Q
+from django.db.models import QuerySet
 from django.db.models import TextChoices
 from django.db.models import UniqueConstraint
 from django.db.models import UUIDField
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+
+
+class OrganisationQuerySet(QuerySet):
+    def active(self):
+        return self.filter(is_active=True)
 
 
 class Organisation(Model):
@@ -25,9 +33,45 @@ class Organisation(Model):
     street_address = CharField(max_length=255, blank=True)
     suburb = CharField(max_length=255, blank=True)
     city = CharField(max_length=255, blank=True)
+    is_active = BooleanField(
+        default=True,
+        help_text=_(
+            "Designates whether this organisation should be treated as active. "
+            "Unselect this instead of deleting organisations.",
+        ),
+        verbose_name=_("active"),
+    )
+
+    objects = OrganisationQuerySet.as_manager()
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        # Detect is_active change from True → False
+        if self.pk:
+            try:
+                old = Organisation.objects.get(pk=self.pk)
+                if old.is_active and not self.is_active:
+                    # Save first to ensure is_active is updated
+                    super().save(*args, **kwargs)
+
+                    # Auto-cancel memberships
+                    self.organisation_memberships.filter(
+                        cancelled_datetime__isnull=True,
+                    ).update(cancelled_datetime=timezone.now())
+
+                    # Auto-revoke pending invites
+                    self.organisation_members.filter(
+                        accepted_datetime__isnull=True,
+                        declined_datetime__isnull=True,
+                        revoked_datetime__isnull=True,
+                    ).update(revoked_datetime=timezone.now())
+                    return
+            except Organisation.DoesNotExist:
+                pass
+
+        super().save(*args, **kwargs)
 
 
 class OrganisationMember(Model):

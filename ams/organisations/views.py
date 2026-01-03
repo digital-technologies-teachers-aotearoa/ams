@@ -761,10 +761,10 @@ class LeaveOrganisationView(LoginRequiredMixin, View):
 leave_organisation_view = LeaveOrganisationView.as_view()
 
 
-class DeleteOrganisationView(LoginRequiredMixin, OrganisationAdminMixin, View):
+class DeactivateOrganisationView(LoginRequiredMixin, OrganisationAdminMixin, View):
     """
-    View for deleting an organisation.
-    Only staff/admin or organisation admins can delete.
+    View for deactivating an organisation.
+    Only staff/admin or organisation admins can deactivate.
     The organisation must contain only the requesting user as a member.
     """
 
@@ -774,7 +774,7 @@ class DeleteOrganisationView(LoginRequiredMixin, OrganisationAdminMixin, View):
         return get_object_or_404(Organisation, uuid=uuid)
 
     def post(self, request, *args, **kwargs):
-        """Delete the organisation if the user is the only member."""
+        """Deactivate the organisation if the user is the only member."""
         organisation = self.get_object()
 
         # Get all active members (not declined or revoked)
@@ -789,8 +789,8 @@ class DeleteOrganisationView(LoginRequiredMixin, OrganisationAdminMixin, View):
             messages.error(
                 request,
                 _(
-                    "Cannot delete organisation with multiple members. "
-                    "You must be the only member to delete this organisation.",
+                    "Cannot deactivate organisation with multiple members. "
+                    "You must be the only member to deactivate this organisation.",
                 ),
             )
             return redirect(
@@ -803,7 +803,8 @@ class DeleteOrganisationView(LoginRequiredMixin, OrganisationAdminMixin, View):
             messages.error(
                 request,
                 _(
-                    "You are not a member of this organisation and cannot delete it.",
+                    "You are not a member of this organisation and "
+                    "cannot deactivate it.",
                 ),
             )
             return redirect(
@@ -813,12 +814,14 @@ class DeleteOrganisationView(LoginRequiredMixin, OrganisationAdminMixin, View):
         # Store organisation name for success message
         org_name = organisation.name
 
-        # Delete the organisation (CASCADE will handle related objects)
-        organisation.delete()
+        # Deactivate the organisation (will auto-cancel memberships and revoke invites)
+        organisation.is_active = False
+        organisation.save()
 
         messages.success(
             request,
-            _("Successfully deleted %(organisation)s.") % {"organisation": org_name},
+            _("Successfully deactivated %(organisation)s.")
+            % {"organisation": org_name},
         )
 
         # Redirect to user detail page
@@ -827,7 +830,7 @@ class DeleteOrganisationView(LoginRequiredMixin, OrganisationAdminMixin, View):
         )
 
 
-delete_organisation_view = DeleteOrganisationView.as_view()
+deactivate_organisation_view = DeactivateOrganisationView.as_view()
 
 
 class RevokeOrganisationInviteView(LoginRequiredMixin, OrganisationAdminMixin, View):
