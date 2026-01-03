@@ -23,4 +23,34 @@ urlpatterns = [
         views.decline_organisation_invite_view,
         name="decline_invite",
     ),
+    path(
+        "<uuid:uuid>/member/<uuid:member_uuid>/remove/",
+        views.remove_organisation_member_view,
+        name="remove_member",
+    ),
+    path(
+        "<uuid:uuid>/member/<uuid:member_uuid>/make-admin/",
+        views.make_organisation_admin_view,
+        name="make_admin",
+    ),
+    path(
+        "<uuid:uuid>/member/<uuid:member_uuid>/revoke-admin/",
+        views.revoke_organisation_admin_view,
+        name="revoke_admin",
+    ),
+    path(
+        "<uuid:uuid>/leave/",
+        views.leave_organisation_view,
+        name="leave",
+    ),
+    path(
+        "<uuid:uuid>/delete/",
+        views.delete_organisation_view,
+        name="delete",
+    ),
+    path(
+        "<uuid:uuid>/member/<uuid:member_uuid>/revoke-invite/",
+        views.revoke_organisation_invite_view,
+        name="revoke_invite",
+    ),
 ]

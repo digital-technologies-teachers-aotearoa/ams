@@ -1,0 +1,35 @@
+{% load i18n %}
+
+<div class="btn-group btn-group-sm" role="group">
+  {% if make_admin_url %}
+    <form method="post" action="{{ make_admin_url }}">
+      {% csrf_token %}
+      <button type="submit"
+              class="btn btn-outline-primary btn-sm"
+              title="{% trans 'Make Admin' %}">
+        <i class="bi bi-shield-check"></i>
+      </button>
+    </form>
+  {% endif %}
+  {% if revoke_admin_url %}
+    <form method="post" action="{{ revoke_admin_url }}">
+      {% csrf_token %}
+      <button type="submit"
+              class="btn btn-outline-warning btn-sm"
+              title="{% trans 'Revoke Admin' %}">
+        <i class="bi bi-shield-x"></i>
+      </button>
+    </form>
+  {% endif %}
+  <form method="post"
+        action="{{ remove_url }}"
+        style="display: inline"
+        onsubmit="return confirm('{% trans 'Are you sure you want to remove this member?' %}');">
+    {% csrf_token %}
+    <button type="submit"
+            class="btn btn-outline-danger btn-sm"
+            title="{% trans 'Remove Member' %}">
+      <i class="bi bi-person-x"></i>
+    </button>
+  </form>
+</div>

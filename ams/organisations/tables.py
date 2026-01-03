@@ -1,3 +1,5 @@
+from django.template.loader import render_to_string
+from django.urls import reverse
 from django_tables2.columns import Column
 from django_tables2.columns import DateColumn
 from django_tables2.tables import Table
@@ -53,6 +55,12 @@ class OrganisationMemberTable(Table):
         )
         order_by = ("-accepted_datetime",)
 
+    def __init__(self, *args, request=None, organisation=None, **kwargs):
+        """Initialize with request and organisation for action buttons."""
+        super().__init__(*args, **kwargs)
+        self.request = request
+        self.organisation = organisation
+
     def render_name(self, record):
         """Render the member's full name or invite email."""
         if record.user:
@@ -66,8 +74,67 @@ class OrganisationMemberTable(Table):
         return record.invite_email
 
     def render_actions(self, record):
-        """Render actions column (empty for now as per step 4)."""
-        return ""
+        """Render actions column with role management buttons."""
+
+        # Don't show actions for the current user (they should use "Leave Organisation")
+        if self.request and record.user == self.request.user:
+            return ""
+
+        # For pending invites, show revoke action
+        if not record.is_active():
+            context = {
+                "member": record,
+                "organisation": self.organisation,
+                "revoke_invite_url": reverse(
+                    "organisations:revoke_invite",
+                    kwargs={
+                        "uuid": self.organisation.uuid,
+                        "member_uuid": record.uuid,
+                    },
+                ),
+            }
+            return render_to_string(
+                "organisations/snippets/pending_invite_actions.html",
+                context,
+                request=self.request,
+            )
+
+        # Build the context for rendering action buttons for active members
+        context = {
+            "member": record,
+            "organisation": self.organisation,
+            "remove_url": reverse(
+                "organisations:remove_member",
+                kwargs={
+                    "uuid": self.organisation.uuid,
+                    "member_uuid": record.uuid,
+                },
+            ),
+        }
+
+        # Add role management URLs based on current role
+        if record.role == OrganisationMember.Role.MEMBER:
+            context["make_admin_url"] = reverse(
+                "organisations:make_admin",
+                kwargs={
+                    "uuid": self.organisation.uuid,
+                    "member_uuid": record.uuid,
+                },
+            )
+        else:  # ADMIN
+            context["revoke_admin_url"] = reverse(
+                "organisations:revoke_admin",
+                kwargs={
+                    "uuid": self.organisation.uuid,
+                    "member_uuid": record.uuid,
+                },
+            )
+
+        return render_to_string(
+            "organisations/snippets/member_action_buttons.html",
+            context,
+            request=self.request,
+        )
 
 
 class OrganisationMembershipTable(Table):

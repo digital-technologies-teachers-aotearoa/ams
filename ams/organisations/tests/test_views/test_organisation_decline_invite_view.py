@@ -8,6 +8,7 @@ from django.utils import timezone
 
 from ams.organisations.tests.factories import OrganisationFactory
 from ams.organisations.tests.factories import OrganisationMemberFactory
+from ams.users.models import User
 from ams.users.tests.factories import UserFactory
 
 pytestmark = pytest.mark.django_db
@@ -248,3 +249,26 @@ class TestDeclineOrganisationInviteView:
         assert member.declined_datetime is None
         # Should not link to the user
         assert member.user is None
+
+    def test_decline_revoked_invite(self, user: User, client):
+        """Test that revoked invites cannot be declined."""
+        org = OrganisationFactory()
+        member = OrganisationMemberFactory(
+            organisation=org,
+            user=user,
+            accepted_datetime=None,
+            revoked_datetime=timezone.now(),
+        )
+
+        client.force_login(user)
+        url = reverse(
+            "organisations:decline_invite",
+            kwargs={"invite_token": member.invite_token},
+        )
+        response = client.get(url, follow=True)
+
+        assert response.status_code == HTTPStatus.OK
+        messages = list(response.context["messages"])
+        assert any("revoked" in str(m).lower() for m in messages)
+        member.refresh_from_db()
+        assert member.declined_datetime is None

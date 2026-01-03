@@ -52,6 +52,7 @@ class OrganisationMember(Model):
     created_datetime = DateTimeField()
     accepted_datetime = DateTimeField(null=True)
     declined_datetime = DateTimeField(null=True)
+    revoked_datetime = DateTimeField(null=True)
     role = CharField(
         max_length=10,
         choices=Role.choices,
@@ -63,7 +64,10 @@ class OrganisationMember(Model):
         constraints = [
             UniqueConstraint(
                 fields=["user", "organisation"],
-                condition=Q(declined_datetime__isnull=True),
+                condition=Q(
+                    declined_datetime__isnull=True,
+                    revoked_datetime__isnull=True,
+                ),
                 name="unique_active_org_member",
             ),
         ]
