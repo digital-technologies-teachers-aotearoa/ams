@@ -29,11 +29,24 @@ User = get_user_model()
 
 
 class MembershipOptionType(TextChoices):
+    """Membership option types.
+
+    Used to distinguish between single-user membership products and
+    organisation-wide membership products.
+    """
+
     INDIVIDUAL = "INDIVIDUAL", _("Individual")
     ORGANISATION = "ORGANISATION", _("Organisation")
 
 
 class MembershipStatus(TextChoices):
+    """Membership lifecycle statuses.
+
+    These values represent the high-level state of a membership and are
+    used by membership models to compute and display status to users and
+    administrators.
+    """
+
     NONE = "NONE", _("None")
     PENDING = "PENDING", _("Pending")
     ACTIVE = "ACTIVE", _("Active")
@@ -42,6 +55,23 @@ class MembershipStatus(TextChoices):
 
 
 class MembershipOption(Model):
+    """Configuration model that describes a membership product.
+
+    A `MembershipOption` defines the name, type, duration, cost and
+    optional seat limits for membership offerings. Once created certain
+    fields listed in `IMMUTABLE_FIELDS` cannot be changed to avoid
+    inconsistencies with existing memberships. Deletion is prevented when
+    any memberships reference the option; use `archived` to retire an
+    option instead.
+    """
+
+    IMMUTABLE_FIELDS = {
+        "duration",
+        "cost",
+        "max_seats",
+        "type",
+    }
+
     name = CharField(max_length=255)
     type = CharField(max_length=255, choices=MembershipOptionType)
     duration = RelativeDeltaField()
@@ -78,6 +108,33 @@ class MembershipOption(Model):
     def duration_display(self):
         return format_membership_duration(self.duration)
 
+    def clean(self):
+        super().clean()
+
+        # Only enforce on updates
+        if not self.pk:
+            return
+
+        # Fetch original values from DB
+        original = MembershipOption.objects.get(pk=self.pk)
+
+        changed_fields = [
+            field
+            for field in self.IMMUTABLE_FIELDS
+            if getattr(self, field) != getattr(original, field)
+        ]
+
+        if changed_fields:
+            raise ValidationError(
+                {
+                    field: _(
+                        "This field cannot be changed after the membership option "
+                        "has been created.",
+                    )
+                    for field in changed_fields
+                },
+            )
+
     def delete(self, *args, **kwargs):
         """Prevent deletion if there are related memberships."""
         if (
@@ -94,7 +151,15 @@ class MembershipOption(Model):
 
 
 class BaseMembership(Model):
-    """Abstract base class for membership models."""
+    """Abstract base class for membership models.
+
+    Provides common fields such as start and expiry dates, timestamps for
+    creation/approval/cancellation, voting rights and shared behaviour
+    for validating dates, calculating expiry and deriving a canonical
+    membership status. Concrete membership types should inherit from this
+    class and add their specific relations (for example a link to a
+    `User` or an `Organisation` and a `membership_option`).
+    """
 
     start_date = DateField()
     expiry_date = DateField()
@@ -143,7 +208,12 @@ class BaseMembership(Model):
 
 
 class IndividualMembershipQuerySet(QuerySet):
-    """Custom queryset for IndividualMembership model."""
+    """QuerySet helpers for `IndividualMembership`.
+
+    Adds convenience filters such as `active()` which returns only
+    individual memberships that are approved, not cancelled and within
+    their active date range.
+    """
 
     def active(self):
         """Return only active memberships."""
@@ -157,6 +227,14 @@ class IndividualMembershipQuerySet(QuerySet):
 
 
 class IndividualMembership(BaseMembership):
+    """Membership record for an individual user.
+
+    Links a Django `User` to a chosen `MembershipOption` and records
+    invoice information and approval/cancellation timestamps. Status and
+    expiry calculation behaviour are inherited from
+    :class:`BaseMembership`.
+    """
+
     user = ForeignKey(
         User,
         on_delete=CASCADE,
@@ -189,6 +267,12 @@ class IndividualMembership(BaseMembership):
 
 
 class OrganisationMembershipQuerySet(QuerySet):
+    """QuerySet helpers for `OrganisationMembership`.
+
+    Mirrors the behaviour of :class:`IndividualMembershipQuerySet` and
+    provides an `active()` filter for organisation memberships.
+    """
+
     def active(self):
         today = timezone.localdate()
         return self.filter(
@@ -200,6 +284,15 @@ class OrganisationMembershipQuerySet(QuerySet):
 
 
 class OrganisationMembership(BaseMembership):
+    """Membership record for an organisation.
+
+    Associates an :class:`Organisation` with a `MembershipOption` and
+    tracks the number of seats allocated. Provides helpers to compute
+    occupied seats, available seats and whether the membership is full.
+    Seat calculations only consider organisation members who have been
+    accepted and whose user accounts are active.
+    """
+
     organisation = ForeignKey(
         Organisation,
         on_delete=CASCADE,

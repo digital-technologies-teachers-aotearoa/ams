@@ -13,6 +13,43 @@ class MembershipOptionAdmin(admin.ModelAdmin):
     search_fields = ("name",)
     list_filter = ("type", "archived")
 
+    def get_fieldsets(self, request, obj=None):
+        return (
+            (
+                None,
+                {
+                    "fields": ("name",),
+                },
+            ),
+            (
+                "Properties",
+                {
+                    "fields": (
+                        "type",
+                        "duration_display" if obj else "duration",
+                        "cost",
+                        "max_seats",
+                    ),
+                    "description": "Note: These values are read only after creation.",
+                },
+            ),
+            (
+                "Billing",
+                {
+                    "fields": ("invoice_reference",),
+                },
+            ),
+        )
+
+    def get_readonly_fields(self, request, obj=None):
+        """Fields are read only on updates only."""
+        if obj:
+            return (*tuple(MembershipOption.IMMUTABLE_FIELDS), "duration_display")
+        return ()
+
+    def duration_display(self, obj):
+        return obj.duration_display
+
 
 @admin.register(IndividualMembership)
 class IndividualMembershipAdmin(admin.ModelAdmin):
