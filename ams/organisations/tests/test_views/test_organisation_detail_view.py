@@ -46,7 +46,7 @@ class TestOrganisationDetailView:
 
         assert response.status_code == HTTPStatus.OK
         assert response.context["active_membership"] == active_membership
-        assert response.context["seat_limit"] == int(
+        assert response.context["membership_seat_limit"] == int(
             active_membership.membership_option.max_seats,
         )
         assert response.context["occupied_seats"] == active_membership.occupied_seats
@@ -76,7 +76,7 @@ class TestOrganisationDetailView:
 
         assert response.status_code == HTTPStatus.OK
         assert response.context["active_membership"] is None
-        assert response.context["seat_limit"] is None
+        assert response.context["membership_seat_limit"] is None
         assert response.context["occupied_seats"] == 0
 
     def test_future_membership_not_active(self, user: User, client):
@@ -104,7 +104,7 @@ class TestOrganisationDetailView:
 
         assert response.status_code == HTTPStatus.OK
         assert response.context["active_membership"] is None
-        assert response.context["seat_limit"] is None
+        assert response.context["membership_seat_limit"] is None
         assert response.context["occupied_seats"] == 0
 
     def test_cancelled_membership_not_active(self, user: User, client):
@@ -132,7 +132,7 @@ class TestOrganisationDetailView:
 
         assert response.status_code == HTTPStatus.OK
         assert response.context["active_membership"] is None
-        assert response.context["seat_limit"] is None
+        assert response.context["membership_seat_limit"] is None
         assert response.context["occupied_seats"] == 0
 
     def test_multiple_memberships_only_active_shown(self, user: User, client):
@@ -178,7 +178,7 @@ class TestOrganisationDetailView:
 
         assert response.status_code == HTTPStatus.OK
         assert response.context["active_membership"] == active_membership
-        assert response.context["seat_limit"] == int(
+        assert response.context["membership_seat_limit"] == int(
             active_membership.membership_option.max_seats,
         )
         assert response.context["occupied_seats"] == active_membership.occupied_seats
@@ -199,7 +199,7 @@ class TestOrganisationDetailView:
 
         assert response.status_code == HTTPStatus.OK
         assert response.context["active_membership"] is None
-        assert response.context["seat_limit"] is None
+        assert response.context["membership_seat_limit"] is None
         assert response.context["occupied_seats"] == 0
 
     def test_membership_starting_today(self, user: User, client):

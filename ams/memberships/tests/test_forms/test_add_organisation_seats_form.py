@@ -23,13 +23,14 @@ class TestAddOrganisationSeatsForm:
             organisation=True,
             cost=Decimal("1000.00"),
             duration={"years": 1},
+            max_seats=None,  # Unlimited seats to allow adding
         )
         membership = OrganisationMembershipFactory(
             organisation=organisation,
             membership_option=membership_option,
             start_date=timezone.localdate(),
             approved=True,
-            max_seats=10,
+            seats=10,
         )
 
         form = AddOrganisationSeatsForm(
@@ -120,7 +121,7 @@ class TestAddOrganisationSeatsForm:
 
     @patch("ams.memberships.forms.get_billing_service")
     def test_form_saves_updates_max_seats(self, mock_get_billing_service):
-        """Test save() method updates max_seats on membership."""
+        """Test save() method updates seats on membership."""
         # Mock billing service to return None (no billing configured)
         mock_get_billing_service.return_value = None
 
@@ -129,16 +130,17 @@ class TestAddOrganisationSeatsForm:
             organisation=True,
             cost=Decimal("0.00"),  # Free membership, no invoice needed
             duration={"years": 1},
+            max_seats=None,  # Unlimited seats to allow adding
         )
         membership = OrganisationMembershipFactory(
             organisation=organisation,
             membership_option=membership_option,
             start_date=timezone.localdate(),
             approved=True,
-            max_seats=10,
+            seats=10,
         )
 
-        initial_seats = membership.max_seats
+        initial_seats = membership.seats
 
         form = AddOrganisationSeatsForm(
             organisation=organisation,
@@ -152,7 +154,7 @@ class TestAddOrganisationSeatsForm:
         # Refresh from database
         membership.refresh_from_db()
 
-        assert membership.max_seats == initial_seats + Decimal("5")
+        assert membership.seats == initial_seats + Decimal("5")
         assert saved_membership.pk == membership.pk
 
     @patch("ams.memberships.forms.get_billing_service")
@@ -170,13 +172,14 @@ class TestAddOrganisationSeatsForm:
             organisation=True,
             cost=Decimal("1000.00"),
             duration={"years": 1},
+            max_seats=None,  # Unlimited seats to allow adding
         )
         membership = OrganisationMembershipFactory(
             organisation=organisation,
             membership_option=membership_option,
             start_date=timezone.localdate(),
             approved=True,
-            max_seats=10,
+            seats=10,
         )
 
         form = AddOrganisationSeatsForm(
