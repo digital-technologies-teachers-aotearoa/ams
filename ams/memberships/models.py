@@ -95,8 +95,8 @@ class BaseMembership(Model):
     start_date = DateField()
     expiry_date = DateField()
     created_datetime = DateTimeField()
-    approved_datetime = DateTimeField(null=True)
-    cancelled_datetime = DateTimeField(null=True)
+    approved_datetime = DateTimeField(null=True, blank=True)
+    cancelled_datetime = DateTimeField(null=True, blank=True)
 
     class Meta:
         abstract = True
