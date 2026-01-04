@@ -138,6 +138,20 @@ class BaseMembership(Model):
             return str(self.status())
 
 
+class IndividualMembershipQuerySet(QuerySet):
+    """Custom queryset for IndividualMembership model."""
+
+    def active(self):
+        """Return only active memberships."""
+        today = timezone.localdate()
+        return self.filter(
+            approved_datetime__isnull=False,
+            cancelled_datetime__isnull=True,
+            start_date__lte=today,
+            expiry_date__gt=today,
+        )
+
+
 class IndividualMembership(BaseMembership):
     user = ForeignKey(
         User,
@@ -157,6 +171,8 @@ class IndividualMembership(BaseMembership):
         related_name="individual_memberships",
     )
 
+    objects = IndividualMembershipQuerySet.as_manager()
+
     class Meta:
         verbose_name = "Membership: Individual"
         verbose_name_plural = "Membership: Individual"
@@ -172,6 +188,7 @@ class OrganisationMembershipQuerySet(QuerySet):
     def active(self):
         today = timezone.localdate()
         return self.filter(
+            approved_datetime__isnull=False,
             cancelled_datetime__isnull=True,
             start_date__lte=today,
             expiry_date__gt=today,

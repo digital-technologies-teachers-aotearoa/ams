@@ -71,3 +71,19 @@ def invalidate_organisation_member_cache(sender, instance, **kwargs):
     if instance.user_id:
         cache_key = f"user_has_active_membership_{instance.user_id}"
         cache.delete(cache_key)
+
+
+@receiver(post_save, sender=OrganisationMember)
+@receiver(post_delete, sender=OrganisationMember)
+def invalidate_organisation_admin_cache(sender, instance, **kwargs):
+    """
+    Invalidate organisation admin cache when member role changes.
+
+    Ensures cache is fresh when:
+    - Member promoted/demoted to/from admin
+    - Member leaves organisation
+    - Member status changes (declined/revoked)
+    """
+    if instance.user_id and instance.organisation_id:
+        cache_key = f"user_is_org_admin_{instance.user_id}_{instance.organisation_id}"
+        cache.delete(cache_key)

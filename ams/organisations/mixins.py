@@ -1,5 +1,6 @@
 """View mixins for organisation permission checking."""
 
+from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
 from django.utils.translation import gettext_lazy as _
 
@@ -9,6 +10,9 @@ from ams.organisations.models import OrganisationMember
 def user_is_organisation_admin(user, organisation):
     """Check if a user is an admin of the given organisation.
 
+    Uses 5-minute caching to reduce database queries for repeated checks.
+    Cache is automatically invalidated when member role changes.
+
     Args:
         user: The user to check permissions for.
         organisation: The organisation to check admin status against.
@@ -16,13 +20,31 @@ def user_is_organisation_admin(user, organisation):
     Returns:
         bool: True if user is an admin of the organisation, False otherwise.
     """
+    # Fast-path for unauthenticated users (no caching needed)
     if not user.is_authenticated:
         return False
-    return OrganisationMember.objects.filter(
+
+    # Fast-path for superusers (no caching needed)
+    if user.is_superuser:
+        return True
+
+    # Check cache first
+    cache_key = f"user_is_org_admin_{user.id}_{organisation.id}"
+    cached_result = cache.get(cache_key)
+    if cached_result is not None:
+        return cached_result
+
+    # Query database
+    is_admin = OrganisationMember.objects.filter(
         organisation=organisation,
         user=user,
         role=OrganisationMember.Role.ADMIN,
     ).exists()
+
+    # Cache for 5 minutes (300 seconds)
+    cache.set(cache_key, is_admin, 300)
+
+    return is_admin
 
 
 class OrganisationAdminMixin:

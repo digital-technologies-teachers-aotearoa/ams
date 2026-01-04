@@ -58,10 +58,10 @@ class TestAcceptOrganisationInviteView:
             membership_option=membership_option,
             start_date=timezone.now().date(),
             expiry_date=timezone.now().date() + timedelta(days=365),
+            approved=True,
         )
 
         # Fill both seats
-
         OrganisationMemberFactory(
             organisation=org,
             user=UserFactory(),

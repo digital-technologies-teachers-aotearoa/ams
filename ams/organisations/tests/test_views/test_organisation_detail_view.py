@@ -36,7 +36,7 @@ class TestOrganisationDetailView:
             organisation=org,
             start_date=timezone.localdate() - timedelta(days=30),
             expiry_date=timezone.localdate() + timedelta(days=335),
-            cancelled_datetime=None,
+            approved=True,
             membership_option__type=MembershipOptionType.ORGANISATION,
             membership_option__max_seats=10,
         )
@@ -137,7 +137,6 @@ class TestOrganisationDetailView:
 
     def test_multiple_memberships_only_active_shown(self, user: User, client):
         """Test that only the active membership is shown when multiple exist."""
-
         org = OrganisationFactory()
         OrganisationMemberFactory(
             organisation=org,
@@ -152,7 +151,7 @@ class TestOrganisationDetailView:
             organisation=org,
             start_date=timezone.localdate() - timedelta(days=730),
             expiry_date=timezone.localdate() - timedelta(days=365),
-            cancelled_datetime=None,
+            approved=True,
         )
 
         # Create active membership
@@ -160,7 +159,7 @@ class TestOrganisationDetailView:
             organisation=org,
             start_date=timezone.localdate() - timedelta(days=30),
             expiry_date=timezone.localdate() + timedelta(days=335),
-            cancelled_datetime=None,
+            approved=True,
             membership_option__type=MembershipOptionType.ORGANISATION,
             membership_option__max_seats=10,
         )
@@ -170,6 +169,7 @@ class TestOrganisationDetailView:
             organisation=org,
             start_date=timezone.localdate() + timedelta(days=335),
             expiry_date=timezone.localdate() + timedelta(days=700),
+            approved=True,
             cancelled_datetime=None,
         )
 
@@ -204,7 +204,6 @@ class TestOrganisationDetailView:
 
     def test_membership_starting_today(self, user: User, client):
         """Test that a membership starting today is considered active."""
-
         org = OrganisationFactory()
         OrganisationMemberFactory(
             organisation=org,
@@ -219,7 +218,7 @@ class TestOrganisationDetailView:
             organisation=org,
             start_date=timezone.localdate(),
             expiry_date=timezone.localdate() + timedelta(days=365),
-            cancelled_datetime=None,
+            approved=True,
         )
 
         url = reverse("organisations:detail", kwargs={"uuid": org.uuid})
@@ -230,7 +229,6 @@ class TestOrganisationDetailView:
 
     def test_membership_expiring_tomorrow(self, user: User, client):
         """Test that a membership expiring tomorrow is considered active."""
-
         org = OrganisationFactory()
         OrganisationMemberFactory(
             organisation=org,
@@ -245,7 +243,7 @@ class TestOrganisationDetailView:
             organisation=org,
             start_date=timezone.localdate() - timedelta(days=365),
             expiry_date=timezone.localdate() + timedelta(days=1),
-            cancelled_datetime=None,
+            approved=True,
         )
 
         url = reverse("organisations:detail", kwargs={"uuid": org.uuid})

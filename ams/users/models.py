@@ -10,6 +10,7 @@ from django.db.models import EmailField
 from django.db.models import ImageField
 from django.db.models import UUIDField
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill
@@ -97,3 +98,35 @@ class User(AbstractUser):
 
         """
         return reverse("users:detail", kwargs={"username": self.username})
+
+    def has_active_individual_membership(self) -> bool:
+        """Check if user has an active individual membership."""
+        return self.individual_memberships.active().exists()
+
+    def has_active_organisation_membership(self) -> bool:
+        """Check if user is member of org with active membership."""
+        return self.organisation_members.filter(
+            accepted_datetime__isnull=False,
+            declined_datetime__isnull=True,
+            user__is_active=True,
+            organisation__is_active=True,
+            organisation__organisation_memberships__cancelled_datetime__isnull=True,
+            organisation__organisation_memberships__start_date__lte=timezone.localdate(),
+            organisation__organisation_memberships__expiry_date__gt=timezone.localdate(),
+        ).exists()
+
+    def check_has_active_membership_core(self) -> bool:
+        """
+        Core logic to check if user has an active membership.
+
+        Checks for:
+        - Active individual membership OR
+        - Active membership in any organization the user belongs to
+
+        Returns:
+            bool: True if user has active membership, False otherwise
+        """
+        return (
+            self.has_active_individual_membership()
+            or self.has_active_organisation_membership()
+        )

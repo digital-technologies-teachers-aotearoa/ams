@@ -2,9 +2,7 @@
 
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
-from django.utils import timezone
 
-from ams.memberships.models import MembershipStatus
 from ams.organisations.models import Organisation
 
 User = get_user_model()
@@ -13,6 +11,11 @@ User = get_user_model()
 def _check_user_membership_core(user: User) -> bool:
     """
     Core logic to check if a user has an active membership.
+
+    This is now a thin wrapper that delegates to the User model.
+    Kept as a function for backward compatibility and to maintain
+    the separation between caching strategy (this file) and
+    business logic (User model).
 
     This internal function contains the shared business logic without any caching.
     It assumes the user is authenticated and is NOT a superuser.
@@ -29,23 +32,7 @@ def _check_user_membership_core(user: User) -> bool:
         bool: True if user has active individual or organization membership,
               False otherwise
     """
-    # Check for active individual membership
-    if any(
-        m.status() == MembershipStatus.ACTIVE for m in user.individual_memberships.all()
-    ):
-        return True
-
-    # Check if user is an active member of any organization with an active membership
-    # This uses a single database query with joins instead of N+1 queries
-    return user.organisation_members.filter(
-        accepted_datetime__isnull=False,
-        declined_datetime__isnull=True,
-        user__is_active=True,
-        organisation__is_active=True,
-        organisation__organisation_memberships__cancelled_datetime__isnull=True,
-        organisation__organisation_memberships__start_date__lte=timezone.localdate(),
-        organisation__organisation_memberships__expiry_date__gte=timezone.localdate(),
-    ).exists()
+    return user.check_has_active_membership_core()
 
 
 def user_has_active_membership(user: User) -> bool:
@@ -137,10 +124,13 @@ def organisation_has_active_membership(organisation: Organisation) -> bool:
     """
     Check if an organisation has an active membership.
 
+    This is a thin wrapper that delegates to the Organisation model.
+    Kept as a function for backward compatibility.
+
     An organisation membership is considered active if:
     - It has not been cancelled
     - The start date is today or in the past
-    - The expiry date is today or in the future
+    - The expiry date is in the future (memberships expire at midnight)
 
     This function does not use caching as it's typically called as part of
     user permission checks which are already cached.
@@ -151,4 +141,4 @@ def organisation_has_active_membership(organisation: Organisation) -> bool:
     Returns:
         bool: True if organisation has an active membership, False otherwise
     """
-    return organisation.organisation_memberships.active().exists()
+    return organisation.has_active_membership

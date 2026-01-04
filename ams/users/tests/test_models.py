@@ -5,11 +5,16 @@ import pytest
 from django.core.exceptions import ValidationError
 from django.core.files.storage import storages
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.utils import timezone
 from imagekit.models import ImageSpecField
 
+from ams.memberships.tests.factories import IndividualMembershipFactory
+from ams.memberships.tests.factories import OrganisationMembershipFactory
+from ams.organisations.tests.factories import OrganisationMemberFactory
 from ams.users.models import User
 from ams.users.models import user_profile_picture_path
 from ams.users.models import username_validator
+from ams.users.tests.factories import UserFactory
 
 
 def test_user_get_absolute_url(user: User):
@@ -410,3 +415,131 @@ class TestUserProfilePictureField:
         # UUID should remain the same
         user.refresh_from_db()
         assert user.uuid == original_uuid
+
+
+@pytest.mark.django_db
+class TestUserMembershipMethods:
+    """Test User model membership checking methods."""
+
+    def test_has_active_individual_membership_returns_true(self):
+        """Test returns True when user has active individual membership."""
+        membership = IndividualMembershipFactory(active=True)
+        user = membership.user
+
+        assert user.has_active_individual_membership() is True
+
+    def test_has_active_individual_membership_returns_false(self):
+        """Test returns False when no active individual membership."""
+        user = UserFactory()
+
+        assert user.has_active_individual_membership() is False
+
+    def test_has_active_individual_membership_excludes_expired(self):
+        """Test returns False when only expired individual membership exists."""
+        membership = IndividualMembershipFactory(expired=True)
+        user = membership.user
+
+        assert user.has_active_individual_membership() is False
+
+    def test_has_active_individual_membership_excludes_cancelled(self):
+        """Test returns False when individual membership is cancelled."""
+        membership = IndividualMembershipFactory(cancelled=True)
+        user = membership.user
+
+        assert user.has_active_individual_membership() is False
+
+    def test_has_active_organisation_membership_returns_true(self):
+        """Test returns True when user is in org with active membership."""
+        # Create org with active membership
+        org_membership = OrganisationMembershipFactory(active=True)
+        org = org_membership.organisation
+
+        # Create user as member of that org
+        org_member = OrganisationMemberFactory(
+            organisation=org,
+            accepted_datetime=timezone.now(),
+        )
+        user = org_member.user
+
+        assert user.has_active_organisation_membership() is True
+
+    def test_has_active_organisation_membership_returns_false(self):
+        """Test returns False when not in org with active membership."""
+        user = UserFactory()
+
+        assert user.has_active_organisation_membership() is False
+
+    def test_has_active_organisation_membership_excludes_expired_org(self):
+        """Test returns False when org membership is expired."""
+        # Create org with expired membership
+        org_membership = OrganisationMembershipFactory(expired=True)
+        org = org_membership.organisation
+
+        # Create user as member of that org
+        org_member = OrganisationMemberFactory(
+            organisation=org,
+            accepted_datetime=timezone.now(),
+        )
+        user = org_member.user
+
+        assert user.has_active_organisation_membership() is False
+
+    def test_has_active_organisation_membership_excludes_unaccepted_member(self):
+        """Test returns False when user hasn't accepted org membership."""
+        # Create org with active membership
+        org_membership = OrganisationMembershipFactory(active=True)
+        org = org_membership.organisation
+
+        # Create user as unaccepted member of that org
+        org_member = OrganisationMemberFactory(
+            organisation=org,
+            accepted_datetime=None,
+        )
+        user = org_member.user
+
+        assert user.has_active_organisation_membership() is False
+
+    def test_check_has_active_membership_core_individual(self):
+        """Test core check returns True for individual membership."""
+        membership = IndividualMembershipFactory(active=True)
+        user = membership.user
+
+        assert user.check_has_active_membership_core() is True
+
+    def test_check_has_active_membership_core_organisation(self):
+        """Test core check returns True for org membership."""
+        # Create org with active membership
+        org_membership = OrganisationMembershipFactory(active=True)
+        org = org_membership.organisation
+
+        # Create user as member of that org
+        org_member = OrganisationMemberFactory(
+            organisation=org,
+            accepted_datetime=timezone.now(),
+        )
+        user = org_member.user
+
+        assert user.check_has_active_membership_core() is True
+
+    def test_check_has_active_membership_core_both(self):
+        """Test core check returns True when has both types."""
+        # Create user with individual membership
+        individual_membership = IndividualMembershipFactory(active=True)
+        user = individual_membership.user
+
+        # Also add org membership for the same user
+        org_membership = OrganisationMembershipFactory(active=True)
+        org = org_membership.organisation
+        OrganisationMemberFactory(
+            user=user,
+            organisation=org,
+            accepted_datetime=timezone.now(),
+        )
+
+        assert user.check_has_active_membership_core() is True
+
+    def test_check_has_active_membership_core_none(self):
+        """Test core check returns False when no memberships."""
+        user = UserFactory()
+
+        assert user.check_has_active_membership_core() is False
