@@ -56,6 +56,10 @@ class MembershipOption(Model):
             "Maximum number of seats for organisation memberships (optional limit)",
         ),
     )
+    voting_rights = BooleanField(
+        default=True,
+        help_text="Allow to vote in association matters.",
+    )
     archived = BooleanField(
         default=False,
         help_text=_("Mark as archived to prevent new signups"),
