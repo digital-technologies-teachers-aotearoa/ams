@@ -173,16 +173,16 @@ class OrganisationDetailView(
 
         if active_membership:
             context["active_membership"] = active_membership
-            context["seat_limit"] = (
-                int(active_membership.max_seats)
-                if active_membership.max_seats
-                else None
-            )
+            context["seats"] = int(active_membership.seats)
             context["occupied_seats"] = active_membership.occupied_seats
+            context["membership_seat_limit"] = (
+                active_membership.membership_option.max_seats
+            )
         else:
             context["active_membership"] = None
-            context["seat_limit"] = None
+            context["seats"] = None
             context["occupied_seats"] = 0
+            context["membership_seat_limit"] = None
 
         return context
 

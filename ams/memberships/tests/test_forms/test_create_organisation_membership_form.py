@@ -227,7 +227,7 @@ class TestCreateOrganisationMembershipForm:
         assert membership.organisation == org
         assert membership.membership_option == option
         assert membership.start_date == timezone.localdate()
-        assert membership.max_seats == 5  # noqa: PLR2004
+        assert membership.seats == 5  # noqa: PLR2004
         assert membership.expiry_date == membership.calculate_expiry_date()
         assert membership.created_datetime is not None
 

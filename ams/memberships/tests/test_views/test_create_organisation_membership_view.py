@@ -51,9 +51,10 @@ class TestCreateOrganisationMembershipView:
         assert f"/organisations/{org.uuid}/" in response.url
 
         # Membership should be created
+        expected_seats = 5
         membership = OrganisationMembership.objects.get(organisation=org)
         assert membership.membership_option == option
-        assert membership.max_seats == 5  # noqa: PLR2004
+        assert membership.seats == expected_seats
         assert membership.start_date == timezone.localdate()
 
     def test_add_membership_as_staff(self, admin_user: User, client):
@@ -80,9 +81,10 @@ class TestCreateOrganisationMembershipView:
         assert f"/organisations/{org.uuid}/" in response.url
 
         # Membership should be created
+        expected_seats = 5
         membership = OrganisationMembership.objects.get(organisation=org)
         assert membership.membership_option == option
-        assert membership.max_seats == 5  # noqa: PLR2004
+        assert membership.seats == expected_seats
 
     def test_add_membership_not_org_admin(self, user: User, client):
         """Test that non-admin members cannot add memberships."""

@@ -165,7 +165,7 @@ class OrganisationMembershipTable(Table):
     )
     seats = Column(
         verbose_name="Seats",
-        empty_values=(),
+        accessor="seats_summary",
         orderable=False,
     )
     invoice = TemplateColumn(
@@ -186,9 +186,3 @@ class OrganisationMembershipTable(Table):
             "invoice",
         )
         order_by = ("-start_date",)
-
-    def render_seats(self, record):
-        """Render seats occupied vs limit."""
-        if record.max_seats:
-            return f"{record.occupied_seats} / {int(record.max_seats)}"
-        return f"{record.occupied_seats} (Unlimited)"

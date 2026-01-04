@@ -196,15 +196,12 @@ class OrganisationMembership(BaseMembership):
         blank=True,
         related_name="organisation_memberships",
     )
-    max_seats = DecimalField(
+    seats = DecimalField(
         max_digits=10,
         decimal_places=0,
-        null=True,
-        blank=True,
         help_text=_(
-            "Number of seats for this membership instance. "
-            "Copied from membership option at creation and can "
-            "be increased via seat top-ups.",
+            "Number of seats allocated to this membership. "
+            "Cannot exceed the membership option's max_seats limit if set.",
         ),
     )
 
@@ -240,7 +237,7 @@ class OrganisationMembership(BaseMembership):
     @property
     def has_seat_limit(self) -> bool:
         """Check if this membership has a seat limit configured."""
-        return bool(self.max_seats)
+        return bool(self.membership_option.max_seats)
 
     @property
     def seats_available(self) -> int | None:
@@ -249,17 +246,22 @@ class OrganisationMembership(BaseMembership):
 
         Returns:
             int: Number of available seats (0 if full)
-            None: If no seat limit configured
         """
-        if not self.has_seat_limit:
-            return None
-
-        max_seats = int(self.max_seats)
-        return max(0, max_seats - self.occupied_seats)
+        return max(0, int(self.seats) - self.occupied_seats)
 
     @property
     def is_full(self) -> bool:
         """Check if all membership seats are occupied."""
-        if not self.has_seat_limit:
-            return False
-        return self.occupied_seats >= int(self.max_seats)
+        return self.occupied_seats >= int(self.seats)
+
+    def seats_summary(self) -> str:
+        """Return summary of seat status."""
+        base = f"Occupied: {self.occupied_seats} / {self.seats}"
+        if self.membership_option.max_seats:
+            max_seats = self.membership_option.max_seats
+            if max_seats == 1:
+                limit = f"Membership has limit of {max_seats} seat"
+            else:
+                limit = f"Membership has limit of {max_seats} seats"
+            return f"{base} ({limit})"
+        return base

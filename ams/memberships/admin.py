@@ -59,25 +59,31 @@ class OrganisationMembershipAdmin(admin.ModelAdmin):
         "organisation",
         "membership_option",
         "status",
-        "occupied_seats_display",
+        "occupied_seats",
+        "seats",
         "start_date",
         "expiry_date",
-        "approved_datetime",
         "invoice",
     )
     search_fields = ("organisation__name", "membership_option__name")
-    list_filter = ("membership_option", "start_date")
+    list_filter = ("start_date",)
     autocomplete_fields = ["organisation", "membership_option", "invoice"]
-    readonly_fields = ("organisation", "status")
+    readonly_fields = (
+        "organisation",
+        "status",
+        "occupied_seats",
+    )
 
     fields = (
         "organisation",
         "membership_option",
+        "status",
+        "occupied_seats",
+        "seats",
         "start_date",
         "expiry_date",
         "approved_datetime",
         "invoice",
-        "status",
     )
 
     @admin.display(
@@ -85,13 +91,3 @@ class OrganisationMembershipAdmin(admin.ModelAdmin):
     )
     def status(self, obj):
         return obj.get_status_display()
-
-    @admin.display(
-        description="Occupied Seats",
-    )
-    def occupied_seats_display(self, obj):
-        max_seats = obj.membership_option.max_seats
-        occupied = obj.occupied_seats
-        if max_seats:
-            return f"{occupied}/{int(max_seats)}"
-        return str(occupied)

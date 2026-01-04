@@ -424,8 +424,8 @@ class CreateOrganisationMembershipForm(ModelForm):
         # Get seat count from cleaned data
         seat_count = self.cleaned_data.get("seat_count", 1)
 
-        # Set max_seats on the membership instance
-        instance.max_seats = seat_count
+        # Set seats on the membership instance
+        instance.seats = seat_count
 
         membership_option = instance.membership_option
 
@@ -563,6 +563,28 @@ class AddOrganisationSeatsForm(Form):
                 code="membership_expiring",
             )
 
+        # Check if adding seats would exceed the membership option's max_seats limit
+        membership_option = self.active_membership.membership_option
+        if membership_option.max_seats:
+            current_seats = self.active_membership.seats or 0
+            new_total = current_seats + seats_to_add
+            max_allowed = int(membership_option.max_seats)
+
+            if new_total > max_allowed:
+                raise ValidationError(
+                    _(
+                        "Cannot add %(add)d seat(s). This would exceed the maximum "
+                        "limit of %(max)d seats for this membership option. "
+                        "Current seats: %(current)d.",
+                    )
+                    % {
+                        "add": seats_to_add,
+                        "max": max_allowed,
+                        "current": int(current_seats),
+                    },
+                    code="exceeds_max_seats",
+                )
+
         return seats_to_add
 
     def calculate_prorata_cost(self, seats_to_add):
@@ -670,16 +692,16 @@ class AddOrganisationSeatsForm(Form):
                         ),
                     ) from e
 
-        # Update max_seats immediately (within transaction)
+        # Update seats immediately (within transaction)
         with transaction.atomic():
-            old_max_seats = membership.max_seats
-            membership.max_seats = old_max_seats + Decimal(seats_to_add)
-            membership.save(update_fields=["max_seats"])
+            old_seats = membership.seats
+            membership.seats = old_seats + Decimal(seats_to_add)
+            membership.save(update_fields=["seats"])
 
             logger.info(
-                "Updated max_seats from %s to %s for membership %s (organisation %s)",
-                old_max_seats,
-                membership.max_seats,
+                "Updated seats from %s to %s for membership %s (organisation %s)",
+                old_seats,
+                membership.seats,
                 membership.pk,
                 self.organisation.uuid,
             )

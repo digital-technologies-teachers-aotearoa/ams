@@ -152,7 +152,7 @@ class CreateOrganisationMembershipView(
                 "%(seats)s seats available until %(expiry)s.",
             )
             % {
-                "seats": membership.max_seats,
+                "seats": membership.seats,
                 "expiry": membership.expiry_date.strftime("%d/%m/%Y"),
             },
         )
@@ -238,7 +238,7 @@ class AddOrganisationSeatsView(
 
         # Add seat information for display
         if self.active_membership:
-            context["current_seats"] = self.active_membership.max_seats
+            context["current_seats"] = self.active_membership.seats
             context["occupied_seats"] = self.active_membership.occupied_seats
             context["seats_available"] = self.active_membership.seats_available
 
@@ -276,7 +276,7 @@ class AddOrganisationSeatsView(
             )
             % {
                 "seats": seats_added,
-                "total": membership.max_seats,
+                "total": membership.seats,
             },
         )
 

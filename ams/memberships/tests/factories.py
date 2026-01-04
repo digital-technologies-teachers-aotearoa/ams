@@ -103,7 +103,7 @@ class OrganisationMembershipFactory(DjangoModelFactory[OrganisationMembership]):
     approved_datetime = None
     cancelled_datetime = None
     expiry_date = LazyAttribute(lambda o: o.start_date + o.membership_option.duration)
-    max_seats = LazyAttribute(lambda o: o.membership_option.max_seats)
+    seats = 1
 
     class Params:
         approved = Trait(approved_datetime=LazyFunction(timezone.now))

@@ -41,13 +41,7 @@
         {% if active_membership %}
           <div class="alert alert-info mb-4">
             <h5>{% trans "Membership Seats" %}</h5>
-            <p class="mb-0">
-              {% if seat_limit %}
-                {% blocktrans with occupied=occupied_seats limit=seat_limit %}Occupied: {{ occupied }} / {{ limit }}{% endblocktrans %}
-              {% else %}
-                {% blocktrans with occupied=occupied_seats %}Occupied: {{ occupied }} (Unlimited){% endblocktrans %}
-              {% endif %}
-            </p>
+            <p class="mb-0">{{ active_membership.seats_summary }}</p>
           </div>
         {% else %}
           <div class="alert alert-warning mb-4">

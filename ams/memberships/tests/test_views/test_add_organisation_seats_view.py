@@ -101,7 +101,7 @@ class TestAddOrganisationSeatsView:
             membership_option=membership_option,
             start_date=timezone.localdate(),
             approved=True,
-            max_seats=10,
+            seats=10,
         )
         client.force_login(user)
         url = reverse("memberships:add_seats", kwargs={"uuid": org.uuid})
@@ -125,13 +125,14 @@ class TestAddOrganisationSeatsView:
             organisation=True,
             cost=Decimal("0.00"),
             duration={"years": 1},
+            max_seats=None,  # Unlimited seats to allow adding
         )
         membership = OrganisationMembershipFactory(
             organisation=org,
             membership_option=membership_option,
             start_date=timezone.localdate(),
             approved=True,
-            max_seats=10,
+            seats=10,
         )
         client.force_login(user)
         url = reverse("memberships:add_seats", kwargs={"uuid": org.uuid})
@@ -139,7 +140,7 @@ class TestAddOrganisationSeatsView:
         response = client.post(url, data=data)
         assert response.status_code == HTTPStatus.FOUND
         membership.refresh_from_db()
-        assert membership.max_seats == Decimal("15")
+        assert membership.seats == Decimal("15")
 
     @patch("ams.memberships.forms.get_billing_service")
     def test_post_valid_creates_invoice(
@@ -164,13 +165,14 @@ class TestAddOrganisationSeatsView:
             organisation=True,
             cost=Decimal("1000.00"),
             duration={"years": 1},
+            max_seats=None,  # Unlimited seats to allow adding
         )
         OrganisationMembershipFactory(
             organisation=org,
             membership_option=membership_option,
             start_date=timezone.localdate(),
             approved=True,
-            max_seats=10,
+            seats=10,
         )
         client.force_login(user)
         url = reverse("memberships:add_seats", kwargs={"uuid": org.uuid})
@@ -200,13 +202,14 @@ class TestAddOrganisationSeatsView:
             organisation=True,
             cost=Decimal("0.00"),
             duration={"years": 1},
+            max_seats=None,  # Unlimited seats to allow adding
         )
         OrganisationMembershipFactory(
             organisation=org,
             membership_option=membership_option,
             start_date=timezone.localdate(),
             approved=True,
-            max_seats=10,
+            seats=10,
         )
         client.force_login(user)
         url = reverse("memberships:add_seats", kwargs={"uuid": org.uuid})
@@ -254,19 +257,21 @@ class TestAddOrganisationSeatsView:
             organisation=True,
             cost=Decimal("1000.00"),
             duration={"years": 1},
+            max_seats=None,  # Unlimited seats
         )
         membership = OrganisationMembershipFactory(
             organisation=org,
             membership_option=membership_option,
             start_date=timezone.localdate(),
             approved=True,
-            max_seats=10,
+            seats=10,
         )
         client.force_login(user)
         url = reverse("memberships:add_seats", kwargs={"uuid": org.uuid})
         response = client.get(url)
         assert response.status_code == HTTPStatus.OK
         assert "current_seats" in response.context
+        assert response.context["current_seats"] == membership.seats
         assert "occupied_seats" in response.context
-        assert "cost_per_seat" in response.context
-        assert response.context["current_seats"] == membership.max_seats
+        assert response.context["occupied_seats"] == membership.occupied_seats
+        assert "prorata_cost_per_seat" in response.context

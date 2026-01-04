@@ -158,7 +158,7 @@ class TestSendStaffOrganisationMembershipNotification:
         membership = OrganisationMembershipFactory(
             organisation=organisation,
             membership_option=membership_option,
-            max_seats=10,
+            seats=10,
             start_date=timezone.localdate(),
             expiry_date=timezone.localdate(),
         )
@@ -295,7 +295,7 @@ class TestSendStaffOrganisationSeatsAddedNotification:
         membership = OrganisationMembershipFactory(
             organisation=organisation,
             membership_option=membership_option,
-            max_seats=15,  # New total after adding 5 seats
+            seats=15,  # New total after adding 5 seats
             start_date=timezone.localdate(),
             expiry_date=timezone.localdate(),
         )
