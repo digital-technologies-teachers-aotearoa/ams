@@ -72,3 +72,88 @@ class TestIndividualMembership:
         status = membership.status()
         # Assert
         assert status == expected_status
+
+
+class TestIndividualMembershipQuerySet:
+    """Test IndividualMembershipQuerySet methods."""
+
+    def test_active_filters_cancelled_memberships(self):
+        """Test that cancelled memberships are excluded from active()."""
+        user = IndividualMembershipFactory().user
+        active_membership = IndividualMembershipFactory(
+            user=user,
+            active=True,
+        )
+        cancelled_membership = IndividualMembershipFactory(
+            user=user,
+            cancelled=True,
+        )
+
+        active_memberships = user.individual_memberships.active()
+
+        assert active_membership in active_memberships
+        assert cancelled_membership not in active_memberships
+
+    def test_active_filters_expired_memberships(self):
+        """Test that expired memberships are excluded from active()."""
+        user = IndividualMembershipFactory().user
+        active_membership = IndividualMembershipFactory(
+            user=user,
+            active=True,
+        )
+        expired_membership = IndividualMembershipFactory(
+            user=user,
+            expired=True,
+        )
+
+        active_memberships = user.individual_memberships.active()
+
+        assert active_membership in active_memberships
+        assert expired_membership not in active_memberships
+
+    def test_active_excludes_memberships_expiring_today(self):
+        """Test memberships expiring today are EXCLUDED (expire at midnight)."""
+        user = IndividualMembershipFactory().user
+        # Create membership expiring today (should be excluded with __gt)
+        today_expiry = IndividualMembershipFactory(
+            user=user,
+            start_date=timezone.localdate() - timedelta(days=30),
+            expiry_date=timezone.localdate(),
+            approved_datetime=timezone.now(),
+        )
+
+        active_memberships = user.individual_memberships.active()
+
+        assert today_expiry not in active_memberships
+
+    def test_active_filters_future_memberships(self):
+        """Test that future memberships are excluded from active()."""
+        user = IndividualMembershipFactory().user
+        active_membership = IndividualMembershipFactory(
+            user=user,
+            active=True,
+        )
+        future_membership = IndividualMembershipFactory(
+            user=user,
+            future=True,
+        )
+
+        active_memberships = user.individual_memberships.active()
+
+        assert active_membership in active_memberships
+        assert future_membership not in active_memberships
+
+    def test_active_includes_current_memberships(self):
+        """Test that current valid memberships are included."""
+        user = IndividualMembershipFactory().user
+        # Create membership: start <= today < expiry
+        current_membership = IndividualMembershipFactory(
+            user=user,
+            start_date=timezone.localdate() - timedelta(days=10),
+            expiry_date=timezone.localdate() + timedelta(days=10),
+            approved_datetime=timezone.now(),
+        )
+
+        active_memberships = user.individual_memberships.active()
+
+        assert current_membership in active_memberships

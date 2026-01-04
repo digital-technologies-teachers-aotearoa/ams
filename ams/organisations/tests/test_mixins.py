@@ -4,6 +4,7 @@ from http import HTTPStatus
 
 import pytest
 from django.contrib.auth.models import AnonymousUser
+from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
 from django.test import RequestFactory
 from django.utils import timezone
@@ -75,6 +76,139 @@ class TestUserIsOrganisationAdmin:
         )
 
         assert user_is_organisation_admin(user, org2) is False
+
+    def test_superuser_returns_true_without_cache(self):
+        """Test that superusers return True and bypass cache."""
+        org = OrganisationFactory()
+        user = UserFactory(is_superuser=True)
+
+        # Clear cache to ensure we're not relying on it
+        cache.clear()
+
+        # Superuser should return True without needing DB query or cache
+        assert user_is_organisation_admin(user, org) is True
+
+        # Verify no cache was set for superuser
+        cache_key = f"user_is_org_admin_{user.id}_{org.id}"
+        assert cache.get(cache_key) is None
+
+    def test_caches_result_for_admin(self):
+        """Test that admin check result is cached."""
+        org = OrganisationFactory()
+        user = UserFactory()
+        OrganisationMemberFactory(
+            organisation=org,
+            user=user,
+            role=OrganisationMember.Role.ADMIN,
+            accepted_datetime=timezone.now(),
+        )
+
+        cache.clear()
+
+        # First call should query DB and cache result
+        cache_key = f"user_is_org_admin_{user.id}_{org.id}"
+        assert cache.get(cache_key) is None
+
+        result = user_is_organisation_admin(user, org)
+
+        assert result is True
+        assert cache.get(cache_key) is True
+
+    def test_caches_result_for_non_admin(self):
+        """Test that non-admin check result is also cached."""
+        org = OrganisationFactory()
+        user = UserFactory()
+
+        cache.clear()
+
+        # First call should query DB and cache result
+        cache_key = f"user_is_org_admin_{user.id}_{org.id}"
+        assert cache.get(cache_key) is None
+
+        result = user_is_organisation_admin(user, org)
+
+        assert result is False
+        assert cache.get(cache_key) is False
+
+    def test_uses_cached_result_on_second_call(self):
+        """Test that second call uses cached result."""
+        org = OrganisationFactory()
+        user = UserFactory()
+        OrganisationMemberFactory(
+            organisation=org,
+            user=user,
+            role=OrganisationMember.Role.ADMIN,
+            accepted_datetime=timezone.now(),
+        )
+
+        cache.clear()
+        cache_key = f"user_is_org_admin_{user.id}_{org.id}"
+
+        # First call
+        result1 = user_is_organisation_admin(user, org)
+        assert result1 is True
+
+        # Manually set cache to False to verify second call uses cache
+        cache.set(cache_key, False, 300)  # noqa: FBT003
+
+        # Second call should return cached False (not DB True)
+        result2 = user_is_organisation_admin(user, org)
+        assert result2 is False
+
+    def test_cache_invalidated_on_member_role_change(self):
+        """Test cache is cleared when member role changes."""
+        org = OrganisationFactory()
+        user = UserFactory()
+        member = OrganisationMemberFactory(
+            organisation=org,
+            user=user,
+            role=OrganisationMember.Role.MEMBER,
+            accepted_datetime=timezone.now(),
+        )
+
+        cache.clear()
+        cache_key = f"user_is_org_admin_{user.id}_{org.id}"
+
+        # First call - should be False and cached
+        result1 = user_is_organisation_admin(user, org)
+        assert result1 is False
+        assert cache.get(cache_key) is False
+
+        # Change role to ADMIN (should trigger cache invalidation via signal)
+        member.role = OrganisationMember.Role.ADMIN
+        member.save()
+
+        # Cache should be cleared
+        assert cache.get(cache_key) is None
+
+        # Next call should query DB and get new result
+        result2 = user_is_organisation_admin(user, org)
+        assert result2 is True
+
+    def test_cache_invalidated_on_member_delete(self):
+        """Test cache is cleared when member is deleted."""
+        org = OrganisationFactory()
+        user = UserFactory()
+        member = OrganisationMemberFactory(
+            organisation=org,
+            user=user,
+            role=OrganisationMember.Role.ADMIN,
+            accepted_datetime=timezone.now(),
+        )
+
+        cache.clear()
+        cache_key = f"user_is_org_admin_{user.id}_{org.id}"
+
+        # First call - should be True and cached
+        result1 = user_is_organisation_admin(user, org)
+        assert result1 is True
+        assert cache.get(cache_key) is True
+
+        # Delete member (should trigger cache invalidation via signal)
+        member.delete()
+
+        # Cache should be cleared
+        assert cache.get(cache_key) is None
 
 
 @pytest.mark.django_db

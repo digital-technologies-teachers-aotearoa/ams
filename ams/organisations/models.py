@@ -15,6 +15,29 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 
+class OrganisationMemberQuerySet(QuerySet):
+    """Custom queryset for OrganisationMember model."""
+
+    def active(self):
+        """Return only active members (not declined or revoked)."""
+        return self.filter(
+            declined_datetime__isnull=True,
+            revoked_datetime__isnull=True,
+        )
+
+    def admins(self):
+        """Return only admin members."""
+        return self.filter(role="ADMIN")
+
+    def active_admins(self):
+        """Return only active admin members."""
+        return self.active().admins()
+
+    def for_organisation(self, organisation):
+        """Filter members by organisation."""
+        return self.filter(organisation=organisation)
+
+
 class OrganisationQuerySet(QuerySet):
     def active(self):
         return self.filter(is_active=True)
@@ -73,6 +96,23 @@ class Organisation(Model):
 
         super().save(*args, **kwargs)
 
+    def get_active_membership(self):
+        """Get the active membership with related option, or None."""
+        return (
+            self.organisation_memberships.active()
+            .select_related("membership_option")
+            .first()
+        )
+
+    def has_minimum_admin_count(self, minimum=1):
+        """Check if org has at least minimum number of active admins."""
+        return self.organisation_members.active_admins().count() >= minimum
+
+    @property
+    def has_active_membership(self) -> bool:
+        """Check if organisation has an active membership."""
+        return self.organisation_memberships.active().exists()
+
 
 class OrganisationMember(Model):
     class Role(TextChoices):
@@ -103,6 +143,8 @@ class OrganisationMember(Model):
         default=Role.MEMBER,
         help_text=_("Member role within the organisation"),
     )
+
+    objects = OrganisationMemberQuerySet.as_manager()
 
     class Meta:
         constraints = [

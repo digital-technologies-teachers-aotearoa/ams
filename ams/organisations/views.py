@@ -142,10 +142,7 @@ class OrganisationDetailView(
 
         # Get organisation members (exclude declined and revoked invites)
         members = (
-            organisation.organisation_members.filter(
-                declined_datetime__isnull=True,
-                revoked_datetime__isnull=True,
-            )
+            organisation.organisation_members.active()
             .select_related(
                 "user",
             )
@@ -233,11 +230,7 @@ class OrganisationInviteMemberView(
         email = form.cleaned_data["email"]
 
         # Check seat availability and add warning if needed
-        active_membership = (
-            self.organisation.organisation_memberships.active()
-            .select_related("membership_option")
-            .first()
-        )
+        active_membership = self.organisation.get_active_membership()
 
         if active_membership and active_membership.is_full:
             messages.warning(
@@ -354,11 +347,7 @@ def _validate_invite(member, request, action: str):  # noqa: PLR0911
 
     # Accept-specific validation
     if action == "accept":
-        active_membership = (
-            member.organisation.organisation_memberships.active()
-            .select_related("membership_option")
-            .first()
-        )
+        active_membership = member.organisation.get_active_membership()
 
         if active_membership and active_membership.is_full:
             return (
@@ -487,11 +476,9 @@ class RemoveOrganisationMemberView(LoginRequiredMixin, OrganisationAdminMixin, V
 
         # Get the member to remove
         member = get_object_or_404(
-            OrganisationMember,
+            OrganisationMember.objects.active(),
             uuid=member_uuid,
             organisation=organisation,
-            declined_datetime__isnull=True,
-            revoked_datetime__isnull=True,
         )
 
         # Prevent removing yourself through this action
@@ -502,14 +489,7 @@ class RemoveOrganisationMemberView(LoginRequiredMixin, OrganisationAdminMixin, V
 
         # If removing an admin, ensure at least one admin will remain
         if member.role == OrganisationMember.Role.ADMIN:
-            admin_count = OrganisationMember.objects.filter(
-                organisation=organisation,
-                role=OrganisationMember.Role.ADMIN,
-                declined_datetime__isnull=True,
-                revoked_datetime__isnull=True,
-            ).count()
-
-            if admin_count <= 1:
+            if not organisation.has_minimum_admin_count(minimum=2):
                 messages.error(
                     request,
                     _(
@@ -559,11 +539,9 @@ class MakeOrganisationAdminView(LoginRequiredMixin, OrganisationAdminMixin, View
 
         # Get the member to promote
         member = get_object_or_404(
-            OrganisationMember,
+            OrganisationMember.objects.active(),
             uuid=member_uuid,
             organisation=organisation,
-            declined_datetime__isnull=True,
-            revoked_datetime__isnull=True,
         )
 
         # Validate that the member is active (not a pending invite)
@@ -621,11 +599,9 @@ class RevokeOrganisationAdminView(LoginRequiredMixin, OrganisationAdminMixin, Vi
 
         # Get the member to demote
         member = get_object_or_404(
-            OrganisationMember,
+            OrganisationMember.objects.active(),
             uuid=member_uuid,
             organisation=organisation,
-            declined_datetime__isnull=True,
-            revoked_datetime__isnull=True,
         )
 
         # Prevent revoking yourself through this action
@@ -647,14 +623,7 @@ class RevokeOrganisationAdminView(LoginRequiredMixin, OrganisationAdminMixin, Vi
             )
 
         # Ensure at least one admin will remain
-        admin_count = OrganisationMember.objects.filter(
-            organisation=organisation,
-            role=OrganisationMember.Role.ADMIN,
-            declined_datetime__isnull=True,
-            revoked_datetime__isnull=True,
-        ).count()
-
-        if admin_count <= 1:
+        if not organisation.has_minimum_admin_count(minimum=2):
             messages.error(
                 request,
                 _(
@@ -698,25 +667,16 @@ class LeaveOrganisationView(LoginRequiredMixin, View):
 
         # Get the current user's membership
         try:
-            member = OrganisationMember.objects.get(
+            member = OrganisationMember.objects.active().get(
                 organisation=organisation,
                 user=request.user,
-                declined_datetime__isnull=True,
-                revoked_datetime__isnull=True,
             )
         except OrganisationMember.DoesNotExist:
             return HttpResponseBadRequest("You are not a member of this organisation.")
 
         # If user is an admin, ensure at least one admin will remain
         if member.role == OrganisationMember.Role.ADMIN:
-            admin_count = OrganisationMember.objects.filter(
-                organisation=organisation,
-                role=OrganisationMember.Role.ADMIN,
-                declined_datetime__isnull=True,
-                revoked_datetime__isnull=True,
-            ).count()
-
-            if admin_count <= 1:
+            if not organisation.has_minimum_admin_count(minimum=2):
                 messages.error(
                     request,
                     _(
@@ -763,11 +723,7 @@ class DeactivateOrganisationView(LoginRequiredMixin, OrganisationAdminMixin, Vie
         organisation = self.get_object()
 
         # Get all active members (not declined or revoked)
-        active_members = OrganisationMember.objects.filter(
-            organisation=organisation,
-            declined_datetime__isnull=True,
-            revoked_datetime__isnull=True,
-        )
+        active_members = organisation.organisation_members.active()
 
         # Check if there is exactly one member
         if active_members.count() != 1:

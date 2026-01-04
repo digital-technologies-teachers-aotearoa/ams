@@ -8,6 +8,7 @@ from django.views.generic import RedirectView
 from django.views.generic import UpdateView
 
 from ams.users.forms import UserUpdateForm
+from ams.users.mixins import UserSelfOrStaffMixin
 from ams.users.models import User
 from ams.users.tables import MembershipTable
 from ams.users.tables import OrganisationTable
@@ -15,7 +16,7 @@ from ams.users.tables import PendingInvitationTable
 from ams.utils.permissions import user_has_active_membership
 
 
-class UserDetailView(LoginRequiredMixin, DetailView):
+class UserDetailView(LoginRequiredMixin, UserSelfOrStaffMixin, DetailView):
     model = User
     slug_field = "username"
     slug_url_kwarg = "username"
