@@ -6,10 +6,49 @@ from ams.organisations.models import OrganisationMember
 
 @admin.register(Organisation)
 class OrganisationAdmin(admin.ModelAdmin):
-    list_display = ("name", "telephone", "email", "contact_name", "is_active")
+    list_display = ("name", "city", "email", "contact_name", "is_active")
     search_fields = ("name", "email", "contact_name")
     list_filter = ("is_active",)
     actions = ["activate_organisations", "deactivate_organisations"]
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": ("name",),
+            },
+        ),
+        (
+            "Contact",
+            {
+                "fields": (
+                    "contact_name",
+                    "email",
+                    "telephone",
+                ),
+            },
+        ),
+        (
+            "Physical address",
+            {
+                "fields": (
+                    "street_address",
+                    "suburb",
+                    "city",
+                ),
+            },
+        ),
+        (
+            "Postal address",
+            {
+                "fields": (
+                    "postal_address",
+                    "postal_suburb",
+                    "postal_city",
+                    "postal_code",
+                ),
+            },
+        ),
+    )
 
     @admin.action(description="Activate selected organisations")
     def activate_organisations(self, request, queryset):
