@@ -57,9 +57,12 @@ class OrganisationForm(ModelForm):
         self.helper.add_layout(
             Layout(
                 "name",
-                "telephone",
-                "contact_name",
-                "email",
+                Fieldset(
+                    _("Contact"),
+                    "contact_name",
+                    "email",
+                    "telephone",
+                ),
                 Fieldset(
                     _("Physical address"),
                     "street_address",
