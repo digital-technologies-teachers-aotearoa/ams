@@ -320,12 +320,18 @@ class CreateOrganisationMembershipForm(ModelForm):
             .first()
         )
 
+        # Default to the day after the latest membership expires,
+        # but only if that expiry is in the future. If the latest
+        # expiry is today or in the past, default to today instead.
+        today = timezone.localdate()
         if latest_membership:
-            # Default to the day after the latest membership expires
-            self.fields["start_date"].initial = latest_membership.expiry_date
+            expiry = latest_membership.expiry_date
+            if expiry and expiry > today:
+                self.fields["start_date"].initial = expiry
+            else:
+                self.fields["start_date"].initial = today
         else:
-            # Default to today
-            self.fields["start_date"].initial = timezone.localdate()
+            self.fields["start_date"].initial = today
 
         self.helper = FormHelper()
         self.helper.form_method = "post"
