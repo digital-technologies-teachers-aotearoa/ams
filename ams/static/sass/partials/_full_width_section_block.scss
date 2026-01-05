@@ -1,11 +1,9 @@
 .full-width-section {
   // Break out of container to extend to page edges
   position: relative;
-  width: 100vw;
   left: 50%;
-  right: 50%;
-  margin-left: -50vw;
-  margin-right: -50vw;
+  width: 100vw;
+  transform: translateX(-50%);
   padding: 3rem 0;
 
   &__background {
