@@ -47,6 +47,7 @@ class ColumnsBlock(StructBlock):
         help_text=(
             "Add columns here. Number of columns should match your layout choice."
         ),
+        collapsed=True,
     )
 
     def clean(self, value):

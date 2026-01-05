@@ -101,6 +101,7 @@ class FullWidthSectionBlock(StructBlock):
         min_num=0,
         max_num=6,
         help_text="Add items to display in this section",
+        collapsed=True,
     )
 
     class Meta:
