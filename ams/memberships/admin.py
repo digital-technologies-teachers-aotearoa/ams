@@ -37,7 +37,7 @@ class MembershipOptionAdmin(admin.ModelAdmin):
             (
                 "Billing",
                 {
-                    "fields": ("invoice_reference",),
+                    "fields": ("invoice_due_days", "invoice_reference"),
                 },
             ),
         )

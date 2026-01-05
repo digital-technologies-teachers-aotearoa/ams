@@ -34,6 +34,7 @@ class MembershipOptionFactory(DjangoModelFactory[MembershipOption]):
         ],
     )
     cost = Faker("pydecimal", left_digits=3, right_digits=2, positive=True)
+    invoice_due_days = 60
     max_seats = None
     archived = False
 
