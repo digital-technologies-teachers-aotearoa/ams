@@ -11,7 +11,6 @@ import re
 from functools import partial
 from typing import TYPE_CHECKING
 
-from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.db import transaction
 from django.utils import timezone
@@ -102,7 +101,9 @@ class MembershipBillingService:
                 },
             ]
             issue_date = timezone.localdate()
-            due_date = issue_date + relativedelta(months=1)
+            due_date = issue_date + timezone.timedelta(
+                days=membership_option.invoice_due_days,
+            )
 
             invoice = self.billing_service.create_invoice(
                 account,

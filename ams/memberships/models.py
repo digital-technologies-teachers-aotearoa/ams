@@ -10,6 +10,7 @@ from django.db.models import DateField
 from django.db.models import DateTimeField
 from django.db.models import DecimalField
 from django.db.models import ForeignKey
+from django.db.models import IntegerField
 from django.db.models import Model
 from django.db.models import QuerySet
 from django.db.models import TextChoices
@@ -76,6 +77,13 @@ class MembershipOption(Model):
     duration = RelativeDeltaField()
     cost = DecimalField(max_digits=10, decimal_places=2)
     invoice_reference = CharField(max_length=25, blank=True)
+    invoice_due_days = IntegerField(
+        default=60,
+        help_text=_(
+            "Number of days from invoice issue date until payment is due. "
+            "This setting only affects new invoices created after changes are saved.",
+        ),
+    )
     max_seats = DecimalField(
         max_digits=10,
         decimal_places=0,

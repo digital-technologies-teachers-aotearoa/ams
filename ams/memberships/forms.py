@@ -106,6 +106,15 @@ class MembershipOptionForm(ModelForm):
             "For example 'DTTA Membership'.",
         ),
     )
+    invoice_due_days = IntegerField(
+        label=_("Invoice Due Days"),
+        initial=60,
+        min_value=1,
+        help_text=_(
+            "Number of days from invoice issue date until payment is due. "
+            "This setting only affects new invoices created after changes are saved.",
+        ),
+    )
     max_seats = DecimalField(
         max_digits=10,
         decimal_places=0,
@@ -127,6 +136,7 @@ class MembershipOptionForm(ModelForm):
             "duration",
             "cost",
             "invoice_reference",
+            "invoice_due_days",
             "max_seats",
             "archived",
         ]

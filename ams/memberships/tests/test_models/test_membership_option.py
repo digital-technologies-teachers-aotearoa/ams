@@ -89,3 +89,28 @@ class TestMembershipOption:
             exc.value,
         )
         assert "Archive it instead" in str(exc.value)
+
+    def test_invoice_due_days_defaults_to_60(self):
+        """Test that invoice_due_days defaults to 60 days."""
+        # Arrange & Act
+        option = MembershipOptionFactory()
+        # Assert
+        assert option.invoice_due_days == 60  # noqa: PLR2004
+
+    def test_invoice_due_days_can_be_customized(self):
+        """Test that invoice_due_days can be set to custom value."""
+        # Arrange & Act
+        option = MembershipOptionFactory(invoice_due_days=30)
+        # Assert
+        assert option.invoice_due_days == 30  # noqa: PLR2004
+
+    def test_invoice_due_days_is_not_immutable(self):
+        """Test that invoice_due_days can be changed after creation."""
+        # Arrange
+        option = MembershipOptionFactory(invoice_due_days=60)
+        # Act - change the value
+        option.invoice_due_days = 90
+        option.save()
+        option.refresh_from_db()
+        # Assert
+        assert option.invoice_due_days == 90  # noqa: PLR2004
