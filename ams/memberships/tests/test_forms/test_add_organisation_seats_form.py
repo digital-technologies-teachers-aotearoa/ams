@@ -119,11 +119,13 @@ class TestAddOrganisationSeatsForm:
             mock_service.assert_called_once_with(membership, 5)
             assert result == Decimal("500.00")
 
-    @patch("ams.memberships.forms.get_billing_service")
-    def test_form_saves_updates_max_seats(self, mock_get_billing_service):
+    @patch("ams.memberships.forms.MembershipBillingService")
+    def test_form_saves_updates_max_seats(self, mock_billing_service_class):
         """Test save() method updates seats on membership."""
-        # Mock billing service to return None (no billing configured)
-        mock_get_billing_service.return_value = None
+        # Mock billing service to return None for invoice (free membership)
+        mock_billing_service = Mock()
+        mock_billing_service.create_membership_invoice.return_value = None
+        mock_billing_service_class.return_value = mock_billing_service
 
         organisation = OrganisationFactory()
         membership_option = MembershipOptionFactory(
@@ -157,15 +159,15 @@ class TestAddOrganisationSeatsForm:
         assert membership.seats == initial_seats + Decimal("5")
         assert saved_membership.pk == membership.pk
 
-    @patch("ams.memberships.forms.get_billing_service")
-    def test_form_saves_creates_invoice(self, mock_get_billing_service):
+    @patch("ams.memberships.forms.MembershipBillingService")
+    def test_form_saves_creates_invoice(self, mock_billing_service_class):
         """Test save() method creates invoice when billing is configured."""
-        # Mock billing service
+        # Mock billing service and invoice
         mock_billing_service = Mock()
         mock_invoice = Mock()
         mock_invoice.invoice_number = "INV-12345"
-        mock_billing_service.create_invoice.return_value = mock_invoice
-        mock_get_billing_service.return_value = mock_billing_service
+        mock_billing_service.create_membership_invoice.return_value = mock_invoice
+        mock_billing_service_class.return_value = mock_billing_service
 
         organisation = OrganisationFactory()
         membership_option = MembershipOptionFactory(
@@ -191,19 +193,18 @@ class TestAddOrganisationSeatsForm:
         assert form.is_valid()
         _saved_membership, invoice = form.save()
 
-        # Verify billing service was called
-        assert mock_billing_service.create_invoice.called
+        # Verify billing service method was called
+        assert mock_billing_service.create_membership_invoice.called
         assert invoice == mock_invoice
 
-        # Verify invoice line items
-        call_args = mock_billing_service.create_invoice.call_args
-        line_items = call_args[0][3]  # 4th positional argument
-
+        # Verify create_membership_invoice was called with correct arguments
+        call_args = mock_billing_service.create_membership_invoice.call_args
         expected_quantity = 5
-        assert len(line_items) == 1
-        assert line_items[0]["quantity"] == expected_quantity
-        assert "description" in line_items[0]
-        assert "unit_amount" in line_items[0]
+        assert call_args[1]["seat_count"] == expected_quantity
+        assert call_args[1]["membership"] == membership
+        assert "unit_price_override" in call_args[1]
+        # Unit price should be prorata_cost / seats_to_add
+        assert call_args[1]["unit_price_override"] is not None
 
     def test_form_rejects_membership_expiring_today(self):
         """Test form validation rejects membership expiring today."""

@@ -27,7 +27,7 @@ def test_zero_cost_membership_form_save_directly():
     membership = form.save(user=user)
 
     assert membership.approved_datetime is not None
-    assert membership.invoice is None
+    assert not membership.invoices.exists()
     assert membership.status().name == "ACTIVE"
 
 
@@ -74,7 +74,7 @@ def test_zero_cost_membership_shows_active_immediately():
     # Membership should be automatically approved
     assert membership.approved_datetime is not None
     assert membership.status().name == "ACTIVE"
-    assert membership.invoice is None
+    assert not membership.invoices.exists()
 
     # User should now have an active membership
     assert user.individual_memberships.filter(

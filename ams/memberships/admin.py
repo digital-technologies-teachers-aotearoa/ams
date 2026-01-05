@@ -61,11 +61,10 @@ class IndividualMembershipAdmin(admin.ModelAdmin):
         "start_date",
         "expiry_date",
         "approved_datetime",
-        "invoice",
     )
     search_fields = ("user__email", "membership_option__name")
     list_filter = ("membership_option", "start_date")
-    autocomplete_fields = ["user", "membership_option", "invoice"]
+    autocomplete_fields = ["user", "membership_option"]
     readonly_fields = ("user_display", "status")
     exclude = ("user",)
 
@@ -75,7 +74,6 @@ class IndividualMembershipAdmin(admin.ModelAdmin):
         "start_date",
         "expiry_date",
         "approved_datetime",
-        "invoice",
         "status",
     )
 
@@ -101,11 +99,10 @@ class OrganisationMembershipAdmin(admin.ModelAdmin):
         "seats",
         "start_date",
         "expiry_date",
-        "invoice",
     )
     search_fields = ("organisation__name", "membership_option__name")
     list_filter = ("start_date",)
-    autocomplete_fields = ["organisation", "membership_option", "invoice"]
+    autocomplete_fields = ["organisation", "membership_option"]
     readonly_fields = (
         "organisation",
         "status",
@@ -121,7 +118,6 @@ class OrganisationMembershipAdmin(admin.ModelAdmin):
         "start_date",
         "expiry_date",
         "approved_datetime",
-        "invoice",
     )
 
     @admin.display(

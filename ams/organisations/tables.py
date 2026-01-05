@@ -170,8 +170,8 @@ class OrganisationMembershipTable(Table):
     )
     invoice = TemplateColumn(
         template_name="users/tables/invoice_column.html",
-        accessor="invoice",
         verbose_name="Invoice",
+        orderable=False,
     )
 
     class Meta:

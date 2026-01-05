@@ -47,7 +47,9 @@ def send_staff_organisation_membership_notification(membership):
         "expiry_date": membership.expiry_date,
         "cost": membership.membership_option.cost,
         "invoice_number": (
-            membership.invoice.invoice_number if membership.invoice else None
+            membership.invoices.first().invoice_number
+            if membership.invoices.exists()
+            else None
         ),
     }
 
@@ -194,7 +196,9 @@ def send_staff_individual_membership_notification(membership):
         "expiry_date": membership.expiry_date,
         "cost": membership.membership_option.cost,
         "invoice_number": (
-            membership.invoice.invoice_number if membership.invoice else None
+            membership.invoices.first().invoice_number
+            if membership.invoices.exists()
+            else None
         ),
     }
 

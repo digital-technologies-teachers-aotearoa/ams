@@ -62,7 +62,6 @@ class IndividualMembershipFactory(DjangoModelFactory[IndividualMembership]):
         MembershipOptionFactory,
         type=MembershipOptionType.INDIVIDUAL,
     )
-    invoice = None
     start_date = LazyFunction(timezone.localdate)
     created_datetime = LazyFunction(timezone.now)
     approved_datetime = None
@@ -97,7 +96,6 @@ class OrganisationMembershipFactory(DjangoModelFactory[OrganisationMembership]):
         MembershipOptionFactory,
         type=MembershipOptionType.ORGANISATION,
     )
-    invoice = None
     start_date = LazyFunction(timezone.localdate)
     created_datetime = LazyFunction(timezone.now)
     approved_datetime = None

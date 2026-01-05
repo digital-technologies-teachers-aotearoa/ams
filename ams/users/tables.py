@@ -25,8 +25,8 @@ class MembershipTable(Table):
     expiry_date = DateColumn(verbose_name="End Date")
     invoice = TemplateColumn(
         template_name="users/tables/invoice_column.html",
-        accessor="invoice",
         verbose_name="Invoice",
+        orderable=False,
     )
 
     class Meta:

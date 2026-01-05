@@ -27,8 +27,8 @@ def test_paying_invoice_approves_pending_individual_membership(
     individual_membership = individual_membership_pending
     account = Account.objects.create(user=individual_membership.user)
     invoice = _create_invoice_for_account(account)
-    individual_membership.invoice = invoice
-    individual_membership.save()
+    invoice.individual_membership = individual_membership
+    invoice.save()
 
     invoice.paid_date = timezone.localdate()
     invoice.save()
@@ -45,8 +45,8 @@ def test_paying_invoice_approves_individual_membership_of_unverified_user(
     individual_membership.user.save()
     account = Account.objects.create(user=individual_membership.user)
     invoice = _create_invoice_for_account(account)
-    individual_membership.invoice = invoice
-    individual_membership.save()
+    invoice.individual_membership = individual_membership
+    invoice.save()
 
     invoice.paid_date = timezone.localdate()
     invoice.save()

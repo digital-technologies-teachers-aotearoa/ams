@@ -29,7 +29,6 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from ams.billing.models import Account
-from ams.billing.services import get_billing_service
 from ams.billing.services.membership import MembershipBillingService
 from ams.memberships.duration import compose_membership_duration
 from ams.memberships.duration import decompose_membership_duration
@@ -235,12 +234,20 @@ class CreateIndividualMembershipForm(ModelForm):
             # Create invoice using billing service
             billing_service = MembershipBillingService()
             try:
+                # Save instance first to get primary key
+                instance.save()
+
                 invoice = billing_service.create_membership_invoice(
                     account,
                     membership_option,
+                    membership=instance,
                 )
                 if invoice:
-                    instance.invoice = invoice
+                    logger.info(
+                        "Created invoice %s for user %s",
+                        invoice.invoice_number,
+                        self.user.uuid,
+                    )
             except Exception as e:
                 logger.exception("Failed to create invoice for user %s", user.pk)
                 raise ValidationError(
@@ -257,8 +264,8 @@ class CreateIndividualMembershipForm(ModelForm):
                 user.pk,
                 membership_option.name,
             )
+            instance.save()
 
-        instance.save()
         return instance
 
 
@@ -468,13 +475,16 @@ class CreateOrganisationMembershipForm(ModelForm):
             # Create invoice using billing service
             billing_service = MembershipBillingService()
             try:
+                # Save instance first to get primary key (but not committed yet)
+                instance.save()
+
                 invoice = billing_service.create_membership_invoice(
                     account,
                     membership_option,
                     seat_count,
+                    membership=instance,
                 )
                 if invoice:
-                    instance.invoice = invoice
                     logger.info(
                         "Created invoice %s for organisation %s",
                         invoice.invoice_number,
@@ -491,8 +501,7 @@ class CreateOrganisationMembershipForm(ModelForm):
                         "Please contact us.",
                     ),
                 ) from e
-
-        if commit:
+        elif commit:
             instance.save()
 
         return instance
@@ -660,58 +669,38 @@ class AddOrganisationSeatsForm(Form):
                     _("Could not create billing account. Please contact us."),
                 ) from e
 
-            # Create invoice using billing service
-            billing_service = get_billing_service()
-            if billing_service:
-                try:
-                    # Prepare invoice line items
-                    invoice_line_items = [
-                        {
-                            "description": _(
-                                "Additional %(seats)d seat(s) (pro-rata) "
-                                "- %(membership)s",
-                            )
-                            % {
-                                "seats": seats_to_add,
-                                "membership": str(membership_option),
-                            },
-                            "unit_amount": prorata_cost / Decimal(seats_to_add),
-                            "quantity": seats_to_add,
-                        },
-                    ]
+            # Create invoice using membership billing service
+            billing_service = MembershipBillingService()
+            try:
+                # Calculate pro-rata unit price
+                unit_price = prorata_cost / Decimal(seats_to_add)
 
-                    # Set invoice dates
-                    issue_date = timezone.localdate()
-                    due_date = issue_date + relativedelta(months=1)
-
-                    # Create invoice
-                    invoice = billing_service.create_invoice(
-                        account,
-                        issue_date,
-                        due_date,
-                        invoice_line_items,
-                        membership_option.invoice_reference or "Additional Seats",
-                    )
-
-                    if invoice:
-                        logger.info(
-                            "Created invoice %s for additional %d seats for "
-                            "organisation %s",
-                            invoice.invoice_number,
-                            seats_to_add,
-                            self.organisation.uuid,
-                        )
-                except Exception as e:
-                    logger.exception(
-                        "Failed to create invoice for organisation %s",
+                invoice = billing_service.create_membership_invoice(
+                    account,
+                    membership_option,
+                    seat_count=seats_to_add,
+                    membership=membership,
+                    unit_price_override=unit_price,
+                )
+                if invoice:
+                    logger.info(
+                        "Created invoice %s for additional %d seats for "
+                        "organisation %s",
+                        invoice.invoice_number,
+                        seats_to_add,
                         self.organisation.uuid,
                     )
-                    raise ValidationError(
-                        _(
-                            "Could not create invoice for the seat purchase. "
-                            "Please contact us.",
-                        ),
-                    ) from e
+            except Exception as e:
+                logger.exception(
+                    "Failed to create invoice for organisation %s",
+                    self.organisation.uuid,
+                )
+                raise ValidationError(
+                    _(
+                        "Could not create invoice for the seat purchase. "
+                        "Please contact us.",
+                    ),
+                ) from e
 
         # Update seats immediately (within transaction)
         with transaction.atomic():

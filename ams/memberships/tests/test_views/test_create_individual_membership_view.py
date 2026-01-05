@@ -34,7 +34,7 @@ def test_zero_cost_membership_auto_approved(client):
     membership = IndividualMembership.objects.get(user=user, membership_option=option)
     assert membership.start_date == timezone.localdate()
     assert membership.approved_datetime is not None
-    assert membership.invoice is None
+    assert not membership.invoices.exists()
     assert membership.status().name == "ACTIVE"
 
 

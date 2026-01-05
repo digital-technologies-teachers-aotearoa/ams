@@ -111,9 +111,17 @@ class TestAddOrganisationSeatsView:
         assert response.context["organisation"] == org
         assert response.context["active_membership"] == membership
 
-    @patch("ams.memberships.forms.get_billing_service")
-    def test_post_valid_adds_seats(self, mock_get_billing_service, user: User, client):
-        mock_get_billing_service.return_value = None
+    @patch("ams.memberships.forms.MembershipBillingService")
+    def test_post_valid_adds_seats(
+        self,
+        mock_billing_service_class,
+        user: User,
+        client,
+    ):
+        # Mock billing service to return None for invoice (free membership)
+        mock_billing_service = Mock()
+        mock_billing_service.create_membership_invoice.return_value = None
+        mock_billing_service_class.return_value = mock_billing_service
         org = OrganisationFactory()
         OrganisationMemberFactory(
             organisation=org,
@@ -142,18 +150,18 @@ class TestAddOrganisationSeatsView:
         membership.refresh_from_db()
         assert membership.seats == Decimal("15")
 
-    @patch("ams.memberships.forms.get_billing_service")
+    @patch("ams.memberships.forms.MembershipBillingService")
     def test_post_valid_creates_invoice(
         self,
-        mock_get_billing_service,
+        mock_billing_service_class,
         user: User,
         client,
     ):
         mock_billing_service = Mock()
         mock_invoice = Mock()
         mock_invoice.invoice_number = "INV-12345"
-        mock_billing_service.create_invoice.return_value = mock_invoice
-        mock_get_billing_service.return_value = mock_billing_service
+        mock_billing_service.create_membership_invoice.return_value = mock_invoice
+        mock_billing_service_class.return_value = mock_billing_service
         org = OrganisationFactory()
         OrganisationMemberFactory(
             organisation=org,
@@ -179,18 +187,21 @@ class TestAddOrganisationSeatsView:
         data = {"seats_to_add": 5}
         response = client.post(url, data=data)
         assert response.status_code == HTTPStatus.FOUND
-        assert mock_billing_service.create_invoice.called
+        assert mock_billing_service.create_membership_invoice.called
 
-    @patch("ams.memberships.forms.get_billing_service")
+    @patch("ams.memberships.forms.MembershipBillingService")
     @patch("ams.memberships.views.send_staff_organisation_seats_added_notification")
     def test_post_valid_sends_notification(
         self,
         mock_send_notification,
-        mock_get_billing_service,
+        mock_billing_service_class,
         user: User,
         client,
     ):
-        mock_get_billing_service.return_value = None
+        # Mock billing service to return None for invoice (free membership)
+        mock_billing_service = Mock()
+        mock_billing_service.create_membership_invoice.return_value = None
+        mock_billing_service_class.return_value = mock_billing_service
         org = OrganisationFactory()
         OrganisationMemberFactory(
             organisation=org,
