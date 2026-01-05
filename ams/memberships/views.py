@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 
+from ams.memberships.email_utils import send_staff_individual_membership_notification
 from ams.memberships.email_utils import send_staff_organisation_membership_notification
 from ams.memberships.email_utils import send_staff_organisation_seats_added_notification
 from ams.memberships.forms import AddOrganisationSeatsForm
@@ -37,7 +38,8 @@ class CreateIndividualMembershipView(LoginRequiredMixin, FormView):
         return reverse("users:detail", args=[self.request.user.username])
 
     def form_valid(self, form):  # type: ignore[override]
-        form.save(user=self.request.user)
+        membership = form.save(user=self.request.user)
+        send_staff_individual_membership_notification(membership)
         messages.success(
             self.request,
             _(
