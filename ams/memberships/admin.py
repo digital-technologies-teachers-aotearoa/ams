@@ -29,6 +29,7 @@ class MembershipOptionAdmin(admin.ModelAdmin):
                         "duration_display" if obj else "duration",
                         "cost",
                         "max_seats",
+                        "voting_rights",
                     ),
                     "description": "Note: These values are read only after creation.",
                 },
