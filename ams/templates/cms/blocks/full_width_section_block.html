@@ -1,7 +1,7 @@
 {% load wagtailcore_tags wagtailimages_tags %}
 
 {# Full-width section that breaks out of the container #}
-<div class="full-width-section bg-body-tertiary text-body-tertiary mb-4"
+<div class="full-width-section bg-body-tertiary text-body-tertiary"
      data-bs-theme="{{ self.colour_mode }}">
   {% if self.background_image %}
     {% image self.background_image fill-2000x800 as bg_img %}
