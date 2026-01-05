@@ -7,16 +7,18 @@ from ams.cms.blocks.heading_block import HeadingBlock
 from ams.cms.blocks.horizontal_rule_block import HorizontalRuleBlock
 from ams.cms.blocks.image_carousel_block import ImageCarouselBlock
 from ams.cms.blocks.image_grid_block import ImageGridBlock
-from ams.cms.blocks.layout_stream_blocks import ContentAndLayoutStreamBlocks
+from ams.cms.blocks.layout_stream_blocks import ContentPageBlocks
+from ams.cms.blocks.layout_stream_blocks import HomePageBlocks
 
 __all__ = [
     "CaptionedImageBlock",
     "ColumnContentStreamBlocks",
     "ColumnsBlock",
-    "ContentAndLayoutStreamBlocks",
+    "ContentPageBlocks",
     "ContentStreamBlocks",
     "FullWidthSectionBlock",
     "HeadingBlock",
+    "HomePageBlocks",
     "HorizontalRuleBlock",
     "ImageCarouselBlock",
     "ImageGridBlock",
