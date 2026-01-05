@@ -25,3 +25,4 @@ class ContentStreamBlocks(StreamBlock):
 class ColumnContentStreamBlocks(ContentStreamBlocks):
     class Meta:
         label = "Column content"
+        min_num = 0

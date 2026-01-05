@@ -41,7 +41,7 @@ class ColumnsBlock(StructBlock):
     )
 
     columns = ListBlock(
-        ColumnContentStreamBlocks(),
+        ColumnContentStreamBlocks(required=False),
         min_num=2,
         max_num=4,
         help_text=(
