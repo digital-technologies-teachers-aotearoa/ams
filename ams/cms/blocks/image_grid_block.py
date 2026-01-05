@@ -59,6 +59,7 @@ class ImageGridBlock(StructBlock):
         GridItemBlock(),
         min_num=1,
         help_text="Add items to the grid. At least one item is required.",
+        collapsed=True,
     )
 
     class Meta:
