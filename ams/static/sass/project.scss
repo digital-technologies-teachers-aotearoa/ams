@@ -46,6 +46,14 @@ $red: #b94a48;
 }
 
 /* Custom */
+html,
+body {
+  max-width: 100%;
+  // Prevents horizontal scrollbars when elements overall. Would be ideal to not require
+  // this, but .full-width-section has this horizontal scrollbar issue.
+  overflow-x: clip;
+}
+
 main > .container {
   // Spacing from top of page to content (under navbar)
   padding-top: 6rem;
@@ -121,4 +129,9 @@ main > .container {
   #navbarLanguageSelector:hover {
     border-color: inherit;
   }
+}
+
+// Apply margin trim to Wagtail paragraphs
+.block-paragraph_block {
+  @extend .margin-trim;
 }
