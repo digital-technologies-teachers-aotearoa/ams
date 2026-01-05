@@ -65,6 +65,7 @@ The following environment variables are available, with some required for runnin
 | `DJANGO_WAGTAIL_AMS_ADMIN_HELPERS` | ⚪ Optional | `True` | Shows helper text within the Wagtail CMS admin. |
 | `AMS_NOTIFY_STAFF_ORGANISATION_EVENTS` | ⚪ Optional | `True` | Notifies staff of organisation creation events. |
 | `AMS_NOTIFY_STAFF_MEMBERSHIP_EVENTS` | ⚪ Optional | `True` | Notifies staff of membership creation events. |
+| `AMS_REQUIRE_FREE_MEMBERSHIP_APPROVAL` | ⚪ Optional | `False` | Require manual approval of free memberships. |
 
 ## Deployment steps
 

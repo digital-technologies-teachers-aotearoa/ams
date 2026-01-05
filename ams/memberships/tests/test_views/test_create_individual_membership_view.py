@@ -1,6 +1,7 @@
 from http import HTTPStatus
 
 import pytest
+from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 
@@ -62,3 +63,64 @@ def test_paid_membership_not_auto_approved(client):
     assert membership.approved_datetime is None
     # Note: No invoice in test environment since billing service is not configured
     assert membership.status().name == "PENDING"
+
+
+@override_settings(REQUIRE_FREE_MEMBERSHIP_APPROVAL=True)
+def test_free_membership_pending_approval_message(client):
+    """Test that pending approval message is shown when feature is enabled."""
+    user = UserFactory()
+    option = MembershipOptionFactory(
+        type=MembershipOptionType.INDIVIDUAL,
+        cost=0,
+    )
+    client.force_login(user)
+
+    resp = client.post(
+        reverse("memberships:apply-individual"),
+        data={
+            "membership_option": option.id,
+            "start_date": timezone.localdate(),
+        },
+        follow=True,
+    )
+
+    assert resp.status_code == HTTPStatus.OK
+    membership = IndividualMembership.objects.get(user=user, membership_option=option)
+    assert membership.approved_datetime is None
+    assert membership.status().name == "PENDING"
+
+    # Check for pending approval message
+    messages = list(resp.context["messages"])
+    assert len(messages) == 1
+    assert "pending admin review" in str(messages[0])
+
+
+@override_settings(REQUIRE_FREE_MEMBERSHIP_APPROVAL=False)
+def test_free_membership_standard_message(client):
+    """Test that standard message is shown when auto-approved."""
+    user = UserFactory()
+    option = MembershipOptionFactory(
+        type=MembershipOptionType.INDIVIDUAL,
+        cost=0,
+    )
+    client.force_login(user)
+
+    resp = client.post(
+        reverse("memberships:apply-individual"),
+        data={
+            "membership_option": option.id,
+            "start_date": timezone.localdate(),
+        },
+        follow=True,
+    )
+
+    assert resp.status_code == HTTPStatus.OK
+    membership = IndividualMembership.objects.get(user=user, membership_option=option)
+    assert membership.approved_datetime is not None
+    assert membership.status().name == "ACTIVE"
+
+    # Check for standard success message
+    messages = list(resp.context["messages"])
+    assert len(messages) == 1
+    assert "submitted" in str(messages[0]).lower()
+    assert "pending" not in str(messages[0]).lower()

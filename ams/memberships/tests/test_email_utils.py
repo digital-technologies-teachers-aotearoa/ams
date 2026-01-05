@@ -478,3 +478,346 @@ class TestSendStaffIndividualMembershipNotification:
 
         # Assert logger.exception was called
         assert mock_logger.exception.called
+
+
+@pytest.mark.django_db
+class TestEmailNotificationContextVariables:
+    """Tests for requires_approval and is_free context variables in emails."""
+
+    def test_individual_free_pending_context(self, mailoutbox):
+        """Test individual free membership pending approval has correct context."""
+        UserFactory(is_staff=True, email="staff@example.com")
+
+        membership_option = MembershipOptionFactory(
+            type=MembershipOptionType.INDIVIDUAL,
+            name="Free Individual",
+            cost=0,
+        )
+        user = UserFactory()
+        membership = IndividualMembershipFactory(
+            user=user,
+            membership_option=membership_option,
+            approved_datetime=None,  # Pending approval
+        )
+
+        send_staff_individual_membership_notification(membership)
+
+        assert len(mailoutbox) == 1
+        email = mailoutbox[0]
+
+        # Check that pending approval warning is in email
+        assert "ACTION REQUIRED" in email.body
+        assert "Pending Approval" in email.body
+
+    def test_individual_free_approved_context(self, mailoutbox):
+        """Test individual free membership approved has correct context."""
+        UserFactory(is_staff=True, email="staff@example.com")
+
+        membership_option = MembershipOptionFactory(
+            type=MembershipOptionType.INDIVIDUAL,
+            name="Free Individual",
+            cost=0,
+        )
+        user = UserFactory()
+        membership = IndividualMembershipFactory(
+            user=user,
+            membership_option=membership_option,
+            approved_datetime=timezone.now(),  # Approved
+        )
+
+        send_staff_individual_membership_notification(membership)
+
+        assert len(mailoutbox) == 1
+        email = mailoutbox[0]
+
+        # Should show as approved, not pending
+        assert "Approved" in email.body
+        # Should not have ACTION REQUIRED warning
+        assert "ACTION REQUIRED" not in email.body
+
+    def test_individual_paid_pending_context(self, mailoutbox):
+        """Test individual paid membership has correct context."""
+        UserFactory(is_staff=True, email="staff@example.com")
+
+        membership_option = MembershipOptionFactory(
+            type=MembershipOptionType.INDIVIDUAL,
+            name="Paid Individual",
+            cost=99.99,
+        )
+        user = UserFactory()
+        membership = IndividualMembershipFactory(
+            user=user,
+            membership_option=membership_option,
+            approved_datetime=None,  # Pending payment
+        )
+
+        send_staff_individual_membership_notification(membership)
+
+        assert len(mailoutbox) == 1
+        email = mailoutbox[0]
+
+        # Paid memberships pending payment should show as pending
+        assert "Pending Approval" in email.body
+        # But should NOT show ACTION REQUIRED (not a free membership)
+        assert "ACTION REQUIRED" not in email.body
+
+    def test_organisation_free_pending_context(self, mailoutbox):
+        """Test organisation free membership pending approval has correct context."""
+        UserFactory(is_staff=True, email="staff@example.com")
+
+        organisation = OrganisationFactory(name="Test Org")
+        membership_option = MembershipOptionFactory(
+            type=MembershipOptionType.ORGANISATION,
+            name="Free Organisation",
+            cost=0,
+        )
+        membership = OrganisationMembershipFactory(
+            organisation=organisation,
+            membership_option=membership_option,
+            seats=5,
+            approved_datetime=None,  # Pending approval
+        )
+
+        send_staff_organisation_membership_notification(membership)
+
+        assert len(mailoutbox) == 1
+        email = mailoutbox[0]
+
+        # Check that pending approval warning is in email
+        assert "ACTION REQUIRED" in email.body
+        assert "Pending Approval" in email.body
+
+    def test_organisation_free_approved_context(self, mailoutbox):
+        """Test organisation free membership approved has correct context."""
+        UserFactory(is_staff=True, email="staff@example.com")
+
+        organisation = OrganisationFactory(name="Test Org")
+        membership_option = MembershipOptionFactory(
+            type=MembershipOptionType.ORGANISATION,
+            name="Free Organisation",
+            cost=0,
+        )
+        membership = OrganisationMembershipFactory(
+            organisation=organisation,
+            membership_option=membership_option,
+            seats=5,
+            approved_datetime=timezone.now(),  # Approved
+        )
+
+        send_staff_organisation_membership_notification(membership)
+
+        assert len(mailoutbox) == 1
+        email = mailoutbox[0]
+
+        # Should show as approved, not pending
+        assert "Approved" in email.body
+        # Should not have ACTION REQUIRED warning
+        assert "ACTION REQUIRED" not in email.body
+
+    def test_organisation_paid_pending_context(self, mailoutbox):
+        """Test organisation paid membership has correct context."""
+        UserFactory(is_staff=True, email="staff@example.com")
+
+        organisation = OrganisationFactory(name="Test Org")
+        membership_option = MembershipOptionFactory(
+            type=MembershipOptionType.ORGANISATION,
+            name="Paid Organisation",
+            cost=199.99,
+        )
+        membership = OrganisationMembershipFactory(
+            organisation=organisation,
+            membership_option=membership_option,
+            seats=5,
+            approved_datetime=None,  # Pending payment
+        )
+
+        send_staff_organisation_membership_notification(membership)
+
+        assert len(mailoutbox) == 1
+        email = mailoutbox[0]
+
+        # Paid memberships pending payment should show as pending
+        assert "Pending Approval" in email.body
+        # But should NOT show ACTION REQUIRED (not a free membership)
+        assert "ACTION REQUIRED" not in email.body
+
+
+@pytest.mark.django_db
+class TestEmailNotificationWhenNotificationsDisabled:
+    """Tests for edge case where notifications are disabled but approval is required."""
+
+    @override_settings(
+        NOTIFY_STAFF_MEMBERSHIP_EVENTS=False,
+        REQUIRE_FREE_MEMBERSHIP_APPROVAL=True,
+    )
+    def test_individual_free_pending_sends_email_despite_disabled_notifications(
+        self,
+        mailoutbox,
+    ):
+        """Test that free individual memberships requiring approval send email even
+        when notifications disabled."""
+        UserFactory(is_staff=True, email="staff@example.com")
+
+        membership_option = MembershipOptionFactory(
+            type=MembershipOptionType.INDIVIDUAL,
+            name="Free Individual",
+            cost=0,
+        )
+        user = UserFactory()
+        membership = IndividualMembershipFactory(
+            user=user,
+            membership_option=membership_option,
+            approved_datetime=None,  # Pending approval
+        )
+
+        send_staff_individual_membership_notification(membership)
+
+        # Email SHOULD be sent despite notifications being disabled
+        assert len(mailoutbox) == 1
+        email = mailoutbox[0]
+
+        # Subject should start with "REQUIRES APPROVAL"
+        assert email.subject.startswith("REQUIRES APPROVAL")
+        assert "ACTION REQUIRED" in email.body
+
+    @override_settings(
+        NOTIFY_STAFF_MEMBERSHIP_EVENTS=False,
+        REQUIRE_FREE_MEMBERSHIP_APPROVAL=False,
+    )
+    def test_individual_free_approved_no_email_when_notifications_disabled(
+        self,
+        mailoutbox,
+    ):
+        """Test that auto-approved free memberships don't send email when
+        notifications disabled."""
+        UserFactory(is_staff=True, email="staff@example.com")
+
+        membership_option = MembershipOptionFactory(
+            type=MembershipOptionType.INDIVIDUAL,
+            name="Free Individual",
+            cost=0,
+        )
+        user = UserFactory()
+        membership = IndividualMembershipFactory(
+            user=user,
+            membership_option=membership_option,
+            approved_datetime=timezone.now(),  # Auto-approved
+        )
+
+        send_staff_individual_membership_notification(membership)
+
+        # Email should NOT be sent (notifications disabled, no approval needed)
+        assert len(mailoutbox) == 0
+
+    @override_settings(NOTIFY_STAFF_MEMBERSHIP_EVENTS=False)
+    def test_individual_paid_no_email_when_notifications_disabled(self, mailoutbox):
+        """Test that paid memberships don't send email when notifications disabled."""
+        UserFactory(is_staff=True, email="staff@example.com")
+
+        membership_option = MembershipOptionFactory(
+            type=MembershipOptionType.INDIVIDUAL,
+            name="Paid Individual",
+            cost=99.99,
+        )
+        user = UserFactory()
+        membership = IndividualMembershipFactory(
+            user=user,
+            membership_option=membership_option,
+            approved_datetime=None,  # Pending payment
+        )
+
+        send_staff_individual_membership_notification(membership)
+
+        # Email should NOT be sent
+        # (notifications disabled, not a free membership approval)
+        assert len(mailoutbox) == 0
+
+    @override_settings(
+        NOTIFY_STAFF_MEMBERSHIP_EVENTS=False,
+        REQUIRE_FREE_MEMBERSHIP_APPROVAL=True,
+    )
+    def test_organisation_free_pending_sends_email_despite_disabled_notifications(
+        self,
+        mailoutbox,
+    ):
+        """Test that free org memberships requiring approval send email even when
+        notifications disabled."""
+        UserFactory(is_staff=True, email="staff@example.com")
+
+        organisation = OrganisationFactory(name="Test Org")
+        membership_option = MembershipOptionFactory(
+            type=MembershipOptionType.ORGANISATION,
+            name="Free Organisation",
+            cost=0,
+        )
+        membership = OrganisationMembershipFactory(
+            organisation=organisation,
+            membership_option=membership_option,
+            seats=5,
+            approved_datetime=None,  # Pending approval
+        )
+
+        send_staff_organisation_membership_notification(membership)
+
+        # Email SHOULD be sent despite notifications being disabled
+        assert len(mailoutbox) == 1
+        email = mailoutbox[0]
+
+        # Subject should start with "REQUIRES APPROVAL"
+        assert email.subject.startswith("REQUIRES APPROVAL")
+        assert "ACTION REQUIRED" in email.body
+
+    @override_settings(
+        NOTIFY_STAFF_MEMBERSHIP_EVENTS=False,
+        REQUIRE_FREE_MEMBERSHIP_APPROVAL=False,
+    )
+    def test_organisation_free_approved_no_email_when_notifications_disabled(
+        self,
+        mailoutbox,
+    ):
+        """Test that auto-approved free org memberships don't send email when
+        notifications disabled."""
+        UserFactory(is_staff=True, email="staff@example.com")
+
+        organisation = OrganisationFactory(name="Test Org")
+        membership_option = MembershipOptionFactory(
+            type=MembershipOptionType.ORGANISATION,
+            name="Free Organisation",
+            cost=0,
+        )
+        membership = OrganisationMembershipFactory(
+            organisation=organisation,
+            membership_option=membership_option,
+            seats=5,
+            approved_datetime=timezone.now(),  # Auto-approved
+        )
+
+        send_staff_organisation_membership_notification(membership)
+
+        # Email should NOT be sent (notifications disabled, no approval needed)
+        assert len(mailoutbox) == 0
+
+    @override_settings(NOTIFY_STAFF_MEMBERSHIP_EVENTS=False)
+    def test_organisation_paid_no_email_when_notifications_disabled(self, mailoutbox):
+        """Test that paid org memberships don't send email when notifications
+        disabled."""
+        UserFactory(is_staff=True, email="staff@example.com")
+
+        organisation = OrganisationFactory(name="Test Org")
+        membership_option = MembershipOptionFactory(
+            type=MembershipOptionType.ORGANISATION,
+            name="Paid Organisation",
+            cost=199.99,
+        )
+        membership = OrganisationMembershipFactory(
+            organisation=organisation,
+            membership_option=membership_option,
+            seats=5,
+            approved_datetime=None,  # Pending payment
+        )
+
+        send_staff_organisation_membership_notification(membership)
+
+        # Email should NOT be sent
+        # (notifications disabled, not a free membership approval)
+        assert len(mailoutbox) == 0

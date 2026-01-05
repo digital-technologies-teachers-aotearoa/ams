@@ -19,8 +19,14 @@ def send_staff_organisation_membership_notification(membership):
     Args:
         membership: The newly created OrganisationMembership instance.
     """
-    # Check feature flag
-    if not settings.NOTIFY_STAFF_MEMBERSHIP_EVENTS:
+    # Check if approval is required (free membership pending approval)
+    requires_approval = (
+        membership.approved_datetime is None and membership.membership_option.cost == 0
+    )
+
+    # Always send email if approval is required, even if notifications are disabled
+    # Otherwise, check feature flag
+    if not requires_approval and not settings.NOTIFY_STAFF_MEMBERSHIP_EVENTS:
         return
 
     # Get staff emails
@@ -32,10 +38,17 @@ def send_staff_organisation_membership_notification(membership):
     if not staff_emails:
         return
 
-    # Build subject
-    subject = _("New Organisation Membership: %(organisation_name)s") % {
-        "organisation_name": membership.organisation.name,
-    }
+    # Build subject - add "REQUIRES APPROVAL" prefix if approval is needed
+    if requires_approval:
+        subject = _(
+            "REQUIRES APPROVAL: Organisation Membership - %(organisation_name)s",
+        ) % {
+            "organisation_name": membership.organisation.name,
+        }
+    else:
+        subject = _("New Organisation Membership: %(organisation_name)s") % {
+            "organisation_name": membership.organisation.name,
+        }
 
     # Build context
     context = {
@@ -51,6 +64,8 @@ def send_staff_organisation_membership_notification(membership):
             if membership.invoices.exists()
             else None
         ),
+        "requires_approval": membership.approved_datetime is None,
+        "is_free": membership.membership_option.cost == 0,
     }
 
     # Render HTML email
@@ -167,8 +182,14 @@ def send_staff_individual_membership_notification(membership):
     Args:
         membership: The newly created IndividualMembership instance.
     """
-    # Check feature flag
-    if not settings.NOTIFY_STAFF_MEMBERSHIP_EVENTS:
+    # Check if approval is required (free membership pending approval)
+    requires_approval = (
+        membership.approved_datetime is None and membership.membership_option.cost == 0
+    )
+
+    # Always send email if approval is required, even if notifications are disabled
+    # Otherwise, check feature flag
+    if not requires_approval and not settings.NOTIFY_STAFF_MEMBERSHIP_EVENTS:
         return
 
     # Get staff emails
@@ -180,10 +201,15 @@ def send_staff_individual_membership_notification(membership):
     if not staff_emails:
         return
 
-    # Build subject
-    subject = _("New Individual Membership: %(user_name)s") % {
-        "user_name": membership.user.get_full_name(),
-    }
+    # Build subject - add "REQUIRES APPROVAL" prefix if approval is needed
+    if requires_approval:
+        subject = _("REQUIRES APPROVAL: Individual Membership - %(user_name)s") % {
+            "user_name": membership.user.get_full_name(),
+        }
+    else:
+        subject = _("New Individual Membership: %(user_name)s") % {
+            "user_name": membership.user.get_full_name(),
+        }
 
     # Build context
     context = {
@@ -200,6 +226,8 @@ def send_staff_individual_membership_notification(membership):
             if membership.invoices.exists()
             else None
         ),
+        "requires_approval": membership.approved_datetime is None,
+        "is_free": membership.membership_option.cost == 0,
     }
 
     # Render HTML email

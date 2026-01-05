@@ -327,3 +327,82 @@ class TestCreateOrganisationMembershipView:
 
         assert response.status_code == HTTPStatus.FOUND
         assert len(mailoutbox) == 0  # No notification sent
+
+    @override_settings(REQUIRE_FREE_MEMBERSHIP_APPROVAL=True)
+    def test_free_membership_pending_approval_message(self, user: User, client):
+        """Test that pending approval message is shown when feature is enabled."""
+        org = OrganisationFactory()
+        OrganisationMemberFactory(
+            organisation=org,
+            user=user,
+            role=OrganisationMember.Role.ADMIN,
+            accepted_datetime=timezone.now(),
+        )
+        option = MembershipOptionFactory(
+            type=MembershipOptionType.ORGANISATION,
+            max_seats=10,
+            cost=0,  # Free
+        )
+
+        client.force_login(user)
+        url = reverse("memberships:apply-organisation", kwargs={"uuid": org.uuid})
+        data = {
+            "membership_option": option.id,
+            "start_date": timezone.localdate(),
+            "seat_count": 5,
+        }
+
+        response = client.post(url, data=data, follow=True)
+
+        assert response.status_code == HTTPStatus.OK
+
+        # Check for pending approval message
+        messages = list(response.context["messages"])
+        assert len(messages) == 1
+        assert "pending admin review" in str(messages[0]).lower()
+        assert "once approved" in str(messages[0]).lower()
+
+        # Verify membership is pending
+        membership = OrganisationMembership.objects.get(organisation=org)
+        assert membership.approved_datetime is None
+        assert membership.status().name == "PENDING"
+
+    @override_settings(REQUIRE_FREE_MEMBERSHIP_APPROVAL=False)
+    def test_free_membership_standard_message(self, user: User, client):
+        """Test that standard message is shown when auto-approved."""
+        org = OrganisationFactory()
+        OrganisationMemberFactory(
+            organisation=org,
+            user=user,
+            role=OrganisationMember.Role.ADMIN,
+            accepted_datetime=timezone.now(),
+        )
+        option = MembershipOptionFactory(
+            type=MembershipOptionType.ORGANISATION,
+            max_seats=10,
+            cost=0,  # Free
+        )
+
+        client.force_login(user)
+        url = reverse("memberships:apply-organisation", kwargs={"uuid": org.uuid})
+        data = {
+            "membership_option": option.id,
+            "start_date": timezone.localdate(),
+            "seat_count": 5,
+        }
+
+        response = client.post(url, data=data, follow=True)
+
+        assert response.status_code == HTTPStatus.OK
+
+        # Check for standard success message
+        messages = list(response.context["messages"])
+        assert len(messages) == 1
+        assert "membership added successfully" in str(messages[0]).lower()
+        assert "5 seats available" in str(messages[0]).lower()
+        assert "pending" not in str(messages[0]).lower()
+
+        # Verify membership is approved
+        membership = OrganisationMembership.objects.get(organisation=org)
+        assert membership.approved_datetime is not None
+        assert membership.status().name == "ACTIVE"
