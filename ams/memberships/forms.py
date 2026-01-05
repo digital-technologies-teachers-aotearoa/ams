@@ -365,6 +365,21 @@ class CreateOrganisationMembershipForm(ModelForm):
         seat_count = self.cleaned_data.get("seat_count")
         membership_option = self.cleaned_data.get("membership_option")
 
+        # Check that seat count includes all current active organisation members
+        if self.organisation and seat_count:
+            active_member_count = (
+                self.organisation.organisation_members.active().count()
+            )
+            if seat_count < active_member_count:
+                raise ValidationError(
+                    _(
+                        "Seat count (%(count)s) must be at least %(required)s to "
+                        "include all current active organisation members.",
+                    )
+                    % {"count": seat_count, "required": active_member_count},
+                    code="insufficient_seats_for_members",
+                )
+
         if membership_option and membership_option.max_seats:
             max_seats = int(membership_option.max_seats)
             if seat_count > max_seats:

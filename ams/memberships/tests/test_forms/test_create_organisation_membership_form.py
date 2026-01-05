@@ -8,6 +8,7 @@ from ams.memberships.models import MembershipOptionType
 from ams.memberships.tests.factories import MembershipOptionFactory
 from ams.memberships.tests.factories import OrganisationMembershipFactory
 from ams.organisations.tests.factories import OrganisationFactory
+from ams.organisations.tests.factories import OrganisationMemberFactory
 
 pytestmark = pytest.mark.django_db
 
@@ -240,3 +241,126 @@ class TestCreateOrganisationMembershipForm:
         """Test form raises error when organisation is not an Organisation instance."""
         with pytest.raises(TypeError, match="must be an instance of Organisation"):
             CreateOrganisationMembershipForm(organisation="not an organisation")
+
+    def test_form_invalid_seat_count_less_than_active_members(self):
+        """Test form is invalid when seat count is less than active member count."""
+        org = OrganisationFactory()
+        option = MembershipOptionFactory(
+            type=MembershipOptionType.ORGANISATION,
+            max_seats=10,
+        )
+
+        # Create 3 active organisation members
+        OrganisationMemberFactory(organisation=org, accepted_datetime=timezone.now())
+        OrganisationMemberFactory(organisation=org, accepted_datetime=timezone.now())
+        OrganisationMemberFactory(organisation=org, accepted_datetime=timezone.now())
+
+        form = CreateOrganisationMembershipForm(
+            organisation=org,
+            data={
+                "membership_option": option.id,
+                "start_date": timezone.localdate(),
+                "seat_count": 2,  # Less than 3 active members
+            },
+        )
+
+        assert not form.is_valid()
+        assert "seat_count" in form.errors
+        assert "must be at least 3" in str(form.errors["seat_count"])
+
+    def test_form_valid_seat_count_equals_active_members(self):
+        """Test form is valid when seat count equals active member count."""
+        org = OrganisationFactory()
+        option = MembershipOptionFactory(
+            type=MembershipOptionType.ORGANISATION,
+            max_seats=10,
+        )
+
+        # Create 3 active organisation members
+        OrganisationMemberFactory(organisation=org, accepted_datetime=timezone.now())
+        OrganisationMemberFactory(organisation=org, accepted_datetime=timezone.now())
+        OrganisationMemberFactory(organisation=org, accepted_datetime=timezone.now())
+
+        form = CreateOrganisationMembershipForm(
+            organisation=org,
+            data={
+                "membership_option": option.id,
+                "start_date": timezone.localdate(),
+                "seat_count": 3,  # Exactly 3 seats for 3 members
+            },
+        )
+
+        assert form.is_valid(), form.errors
+
+    def test_form_valid_seat_count_exceeds_active_members(self):
+        """Test form is valid when seat count exceeds active member count."""
+        org = OrganisationFactory()
+        option = MembershipOptionFactory(
+            type=MembershipOptionType.ORGANISATION,
+            max_seats=10,
+        )
+
+        # Create 3 active organisation members
+        OrganisationMemberFactory(organisation=org, accepted_datetime=timezone.now())
+        OrganisationMemberFactory(organisation=org, accepted_datetime=timezone.now())
+        OrganisationMemberFactory(organisation=org, accepted_datetime=timezone.now())
+
+        form = CreateOrganisationMembershipForm(
+            organisation=org,
+            data={
+                "membership_option": option.id,
+                "start_date": timezone.localdate(),
+                "seat_count": 5,  # More than 3 active members
+            },
+        )
+
+        assert form.is_valid(), form.errors
+
+    def test_form_ignores_declined_and_revoked_members_in_count(self):
+        """Test form only counts active members, ignoring declined and revoked."""
+        org = OrganisationFactory()
+        option = MembershipOptionFactory(
+            type=MembershipOptionType.ORGANISATION,
+            max_seats=10,
+        )
+
+        # Create 2 active members
+        OrganisationMemberFactory(organisation=org, accepted_datetime=timezone.now())
+        OrganisationMemberFactory(organisation=org, accepted_datetime=timezone.now())
+
+        # Create 1 declined member
+        OrganisationMemberFactory(
+            organisation=org,
+            declined_datetime=timezone.now(),
+        )
+
+        # Create 1 revoked member
+        OrganisationMemberFactory(
+            organisation=org,
+            revoked_datetime=timezone.now(),
+        )
+
+        # Form should require only 2 seats (for 2 active members)
+        form = CreateOrganisationMembershipForm(
+            organisation=org,
+            data={
+                "membership_option": option.id,
+                "start_date": timezone.localdate(),
+                "seat_count": 2,
+            },
+        )
+
+        assert form.is_valid(), form.errors
+
+        # Form should be invalid with only 1 seat
+        form_invalid = CreateOrganisationMembershipForm(
+            organisation=org,
+            data={
+                "membership_option": option.id,
+                "start_date": timezone.localdate(),
+                "seat_count": 1,
+            },
+        )
+
+        assert not form_invalid.is_valid()
+        assert "seat_count" in form_invalid.errors
