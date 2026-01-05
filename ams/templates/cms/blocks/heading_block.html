@@ -1,7 +1,9 @@
-{% if self.size == 'h2' %}
-  <h2 class="mb-0">{{ self.heading_text }}</h2>
-{% elif self.size == 'h3' %}
-  <h3 class="mb-0">{{ self.heading_text }}</h3>
-{% elif self.size == 'h4' %}
-  <h4 class="mb-0">{{ self.heading_text }}</h4>
+<{{ self.size }} class="mb-0
+{% if self.alignment == 'center' %}
+  text-center
+{% else %}
+  text-start
 {% endif %}
+">
+{{ self.heading_text }}
+</{{ self.size }}>
