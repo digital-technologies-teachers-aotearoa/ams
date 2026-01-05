@@ -1,0 +1,6 @@
+<hgroup class="d-flex gap-1 {% if self.subtitle.position == 'after' %}flex-column{% else %} flex-column-reverse {% endif %}">
+  <h1 class="mb-0 display-{{ self.title.size }} {% if self.alignment == 'center' %} text-center {% else %} text-start {% endif %}{% if self.title.font_weight == 'bold' %} fw-bold {% elif self.title.font_weight == 'semibold' %} fw-semibold {% elif self.title.font_weight == 'normal' %} fw-normal {% elif self.title.font_weight == 'light' %} fw-light {% endif %}"
+      style="color: {{ self.title.colour }}">{{ self.title.text }}</h1>
+  <p class="mb-0 display-{{ self.subtitle.size }} {% if self.alignment == 'center' %} text-center {% else %} text-start {% endif %}{% if self.subtitle.font_weight == 'bold' %} fw-bold {% elif self.subtitle.font_weight == 'semibold' %} fw-semibold {% elif self.subtitle.font_weight == 'normal' %} fw-normal {% elif self.subtitle.font_weight == 'light' %} fw-light {% endif %}"
+     style="color: {{ self.subtitle.colour }}">{{ self.subtitle.text }}</p>
+</hgroup>

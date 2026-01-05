@@ -3,8 +3,5 @@
 {% load wagtailcore_tags %}
 
 {% block content %}
-  <h1 class="text-center display-5 fw-bold text-body-emphasis lh-1 mb-3">
-    {{ settings.cms.AssociationSettings.association_long_name|default:'Association Management Software' }}
-  </h1>
   <div class="col-12 d-flex flex-column gap-5">{{ page.body }}</div>
 {% endblock content %}

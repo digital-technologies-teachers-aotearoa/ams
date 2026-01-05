@@ -5,14 +5,15 @@ from wagtail.admin.panels import FieldPanel
 from wagtail.fields import StreamField
 from wagtail.models import Page
 
-from ams.cms.blocks import ContentAndLayoutStreamBlocks
+from ams.cms.blocks import ContentPageBlocks
+from ams.cms.blocks import HomePageBlocks
 from ams.utils.permissions import user_has_active_membership
 from ams.utils.reserved_paths import get_reserved_paths_set
 
 
 class HomePage(Page):
     body = StreamField(
-        ContentAndLayoutStreamBlocks(),
+        HomePageBlocks(),
         blank=True,
         use_json_field=True,
         help_text="Content for the home page.",
@@ -32,7 +33,7 @@ class ContentPage(Page):
     ]
 
     body = StreamField(
-        ContentAndLayoutStreamBlocks(),
+        ContentPageBlocks(),
         blank=True,
         use_json_field=True,
         help_text="Content for this page.",
