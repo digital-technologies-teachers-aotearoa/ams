@@ -25,7 +25,6 @@ class TestOrganisationMembershipTable:
         org = OrganisationFactory()
         membership = OrganisationMembershipFactory(
             organisation=org,
-            invoice=None,
             start_date=timezone.localdate() - timedelta(days=30),
             expiry_date=timezone.localdate() + timedelta(days=335),
             membership_option__type=MembershipOptionType.ORGANISATION,
@@ -36,14 +35,12 @@ class TestOrganisationMembershipTable:
         # Check that invoice column is using the correct template
         invoice_column = table.base_columns["invoice"]
         assert invoice_column.template_name == "users/tables/invoice_column.html"
-        assert invoice_column.accessor == "invoice"
 
     def test_invoice_column_with_no_invoice(self):
         """Test that invoice column has None when there's no invoice."""
         org = OrganisationFactory()
         membership = OrganisationMembershipFactory(
             organisation=org,
-            invoice=None,
             start_date=timezone.localdate() - timedelta(days=30),
             expiry_date=timezone.localdate() + timedelta(days=335),
             membership_option__type=MembershipOptionType.ORGANISATION,
@@ -53,107 +50,107 @@ class TestOrganisationMembershipTable:
 
         # Verify that the table has the correct data
         assert len(table.data) == 1
-        assert table.data[0].invoice is None
+        assert not table.data[0].invoices.exists()
 
     def test_invoice_column_with_paid_invoice_and_xero(self):
         """Test that invoice data is available for paid invoice with Xero."""
         org = OrganisationFactory()
         account = AccountFactory(organisation=org)
-        invoice = InvoiceFactory(
-            account=account,
-            paid_date=timezone.localdate(),
-            billing_service_invoice_id="XERO-123",
-        )
         membership = OrganisationMembershipFactory(
             organisation=org,
-            invoice=invoice,
             start_date=timezone.localdate() - timedelta(days=30),
             expiry_date=timezone.localdate() + timedelta(days=335),
             membership_option__type=MembershipOptionType.ORGANISATION,
+        )
+        invoice = InvoiceFactory(
+            account=account,
+            organisation_membership=membership,
+            paid_date=timezone.localdate(),
+            billing_service_invoice_id="XERO-123",
         )
 
         table = OrganisationMembershipTable([membership])
 
         # Verify that the table has the correct invoice data
         assert len(table.data) == 1
-        assert table.data[0].invoice == invoice
-        assert table.data[0].invoice.billing_service_invoice_id == "XERO-123"
-        assert table.data[0].invoice.paid_date is not None
+        assert table.data[0].invoices.first() == invoice
+        assert table.data[0].invoices.first().billing_service_invoice_id == "XERO-123"
+        assert table.data[0].invoices.first().paid_date is not None
 
     def test_invoice_column_with_paid_invoice_no_xero(self):
         """Test that invoice data is available for paid invoice without Xero."""
         org = OrganisationFactory()
         account = AccountFactory(organisation=org)
-        invoice = InvoiceFactory(
-            account=account,
-            paid_date=timezone.localdate(),
-            billing_service_invoice_id="",  # No Xero integration
-        )
         membership = OrganisationMembershipFactory(
             organisation=org,
-            invoice=invoice,
             start_date=timezone.localdate() - timedelta(days=30),
             expiry_date=timezone.localdate() + timedelta(days=335),
             membership_option__type=MembershipOptionType.ORGANISATION,
+        )
+        invoice = InvoiceFactory(
+            account=account,
+            organisation_membership=membership,
+            paid_date=timezone.localdate(),
+            billing_service_invoice_id="",  # No Xero integration
         )
 
         table = OrganisationMembershipTable([membership])
 
         # Verify that the table has the correct invoice data
         assert len(table.data) == 1
-        assert table.data[0].invoice == invoice
-        assert table.data[0].invoice.billing_service_invoice_id == ""
-        assert table.data[0].invoice.paid_date is not None
+        assert table.data[0].invoices.first() == invoice
+        assert table.data[0].invoices.first().billing_service_invoice_id == ""
+        assert table.data[0].invoices.first().paid_date is not None
 
     def test_invoice_column_with_unpaid_invoice_and_xero(self):
         """Test that invoice data is available for unpaid invoice with Xero."""
         org = OrganisationFactory()
         account = AccountFactory(organisation=org)
-        invoice = InvoiceFactory(
-            account=account,
-            paid_date=None,
-            billing_service_invoice_id="XERO-123",
-        )
         membership = OrganisationMembershipFactory(
             organisation=org,
-            invoice=invoice,
             start_date=timezone.localdate() - timedelta(days=30),
             expiry_date=timezone.localdate() + timedelta(days=335),
             membership_option__type=MembershipOptionType.ORGANISATION,
+        )
+        invoice = InvoiceFactory(
+            account=account,
+            organisation_membership=membership,
+            paid_date=None,
+            billing_service_invoice_id="XERO-123",
         )
 
         table = OrganisationMembershipTable([membership])
 
         # Verify that the table has the correct invoice data
         assert len(table.data) == 1
-        assert table.data[0].invoice == invoice
-        assert table.data[0].invoice.billing_service_invoice_id == "XERO-123"
-        assert table.data[0].invoice.paid_date is None
+        assert table.data[0].invoices.first() == invoice
+        assert table.data[0].invoices.first().billing_service_invoice_id == "XERO-123"
+        assert table.data[0].invoices.first().paid_date is None
 
     def test_invoice_column_with_unpaid_invoice_no_xero(self):
         """Test that invoice data is available for unpaid invoice without Xero."""
         org = OrganisationFactory()
         account = AccountFactory(organisation=org)
-        invoice = InvoiceFactory(
-            account=account,
-            paid_date=None,
-            billing_service_invoice_id="",  # No Xero integration
-        )
         membership = OrganisationMembershipFactory(
             organisation=org,
-            invoice=invoice,
             start_date=timezone.localdate() - timedelta(days=30),
             expiry_date=timezone.localdate() + timedelta(days=335),
             membership_option__type=MembershipOptionType.ORGANISATION,
+        )
+        invoice = InvoiceFactory(
+            account=account,
+            organisation_membership=membership,
+            paid_date=None,
+            billing_service_invoice_id="",  # No Xero integration
         )
 
         table = OrganisationMembershipTable([membership])
 
         # Verify that the table has the correct invoice data
         assert len(table.data) == 1
-        assert table.data[0].invoice == invoice
-        assert table.data[0].invoice.billing_service_invoice_id == ""
-        assert table.data[0].invoice.paid_date is None
+        assert table.data[0].invoices.first() == invoice
+        assert table.data[0].invoices.first().billing_service_invoice_id == ""
+        assert table.data[0].invoices.first().paid_date is None
 
 
 class TestInvoiceColumnTemplateRendering:
@@ -161,10 +158,17 @@ class TestInvoiceColumnTemplateRendering:
 
     def test_invoice_template_renders_not_required_when_no_invoice(self):
         """Test invoice template renders 'Not required' when there's no invoice."""
+        org = OrganisationFactory()
+        membership = OrganisationMembershipFactory(
+            organisation=org,
+            start_date=timezone.localdate() - timedelta(days=30),
+            expiry_date=timezone.localdate() + timedelta(days=335),
+            membership_option__type=MembershipOptionType.ORGANISATION,
+        )
         template = Template(
             "{% load icon %}{% include 'users/tables/invoice_column.html' %}",
         )
-        context = Context({"value": None})
+        context = Context({"record": membership})
 
         html = template.render(context)
 
@@ -175,8 +179,15 @@ class TestInvoiceColumnTemplateRendering:
         """Test invoice template renders a link for paid invoices with Xero."""
         org = OrganisationFactory()
         account = AccountFactory(organisation=org)
+        membership = OrganisationMembershipFactory(
+            organisation=org,
+            start_date=timezone.localdate() - timedelta(days=30),
+            expiry_date=timezone.localdate() + timedelta(days=335),
+            membership_option__type=MembershipOptionType.ORGANISATION,
+        )
         invoice = InvoiceFactory(
             account=account,
+            organisation_membership=membership,
             paid_date=timezone.localdate(),
             billing_service_invoice_id="XERO-123",
         )
@@ -184,7 +195,7 @@ class TestInvoiceColumnTemplateRendering:
         template = Template(
             "{% load icon %}{% include 'users/tables/invoice_column.html' %}",
         )
-        context = Context({"value": invoice})
+        context = Context({"record": membership})
 
         html = template.render(context)
 
@@ -196,8 +207,15 @@ class TestInvoiceColumnTemplateRendering:
         """Test invoice template renders text only for paid invoices without Xero."""
         org = OrganisationFactory()
         account = AccountFactory(organisation=org)
+        membership = OrganisationMembershipFactory(
+            organisation=org,
+            start_date=timezone.localdate() - timedelta(days=30),
+            expiry_date=timezone.localdate() + timedelta(days=335),
+            membership_option__type=MembershipOptionType.ORGANISATION,
+        )
         invoice = InvoiceFactory(
             account=account,
+            organisation_membership=membership,
             paid_date=timezone.localdate(),
             billing_service_invoice_id="",
         )
@@ -205,7 +223,7 @@ class TestInvoiceColumnTemplateRendering:
         template = Template(
             "{% load icon %}{% include 'users/tables/invoice_column.html' %}",
         )
-        context = Context({"value": invoice})
+        context = Context({"record": membership})
 
         html = template.render(context)
 
@@ -217,8 +235,15 @@ class TestInvoiceColumnTemplateRendering:
         """Test invoice template renders a link for unpaid invoices with Xero."""
         org = OrganisationFactory()
         account = AccountFactory(organisation=org)
+        membership = OrganisationMembershipFactory(
+            organisation=org,
+            start_date=timezone.localdate() - timedelta(days=30),
+            expiry_date=timezone.localdate() + timedelta(days=335),
+            membership_option__type=MembershipOptionType.ORGANISATION,
+        )
         invoice = InvoiceFactory(
             account=account,
+            organisation_membership=membership,
             paid_date=None,
             billing_service_invoice_id="XERO-456",
         )
@@ -226,7 +251,7 @@ class TestInvoiceColumnTemplateRendering:
         template = Template(
             "{% load icon %}{% include 'users/tables/invoice_column.html' %}",
         )
-        context = Context({"value": invoice})
+        context = Context({"record": membership})
 
         html = template.render(context)
 
@@ -238,8 +263,15 @@ class TestInvoiceColumnTemplateRendering:
         """Test invoice template renders text only for unpaid invoices without Xero."""
         org = OrganisationFactory()
         account = AccountFactory(organisation=org)
+        membership = OrganisationMembershipFactory(
+            organisation=org,
+            start_date=timezone.localdate() - timedelta(days=30),
+            expiry_date=timezone.localdate() + timedelta(days=335),
+            membership_option__type=MembershipOptionType.ORGANISATION,
+        )
         invoice = InvoiceFactory(
             account=account,
+            organisation_membership=membership,
             paid_date=None,
             billing_service_invoice_id="",
         )
@@ -247,7 +279,7 @@ class TestInvoiceColumnTemplateRendering:
         template = Template(
             "{% load icon %}{% include 'users/tables/invoice_column.html' %}",
         )
-        context = Context({"value": invoice})
+        context = Context({"record": membership})
 
         html = template.render(context)
 

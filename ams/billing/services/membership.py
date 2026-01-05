@@ -24,6 +24,8 @@ from ams.memberships.models import MembershipOption
 from ams.memberships.models import MembershipStatus
 
 if TYPE_CHECKING:  # pragma: no cover
+    from decimal import Decimal
+
     from ams.billing.models import Account
     from ams.billing.models import Invoice
 
@@ -48,6 +50,8 @@ class MembershipBillingService:
         account: Account,
         membership_option: MembershipOption,
         seat_count: int = 1,
+        membership=None,
+        unit_price_override: Decimal | None = None,
     ) -> Invoice | None:
         """Create an invoice for a membership option if billable.
 
@@ -55,6 +59,8 @@ class MembershipBillingService:
             account: The billing account for the invoice.
             membership_option: The membership option being invoiced.
             seat_count: Number of seats/quantity for the membership (default: 1).
+            membership: Optional IndividualMembership or OrganisationMembership to link.
+            unit_price_override: Optional override for unit price (e.g., pro-rata).
 
         Raises:
             BillingDetailUpdateError: If billing details update fails.
@@ -91,7 +97,7 @@ class MembershipBillingService:
             invoice_line_items = [
                 {
                     "description": str(membership_option),
-                    "unit_amount": membership_option.cost,
+                    "unit_amount": unit_price_override or membership_option.cost,
                     "quantity": seat_count,
                 },
             ]
@@ -105,6 +111,17 @@ class MembershipBillingService:
                 invoice_line_items,
                 membership_option.invoice_reference,
             )
+
+            # Link invoice to membership
+            if membership:
+                if hasattr(membership, "user"):
+                    # Individual membership
+                    invoice.individual_membership = membership
+                    invoice.save(update_fields=["individual_membership"])
+                else:
+                    # Organisation membership
+                    invoice.organisation_membership = membership
+                    invoice.save(update_fields=["organisation_membership"])
 
             if self.can_send_email(email):
                 transaction.on_commit(partial(self._email_invoice, invoice=invoice))
@@ -135,16 +152,33 @@ class MembershipBillingService:
             )
 
     def approve_paid_memberships(self, invoice: Invoice) -> None:
-        """Approve user memberships when invoice is paid."""
+        """Approve memberships when invoice is paid.
+
+        Handles both individual and organisation memberships.
+        """
         if not invoice.paid_date:
             return
 
-        for individual_membership in invoice.individual_memberships.all():
-            if individual_membership.status() == MembershipStatus.PENDING:
-                individual_membership.approved_datetime = timezone.now()
-                individual_membership.save(update_fields=["approved_datetime"])
+        # Approve individual membership if linked
+        if invoice.individual_membership:
+            if invoice.individual_membership.status() == MembershipStatus.PENDING:
+                invoice.individual_membership.approved_datetime = timezone.now()
+                invoice.individual_membership.save(update_fields=["approved_datetime"])
                 logger.info(
-                    "Approved user membership %s for invoice %s",
-                    individual_membership.pk,
+                    "Approved individual membership %s for invoice %s",
+                    invoice.individual_membership.pk,
+                    invoice.invoice_number,
+                )
+
+        # Approve organisation membership if linked
+        if invoice.organisation_membership:
+            if invoice.organisation_membership.status() == MembershipStatus.PENDING:
+                invoice.organisation_membership.approved_datetime = timezone.now()
+                invoice.organisation_membership.save(
+                    update_fields=["approved_datetime"],
+                )
+                logger.info(
+                    "Approved organisation membership %s for invoice %s",
+                    invoice.organisation_membership.pk,
                     invoice.invoice_number,
                 )

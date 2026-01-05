@@ -1,23 +1,27 @@
 {% load icon %}
 
-{% if not value %}
+{% if not record.invoices.exists %}
   <span class="text-secondary">Not required</span>
-{% elif value.paid_date %}
-  {% if value.billing_service_invoice_id %}
-    <a href="{% url 'billing:invoice-redirect' value.invoice_number %}"
-       target="_blank"
-       rel="noopener noreferrer"
-       class="text-success">Paid<span class="ps-1">{% icon "box-arrow-up-right" %}</span></a>
-  {% else %}
-    <span class="text-success">Paid</span>
-  {% endif %}
 {% else %}
-  {% if value.billing_service_invoice_id %}
-    <a href="{% url 'billing:invoice-redirect' value.invoice_number %}"
-       target="_blank"
-       rel="noopener noreferrer"
-       class="text-warning">Awaiting payment<span class="ps-1">{% icon "box-arrow-up-right" %}</span></a>
-  {% else %}
-    <span class="text-warning">Awaiting payment</span>
-  {% endif %}
+  {% for invoice in record.invoices.all %}
+    {% if invoice.paid_date %}
+      {% if invoice.billing_service_invoice_id %}
+        <a href="{% url 'billing:invoice-redirect' invoice.invoice_number %}"
+           target="_blank"
+           rel="noopener noreferrer"
+           class="text-success d-block">Paid<span class="ps-1">{% icon "box-arrow-up-right" %}</span></a>
+      {% else %}
+        <span class="text-success d-block">Paid</span>
+      {% endif %}
+    {% else %}
+      {% if invoice.billing_service_invoice_id %}
+        <a href="{% url 'billing:invoice-redirect' invoice.invoice_number %}"
+           target="_blank"
+           rel="noopener noreferrer"
+           class="text-warning d-block">Awaiting payment<span class="ps-1">{% icon "box-arrow-up-right" %}</span></a>
+      {% else %}
+        <span class="text-warning d-block">Awaiting payment</span>
+      {% endif %}
+    {% endif %}
+  {% endfor %}
 {% endif %}

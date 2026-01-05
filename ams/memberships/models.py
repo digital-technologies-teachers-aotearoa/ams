@@ -4,7 +4,6 @@ from typing import Any
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db.models import CASCADE
-from django.db.models import SET_NULL
 from django.db.models import BooleanField
 from django.db.models import CharField
 from django.db.models import DateField
@@ -245,13 +244,6 @@ class IndividualMembership(BaseMembership):
         on_delete=CASCADE,
         related_name="individual_memberships",
     )
-    invoice = ForeignKey(
-        "billing.Invoice",
-        on_delete=SET_NULL,
-        null=True,
-        blank=True,
-        related_name="individual_memberships",
-    )
 
     objects = IndividualMembershipQuerySet.as_manager()
 
@@ -301,13 +293,6 @@ class OrganisationMembership(BaseMembership):
     membership_option = ForeignKey(
         MembershipOption,
         on_delete=CASCADE,
-        related_name="organisation_memberships",
-    )
-    invoice = ForeignKey(
-        "billing.Invoice",
-        on_delete=SET_NULL,
-        null=True,
-        blank=True,
         related_name="organisation_memberships",
     )
     seats = DecimalField(

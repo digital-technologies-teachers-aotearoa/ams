@@ -241,7 +241,7 @@ class TestCreateOrganisationMembershipView:
 
         # Membership should be created without invoice
         membership = OrganisationMembership.objects.get(organisation=org)
-        assert membership.invoice is None
+        assert not membership.invoices.exists()
 
     def test_add_membership_sends_staff_notification(
         self,

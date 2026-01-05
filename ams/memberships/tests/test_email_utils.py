@@ -123,7 +123,6 @@ class TestSendStaffOrganisationMembershipNotification:
         membership = OrganisationMembershipFactory(
             organisation=organisation,
             membership_option=membership_option,
-            invoice=None,
         )
 
         # Send notification
@@ -293,7 +292,6 @@ class TestSendStaffOrganisationSeatsAddedNotification:
         membership = OrganisationMembershipFactory(
             organisation=organisation,
             membership_option=membership_option,
-            invoice=None,
         )
 
         # Send notification without invoice
@@ -446,7 +444,6 @@ class TestSendStaffIndividualMembershipNotification:
         membership = IndividualMembershipFactory(
             user=user,
             membership_option=membership_option,
-            invoice=None,
         )
 
         # Send notification

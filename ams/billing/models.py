@@ -58,6 +58,20 @@ class Invoice(Model):
     due = DecimalField(max_digits=10, decimal_places=2)
     billing_service_invoice_id = CharField(max_length=255, unique=True)
     update_needed = BooleanField(default=False)
+    individual_membership = ForeignKey(
+        "memberships.IndividualMembership",
+        on_delete=CASCADE,
+        null=True,
+        blank=True,
+        related_name="invoices",
+    )
+    organisation_membership = ForeignKey(
+        "memberships.OrganisationMembership",
+        on_delete=CASCADE,
+        null=True,
+        blank=True,
+        related_name="invoices",
+    )
 
     def __str__(self):
         return f"Invoice {self.invoice_number} for {self.account}"

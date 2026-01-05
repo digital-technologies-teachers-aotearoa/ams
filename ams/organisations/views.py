@@ -155,10 +155,13 @@ class OrganisationDetailView(
         )
 
         # Get organisation memberships
-        memberships = organisation.organisation_memberships.select_related(
-            "membership_option",
-            "invoice",
-        ).order_by("-start_date")
+        memberships = (
+            organisation.organisation_memberships.select_related(
+                "membership_option",
+            )
+            .prefetch_related("invoices")
+            .order_by("-start_date")
+        )
         context["membership_table"] = OrganisationMembershipTable(memberships)
 
         # Get active organisation membership for seats summary
