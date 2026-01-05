@@ -463,6 +463,8 @@ class XeroBillingService(BillingService):
         Returns:
             The newly created Invoice model instance.
         """
+        self._get_authentication_token()
+
         contact_id = account.xero_contact.contact_id
 
         amount_type = LineAmountTypes[settings.XERO_AMOUNT_TYPE]
