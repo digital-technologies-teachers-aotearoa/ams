@@ -40,12 +40,24 @@ class CreateIndividualMembershipView(LoginRequiredMixin, FormView):
     def form_valid(self, form):  # type: ignore[override]
         membership = form.save(user=self.request.user)
         send_staff_individual_membership_notification(membership)
-        messages.success(
-            self.request,
-            _(
-                "Your membership application has been submitted.",
-            ),
-        )
+
+        # Show different message based on approval status
+        if membership.approved_datetime:
+            messages.success(
+                self.request,
+                _(
+                    "Your membership application has been submitted.",
+                ),
+            )
+        else:
+            messages.success(
+                self.request,
+                _(
+                    "Your membership application has been submitted and is "
+                    "pending admin review. You will be notified once approved.",
+                ),
+            )
+
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):  # type: ignore[override]
@@ -142,18 +154,32 @@ class CreateOrganisationMembershipView(
         # Send staff notification
         send_staff_organisation_membership_notification(membership)
 
-        # Add success message
-        messages.success(
-            self.request,
-            _(
-                "Membership added successfully. "
-                "%(seats)s seats available until %(expiry)s.",
+        # Add success message based on approval status
+        if membership.approved_datetime:
+            messages.success(
+                self.request,
+                _(
+                    "Membership added successfully. "
+                    "%(seats)s seats available until %(expiry)s.",
+                )
+                % {
+                    "seats": membership.seats,
+                    "expiry": membership.expiry_date.strftime("%d/%m/%Y"),
+                },
             )
-            % {
-                "seats": membership.seats,
-                "expiry": membership.expiry_date.strftime("%d/%m/%Y"),
-            },
-        )
+        else:
+            messages.success(
+                self.request,
+                _(
+                    "Membership application submitted successfully and is pending "
+                    "admin review. Once approved, %(seats)s seats will be available "
+                    "until %(expiry)s.",
+                )
+                % {
+                    "seats": membership.seats,
+                    "expiry": membership.expiry_date.strftime("%d/%m/%Y"),
+                },
+            )
 
         # Redirect to organisation detail
         return redirect(

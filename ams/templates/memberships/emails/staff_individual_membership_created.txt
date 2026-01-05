@@ -3,6 +3,10 @@
 
 {% blocktrans with user_name=user_full_name %}A new membership has been purchased for {{ user_name }}.{% endblocktrans %}
 
+{% if requires_approval and is_free %}
+⚠ ACTION REQUIRED: This free membership requires manual approval in Django admin.
+{% endif %}
+
 {% trans "Membership Details" %}
 ------------------------
 {% trans "Member:" %} {{ user_full_name }}
@@ -11,6 +15,7 @@
 {% trans "Start Date:" %} {{ start_date|date:"d/m/Y" }}
 {% trans "Expiry Date:" %} {{ expiry_date|date:"d/m/Y" }}
 {% trans "Cost:" %} ${{ cost }}
+{% trans "Status:" %} {% if requires_approval %}{% trans "Pending Approval" %}{% else %}{% trans "Approved" %}{% endif %}
 {% if invoice_number %}{% trans "Invoice Number:" %} {{ invoice_number }}{% endif %}
 
 ------------------------

@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 import pytest
+from django.test import override_settings
 from django.utils import timezone
 
 from ams.memberships.forms import CreateOrganisationMembershipForm
@@ -364,3 +365,83 @@ class TestCreateOrganisationMembershipForm:
 
         assert not form_invalid.is_valid()
         assert "seat_count" in form_invalid.errors
+
+    @override_settings(REQUIRE_FREE_MEMBERSHIP_APPROVAL=True)
+    def test_free_membership_requires_approval_when_enabled(self):
+        """Test that free org memberships require approval when feature is enabled."""
+        org = OrganisationFactory()
+        option = MembershipOptionFactory(
+            type=MembershipOptionType.ORGANISATION,
+            cost=0,
+            max_seats=10,
+        )
+
+        form = CreateOrganisationMembershipForm(
+            organisation=org,
+            data={
+                "membership_option": option.id,
+                "start_date": timezone.localdate(),
+                "seat_count": 5,
+            },
+        )
+        assert form.is_valid()
+
+        membership = form.save()
+
+        # Should NOT be auto-approved
+        assert membership.approved_datetime is None
+        assert membership.status().name == "PENDING"
+        assert not membership.invoices.exists()
+
+    @override_settings(REQUIRE_FREE_MEMBERSHIP_APPROVAL=False)
+    def test_free_membership_auto_approved_when_disabled(self):
+        """Test that free org memberships are auto-approved when feature is disabled."""
+        org = OrganisationFactory()
+        option = MembershipOptionFactory(
+            type=MembershipOptionType.ORGANISATION,
+            cost=0,
+            max_seats=10,
+        )
+
+        form = CreateOrganisationMembershipForm(
+            organisation=org,
+            data={
+                "membership_option": option.id,
+                "start_date": timezone.localdate(),
+                "seat_count": 5,
+            },
+        )
+        assert form.is_valid()
+
+        membership = form.save()
+
+        # Should be auto-approved (NEW behavior - previously wasn't auto-approved)
+        assert membership.approved_datetime is not None
+        assert membership.status().name == "ACTIVE"
+        assert not membership.invoices.exists()
+
+    @override_settings(REQUIRE_FREE_MEMBERSHIP_APPROVAL=True)
+    def test_paid_membership_unchanged_when_approval_required(self):
+        """Test that paid org memberships are unaffected by approval setting."""
+        org = OrganisationFactory()
+        option = MembershipOptionFactory(
+            type=MembershipOptionType.ORGANISATION,
+            cost=99.99,
+            max_seats=10,
+        )
+
+        form = CreateOrganisationMembershipForm(
+            organisation=org,
+            data={
+                "membership_option": option.id,
+                "start_date": timezone.localdate(),
+                "seat_count": 5,
+            },
+        )
+        assert form.is_valid()
+
+        membership = form.save()
+
+        # Paid memberships should still not be auto-approved (pending payment)
+        assert membership.approved_datetime is None
+        assert membership.status().name == "PENDING"

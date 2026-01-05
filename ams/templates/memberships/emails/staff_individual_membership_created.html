@@ -26,6 +26,13 @@
             {% endblocktrans %}
       </p>
     </div>
+    {% if requires_approval and is_free %}
+    <div style="background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin-bottom: 20px;">
+      <p style="margin: 0; font-weight: bold; color: #856404;">
+        {% trans "⚠ ACTION REQUIRED: This free membership requires manual approval in Django admin." %}
+      </p>
+    </div>
+    {% endif %}
     <div style="background-color: #ffffff;
                 border: 1px solid #dee2e6;
                 border-radius: 8px;
@@ -56,6 +63,16 @@
         <tr>
           <td style="padding: 8px 0; font-weight: bold;">{% trans "Cost:" %}</td>
           <td style="padding: 8px 0;">${{ cost }}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-weight: bold;">{% trans "Status:" %}</td>
+          <td style="padding: 8px 0;">
+            {% if requires_approval %}
+              <strong style="color: #ffc107;">{% trans "Pending Approval" %}</strong>
+            {% else %}
+              <strong style="color: #28a745;">{% trans "Approved" %}</strong>
+            {% endif %}
+          </td>
         </tr>
         {% if invoice_number %}
           <tr>

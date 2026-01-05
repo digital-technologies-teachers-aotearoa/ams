@@ -8,6 +8,7 @@ from crispy_forms.layout import HTML
 from crispy_forms.layout import Layout
 from crispy_forms.layout import Submit
 from dateutil.relativedelta import relativedelta
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.forms import BooleanField
@@ -257,13 +258,23 @@ class CreateIndividualMembershipForm(ModelForm):
                     ),
                 ) from e
         else:
-            # Zero-cost membership: automatically approve
-            instance.approved_datetime = timezone.now()
-            logger.info(
-                "Auto-approving zero-cost membership for user %s with option %s",
-                user.pk,
-                membership_option.name,
-            )
+            # Zero-cost membership
+            if settings.REQUIRE_FREE_MEMBERSHIP_APPROVAL:
+                logger.info(
+                    "Zero-cost membership created pending approval "
+                    "for user %s with option %s",
+                    user.pk,
+                    membership_option.name,
+                )
+            else:
+                # Auto-approve
+                instance.approved_datetime = timezone.now()
+                logger.info(
+                    "Auto-approving zero-cost membership for user %s with option %s",
+                    user.pk,
+                    membership_option.name,
+                )
+
             instance.save()
 
         return instance
@@ -501,8 +512,27 @@ class CreateOrganisationMembershipForm(ModelForm):
                         "Please contact us.",
                     ),
                 ) from e
-        elif commit:
-            instance.save()
+        else:
+            # Zero-cost membership
+            if settings.REQUIRE_FREE_MEMBERSHIP_APPROVAL:
+                logger.info(
+                    "Zero-cost membership created pending approval "
+                    "for organisation %s with option %s",
+                    self.organisation.uuid,
+                    membership_option.name,
+                )
+            else:
+                # Auto-approve
+                instance.approved_datetime = timezone.now()
+                logger.info(
+                    "Auto-approving zero-cost organisation membership for "
+                    "organisation %s with option %s",
+                    self.organisation.uuid,
+                    membership_option.name,
+                )
+
+            if commit:
+                instance.save()
 
         return instance
 
