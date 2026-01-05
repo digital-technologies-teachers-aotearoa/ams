@@ -140,7 +140,7 @@ class TestOrganisationCreateView:
         assert set(email.to) == {staff1.email, staff2.email}
         assert "New Organisation" in email.body
 
-    @override_settings(NOTIFY_STAFF_ORG_EVENTS=False)
+    @override_settings(NOTIFY_STAFF_ORGANISATION_EVENTS=False)
     def test_create_organisation_no_notification_when_disabled(
         self,
         user: User,

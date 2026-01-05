@@ -291,7 +291,7 @@ class TestCreateOrganisationMembershipView:
         assert set(email.to) == {staff1.email, staff2.email}
         assert "Annual Membership" in email.body
 
-    @override_settings(NOTIFY_STAFF_ORG_EVENTS=False)
+    @override_settings(NOTIFY_STAFF_MEMBERSHIP_EVENTS=False)
     def test_add_membership_no_notification_when_disabled(
         self,
         user: User,

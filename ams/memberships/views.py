@@ -6,18 +6,14 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 
+from ams.memberships.email_utils import send_staff_organisation_membership_notification
+from ams.memberships.email_utils import send_staff_organisation_seats_added_notification
 from ams.memberships.forms import AddOrganisationSeatsForm
 from ams.memberships.forms import CreateIndividualMembershipForm
 from ams.memberships.forms import CreateOrganisationMembershipForm
 from ams.memberships.models import MembershipOption
 from ams.memberships.models import MembershipOptionType
 from ams.memberships.services import calculate_prorata_seat_cost
-from ams.organisations.email_utils import (
-    send_staff_organisation_membership_notification,
-)
-from ams.organisations.email_utils import (
-    send_staff_organisation_seats_added_notification,
-)
 from ams.organisations.mixins import OrganisationAdminMixin
 from ams.organisations.models import Organisation
 
