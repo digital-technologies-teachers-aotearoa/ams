@@ -53,13 +53,13 @@ def send_staff_organisation_membership_notification(membership):
 
     # Render HTML email
     html_message = render_to_string(
-        "organisations/emails/staff_organisation_membership_created.html",
+        "memberships/emails/staff_organisation_membership_created.html",
         context,
     )
 
     # Render plain text email
     text_message = render_to_string(
-        "organisations/emails/staff_organisation_membership_created.txt",
+        "memberships/emails/staff_organisation_membership_created.txt",
         context,
     )
 
@@ -130,13 +130,13 @@ def send_staff_organisation_seats_added_notification(
 
     # Render HTML email
     html_message = render_to_string(
-        "organisations/emails/staff_organisation_seats_added.html",
+        "memberships/emails/staff_organisation_seats_added.html",
         context,
     )
 
     # Render plain text email
     text_message = render_to_string(
-        "organisations/emails/staff_organisation_seats_added.txt",
+        "memberships/emails/staff_organisation_seats_added.txt",
         context,
     )
 
@@ -154,5 +154,75 @@ def send_staff_organisation_seats_added_notification(
         logger.exception(
             "Failed to send staff notification for seats added to organisation: %s",
             organisation.uuid,
+        )
+        # Do not re-raise - allow user action to succeed
+
+
+def send_staff_individual_membership_notification(membership):
+    """
+    Send notification to staff when a new individual membership is purchased.
+
+    Args:
+        membership: The newly created IndividualMembership instance.
+    """
+    # Check feature flag
+    if not settings.NOTIFY_STAFF_MEMBERSHIP_EVENTS:
+        return
+
+    # Get staff emails
+    staff_emails = list(
+        User.objects.filter(is_staff=True).values_list("email", flat=True),
+    )
+
+    # Early return if no staff
+    if not staff_emails:
+        return
+
+    # Build subject
+    subject = _("New Individual Membership: %(user_name)s") % {
+        "user_name": membership.user.get_full_name(),
+    }
+
+    # Build context
+    context = {
+        "membership": membership,
+        "user": membership.user,
+        "user_full_name": membership.user.get_full_name(),
+        "user_email": membership.user.email,
+        "membership_option": membership.membership_option,
+        "start_date": membership.start_date,
+        "expiry_date": membership.expiry_date,
+        "cost": membership.membership_option.cost,
+        "invoice_number": (
+            membership.invoice.invoice_number if membership.invoice else None
+        ),
+    }
+
+    # Render HTML email
+    html_message = render_to_string(
+        "memberships/emails/staff_individual_membership_created.html",
+        context,
+    )
+
+    # Render plain text email
+    text_message = render_to_string(
+        "memberships/emails/staff_individual_membership_created.txt",
+        context,
+    )
+
+    # Send email with error handling
+    try:
+        send_mail(
+            subject=subject,
+            message=text_message,
+            from_email=None,  # Use DEFAULT_FROM_EMAIL
+            recipient_list=staff_emails,
+            html_message=html_message,
+            fail_silently=False,
+        )
+    except Exception:
+        logger.exception(
+            "Failed to send staff notification for individual membership: %s",
+            membership.user.pk,
         )
         # Do not re-raise - allow user action to succeed
