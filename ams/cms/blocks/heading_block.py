@@ -12,8 +12,15 @@ class HeadingBlock(StructBlock):
             ("h3", "H3"),
             ("h4", "H4"),
         ],
-        blank=True,
-        required=False,
+        required=True,
+    )
+    alignment = ChoiceBlock(
+        choices=[
+            ("left", "Left aligned"),
+            ("center", "Center aligned"),
+        ],
+        default="left",
+        required=True,
     )
 
     class Meta:
