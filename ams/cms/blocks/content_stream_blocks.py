@@ -2,16 +2,18 @@ from wagtail.blocks import RichTextBlock
 from wagtail.blocks import StreamBlock
 from wagtail.embeds.blocks import EmbedBlock
 
-from .captioned_image_block import CaptionedImageBlock
-from .heading_block import HeadingBlock
-from .horizontal_rule_block import HorizontalRuleBlock
-from .image_carousel_block import ImageCarouselBlock
-from .image_grid_block import ImageGridBlock
+from ams.cms.blocks.captioned_image_block import CaptionedImageBlock
+from ams.cms.blocks.heading_block import HeadingBlock
+from ams.cms.blocks.horizontal_rule_block import HorizontalRuleBlock
+from ams.cms.blocks.image_carousel_block import ImageCarouselBlock
+from ams.cms.blocks.image_grid_block import ImageGridBlock
+from ams.cms.blocks.lead_paragraph_block import LeadParagraphBlock
 
 
 class ContentStreamBlocks(StreamBlock):
     heading_block = HeadingBlock()
     paragraph_block = RichTextBlock(icon="pilcrow")
+    lead_paragraph_block = LeadParagraphBlock()
     image_block = CaptionedImageBlock()
     image_grid_block = ImageGridBlock()
     image_carousel_block = ImageCarouselBlock()

@@ -55,8 +55,8 @@ body {
 }
 
 main > .container {
-  // Spacing from top of page to content (under navbar)
-  padding-top: 6rem;
+  // Spacing from top of page to content (under navbar of 66px)
+  padding-top: calc(3rem + 66px);
   // Spacing from bottom of content to footer
   padding-bottom: 3rem;
 }
@@ -134,4 +134,9 @@ main > .container {
 // Apply margin trim to Wagtail paragraphs
 .block-paragraph_block {
   @extend .margin-trim;
+}
+
+// Apply .lead to <p> within div.lead-paragraph
+div.lead-paragraph p {
+  @extend .lead;
 }
