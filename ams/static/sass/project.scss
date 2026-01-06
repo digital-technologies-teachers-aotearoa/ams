@@ -131,8 +131,20 @@ main > .container {
   }
 }
 
+/* Spacing */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+}
+
 // Apply margin trim to Wagtail paragraphs
-.block-paragraph_block {
+.block-paragraph_block,
+.block-lead_paragraph_block {
   @extend .margin-trim;
 }
 

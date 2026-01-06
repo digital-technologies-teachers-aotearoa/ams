@@ -3,6 +3,8 @@
 {% load wagtailcore_tags wagtailimages_tags %}
 
 {% block content %}
-  <h1 class="text-body-emphasis">{{ page.title }}</h1>
-  <div class="col-12 d-flex flex-column gap-5">{{ page.body }}</div>
+  <div class="col-12 d-flex flex-column gap-3">
+    <h1 class="text-body-emphasis">{{ page.title }}</h1>
+    {{ page.body }}
+  </div>
 {% endblock content %}
