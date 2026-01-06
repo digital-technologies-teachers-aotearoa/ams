@@ -1,22 +1,16 @@
-{% load wagtailcore_tags wagtailimages_tags %}
+{% load wagtailcore_tags %}
 
-<div class="image-grid row g-4">
+<div class="image-grid row row-cols-{{ self.columns }} g-4 {% if self.image_alignment == 'center' %}justify-content-center{% endif %}">
   {% for item in self.items %}
-    <div class="col-12 col-sm-6 col-md-{% if self.columns == '2' %}6{% elif self.columns == '3' %}4{% elif self.columns == '4' %}3{% elif self.columns == '6' %}2{% endif %}">
-      <div class="grid-item text-center">
-        <div class="grid-item-image mb-3">
-          {% if self.border_style == 'rounded' %}
-            {% image item.image fill-300x300 loading="lazy" class="img-fluid rounded-4" %}
-          {% elif self.border_style == 'circle' %}
-            <div class="circle-responsive">{% image item.image fill-300x300 loading="lazy" class="img-fluid" %}</div>
-          {% else %}
-            {% image item.image fill-300x300 loading="lazy" class="img-fluid" %}
-          {% endif %}
-        </div>
-        {% if item.title %}<h4 class="grid-item-title h5 mb-2">{{ item.title }}</h4>{% endif %}
-        {% if item.subtitle %}<p class="grid-item-subtitle text-muted mb-2">{{ item.subtitle }}</p>{% endif %}
-        {% if item.description %}<div class="grid-item-description">{{ item.description|richtext }}</div>{% endif %}
-      </div>
+    <div class="col">
+      {% if item.link_page or item.link_url %}
+        <a href="{% if item.link_page %}{% pageurl item.link_page %}{% else %}{{ item.link_url }}{% endif %}"
+           class="image-grid__item text-center d-block">
+          {% include "cms/blocks/partials/image_grid_item_content.html" %}
+        </a>
+      {% else %}
+        <div class="image-grid__item text-center">{% include "cms/blocks/partials/image_grid_item_content.html" %}</div>
+      {% endif %}
     </div>
   {% endfor %}
 </div>
