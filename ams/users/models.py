@@ -8,6 +8,7 @@ from django.core.validators import RegexValidator
 from django.db.models import CharField
 from django.db.models import EmailField
 from django.db.models import ImageField
+from django.db.models import TextField
 from django.db.models import UUIDField
 from django.urls import reverse
 from django.utils import timezone
@@ -83,6 +84,11 @@ class User(AbstractUser):
         processors=[ResizeToFill(800, 800)],
         format="JPEG",
         options={"quality": 80},
+    )
+    admin_notes = TextField(
+        _("admin notes"),
+        blank=True,
+        help_text=_("Internal notes for administrators only."),
     )
 
     USERNAME_FIELD = "email"
