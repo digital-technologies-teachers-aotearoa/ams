@@ -3,11 +3,11 @@
 <footer class="footer mt-auto py-3"
         data-bs-theme="{{ settings.cms.ThemeSettings.footer_colour_mode }}">
   <div class="container">
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-5 py-5 my-5">
-      <div class="col mb-3">
+    <div class="row py-5 my-5">
+      <div class="col-12 col-lg-6 mb-3">
         <a href="{% translate_url LANGUAGE_CODE '/' %}"
            class="d-flex align-items-center mb-3 link-body-emphasis text-decoration-none">
-          {% include "snippets/association_logo_or_name.html" %}
+          {% include "snippets/footer_logo_or_name.html" %}
         </a>
         <div>
           <ul class="nav justify-content-start list-unstyled d-flex">
@@ -28,14 +28,13 @@
           </ul>
         </div>
       </div>
-      <div class="col mb-3"></div>
-      <div class="col mb-3">
+      <div class="col-12 col-md-4 col-lg-2 mb-3">
         {% flat_menu 'footer-1' template="cms/menu/footer_menu.html" max_levels=1 show_menu_heading=True %}
       </div>
-      <div class="col mb-3">
+      <div class="col-12 col-md-4 col-lg-2 mb-3">
         {% flat_menu 'footer-2' template="cms/menu/footer_menu.html" max_levels=1 show_menu_heading=True %}
       </div>
-      <div class="col mb-3">
+      <div class="col-12 col-md-4 col-lg-2 mb-3">
         {% flat_menu 'footer-3' template="cms/menu/footer_menu.html" max_levels=1 show_menu_heading=True %}
       </div>
     </div>
