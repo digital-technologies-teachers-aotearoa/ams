@@ -6,6 +6,14 @@ from wagtail.images.blocks import ImageBlock
 
 class CaptionedImageBlock(StructBlock):
     image = ImageBlock(required=True)
+    image_scaling = ChoiceBlock(
+        choices=[
+            ("fit", "Fit (don't crop, suitable for logos)"),
+            ("fill", "Fill square (crop to fill, suitable for photos)"),
+        ],
+        default="center",
+        help_text="Alignment of items within grid (if space available)",
+    )
     caption = CharBlock(required=False)
     attribution = CharBlock(required=False)
     border_style = ChoiceBlock(
