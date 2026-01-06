@@ -7,6 +7,8 @@ existing code that imports from ams.cms.models.
 # Page models
 # Document models
 from ams.cms.models.documents import AMSDocument
+from ams.cms.models.pages import ArticlePage
+from ams.cms.models.pages import ArticlesIndexPage
 from ams.cms.models.pages import ContentPage
 from ams.cms.models.pages import HomePage
 
@@ -20,6 +22,8 @@ from ams.cms.models.theme import ThemeSettingsRevision
 
 __all__ = [
     "AMSDocument",
+    "ArticlePage",
+    "ArticlesIndexPage",
     "AssociationSettings",
     "ContentPage",
     "HomePage",

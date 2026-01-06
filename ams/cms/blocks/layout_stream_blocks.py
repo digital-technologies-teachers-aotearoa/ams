@@ -1,3 +1,4 @@
+from ams.cms.blocks.recent_articles_block import RecentArticlesBlock
 from ams.cms.blocks.title_block import TitleBlock
 
 from .columns_block import ColumnsBlock
@@ -11,6 +12,7 @@ class HomePageBlocks(ContentStreamBlocks):
     title_block = TitleBlock()
     columns_block = ColumnsBlock()
     full_width_section_block = FullWidthSectionBlock()
+    recent_articles_block = RecentArticlesBlock()
 
 
 class ContentPageBlocks(ContentStreamBlocks):

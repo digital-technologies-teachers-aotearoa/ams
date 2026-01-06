@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% load wagtailcore_tags %}
+
+{% block content %}
+  <h1 class="text-body-emphasis">{{ page.title }}</h1>
+  {% if page.intro %}<div class="lead mb-4">{{ page.intro|richtext }}</div>{% endif %}
+  {% if articles %}
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+      {% for article in articles %}
+        {% include "cms/partials/article_card.html" with article=article %}
+      {% endfor %}
+    </div>
+    {# Pagination controls #}
+    {% if articles.has_other_pages %}
+      <nav aria-label="Articles pagination" class="mt-5">
+        <ul class="pagination justify-content-center">
+          {% if articles.has_previous %}
+            <li class="page-item">
+              <a class="page-link"
+                 href="?page={{ articles.previous_page_number }}"
+                 aria-label="Previous">
+                <span aria-hidden="true">«</span>
+              </a>
+            </li>
+          {% else %}
+            <li class="page-item disabled">
+              <span class="page-link">«</span>
+            </li>
+          {% endif %}
+          {% for num in articles.paginator.page_range %}
+            {% if articles.number == num %}
+              <li class="page-item active" aria-current="page">
+                <span class="page-link">{{ num }}</span>
+              </li>
+            {% elif num > articles.number|add:'-3' and num < articles.number|add:'3' %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+              </li>
+            {% endif %}
+          {% endfor %}
+          {% if articles.has_next %}
+            <li class="page-item">
+              <a class="page-link"
+                 href="?page={{ articles.next_page_number }}"
+                 aria-label="Next">
+                <span aria-hidden="true">»</span>
+              </a>
+            </li>
+          {% else %}
+            <li class="page-item disabled">
+              <span class="page-link">»</span>
+            </li>
+          {% endif %}
+        </ul>
+      </nav>
+    {% endif %}
+  {% else %}
+    <p class="text-muted">No articles have been published yet.</p>
+  {% endif %}
+{% endblock content %}

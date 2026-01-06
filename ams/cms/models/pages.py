@@ -1,11 +1,17 @@
 from django.core.exceptions import ValidationError
+from django.core.paginator import EmptyPage
+from django.core.paginator import PageNotAnInteger
+from django.core.paginator import Paginator
 from django.db import models
 from django.http import HttpResponseForbidden
+from django.utils import timezone
 from wagtail.admin.panels import FieldPanel
+from wagtail.fields import RichTextField
 from wagtail.fields import StreamField
 from wagtail.models import Page
 
 from ams.cms.blocks import ContentPageBlocks
+from ams.cms.blocks import ContentStreamBlocks
 from ams.cms.blocks import HomePageBlocks
 from ams.utils.permissions import user_has_active_membership
 from ams.utils.reserved_paths import get_reserved_paths_set
@@ -86,3 +92,76 @@ class ContentPage(Page):
                     f"{', '.join(sorted(reserved_paths))}",
                 },
             )
+
+
+class ArticlesIndexPage(Page):
+    """Container page that holds and lists all articles."""
+
+    intro = RichTextField(blank=True)
+
+    subpage_types = ["cms.ArticlePage"]
+    parent_page_types = ["cms.HomePage"]
+    template = "cms/pages/articles_index_page.html"
+
+    content_panels = [*Page.content_panels, FieldPanel("intro")]
+
+    def get_context(self, request):
+        """Add paginated articles to context."""
+        context = super().get_context(request)
+
+        # Get all live articles ordered by publication date
+        # Only show articles where publication_date <= now()
+        articles = (
+            ArticlePage.objects.child_of(self)
+            .live()
+            .filter(publication_date__lte=timezone.now())
+            .order_by("-publication_date")
+        )
+
+        # Paginate articles (12 per page)
+        page = request.GET.get("page", 1)
+        paginator = Paginator(articles, 12)
+
+        try:
+            articles_page = paginator.page(page)
+        except PageNotAnInteger:
+            articles_page = paginator.page(1)
+        except EmptyPage:
+            articles_page = paginator.page(paginator.num_pages)
+
+        context["articles"] = articles_page
+        return context
+
+
+class ArticlePage(Page):
+    """Individual article page."""
+
+    publication_date = models.DateTimeField(
+        default=timezone.now,
+        help_text="Date and time when this article should be published",
+    )
+    summary = models.CharField(
+        max_length=300,
+        help_text="Shown on cards that link to the full article",
+    )
+    author = models.CharField(max_length=255, blank=True)
+
+    body = StreamField(
+        ContentStreamBlocks(),
+        use_json_field=True,
+    )
+
+    parent_page_types = ["cms.ArticlesIndexPage"]
+    subpage_types = []
+    template = "cms/pages/article_page.html"
+
+    content_panels = [
+        *Page.content_panels,
+        FieldPanel("publication_date"),
+        FieldPanel("author"),
+        FieldPanel("summary"),
+        FieldPanel("body"),
+    ]
+
+    class Meta:
+        ordering = ["-publication_date"]
