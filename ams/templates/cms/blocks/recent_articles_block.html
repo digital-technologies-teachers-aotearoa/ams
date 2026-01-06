@@ -1,0 +1,13 @@
+{% load wagtailcore_tags %}
+
+<div class="recent-articles-block mb-5">
+  {% if articles %}
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+      {% for article in articles %}
+        <div class="col d-flex">{% include "cms/partials/article_card.html" with article=article %}</div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-muted">No articles have been published yet.</p>
+  {% endif %}
+</div>

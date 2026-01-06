@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% load wagtailcore_tags %}
+
+{% block content %}
+  <article>
+    <header class="mb-4">
+      <h1 class="text-body-emphasis">{{ page.title }}</h1>
+      <p class="text-muted">
+        {{ page.publication_date|date:"F j, Y" }}
+        {% if page.author %}· by {{ page.author }}{% endif %}
+      </p>
+    </header>
+    <div class="col-12 d-flex flex-column gap-3">{{ page.body }}</div>
+  </article>
+{% endblock content %}
