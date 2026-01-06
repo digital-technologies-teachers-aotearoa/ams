@@ -1,8 +1,10 @@
 from wagtail.blocks import CharBlock
 from wagtail.blocks import ChoiceBlock
 from wagtail.blocks import ListBlock
+from wagtail.blocks import PageChooserBlock
 from wagtail.blocks import RichTextBlock
 from wagtail.blocks import StructBlock
+from wagtail.blocks import URLBlock
 from wagtail.images.blocks import ImageBlock
 
 
@@ -10,8 +12,16 @@ class GridItemBlock(StructBlock):
     """Individual item within an image grid."""
 
     image = ImageBlock(required=True)
+    image_scaling = ChoiceBlock(
+        choices=[
+            ("fit", "Fit (don't crop, suitable for logos)"),
+            ("fill", "Fill (crop to fill, suitable for photos)"),
+        ],
+        default="center",
+        help_text="Alignment of items within grid (if space available)",
+    )
     title = CharBlock(
-        required=True,
+        required=False,
         max_length=255,
         help_text="Title for this grid item (e.g., person's name or item title)",
     )
@@ -24,6 +34,14 @@ class GridItemBlock(StructBlock):
         required=False,
         features=["bold", "italic", "link"],
         help_text="Optional rich text description",
+    )
+    link_page = PageChooserBlock(
+        required=False,
+        help_text="Internal page to link to (takes priority over external URL)",
+    )
+    link_url = URLBlock(
+        required=False,
+        help_text="External URL to link to (used if no internal page is selected)",
     )
 
     class Meta:
@@ -51,8 +69,26 @@ class ImageGridBlock(StructBlock):
             ("circle", "Circle"),
         ],
         default="none",
-        required=False,
+        required=True,
         help_text="Choose the image border style",
+    )
+    image_alignment = ChoiceBlock(
+        choices=[
+            ("left", "Left"),
+            ("center", "Center"),
+        ],
+        default="center",
+        required=True,
+        help_text="Alignment of items within grid (if space available)",
+    )
+    text_alignment = ChoiceBlock(
+        choices=[
+            ("left", "Left"),
+            ("center", "Center"),
+        ],
+        default="center",
+        required=True,
+        help_text="Alignment of text",
     )
 
     items = ListBlock(

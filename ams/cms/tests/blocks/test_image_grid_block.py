@@ -42,10 +42,10 @@ class TestGridItemBlock:
         block = GridItemBlock()
         assert isinstance(block.child_blocks["image"], ImageBlock)
 
-    def test_grid_item_block_title_required(self):
+    def test_grid_item_block_title_optional(self):
         """Test that title field is required."""
         block = GridItemBlock()
-        assert block.child_blocks["title"].required is True
+        assert block.child_blocks["title"].required is False
 
     def test_grid_item_block_subtitle_optional(self):
         """Test that subtitle field is optional."""
@@ -145,8 +145,7 @@ class TestImageGridBlock:
 
         # Check that grid container exists
         assert "image-grid" in html
-        assert "row" in html
-        assert "grid-item" in html
+        assert "image-grid__item" in html
 
         # Check that item content is rendered
         assert "Test Person" in html
