@@ -8,8 +8,39 @@ from django.utils.translation import gettext_lazy as _
 from wagtail import hooks
 from wagtail.admin.menu import MenuItem
 from wagtail.admin.ui.components import Component
+from wagtail.admin.ui.tables import Column
+from wagtail.admin.viewsets.pages import PageListingViewSet
 
+from ams.cms.models.pages import ArticlePage
 from ams.utils.permissions import user_has_active_membership
+
+
+class ArticlePageListingViewSet(PageListingViewSet):
+    icon = "calendar-alt"
+    menu_label = "Articles"
+    add_to_admin_menu = True
+    model = ArticlePage
+    columns = [
+        *PageListingViewSet.columns,
+        Column(
+            "publication_date",
+            label="Publication Date",
+            sort_key="publication_date",
+        ),
+        Column(
+            "author",
+            label="Author",
+            sort_key="author",
+        ),
+    ]
+
+
+article_page_listing_viewset = ArticlePageListingViewSet("article_pages")
+
+
+@hooks.register("register_admin_viewset")
+def register_article_page_listing_viewset():
+    return article_page_listing_viewset
 
 
 @hooks.register("construct_help_menu")
