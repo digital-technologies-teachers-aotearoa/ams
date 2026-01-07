@@ -15,7 +15,10 @@ from config.templatetags.translate_url import translate_url as tag_translate_url
         ("/en/current/page/", "mi", "/mi/current/page/"),
     ],
 )
-@override_settings(ROOT_URLCONF="config.tests.urls_for_translate")
+@override_settings(
+    ROOT_URLCONF="config.tests.urls_for_translate",
+    LANGUAGES=[("en", "English"), ("mi", "Te Reo Māori")],
+)
 def test_translate_url_uses_request_path_when_no_path_given(
     current_path,
     target_lang,
@@ -45,7 +48,10 @@ def test_translate_url_uses_request_path_when_no_path_given(
         ("mi", "mi", "/mi/another/page/", "/mi/another/page/"),
     ],
 )
-@override_settings(ROOT_URLCONF="config.tests.urls_for_translate")
+@override_settings(
+    ROOT_URLCONF="config.tests.urls_for_translate",
+    LANGUAGES=[("en", "English"), ("mi", "Te Reo Māori")],
+)
 def test_translate_url_with_explicit_paths(
     source_lang,
     target_lang,
@@ -69,7 +75,10 @@ def test_translate_url_with_explicit_paths(
         ("en", "mi", "", "/current/page/"),  # No query string
     ],
 )
-@override_settings(ROOT_URLCONF="config.tests.urls_for_translate")
+@override_settings(
+    ROOT_URLCONF="config.tests.urls_for_translate",
+    LANGUAGES=[("en", "English"), ("mi", "Te Reo Māori")],
+)
 def test_translate_url_preserves_query_strings(
     source_lang,
     target_lang,
@@ -94,6 +103,10 @@ def test_translate_url_preserves_query_strings(
         ("mi", None, "/mi/"),  # No path provided
     ],
 )
+@override_settings(
+    ROOT_URLCONF="config.tests.urls_for_translate",
+    LANGUAGES=[("en", "English"), ("mi", "Te Reo Māori")],
+)
 def test_translate_url_root_paths(language_code, path, expected_path):
     """Test translation of root paths returns language-prefixed root."""
     if path is None:
@@ -109,6 +122,10 @@ def test_translate_url_root_paths(language_code, path, expected_path):
         ("en", "/en/"),
         ("mi", "/mi/"),
     ],
+)
+@override_settings(
+    ROOT_URLCONF="config.tests.urls_for_translate",
+    LANGUAGES=[("en", "English"), ("mi", "Te Reo Māori")],
 )
 def test_translate_url_without_request_falls_back_to_lang_root(
     language_code,
@@ -143,7 +160,10 @@ def test_translate_url_without_request_falls_back_to_lang_root(
         ),
     ],
 )
-@override_settings(ROOT_URLCONF="config.tests.urls_for_translate")
+@override_settings(
+    ROOT_URLCONF="config.tests.urls_for_translate",
+    LANGUAGES=[("en", "English"), ("mi", "Te Reo Māori")],
+)
 def test_translate_url_context_variations(context, lang_code, path, expected_result):
     """Test translate_url with various context and parameter combinations."""
     result = tag_translate_url(context, lang_code, path)
@@ -158,7 +178,10 @@ def test_translate_url_context_variations(context, lang_code, path, expected_res
         ("/en/current/page/#top", "mi", "/mi/current/page/#top"),
     ],
 )
-@override_settings(ROOT_URLCONF="config.tests.urls_for_translate")
+@override_settings(
+    ROOT_URLCONF="config.tests.urls_for_translate",
+    LANGUAGES=[("en", "English"), ("mi", "Te Reo Māori")],
+)
 def test_translate_url_with_fragments(source_path, target_lang, expected_path):
     """Test URL translation preserves URL fragments (anchors)."""
     ctx = {"request": RequestFactory().get("/en/ignored/")}
@@ -173,7 +196,10 @@ def test_translate_url_with_fragments(source_path, target_lang, expected_path):
         ("/en/current/page/", "mi", "/mi/current/page/"),
     ],
 )
-@override_settings(ROOT_URLCONF="config.tests.urls_for_translate")
+@override_settings(
+    ROOT_URLCONF="config.tests.urls_for_translate",
+    LANGUAGES=[("en", "English"), ("mi", "Te Reo Māori")],
+)
 def test_translate_url_trailing_slash_handling(
     path_with_slash,
     target_lang,
@@ -184,7 +210,10 @@ def test_translate_url_trailing_slash_handling(
     assert result == expected_path
 
 
-@override_settings(ROOT_URLCONF="config.tests.urls_for_translate")
+@override_settings(
+    ROOT_URLCONF="config.tests.urls_for_translate",
+    LANGUAGES=[("en", "English"), ("mi", "Te Reo Māori")],
+)
 def test_translate_url_non_existent_path():
     """Test translate_url handles non-existent paths by preserving the structure."""
     result = tag_translate_url({}, "mi", "/en/does/not/exist/")
@@ -204,7 +233,10 @@ def test_translate_url_non_existent_path():
         ("/xx/page/", "yy", "/yy/"),
     ],
 )
-@override_settings(ROOT_URLCONF="config.tests.urls_for_translate")
+@override_settings(
+    ROOT_URLCONF="config.tests.urls_for_translate",
+    LANGUAGES=[("en", "English"), ("mi", "Te Reo Māori")],
+)
 def test_translate_url_invalid_language_codes(path, target_lang, expected_path):
     """Test translate_url with invalid language codes falls back to language root."""
     result = tag_translate_url({}, target_lang, path)
