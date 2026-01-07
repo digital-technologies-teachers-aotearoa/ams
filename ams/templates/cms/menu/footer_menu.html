@@ -1,6 +1,6 @@
 {% load menu_tags %}
 
-{% if show_menu_heading and menu_heading %}<h5>{{ menu_heading|safe }}</h5>{% endif %}
+{% if show_menu_heading and menu_heading %}<h5 class="text-body-emphasis mb-2">{{ menu_heading|safe }}</h5>{% endif %}
 <ul class="nav flex-column">
   {% for item in menu_items %}
     <li class="nav-item mb-2">
