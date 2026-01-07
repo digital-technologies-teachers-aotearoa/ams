@@ -1,21 +1,25 @@
 {% load wagtailimages_tags %}
 
-<figure class="figure text-center d-block">
+<figure class="figure text-center mb-0 d-flex flex-column gap-2">
   {% if self.image_scaling == "fit" %}
     {% if self.border_style == 'rounded' %}
-      {% image self.image height-1000 loading="lazy" class="figure-img img-fluid rounded-4" %}
+      {% image self.image height-1000 loading="lazy" class="figure-img img-fluid mb-0 rounded-4" %}
     {% elif self.border_style == 'circle' %}
-      <div class="circle-responsive">{% image self.image height-1000 loading="lazy" class="figure-img img-fluid" %}</div>
+      <div class="circle-responsive">
+        {% image self.image height-1000 loading="lazy" class="figure-img img-fluid mb-0" %}
+      </div>
     {% else %}
-      {% image self.image height-1000 loading="lazy" class="figure-img img-fluid" %}
+      {% image self.image height-1000 loading="lazy" class="figure-img img-fluid mb-0" %}
     {% endif %}
   {% else %}
     {% if self.border_style == 'rounded' %}
-      {% image self.image fill-1000x1000 loading="lazy" class="figure-img img-fluid rounded-4" %}
+      {% image self.image fill-1000x1000 loading="lazy" class="figure-img img-fluid mb-0 rounded-4" %}
     {% elif self.border_style == 'circle' %}
-      <div class="circle-responsive">{% image self.image fill-1000x1000 loading="lazy" class="figure-img img-fluid" %}</div>
+      <div class="circle-responsive">
+        {% image self.image fill-1000x1000 loading="lazy" class="figure-img img-fluid mb-0" %}
+      </div>
     {% else %}
-      {% image self.image fill-1000x1000 loading="lazy" class="figure-img img-fluid" %}
+      {% image self.image fill-1000x1000 loading="lazy" class="figure-img img-fluid mb-0" %}
     {% endif %}
   {% endif %}
   {% if self.caption or self.attribution %}
