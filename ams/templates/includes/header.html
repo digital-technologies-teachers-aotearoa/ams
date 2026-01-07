@@ -34,7 +34,9 @@
                    href="{% url 'account_signup' %}">{% translate "Sign Up" %}</a>
               </li>
             {% endif %}
-            {% include "includes/language_dropdown.html" %}
+            {% if LANGUAGES|length > 1 %}
+              {% include "includes/language_dropdown.html" %}
+            {% endif %}
           {% endif %}
         </ul>
       </div>

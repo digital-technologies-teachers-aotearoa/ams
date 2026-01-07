@@ -9,8 +9,10 @@ from django.urls import translate_url as django_translate_url
 
 register = Library()
 
-# Precompute valid language codes at module load time
-VALID_LANG_CODES = frozenset(code for code, name in settings.LANGUAGES)
+
+def _get_valid_lang_codes():
+    """Get valid language codes from current settings."""
+    return frozenset(code for code, name in settings.LANGUAGES)
 
 
 @register.simple_tag(takes_context=True)
@@ -21,8 +23,11 @@ def translate_url(context, lang_code, path=None, *args, **kwargs):
         {% translate_url 'en' %} - translates current page
         {% translate_url 'en' '/' %} - translates specific path
     """
+    # Get valid language codes dynamically to support @override_settings in tests
+    valid_lang_codes = _get_valid_lang_codes()
+
     # Early validation of target language code
-    lang_code_valid = lang_code in VALID_LANG_CODES
+    lang_code_valid = lang_code in valid_lang_codes
 
     # If no path provided, use current request path
     if path is None:
@@ -48,8 +53,8 @@ def translate_url(context, lang_code, path=None, *args, **kwargs):
     # If path starts with a language code (e.g., /en/page/), replace it
     if (
         len(path_parts) > 1
-        and path_parts[1] in VALID_LANG_CODES
-        and lang_code in VALID_LANG_CODES
+        and path_parts[1] in valid_lang_codes
+        and lang_code in valid_lang_codes
     ):
         path_parts[1] = lang_code
         new_path = "/".join(path_parts)

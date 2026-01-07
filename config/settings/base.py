@@ -31,7 +31,8 @@ LANGUAGE_CODE = "en"
 # https://docs.djangoproject.com/en/dev/ref/settings/#languages
 LANGUAGES = [
     ("en", _("English")),
-    ("mi", _("Te Reo Māori")),
+    # Disabled until full Te Reo Māori support
+    # ("mi", _("Te Reo Māori")),  # noqa: ERA001
 ]
 EXTRA_LANG_INFO = {
     "mi": {
