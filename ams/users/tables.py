@@ -28,6 +28,11 @@ class MembershipTable(Table):
         verbose_name="Invoice",
         orderable=False,
     )
+    actions = Column(
+        verbose_name="Actions",
+        empty_values=(),
+        orderable=False,
+    )
 
     class Meta:
         model = IndividualMembership
@@ -38,6 +43,20 @@ class MembershipTable(Table):
             "start_date",
             "expiry_date",
             "invoice",
+            "actions",
+        )
+
+    def render_actions(self, record: IndividualMembership):
+        """Render actions column with role management buttons."""
+
+        # Build the context for rendering action buttons for active members
+        context = {
+            "can_cancel": record.can_cancel,
+        }
+
+        return render_to_string(
+            "memberships/membership_actions_column.html",
+            context,
         )
 
 

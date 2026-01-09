@@ -1,0 +1,14 @@
+{% load i18n %}
+
+{% if can_cancel %}
+  <button type="button"
+          class="btn btn-outline-danger btn-sm"
+          title="{% trans 'Cancel Membership' %}"
+          data-bs-toggle="modal"
+          data-bs-target="#actionModal"
+          data-action-title="{% trans 'Cancel Membership' %}"
+          data-action-message="{% trans 'To cancel your membership, please contact us.' %}"
+          data-action-cancel="{% trans 'Close' %}">
+    <i class="bi bi-x-circle"></i> {% trans 'Cancel Membership' %}
+  </button>
+{% endif %}
