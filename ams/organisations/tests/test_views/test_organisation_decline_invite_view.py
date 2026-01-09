@@ -6,6 +6,7 @@ import pytest
 from django.urls import reverse
 from django.utils import timezone
 
+from ams.organisations.models import OrganisationMember
 from ams.organisations.tests.factories import OrganisationFactory
 from ams.organisations.tests.factories import OrganisationMemberFactory
 from ams.users.models import User
@@ -18,7 +19,7 @@ class TestDeclineOrganisationInviteView:
     """Tests for the decline organisation invite view."""
 
     def test_decline_invite_as_existing_user(self, client):
-        """Test declining an invitation as an existing user."""
+        """Test declining an invitation as an existing user deletes the record."""
         user = UserFactory()
         org = OrganisationFactory()
 
@@ -29,6 +30,7 @@ class TestDeclineOrganisationInviteView:
             accepted_datetime=None,
             declined_datetime=None,
         )
+        member_id = member.id
 
         client.force_login(user)
         url = reverse(
@@ -45,13 +47,8 @@ class TestDeclineOrganisationInviteView:
             kwargs={"username": user.username},
         )
 
-        # Refresh member from database
-        member.refresh_from_db()
-
-        # Should have declined_datetime set
-        assert member.declined_datetime is not None
-        # Should not have accepted_datetime set
-        assert member.accepted_datetime is None
+        # Member record should be deleted (not just marked as declined)
+        assert not OrganisationMember.objects.filter(id=member_id).exists()
 
     def test_decline_invite_wrong_user(self, client):
         """Test that a user cannot decline another user's invitation."""
@@ -175,7 +172,8 @@ class TestDeclineOrganisationInviteView:
         assert "/accounts/login/" in response.url
 
     def test_decline_invite_new_user_matching_email(self, client):
-        """Test declining an invitation as a new user with matching email."""
+        """Test declining an invitation as a new user with matching email deletes
+        record."""
         org = OrganisationFactory()
         invite_email = "newuser@example.com"
 
@@ -187,6 +185,7 @@ class TestDeclineOrganisationInviteView:
             accepted_datetime=None,
             declined_datetime=None,
         )
+        member_id = member.id
 
         # Create and login as new user with matching email
         user = UserFactory(email=invite_email)
@@ -206,13 +205,8 @@ class TestDeclineOrganisationInviteView:
             kwargs={"username": user.username},
         )
 
-        # Refresh member from database
-        member.refresh_from_db()
-
-        # Should have declined_datetime set
-        assert member.declined_datetime is not None
-        # Should link to the user
-        assert member.user == user
+        # Member record should be deleted (not just marked as declined)
+        assert not OrganisationMember.objects.filter(id=member_id).exists()
 
     def test_decline_invite_new_user_wrong_email(self, client):
         """Test declining fails when new user email doesn't match invite."""

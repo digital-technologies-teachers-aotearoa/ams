@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
@@ -24,6 +26,8 @@ from ams.organisations.models import OrganisationMember
 from ams.organisations.tables import OrganisationMembershipTable
 from ams.organisations.tables import OrganisationMemberTable
 from ams.users.models import User
+
+logger = logging.getLogger(__name__)
 
 
 class OrganisationCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
@@ -389,6 +393,16 @@ class AcceptOrganisationInviteView(LoginRequiredMixin, RedirectView):
             return redirect_url
 
         # Accept the invite
+        logger.info(
+            "Organisation invite accepted: email=%s, organisation=%s, user=%s, "
+            "invited_date=%s",
+            member.invite_email or (member.user.email if member.user else "unknown"),
+            member.organisation.name,
+            self.request.user.email
+            if self.request.user.is_authenticated
+            else "anonymous",
+            member.created_datetime,
+        )
         member.accepted_datetime = timezone.now()
         if not member.user:
             member.user = self.request.user
@@ -436,18 +450,26 @@ class DeclineOrganisationInviteView(LoginRequiredMixin, RedirectView):
             messages.add_message(self.request, level, message)
             return redirect_url
 
-        # Decline the invite
-        member.declined_datetime = timezone.now()
-        if not member.user:
-            member.user = self.request.user
-        member.save()
+        # Decline the invite - log then delete (no need to keep declined invites)
+        organisation_name = member.organisation.name
+        logger.info(
+            "Organisation invite declined: email=%s, organisation=%s, user=%s, "
+            "invited_date=%s",
+            member.invite_email or (member.user.email if member.user else "unknown"),
+            organisation_name,
+            self.request.user.email
+            if self.request.user.is_authenticated
+            else "anonymous",
+            member.created_datetime,
+        )
+        member.delete()
 
         messages.success(
             self.request,
             _(
                 "You have declined the invitation to join %(organisation)s.",
             )
-            % {"organisation": member.organisation.name},
+            % {"organisation": organisation_name},
         )
 
         return reverse(
@@ -831,14 +853,23 @@ class RevokeOrganisationInviteView(LoginRequiredMixin, OrganisationAdminMixin, V
                 reverse("organisations:detail", kwargs={"uuid": organisation.uuid}),
             )
 
-        # Revoke the invite
-        member.revoked_datetime = timezone.now()
-        member.save()
+        # Revoke the invite - log then delete (no need to keep revoked invites)
+        invite_email = member.invite_email or (
+            member.user.email if member.user else "unknown"
+        )
+        logger.info(
+            "Organisation invite revoked: email=%s, organisation=%s, revoked_by=%s, "
+            "invited_date=%s",
+            invite_email,
+            organisation.name,
+            request.user.email,
+            member.created_datetime,
+        )
+        member.delete()
 
         messages.success(
             request,
-            _("Successfully revoked invite to %(email)s.")
-            % {"email": member.invite_email or member.user.email},
+            _("Successfully revoked invite to %(email)s.") % {"email": invite_email},
         )
 
         return redirect(

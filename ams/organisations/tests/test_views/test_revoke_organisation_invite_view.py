@@ -17,7 +17,7 @@ class TestRevokeOrganisationInviteView:
     """Tests for RevokeOrganisationInviteView."""
 
     def test_org_admin_can_revoke_pending_invite(self, user: User, client):
-        """Test that an org admin can revoke a pending invite."""
+        """Test that an org admin can revoke a pending invite (deletes record)."""
         org = OrganisationFactory()
         OrganisationMemberFactory(
             organisation=org,
@@ -32,6 +32,7 @@ class TestRevokeOrganisationInviteView:
             accepted_datetime=None,
             declined_datetime=None,
         )
+        pending_invite_id = pending_invite.id
 
         client.force_login(user)
         url = reverse(
@@ -41,11 +42,11 @@ class TestRevokeOrganisationInviteView:
         response = client.post(url)
 
         assert response.status_code == HTTPStatus.FOUND
-        pending_invite.refresh_from_db()
-        assert pending_invite.revoked_datetime is not None
+        # Member record should be deleted (not just marked as revoked)
+        assert not OrganisationMember.objects.filter(id=pending_invite_id).exists()
 
     def test_staff_can_revoke_invite(self, user: User, client):
-        """Test that staff can revoke an invite."""
+        """Test that staff can revoke an invite (deletes record)."""
         user.is_staff = True
         user.save()
 
@@ -56,6 +57,7 @@ class TestRevokeOrganisationInviteView:
             accepted_datetime=None,
             declined_datetime=None,
         )
+        pending_invite_id = pending_invite.id
 
         client.force_login(user)
         url = reverse(
@@ -65,8 +67,8 @@ class TestRevokeOrganisationInviteView:
         response = client.post(url)
 
         assert response.status_code == HTTPStatus.FOUND
-        pending_invite.refresh_from_db()
-        assert pending_invite.revoked_datetime is not None
+        # Member record should be deleted (not just marked as revoked)
+        assert not OrganisationMember.objects.filter(id=pending_invite_id).exists()
 
     def test_cannot_revoke_accepted_invite(self, user: User, client):
         """Test that accepted invites cannot be revoked."""
