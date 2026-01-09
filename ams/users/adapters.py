@@ -14,8 +14,32 @@ if typing.TYPE_CHECKING:
 
 
 class AccountAdapter(DefaultAccountAdapter):
+    SUPPRESSED_MESSAGE_TEMPLATES = [
+        "account/messages/logged_in.txt",
+        "account/messages/logged_out.txt",
+    ]
+
     def is_open_for_signup(self, request: HttpRequest) -> bool:
         return getattr(settings, "ACCOUNT_ALLOW_REGISTRATION", True)
+
+    def add_message(
+        self,
+        request,
+        level,
+        message_template,
+        message_context=None,
+        extra_tags="",
+    ):
+        # Suppress the "successfully signed in" message
+        if message_template in self.SUPPRESSED_MESSAGE_TEMPLATES:
+            return
+        super().add_message(
+            request,
+            level,
+            message_template,
+            message_context,
+            extra_tags,
+        )
 
 
 class SocialAccountAdapter(DefaultSocialAccountAdapter):
