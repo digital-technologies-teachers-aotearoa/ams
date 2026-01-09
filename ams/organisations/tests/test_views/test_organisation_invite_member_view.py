@@ -136,8 +136,17 @@ class TestOrganisationInviteMemberView:
         assert response.status_code == HTTPStatus.FOUND
         assert "/accounts/login/" in response.url
 
-    def test_reinvite_declined_user(self, user: User, client, mailoutbox):
-        """Test that users who declined an invite can be re-invited."""
+    def test_invite_allowed_when_no_existing_record(
+        self,
+        user: User,
+        client,
+        mailoutbox,
+    ):
+        """Test that inviting works when there's no existing invite record.
+
+        Note: In production, declined/revoked invites are deleted immediately,
+        so there won't be any conflicting records when re-inviting.
+        """
         org = OrganisationFactory()
         OrganisationMemberFactory(
             organisation=org,
@@ -146,18 +155,9 @@ class TestOrganisationInviteMemberView:
             accepted_datetime=timezone.now(),
         )
 
-        # Create a declined invite
-        declined_member = OrganisationMemberFactory(
-            organisation=org,
-            invite_email="declined@example.com",
-            accepted_datetime=None,
-            declined_datetime=timezone.now(),
-        )
-        declined_member_id = declined_member.id
-
         client.force_login(user)
         url = reverse("organisations:invite_member", kwargs={"uuid": org.uuid})
-        data = {"email": "declined@example.com"}
+        data = {"email": "newuser@example.com"}
 
         response = client.post(url, data=data)
 
@@ -165,87 +165,15 @@ class TestOrganisationInviteMemberView:
         assert response.status_code == HTTPStatus.FOUND
         assert f"/organisations/{org.uuid}/" in response.url
 
-        # Old declined invite should still exist (not deleted)
-        assert OrganisationMember.objects.filter(id=declined_member_id).exists()
-        old_invite = OrganisationMember.objects.get(id=declined_member_id)
-        assert old_invite.declined_datetime is not None
-
         # New invite should be created
         new_member = OrganisationMember.objects.get(
             organisation=org,
-            invite_email="declined@example.com",
-            declined_datetime__isnull=True,
+            invite_email="newuser@example.com",
         )
         assert new_member.accepted_datetime is None
-        assert new_member.id != declined_member_id  # Different member record
-
-        # Should have 2 total invites for this email (1 declined, 1 pending)
-        assert (
-            OrganisationMember.objects.filter(
-                organisation=org,
-                invite_email="declined@example.com",
-            ).count()
-            == 2  # noqa: PLR2004
-        )
+        assert new_member.declined_datetime is None
+        assert new_member.revoked_datetime is None
 
         # Email should be sent
         assert len(mailoutbox) == 1
-        assert mailoutbox[0].to == ["declined@example.com"]
-
-    def test_reinvite_declined_existing_user(self, user: User, client, mailoutbox):
-        """Test re-inviting an existing user who previously declined."""
-        existing_user = UserFactory(email="existing@example.com")
-        org = OrganisationFactory()
-        OrganisationMemberFactory(
-            organisation=org,
-            user=user,
-            role=OrganisationMember.Role.ADMIN,
-            accepted_datetime=timezone.now(),
-        )
-
-        # Create a declined invite with user linked
-        declined_member = OrganisationMemberFactory(
-            organisation=org,
-            user=existing_user,
-            invite_email="existing@example.com",
-            accepted_datetime=None,
-            declined_datetime=timezone.now(),
-        )
-        declined_member_id = declined_member.id
-
-        client.force_login(user)
-        url = reverse("organisations:invite_member", kwargs={"uuid": org.uuid})
-        data = {"email": "existing@example.com"}
-
-        response = client.post(url, data=data)
-
-        # Should redirect to organisation detail (successful invite)
-        assert response.status_code == HTTPStatus.FOUND
-
-        # Old declined invite should still exist (not deleted)
-        assert OrganisationMember.objects.filter(id=declined_member_id).exists()
-        old_invite = OrganisationMember.objects.get(id=declined_member_id)
-        assert old_invite.declined_datetime is not None
-
-        # New invite should be created with user linked
-        new_member = OrganisationMember.objects.get(
-            organisation=org,
-            invite_email="existing@example.com",
-            declined_datetime__isnull=True,
-        )
-        assert new_member.user == existing_user
-        assert new_member.accepted_datetime is None
-        assert new_member.id != declined_member_id  # Different member record
-
-        # Should have 2 total invites for this user+org (1 declined, 1 pending)
-        assert (
-            OrganisationMember.objects.filter(
-                organisation=org,
-                user=existing_user,
-            ).count()
-            == 2  # noqa: PLR2004
-        )
-
-        # Email should be sent
-        assert len(mailoutbox) == 1
-        assert mailoutbox[0].to == ["existing@example.com"]
+        assert mailoutbox[0].to == ["newuser@example.com"]

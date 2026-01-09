@@ -36,6 +36,11 @@ This guide enables AI coding agents to work productively in the Association Mana
 - Templates: `ams/templates/` (organized by app)
 - Documentation: `docs/docs/`
 
+## Accessing the website
+
+Using the Playwright MCP, open `localhost:3000`.
+Usernames and passwords can be found in `.envs/.local/django.ini`.
+
 ## Running Commands
 
 **IMPORTANT:** This is a Dockerized project. ALL commands run inside Docker containers.
