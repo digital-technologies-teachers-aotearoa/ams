@@ -36,7 +36,8 @@ django_settings_module = "config.settings.test"
 
 # ==== djLint ====
 [tool.djlint]
-blank_line_after_tag = "load,extends"
+blank_line_after_tag = "load,extends,endblock"
+custom_blocks = "element,slot"
 close_void_tags = true
 format_css = false
 format_js = true

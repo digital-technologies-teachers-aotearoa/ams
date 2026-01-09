@@ -1,0 +1,48 @@
+{% extends "mfa/totp/base.html" %}
+
+{% load allauth i18n %}
+
+{% block head_title %}
+  {% translate "Activate Authenticator App" %}
+{% endblock head_title %}
+
+{% block allauth_content %}
+  {% element h1 %}
+    {% translate "Activate Authenticator App" %}
+  {% endelement %}
+  <p>
+    {% blocktranslate %}Follow these steps to set up two-factor authentication:{% endblocktranslate %}
+  </p>
+  <p>
+    {% blocktranslate %}<strong>Step 1:</strong> Install an authenticator app on your phone if you don't have one. Popular options include Google Authenticator, Microsoft Authenticator, Authy, or 1Password.{% endblocktranslate %}
+  </p>
+  <p class="mb-0">
+    {% blocktranslate %}<strong>Step 2:</strong> Open your authenticator app and scan the QR code below. Alternatively, you can manually enter the secret key shown below the QR code.{% endblocktranslate %}
+  </p>
+  {% url 'mfa_activate_totp' as action_url %}
+  {% element form form=form method="post" action=action_url %}
+    {% slot body %}
+      {% element img src=totp_svg_data_uri alt=form.secret tags="mfa,totp,qr" %}
+      {% endelement %}
+      {% csrf_token %}
+      {% element field id="authenticator_secret" type="text" value=form.secret disabled=True %}
+        {% slot label %}
+          {% translate "Secret key (for manual entry)" %}
+        {% endslot %}
+        {% slot help_text %}
+          {% translate "You can save this secret key to restore your authenticator app if you change phones." %}
+        {% endslot %}
+      {% endelement %}
+      <p class="mt-3">
+        {% blocktranslate %}<strong>Step 3:</strong> Enter the 6-digit verification code from your authenticator app to confirm setup.{% endblocktranslate %}
+      </p>
+      {% element fields form=form %}
+      {% endelement %}
+    {% endslot %}
+    {% slot actions %}
+      {% element button type="submit" %}
+        {% trans "Activate" %}
+      {% endelement %}
+    {% endslot %}
+  {% endelement %}
+{% endblock allauth_content %}
