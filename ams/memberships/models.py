@@ -194,6 +194,11 @@ class BaseMembership(Model):
             return False
         return timezone.localdate() >= self.expiry_date
 
+    @property
+    def can_cancel(self) -> bool:
+        """Check if this membership can be cancelled."""
+        return self.status() in [MembershipStatus.ACTIVE, MembershipStatus.PENDING]
+
     def status(self) -> Any:
         if self.cancelled_datetime:
             return MembershipStatus.CANCELLED

@@ -14,10 +14,12 @@
                   aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <p class="modal-message"></p>
+          <p class="modal-message mb-0"></p>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans 'Cancel' %}</button>
+          <button type="button"
+                  class="btn btn-secondary modal-cancel"
+                  data-bs-dismiss="modal">{% trans 'Cancel' %}</button>
           <button type="submit" class="btn btn-primary modal-confirm"></button>
         </div>
       </form>

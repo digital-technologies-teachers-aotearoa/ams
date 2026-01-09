@@ -157,3 +157,31 @@ class TestIndividualMembershipQuerySet:
         active_memberships = user.individual_memberships.active()
 
         assert current_membership in active_memberships
+
+
+class TestIndividualMembershipCanCancel:
+    """Test can_cancel property on IndividualMembership."""
+
+    def test_can_cancel_returns_true_for_active_membership(self):
+        """Test that active memberships can be cancelled."""
+        membership = IndividualMembershipFactory(active=True)
+
+        assert membership.can_cancel is True
+
+    def test_can_cancel_returns_true_for_pending_membership(self):
+        """Test that pending memberships can be cancelled."""
+        membership = IndividualMembershipFactory(pending=True)
+
+        assert membership.can_cancel is True
+
+    def test_can_cancel_returns_false_for_cancelled_membership(self):
+        """Test that cancelled memberships cannot be cancelled again."""
+        membership = IndividualMembershipFactory(cancelled=True)
+
+        assert membership.can_cancel is False
+
+    def test_can_cancel_returns_false_for_expired_membership(self):
+        """Test that expired memberships cannot be cancelled."""
+        membership = IndividualMembershipFactory(expired=True)
+
+        assert membership.can_cancel is False

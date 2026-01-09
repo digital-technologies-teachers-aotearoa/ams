@@ -449,3 +449,31 @@ class TestOrganisationMembershipSeatsSummary:
             f"Occupied: {membership.occupied_seats} / {membership.seats}"
             in membership.seats_summary()
         )
+
+
+class TestOrganisationMembershipCanCancel:
+    """Test can_cancel property on OrganisationMembership."""
+
+    def test_can_cancel_returns_true_for_active_membership(self):
+        """Test that active memberships can be cancelled."""
+        membership = OrganisationMembershipFactory(active=True)
+
+        assert membership.can_cancel is True
+
+    def test_can_cancel_returns_true_for_pending_membership(self):
+        """Test that pending memberships can be cancelled."""
+        membership = OrganisationMembershipFactory(pending=True)
+
+        assert membership.can_cancel is True
+
+    def test_can_cancel_returns_false_for_cancelled_membership(self):
+        """Test that cancelled memberships cannot be cancelled again."""
+        membership = OrganisationMembershipFactory(cancelled=True)
+
+        assert membership.can_cancel is False
+
+    def test_can_cancel_returns_false_for_expired_membership(self):
+        """Test that expired memberships cannot be cancelled."""
+        membership = OrganisationMembershipFactory(expired=True)
+
+        assert membership.can_cancel is False
