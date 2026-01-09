@@ -5,11 +5,23 @@
 {% block bodyclass %}
   bg-light
 {% endblock bodyclass %}
+
 {% block css %}
   {{ block.super }}
 {% endblock css %}
+
 {% block title %}
   {% block head_title %}
     {% trans "Sign In" %}
   {% endblock head_title %}
 {% endblock title %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-12 col-md-10 col-lg-8">
+      {% block allauth_content %}
+      {% endblock allauth_content %}
+
+    </div>
+  </div>
+{% endblock content %}

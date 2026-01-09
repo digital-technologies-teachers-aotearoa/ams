@@ -1,0 +1,34 @@
+{% extends "mfa/totp/base.html" %}
+
+{% load i18n %}
+{% load allauth %}
+
+{% block head_title %}
+  {% trans "Deactivate Authenticator App" %}
+{% endblock head_title %}
+
+{% block allauth_content %}
+  {% element h1 %}
+    {% trans "Deactivate Authenticator App" %}
+  {% endelement %}
+  <div class="alert alert-danger">
+    {% blocktranslate %}Deactivating two-factor authentication will make your account less secure. Anyone with your password will be able to sign in without a verification code.{% endblocktranslate %}
+  </div>
+  {% element p %}
+    {% blocktranslate %}After deactivating, you can also remove this account from your authenticator app.{% endblocktranslate %}
+  {% endelement %}
+  {% url 'mfa_deactivate_totp' as action_url %}
+  {% element form form=form method="post" action=action_url no_visible_fields=True %}
+    {% slot body %}
+      {% csrf_token %}
+      {% element fields form=form %}
+        {{ form.as_p }}
+      {% endelement %}
+    {% endslot %}
+    {% slot actions %}
+      {% element button tags="danger,delete" type="submit" %}
+        {% trans "Deactivate" %}
+      {% endelement %}
+    {% endslot %}
+  {% endelement %}
+{% endblock allauth_content %}
