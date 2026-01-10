@@ -23,8 +23,7 @@ This can be run on any managed platform that supports Docker containers, such as
 - Media storage (storage buckets)
     - Media storage requires Amazon S3, DigitalOcean Spaces, or [any other compatible providers listed here](https://django-storages.readthedocs.io/en/latest/backends/s3_compatible/index.html).
     - Additional details regarding media related environment variables can be found on [this settings page](https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html#settings), matching settings by suffix (for example: `AWS_S3_ENDPOINT_URL` and `DJANGO_MEDIA_PUBLIC_ENDPOINT_URL` are equivalent).
-    - Storage buckets should have policies applied to them to match expected behaviour by AMS.
-      Default policies are provided within the [`compose/production/media-storage` directory](https://github.com/digital-technologies-teachers-aotearoa/ams/tree/main/compose/production/media-storage), with a [README providing additional information about these files](https://github.com/digital-technologies-teachers-aotearoa/ams/blob/main/compose/production/media-storage/README.md).
+    - Files uploaded have ACLs applied to them so buckets currently don't require  policies applied to them.
 
 ### Environment variables
 
