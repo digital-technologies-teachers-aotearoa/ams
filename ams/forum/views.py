@@ -41,12 +41,20 @@ def forum_sso_login_callback(request: HttpRequest) -> HttpResponse:
     name = request.user.get_full_name()
     external_id = request.user.id
 
+    # Prepare SSO parameters
+    sso_params = {"name": name}
+
+    # Add avatar URL if user has a profile picture
+    if request.user.profile_picture.name:
+        sso_params["avatar_url"] = request.user.profile_picture.url
+        sso_params["avatar_force_update"] = "true"
+
     redirect_url = sso_redirect_url(
         nonce,
         secret,
         request.user.email,
         external_id,
         username,
-        name=name,
+        **sso_params,
     )
     return HttpResponseRedirect(settings.DISCOURSE_REDIRECT_DOMAIN + redirect_url)
