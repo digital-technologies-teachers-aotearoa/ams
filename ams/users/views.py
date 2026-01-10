@@ -1,5 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
+from django.db.models import Q
 from django.db.models import QuerySet
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -7,6 +8,7 @@ from django.views.generic import DetailView
 from django.views.generic import RedirectView
 from django.views.generic import UpdateView
 
+from ams.organisations.models import OrganisationMember
 from ams.users.forms import UserUpdateForm
 from ams.users.mixins import UserSelfOrStaffMixin
 from ams.users.models import User
@@ -30,14 +32,23 @@ class UserDetailView(LoginRequiredMixin, UserSelfOrStaffMixin, DetailView):
         context["has_active_membership"] = user_has_active_membership(user)
 
         # Organizations - separate pending invitations from accepted memberships
-        all_org_members = user.organisation_members.select_related(
-            "organisation",
-        ).prefetch_related("organisation__organisation_memberships")
+        # Query for invites by both user and email to catch invites sent before signup
 
-        # Pending invitations (not yet accepted or declined)
+        all_org_members = (
+            OrganisationMember.objects.filter(
+                Q(user=user) | Q(invite_email__iexact=user.email),
+            )
+            .select_related(
+                "organisation",
+            )
+            .prefetch_related("organisation__organisation_memberships")
+        )
+
+        # Pending invitations (not yet accepted, declined, or revoked)
         pending_invitations = all_org_members.filter(
             accepted_datetime__isnull=True,
             declined_datetime__isnull=True,
+            revoked_datetime__isnull=True,
         ).order_by("-created_datetime")
         context["pending_invitation_table"] = PendingInvitationTable(
             pending_invitations,
