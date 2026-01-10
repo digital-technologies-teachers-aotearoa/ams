@@ -23,7 +23,7 @@ discourse_connect_secret: changeme
 logout_redirect: <website domain>
 
 # The following settings complement using single sign on
-invite_only: 'true'
+invite_only: 'false'
 login_required: 'true'
 allow_new_registrations: 'false'
 enable_signup_cta: 'false'
@@ -31,6 +31,7 @@ auth_skip_create_confirm: 'true'
 auth_overrides_email: 'true'
 auth_overrides_username: 'true'
 auth_overrides_name: 'true'
+auth_overrides_avatar: 'true'
 email_editable: 'false'
 discourse_connect_overrides_bio: 'true'
 discourse_connect_overrides_avatar: 'true'
@@ -38,6 +39,8 @@ discourse_connect_overrides_profile_background: 'true'
 discourse_connect_overrides_location: 'true'
 discourse_connect_overrides_website: 'true'
 discourse_connect_overrides_card_background: 'true'
+gravatar_enabled: 'false',
+automatically_download_gravatars: 'false',
 
 # Prevent bootstrap mode
 # See: https://meta.discourse.org/t/-/322876
