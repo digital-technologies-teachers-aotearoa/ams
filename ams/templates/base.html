@@ -4,7 +4,8 @@
 <!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE }}" class="h-100">
   <head>{% include "includes/head.html" %}</head>
-  <body class="d-flex flex-column h-100 {% block bodyclass %}{% endblock bodyclass %}">
+  <body class="d-flex flex-column h-100 {% block bodyclass %}{% endblock bodyclass %}
+     ">
     {% block body %}
       {% include "includes/header.html" %}
       <main class="flex-shrink-0">
@@ -12,15 +13,19 @@
           {% include "includes/messages.html" %}
           {% block content %}
           {% endblock content %}
+
         </div>
       </main>
       {% include "includes/footer.html" %}
     {% endblock body %}
+
     {% block modal %}
       {% include "includes/action_modal.html" %}
     {% endblock modal %}
+
     {% block inline_javascript %}
       <script src="{% static 'js/action-modal.js' %}"></script>
     {% endblock inline_javascript %}
+
   </body>
 </html>
