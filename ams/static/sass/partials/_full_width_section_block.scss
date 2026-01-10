@@ -34,23 +34,12 @@
   }
 
   &__items {
-    display: grid;
-    grid-auto-flow: row;
-    grid-template-columns: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
     align-items: center;
-    gap: 1rem;
-
-    &--circle {
-      justify-items: center;
-    }
-  }
-
-  @include media-breakpoint-up(md) {
-    &__items {
-      grid-auto-flow: column;
-      justify-content: center;
-      grid-template-columns: repeat(auto-fit, 200px);
-    }
+    gap: 1.5rem;
+    padding: 0 1rem;
   }
 
   &__item {
@@ -64,6 +53,12 @@
     align-items: center;
     text-decoration: none;
 
+    // All items have same base sizing
+    flex: 0 1 200px;
+    min-width: 150px;
+    max-width: 250px;
+    height: 200px;
+
     &:is(a):hover {
       text-decoration: underline;
     }
@@ -72,18 +67,14 @@
     &--circle {
       border-radius: 50%;
       aspect-ratio: 1 / 1;
-      max-height: 200px;
-      max-width: 200px;
-      width: 100%;
+      // Override height to maintain square for circle
+      height: auto;
     }
 
     // Parallelogram shape
     &--parallelogram {
       transform: skew(-20deg);
-
-      @include media-breakpoint-down(md) {
-        margin: 0 1rem;
-      }
+      // Parallelograms maintain the base height of 200px
 
       // Un-skew the content so text is readable
       .full-width-section__item-content {
