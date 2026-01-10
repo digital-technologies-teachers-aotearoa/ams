@@ -6,6 +6,7 @@
   {% block title %}
     {{ settings.cms.AssociationSettings.association_short_name|default:'Association Management Software' }}
   {% endblock title %}
+
 </title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="description"
@@ -18,6 +19,7 @@
   <link href="{% static 'css/project.min.css' %}" rel="stylesheet" />
   {% theme_css %}
 {% endblock css %}
+
 {# Placed at the top of the document so pages load faster with defer #}
 {% block javascript %}
   <script defer src="{% static 'js/vendors.min.js' %}"></script>
