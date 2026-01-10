@@ -8,6 +8,7 @@ import pytest
 from django.test import Client
 from django.urls import reverse
 
+from ams.organisations.models import OrganisationMember
 from ams.organisations.tests.factories import OrganisationFactory
 from ams.organisations.tests.factories import OrganisationMemberFactory
 from ams.users.models import User
@@ -216,6 +217,7 @@ class TestOrganisationInviteBeforeSignupIntegration:
 
         # Login and decline the invite
         client.force_login(new_user)
+        invite_id = invite.id
         decline_url = reverse(
             "organisations:decline_invite",
             kwargs={"invite_token": invite.invite_token},
@@ -224,10 +226,8 @@ class TestOrganisationInviteBeforeSignupIntegration:
 
         assert decline_response.status_code == HTTPStatus.OK
 
-        # Verify invite was declined and user is linked
-        invite.refresh_from_db()
-        assert invite.user == new_user
-        assert invite.declined_datetime is not None
+        # Verify invite was deleted (decline view deletes the record)
+        assert not OrganisationMember.objects.filter(id=invite_id).exists()
 
         # Verify dashboard no longer shows the invite
         user_detail_url = reverse(
@@ -236,3 +236,85 @@ class TestOrganisationInviteBeforeSignupIntegration:
         )
         response = client.get(user_detail_url)
         assert response.context["has_pending_invitations"] is False
+
+    def test_revoked_invite_redirects_to_dashboard(self, client: Client):
+        """Test that a revoked invite no longer appears on user dashboard.
+
+        This test verifies that when an admin revokes an invite to a user,
+        the invite is removed from the database and no longer appears in
+        the user's pending invitations on their dashboard.
+        """
+        # Step 1: Set up admin user and organisation
+        admin = User.objects.create_user(
+            username="admin",
+            email="admin@example.com",
+            password="testpass123",
+            first_name="Admin",
+            last_name="User",
+        )
+        organisation = OrganisationFactory(name="Test Organisation")
+
+        # Admin is member with admin role
+        OrganisationMemberFactory(
+            user=admin,
+            organisation=organisation,
+            accepted_datetime__not_none=True,
+            role="ADMIN",
+        )
+
+        # Step 2: Create invite to non-existent user's email
+        invite_email = "newuser@example.com"
+        invite = OrganisationMemberFactory(
+            invite=True,  # user=None
+            invite_email=invite_email,
+            organisation=organisation,
+        )
+        invite_id = invite.id
+
+        # Step 3: User signs up with invited email
+        new_user = User.objects.create_user(
+            username="newuser",
+            email=invite_email,
+            password="testpass123",
+            first_name="New",
+            last_name="User",
+        )
+
+        # Step 4: Verify user can see the pending invite on dashboard
+        client.force_login(new_user)
+        user_detail_url = reverse(
+            "users:detail",
+            kwargs={"username": new_user.username},
+        )
+        response = client.get(user_detail_url)
+
+        assert response.status_code == HTTPStatus.OK
+        assert response.context["has_pending_invitations"] is True
+        pending_invitations = list(response.context["pending_invitation_table"].data)
+        assert len(pending_invitations) == 1
+        assert pending_invitations[0].uuid == invite.uuid
+
+        # Step 5: Admin revokes the invite
+        client.force_login(admin)
+        revoke_url = reverse(
+            "organisations:revoke_invite",
+            kwargs={
+                "uuid": organisation.uuid,
+                "member_uuid": invite.uuid,
+            },
+        )
+        revoke_response = client.post(revoke_url, follow=True)
+
+        assert revoke_response.status_code == HTTPStatus.OK
+
+        # Step 6: Verify invite was deleted (revoke view deletes the record)
+        assert not OrganisationMember.objects.filter(id=invite_id).exists()
+
+        # Step 7: Verify user's dashboard no longer shows the invite
+        client.force_login(new_user)
+        response = client.get(user_detail_url)
+
+        assert response.status_code == HTTPStatus.OK
+        assert response.context["has_pending_invitations"] is False
+        pending_invitations = list(response.context["pending_invitation_table"].data)
+        assert len(pending_invitations) == 0
