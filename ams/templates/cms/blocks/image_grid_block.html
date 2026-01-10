@@ -1,6 +1,6 @@
 {% load wagtailcore_tags %}
 
-<div class="image-grid row row-cols-{{ self.columns }} g-4 {% if self.image_alignment == 'center' %}justify-content-center{% endif %}">
+<div class="image-grid row row-cols-2 row-cols-lg-{{ self.columns }} g-4 {% if self.image_alignment == 'center' %}justify-content-center{% endif %}">
   {% for item in self.items %}
     <div class="col">
       {% if item.link_page or item.link_url %}
