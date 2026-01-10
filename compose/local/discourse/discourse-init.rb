@@ -30,7 +30,7 @@ ordered_settings = [
 # Other settings
 more_settings = {
   'title' => 'AMS Forums',
-  'invite_only' => true,
+  'invite_only' => false,
   'login_required' => true,
   'allow_new_registrations' => false,
   'enable_signup_cta' => false,
@@ -45,6 +45,8 @@ more_settings = {
   'discourse_connect_overrides_location' => true,
   'discourse_connect_overrides_website' => true,
   'discourse_connect_overrides_card_background' => true,
+  'gravatar_enabled' => false,
+  'automatically_download_gravatars' => false,
   'logout_redirect' => 'http://localhost:3000',
   'pending_users_reminder_delay_minutes' => 5,
   'default_trust_level' => 1,
