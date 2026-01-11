@@ -16,8 +16,8 @@
 {% image settings.cms.AssociationSettings.association_favicon format-ico preserve-svg as favicon_image %}
 <link rel="icon" href="{{ favicon_image.url }}" />
 {% block css %}
-  <link href="{% static 'css/project.min.css' %}" rel="stylesheet" />
   {% theme_css %}
+  <link href="{% static 'css/project.min.css' %}" rel="stylesheet" />
 {% endblock css %}
 
 {# Placed at the top of the document so pages load faster with defer #}
