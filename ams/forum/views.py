@@ -8,6 +8,7 @@ from django.urls import reverse
 from pydiscourse.sso import sso_redirect_url
 from pydiscourse.sso import sso_validate
 
+from ams.terms.decorators import terms_required
 from ams.utils.permissions import user_has_active_membership
 
 
@@ -19,6 +20,7 @@ def forum_sso_login_redirect(request: HttpRequest) -> HttpResponse:
 
 
 @login_required
+@terms_required
 def forum_sso_login_callback(request: HttpRequest) -> HttpResponse:
     # Check if user has forum access (superuser or active membership)
     if not user_has_active_membership(request.user):
