@@ -21,6 +21,7 @@ The following URL patterns are reserved for applications and cannot be used as p
 - `/forum/` - Forum application
 - `/cms/` - Content management system
 - `/accounts/` - User authentication
+- `/terms/` - Terms and conditions
 
 When creating new pages, avoid using these terms as slugs for pages that are direct children of the homepage to prevent URL conflicts.
 
@@ -30,3 +31,4 @@ When creating menus within the CMS, you may want to link to a page that is not c
 You can use the following URLs within the 'External URL' field on a menu item to link to the following pages:
 
 - Discourse forum = `/forum/` - This will automatically redirect visitors to the forum with proper authentication.
+- Terms and Conditions = `/terms/` - This displays all current terms and policies.

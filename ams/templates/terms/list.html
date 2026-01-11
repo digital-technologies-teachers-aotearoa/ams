@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+
+{% block title %}
+  {% translate "Terms and Conditions" %}
+{% endblock title %}
+
+{% block content %}
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <div class="mb-4">
+        <h1>{% translate "Terms and Conditions" %}</h1>
+        <p class="text-muted">{% translate "Below are the current terms and policies for our platform." %}</p>
+      </div>
+      {% if term_versions %}
+        {% for term_version in term_versions %}
+          {% include "terms/term_card.html" %}
+        {% endfor %}
+      {% else %}
+        <div class="alert alert-info">
+          <i class="bi bi-info-circle"></i>
+          {% translate "No terms are currently available." %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+{% endblock content %}

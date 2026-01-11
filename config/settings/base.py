@@ -128,6 +128,7 @@ LOCAL_APPS = [
     "ams.billing",
     "ams.utils",
     "ams.forum",
+    "ams.terms",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

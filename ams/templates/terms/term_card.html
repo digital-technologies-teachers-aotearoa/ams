@@ -1,0 +1,18 @@
+{% load i18n %}
+
+<div class="card shadow-sm mb-4">
+  <div class="card-header">
+    <h1 class="mb-0">{{ term_version.term.name }}</h1>
+  </div>
+  <div class="card-body">
+    <div class="terms-content border rounded p-4 mb-3">{{ term_version.content|safe }}</div>
+    <div class="terms-meta text-muted small">
+      <p class="mb-1">
+        <strong>{% translate "Version:" %}</strong> {{ term_version.version }}
+      </p>
+      <p class="mb-0">
+        <strong>{% translate "Effective Date:" %}</strong> {{ term_version.date_active|date:"F j, Y" }}
+      </p>
+    </div>
+  </div>
+</div>

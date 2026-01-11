@@ -47,6 +47,8 @@ urlpatterns += i18n_patterns(
         "organisations/",
         include("ams.organisations.urls", namespace="organisations"),
     ),
+    # Terms and conditions
+    path("terms/", include("ams.terms.urls", namespace="terms")),
     # CMS pages are handled by Wagtail
     path("", include(wagtail_urls)),
 )
