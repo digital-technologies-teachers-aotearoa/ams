@@ -110,8 +110,8 @@ main > .container {
   display: block;
   margin: auto;
   stroke-width: 0;
-  stroke: rgba(0, 0, 0, 0.65);
-  fill: rgba(0, 0, 0, 0.65);
+  stroke: currentColor;
+  fill: currentColor;
 }
 
 .navbar-icon {
@@ -153,4 +153,23 @@ main > .container {
 // Apply .lead to <p> within div.lead-paragraph
 div.lead-paragraph p {
   @extend .lead;
+}
+
+// Navbar
+/* Perfect mobile logo centering */
+#navbar-logo img {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@media (min-width: 992px) {
+  #navbar-logo img {
+    position: static;
+    transform: none;
+  }
+}
+
+.navbar .nav-link.dropdown-toggle.submenu {
+  padding: var(--bs-nav-link-padding-y) var(--bs-nav-link-padding-x);
 }

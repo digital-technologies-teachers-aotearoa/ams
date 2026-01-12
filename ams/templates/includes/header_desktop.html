@@ -1,0 +1,69 @@
+{% load i18n menu_tags translate_url %}
+
+<header>
+  <!-- Fixed navbar -->
+  <nav class="navbar navbar-expand-lg  fixed-top"
+       data-bs-theme="{{ settings.cms.ThemeSettings.navbar_colour_mode }}">
+    <div class="container position-relative">
+      <!-- Mobile: Main menu toggle (left) -->
+      <button class="navbar-toggler"
+              type="button"
+              data-bs-toggle="offcanvas"
+              data-bs-target="#mainNavOffcanvas"
+              aria-controls="mainNavOffcanvas">
+        <span class="navbar-icon navbar-toggler-icon"></span>
+      </button>
+      <!-- Logo -->
+      <a id="navbar-logo"
+         class="navbar-brand me-0"
+         href="{% translate_url LANGUAGE_CODE '/' %}">{% include "snippets/navbar_logo_or_name.html" %}</a>
+      <!-- Desktop menu -->
+      <div class="collapse navbar-collapse">
+        <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+          {% main_menu template="cms/menu/desktop_top_level_item.html" sub_menu_template="cms/menu/desktop_child_item.html" max_levels=2 %}
+          {% if request.user.is_authenticated %}
+            <!-- Desktop avatar -->
+            <li class="nav-item dropdown ms-lg-3">
+              <button class="nav-link text-body-emphasis dropdown-toggle d-flex align-items-center"
+                      type="button"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false">
+                <div class="profile-picture profile-picture-small">
+                  {% include "snippets/user_avatar.html" with user=request.user %}
+                </div>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                  <a class="dropdown-item"
+                     href="{% url 'users:detail' request.user.username %}">{% translate "My Profile" %}</a>
+                </li>
+                <li>
+                  <hr class="dropdown-divider" />
+                </li>
+                <li>
+                  <a class="dropdown-item" href="{% url 'account_logout' %}">{% translate "Logout" %}</a>
+                </li>
+              </ul>
+            </li>
+          {% else %}
+            <li class="nav-item ms-lg-3">
+              {# URL provided by django-allauth/account/urls.py #}
+              <a id="log-in-link" class="nav-link" href="{% url 'account_login' %}">{% translate "Sign In" %}</a>
+            </li>
+            {% if ACCOUNT_ALLOW_REGISTRATION %}
+              <li class="nav-item">
+                {# URL provided by django-allauth/account/urls.py #}
+                <a id="sign-up-link"
+                   class="btn btn-primary"
+                   href="{% url 'account_signup' %}">{% translate "Sign Up" %}</a>
+              </li>
+            {% endif %}
+            {% if LANGUAGES|length > 1 %}
+              {% include "includes/language_dropdown.html" %}
+            {% endif %}
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </nav>
+</header>

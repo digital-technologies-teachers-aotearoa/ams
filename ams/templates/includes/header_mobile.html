@@ -1,0 +1,48 @@
+{% load i18n menu_tags translate_url %}
+
+<div class="offcanvas offcanvas-start" tabindex="-1" id="mainNavOffcanvas">
+  <div class="offcanvas-header">
+    <a class="ps-3" href="{% translate_url LANGUAGE_CODE '/' %}">{% include "snippets/navbar_logo_or_name.html" %}</a>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+  </div>
+  <div class="offcanvas-body">
+    <ul class="nav flex-column gap-2">
+      {% main_menu template="cms/menu/mobile_top_level_item.html" sub_menu_template="cms/menu/mobile_child_item.html" max_levels=2 %}
+      <li>
+        <hr />
+      </li>
+      {% if request.user.is_authenticated %}
+        {% with user=request.user %}
+          <li>
+            <div class="d-flex align-items-center gap-2 mx-3 my-2">
+              <div class="profile-picture profile-picture-small">{% include "snippets/user_avatar.html" %}</div>
+              <div class="text-muted mb-0">{{ user.get_full_name }}</div>
+            </div>
+          </li>
+          <li>
+            <a class="nav-link" href="{% url 'users:detail' user.username %}">{% translate "My Profile" %}</a>
+          </li>
+          <li>
+            <hr />
+          </li>
+          <li>
+            <a class="nav-link text-danger" href="{% url 'account_logout' %}">{% translate "Logout" %}</a>
+          </li>
+        {% endwith %}
+      {% else %}
+        <li class="nav-item">
+          {# URL provided by django-allauth/account/urls.py #}
+          <a id="log-in-link" class="nav-link" href="{% url 'account_login' %}">{% translate "Sign In" %}</a>
+        </li>
+        {% if ACCOUNT_ALLOW_REGISTRATION %}
+          <li class="nav-item">
+            {# URL provided by django-allauth/account/urls.py #}
+            <a id="sign-up-link"
+               class="btn btn-primary"
+               href="{% url 'account_signup' %}">{% translate "Sign Up" %}</a>
+          </li>
+        {% endif %}
+      {% endif %}
+    </ul>
+  </div>
+</div>

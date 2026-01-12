@@ -1,7 +1,7 @@
 {% load wagtailimages_tags %}
 
 {% if settings.cms.AssociationSettings.use_logo_in_navbar %}
-  {% image settings.cms.AssociationSettings.association_logo max-300x80 preserve-svg class="navbar-logo" %}
+  {% image settings.cms.AssociationSettings.association_logo max-300x80 preserve-svg %}
 {% else %}
   {{ settings.cms.AssociationSettings.association_short_name|default:'Association Management Software' }}
 {% endif %}
