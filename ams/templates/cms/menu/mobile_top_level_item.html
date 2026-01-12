@@ -1,0 +1,14 @@
+{% load menu_tags %}
+
+{% for item in menu_items %}
+  <li class="nav-item">
+    <a class="nav-link {% if item.active_class %}active{% endif %}"
+       href="{{ item.href }}"
+       {% if item.active_class %}aria-current="page"{% endif %}>{{ item.text }}</a>
+    {% if item.has_children_in_menu %}
+      <ul class="nav flex-column ms-3">
+        {% sub_menu item %}
+      </ul>
+    {% endif %}
+  </li>
+{% endfor %}

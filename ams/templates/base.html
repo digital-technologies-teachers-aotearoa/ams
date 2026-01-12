@@ -1,14 +1,14 @@
-{% load static i18n wagtailcore_tags %}
+{% load static i18n %}
 
 {% get_current_language as LANGUAGE_CODE %}
 <!DOCTYPE html>
-<html lang="{{ LANGUAGE_CODE }}" class="h-100">
+<html lang="{{ LANGUAGE_CODE }}">
   <head>{% include "includes/head.html" %}</head>
-  <body class="d-flex flex-column h-100 {% block bodyclass %}{% endblock bodyclass %}
+  <body class="min-vh-100 d-flex flex-column {% block bodyclass %}{% endblock bodyclass %}
      ">
     {% block body %}
-      {% include "includes/header.html" %}
-      <main class="flex-shrink-0">
+      {% include "includes/header_desktop.html" %}
+      <main class="flex-grow-1">
         <div class="container">
           {% include "includes/messages.html" %}
           {% block content %}
@@ -27,5 +27,6 @@
       <script src="{% static 'js/action-modal.js' %}"></script>
     {% endblock inline_javascript %}
 
+    {% include "includes/header_mobile.html" %}
   </body>
 </html>
