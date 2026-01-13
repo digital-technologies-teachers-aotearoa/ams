@@ -24,5 +24,6 @@
     </div>
   </div>
   {{ membership_data_json|json_script:"membership-data" }}
+  <script src="{% static 'js/membership_calculator.js' %}"></script>
   <script src="{% static 'js/organisation_membership_add.js' %}"></script>
 {% endblock content %}

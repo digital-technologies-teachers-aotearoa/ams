@@ -12,35 +12,14 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
+  // Get DOM elements
   const optionSelect = document.getElementById('id_membership_option');
   const startInput = document.getElementById('id_start_date');
   const seatInput = document.getElementById('id_seat_count');
   const expiryEl = document.getElementById('membership-expiry-date');
   const costEl = document.getElementById('membership-total-cost');
-
-  function parseDate(str) {
-    // yyyy-mm-dd
-    const [y, m, d] = str.split('-').map(Number);
-    return new Date(y, m - 1, d);
-  }
-
-  function formatDate(date) {
-    // Format as DD/MM/YYYY
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
-  }
-
-  function addDuration(date, duration) {
-    let newDate = new Date(date.getTime());
-    if (duration.years)
-      newDate.setFullYear(newDate.getFullYear() + duration.years);
-    if (duration.months) newDate.setMonth(newDate.getMonth() + duration.months);
-    if (duration.weeks) newDate.setDate(newDate.getDate() + 7 * duration.weeks);
-    if (duration.days) newDate.setDate(newDate.getDate() + duration.days);
-    return newDate;
-  }
+  const infoBox = document.getElementById('charged-seats-info');
+  const infoMessage = document.getElementById('charged-seats-message');
 
   function updateCalculations() {
     if (!optionSelect || !startInput) return;
@@ -51,51 +30,35 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (optionId && startVal && membershipData && membershipData[optionId]) {
       const option = membershipData[optionId];
-      const duration = {
-        years: option.years,
-        months: option.months,
-        weeks: option.weeks,
-        days: option.days,
-      };
 
-      // Calculate expiry date
-      const startDate = parseDate(startVal);
-      const expiryDate = addDuration(startDate, duration);
-      expiryEl.textContent = formatDate(expiryDate);
+      // Use shared calculator
+      const result = MembershipCalculator.calculateNewMembership({
+        membershipOption: {
+          cost: option.cost,
+          max_charged_seats: option.max_charged_seats,
+          duration: {
+            years: option.years,
+            months: option.months,
+            weeks: option.weeks,
+            days: option.days,
+          },
+        },
+        startDate: startVal,
+        seatCount: seatCount,
+      });
 
-      // Calculate chargeable seats
-      const maxCharged = option.max_charged_seats;
-      let chargedSeats = seatCount;
-      let freeSeats = 0;
+      // Update UI
+      expiryEl.textContent = result.expiryDateFormatted;
+      costEl.textContent = result.totalCostFormatted;
 
-      if (maxCharged && seatCount > maxCharged) {
-        chargedSeats = maxCharged;
-        freeSeats = seatCount - maxCharged;
-      }
-
-      // Calculate total cost (only for charged seats)
-      const totalCost = option.cost * chargedSeats;
-      costEl.textContent = `$${totalCost.toFixed(2)}`;
-
-      // Show charged/free seats info if applicable
-      const infoBox = document.getElementById('charged-seats-info');
-      const infoMessage = document.getElementById('charged-seats-message');
-
-      if (infoBox && infoMessage) {
-        if (maxCharged && seatCount > maxCharged) {
-          infoMessage.innerHTML = `<strong>Note:</strong> First ${chargedSeats} seat(s) are charged at $${option.cost.toFixed(
-            2,
-          )} each. Additional ${freeSeats} seat(s) are free.`;
-          infoBox.classList.remove('d-none');
-        } else if (maxCharged) {
-          infoMessage.innerHTML = `<strong>Pricing:</strong> First ${maxCharged} seat(s) are charged at $${option.cost.toFixed(
-            2,
-          )} each. Additional seats are free.`;
-          infoBox.classList.remove('d-none');
-        } else {
-          infoBox.classList.add('d-none');
-        }
-      }
+      MembershipCalculator.updateSeatInfoBox({
+        infoBox,
+        messageElement: infoMessage,
+        chargedSeats: result.chargedSeats,
+        freeSeats: result.freeSeats,
+        costPerSeat: option.cost,
+        maxChargedSeats: option.max_charged_seats,
+      });
 
       // Update max seats on input if applicable
       if (seatInput && option.max_seats) {
@@ -104,14 +67,13 @@ document.addEventListener('DOMContentLoaded', function () {
     } else {
       expiryEl.textContent = '—';
       costEl.textContent = '—';
-
-      const infoBox = document.getElementById('charged-seats-info');
       if (infoBox) {
         infoBox.classList.add('d-none');
       }
     }
   }
 
+  // Event listeners
   if (optionSelect) {
     optionSelect.addEventListener('change', updateCalculations);
   }

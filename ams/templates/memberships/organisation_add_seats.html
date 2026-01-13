@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load i18n %}
+{% load i18n static %}
 {% load crispy_forms_tags %}
 
 {% block title %}
@@ -8,7 +8,10 @@
 {% endblock title %}
 
 {% block content %}
-  <div class="container my-5">
+  <div class="container my-5"
+       data-prorata-cost-per-seat="{{ prorata_cost_per_seat }}"
+       {% if max_charged_seats %}data-max-charged-seats="{{ max_charged_seats }}"{% endif %}
+       {% if current_chargeable_seats %}data-current-chargeable-seats="{{ current_chargeable_seats }}"{% endif %}>
     <div class="row">
       <div class="col-12 col-md-8 offset-md-2">
         <h1>{% trans "Add Seats to" %} {{ organisation.name }}</h1>
@@ -72,92 +75,6 @@
     </div>
   </div>
   <!-- JavaScript for live pro-rata calculation -->
-  <script>
-    (function() {
-      // Get pre-calculated pro-rata cost for 1 seat from server
-      const prorataCostPerSeat = parseFloat('{{ prorata_cost_per_seat }}');
-      const maxChargedSeats = {
-        {
-          max_charged_seats |
-            default: 'null'
-        }
-      };
-      const currentChargeableSeats = {
-        {
-          current_chargeable_seats |
-            default: '0'
-        }
-      };
-
-      // Get form elements
-      const seatsInput = document.getElementById('id_seats_to_add');
-      const previewElement = document.getElementById('prorata-preview');
-      const breakdownBox = document.getElementById('seats-breakdown');
-      const breakdownTotal = document.getElementById('breakdown-total');
-      const breakdownChargeable = document.getElementById('breakdown-chargeable');
-      const breakdownFree = document.getElementById('breakdown-free');
-
-      if (!seatsInput || !previewElement) {
-        return;
-      }
-
-      // Function to calculate chargeable seats
-      function calculateChargeableSeats(seatsToAdd) {
-        if (!maxChargedSeats) {
-          return seatsToAdd;
-        }
-
-        // Calculate how many more seats we can charge for
-        const remainingChargeable = Math.max(0, maxChargedSeats - currentChargeableSeats);
-        return Math.min(seatsToAdd, remainingChargeable);
-      }
-
-      // Function to calculate and display pro-rata cost
-      function updateProrataPreview() {
-        const seats = parseInt(seatsInput.value) || 0;
-
-        if (seats <= 0) {
-          previewElement.textContent = '{% trans "Enter number of seats to see the cost." %}';
-          if (breakdownBox) {
-            breakdownBox.style.display = 'none';
-          }
-          return;
-        }
-
-        // Calculate chargeable and free seats
-        const chargeableSeats = calculateChargeableSeats(seats);
-        const freeSeats = seats - chargeableSeats;
-
-        // Multiply pre-calculated cost per seat by number of chargeable seats
-        const prorataCost = (prorataCostPerSeat * chargeableSeats).toFixed(2);
-
-        // Format as currency
-        const formattedCost = '$' + prorataCost;
-
-        // Update preview
-        if (chargeableSeats === seats) {
-          previewElement.textContent = '{% trans "Estimated cost:" %} ' + formattedCost +
-            ' {% trans "for" %} ' + seats + ' {% trans "seat(s)" %}';
-        } else {
-          previewElement.textContent = '{% trans "Estimated cost:" %} ' + formattedCost +
-            ' {% trans "for" %} ' + chargeableSeats + ' {% trans "charged seat(s)" %} ' +
-            '(' + freeSeats + ' {% trans "free" %})';
-        }
-
-        // Show breakdown if there are free seats
-        if (breakdownBox && maxChargedSeats) {
-          breakdownTotal.textContent = seats;
-          breakdownChargeable.textContent = chargeableSeats;
-          breakdownFree.textContent = freeSeats;
-          breakdownBox.style.display = 'block';
-        }
-      }
-
-      // Add event listener
-      seatsInput.addEventListener('input', updateProrataPreview);
-
-      // Initial calculation if value exists
-      updateProrataPreview();
-    })();
-  </script>
+  <script src="{% static 'js/membership_calculator.js' %}"></script>
+  <script src="{% static 'js/organisation_add_seats.js' %}"></script>
 {% endblock content %}
