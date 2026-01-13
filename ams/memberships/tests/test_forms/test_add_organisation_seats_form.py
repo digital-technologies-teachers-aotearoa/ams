@@ -232,3 +232,144 @@ class TestAddOrganisationSeatsForm:
         assert not form.is_valid()
         assert "seats_to_add" in form.errors
         assert "expires too soon" in form.errors["seats_to_add"][0]
+
+    @patch("ams.memberships.forms.MembershipBillingService")
+    def test_add_seats_respects_max_charged_seats(self, mock_billing_service_class):
+        """Test adding seats when max_charged_seats limits billing."""
+        # Arrange
+        mock_billing_service = Mock()
+        mock_billing_service.create_membership_invoice.return_value = None
+        mock_billing_service_class.return_value = mock_billing_service
+
+        organisation = OrganisationFactory()
+        membership_option = MembershipOptionFactory(
+            organisation=True,
+            cost=Decimal("1000.00"),
+            duration={"years": 1},
+            max_charged_seats=4,
+        )
+        start_date = timezone.localdate()
+        expiry_date = start_date + relativedelta(years=1)
+        membership = OrganisationMembershipFactory(
+            organisation=organisation,
+            membership_option=membership_option,
+            start_date=start_date,
+            expiry_date=expiry_date,
+            seats=2,  # Currently have 2 seats
+            approved=True,
+        )
+
+        form = AddOrganisationSeatsForm(
+            organisation=organisation,
+            active_membership=membership,
+            data={"seats_to_add": 5},  # Adding 5 more (total will be 7)
+        )
+
+        # Act
+        assert form.is_valid(), form.errors
+        updated_membership, _invoice = form.save()
+
+        # Assert
+        # Membership should have 7 seats total
+        updated_membership.refresh_from_db()
+        expected_seats = 7
+        assert updated_membership.seats == expected_seats
+
+        # But only charged for 2 more seats (4 limit - 2 current = 2 chargeable)
+        # Verify calculate_prorata_seat_cost was called and invoice created
+        # The pro-rata calculation internally uses calculate_chargeable_seats
+        mock_billing_service.create_membership_invoice.assert_called_once()
+
+    @patch("ams.memberships.forms.MembershipBillingService")
+    def test_add_seats_zero_cost_when_at_max_charged_limit(
+        self,
+        mock_billing_service_class,
+    ):
+        """Test adding seats charges $0 when already at max_charged_seats."""
+        # Arrange
+        mock_billing_service = Mock()
+        mock_billing_service.create_membership_invoice.return_value = None
+        mock_billing_service_class.return_value = mock_billing_service
+
+        organisation = OrganisationFactory()
+        membership_option = MembershipOptionFactory(
+            organisation=True,
+            cost=Decimal("1000.00"),
+            duration={"years": 1},
+            max_seats=None,  # No overall limit on seats
+            max_charged_seats=5,  # But only charge for first 5
+        )
+        start_date = timezone.localdate()
+        expiry_date = start_date + relativedelta(years=1)
+        membership = OrganisationMembershipFactory(
+            organisation=organisation,
+            membership_option=membership_option,
+            start_date=start_date,
+            expiry_date=expiry_date,
+            seats=5,  # Already at limit
+            approved=True,
+        )
+
+        form = AddOrganisationSeatsForm(
+            organisation=organisation,
+            active_membership=membership,
+            data={"seats_to_add": 10},  # Adding 10 more
+        )
+
+        # Act
+        assert form.is_valid(), form.errors
+        updated_membership, _invoice = form.save()
+
+        # Assert
+        # Membership should have 15 seats total
+        updated_membership.refresh_from_db()
+        expected_seats = 15
+        assert updated_membership.seats == expected_seats
+
+        # Verify NO invoice created (pro-rata cost is $0 when at limit)
+        # When cost is $0, the form skips invoice creation
+        mock_billing_service.create_membership_invoice.assert_not_called()
+
+    @patch("ams.memberships.forms.MembershipBillingService")
+    def test_add_seats_all_charged_without_limit(self, mock_billing_service_class):
+        """Test adding seats charges for all when no max_charged_seats."""
+        # Arrange
+        mock_billing_service = Mock()
+        mock_billing_service.create_membership_invoice.return_value = None
+        mock_billing_service_class.return_value = mock_billing_service
+
+        organisation = OrganisationFactory()
+        membership_option = MembershipOptionFactory(
+            organisation=True,
+            cost=Decimal("1000.00"),
+            duration={"years": 1},
+            max_seats=None,  # No overall limit on seats
+            max_charged_seats=None,  # No limit on charging either
+        )
+        start_date = timezone.localdate()
+        expiry_date = start_date + relativedelta(years=1)
+        membership = OrganisationMembershipFactory(
+            organisation=organisation,
+            membership_option=membership_option,
+            start_date=start_date,
+            expiry_date=expiry_date,
+            seats=10,
+            approved=True,
+        )
+
+        form = AddOrganisationSeatsForm(
+            organisation=organisation,
+            active_membership=membership,
+            data={"seats_to_add": 5},
+        )
+
+        # Act
+        assert form.is_valid(), form.errors
+        updated_membership, _invoice = form.save()
+
+        # Assert
+        updated_membership.refresh_from_db()
+        expected_seats = 15
+        assert updated_membership.seats == expected_seats
+        # All 5 seats should be charged
+        mock_billing_service.create_membership_invoice.assert_called_once()

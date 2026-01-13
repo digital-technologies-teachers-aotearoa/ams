@@ -11,6 +11,7 @@ from ams.memberships.models import MembershipOption
 from ams.memberships.models import MembershipOptionType
 from ams.memberships.models import MembershipStatus
 from ams.memberships.models import OrganisationMembership
+from ams.memberships.tests.factories import MembershipOptionFactory
 from ams.memberships.tests.factories import OrganisationMembershipFactory
 from ams.organisations.models import OrganisationMember
 from ams.organisations.tests.factories import OrganisationFactory
@@ -211,7 +212,8 @@ class TestOrganisationMembership:
         # Act
         seats = membership.occupied_seats
         # Assert - only the 3 accepted + active should count
-        assert seats == 3  # noqa: PLR2004
+        expected_seats = 3
+        assert seats == expected_seats
 
     def test_occupied_seats_pending_membership_counts(self):
         # Arrange - pending membership (not yet approved)
@@ -336,7 +338,8 @@ class TestOrganisationMembershipSeatsAvailable:
         )
 
         # With 0 occupied seats, should have 10 available
-        assert membership.seats_available == 10  # noqa: PLR2004
+        expected_seats = 10
+        assert membership.seats_available == expected_seats
 
 
 class TestOrganisationMembershipIsFull:
@@ -477,3 +480,172 @@ class TestOrganisationMembershipCanCancel:
         membership = OrganisationMembershipFactory(expired=True)
 
         assert membership.can_cancel is False
+
+
+class TestOrganisationMembershipChargeableSeats:
+    """Tests for chargeable_seats property."""
+
+    def test_chargeable_seats_with_no_limit(self):
+        """Test chargeable_seats returns all seats when no limit is set."""
+        # Arrange
+        organisation = OrganisationFactory()
+        membership_option = MembershipOptionFactory(
+            organisation=True,
+            max_charged_seats=None,  # No limit
+        )
+        membership = OrganisationMembershipFactory(
+            organisation=organisation,
+            membership_option=membership_option,
+            seats=10,
+        )
+        # Act & Assert
+        expected_chargable_seats = 10
+        assert membership.chargeable_seats == expected_chargable_seats
+
+    def test_chargeable_seats_respects_max_charged_seats_limit(self):
+        """Test chargeable_seats caps at max_charged_seats when seats exceed limit."""
+        # Arrange
+        organisation = OrganisationFactory()
+        membership_option = MembershipOptionFactory(
+            organisation=True,
+            max_charged_seats=5,
+        )
+        membership = OrganisationMembershipFactory(
+            organisation=organisation,
+            membership_option=membership_option,
+            seats=10,  # More than max_charged_seats
+        )
+        # Act & Assert
+        expected_chargable_seats = 5
+        assert membership.chargeable_seats == expected_chargable_seats
+
+    def test_chargeable_seats_when_below_limit(self):
+        """Test chargeable_seats returns actual seats when below limit."""
+        # Arrange
+        organisation = OrganisationFactory()
+        membership_option = MembershipOptionFactory(
+            organisation=True,
+            max_charged_seats=10,
+        )
+        membership = OrganisationMembershipFactory(
+            organisation=organisation,
+            membership_option=membership_option,
+            seats=3,  # Less than max_charged_seats
+        )
+        # Act & Assert
+        expected_chargable_seats = 3
+        assert membership.chargeable_seats == expected_chargable_seats
+
+    def test_chargeable_seats_at_limit(self):
+        """Test chargeable_seats when seats equal max_charged_seats."""
+        # Arrange
+        organisation = OrganisationFactory()
+        membership_option = MembershipOptionFactory(
+            organisation=True,
+            max_charged_seats=5,
+        )
+        membership = OrganisationMembershipFactory(
+            organisation=organisation,
+            membership_option=membership_option,
+            seats=5,  # Exactly at limit
+        )
+        # Act & Assert
+        expected_chargable_seats = 5
+        assert membership.chargeable_seats == expected_chargable_seats
+
+
+class TestOrganisationMembershipFreeSeats:
+    """Tests for free_seats property."""
+
+    def test_free_seats_with_max_charged_seats(self):
+        """Test free_seats calculates correctly when limit is set."""
+        # Arrange
+        organisation = OrganisationFactory()
+        membership_option = MembershipOptionFactory(
+            organisation=True,
+            max_charged_seats=5,
+        )
+        membership = OrganisationMembershipFactory(
+            organisation=organisation,
+            membership_option=membership_option,
+            seats=10,
+        )
+        # Act & Assert
+        expected_free_seats = 5
+        assert membership.free_seats == expected_free_seats
+
+    def test_free_seats_without_limit(self):
+        """Test free_seats is 0 when no limit is set (all seats charged)."""
+        # Arrange
+        organisation = OrganisationFactory()
+        membership_option = MembershipOptionFactory(
+            organisation=True,
+            max_charged_seats=None,
+        )
+        membership = OrganisationMembershipFactory(
+            organisation=organisation,
+            membership_option=membership_option,
+            seats=10,
+        )
+        # Act & Assert
+        assert membership.free_seats == 0
+
+    def test_free_seats_when_below_limit(self):
+        """Test free_seats is 0 when seats are below limit."""
+        # Arrange
+        organisation = OrganisationFactory()
+        membership_option = MembershipOptionFactory(
+            organisation=True,
+            max_charged_seats=10,
+        )
+        membership = OrganisationMembershipFactory(
+            organisation=organisation,
+            membership_option=membership_option,
+            seats=3,
+        )
+        # Act & Assert
+        assert membership.free_seats == 0
+
+
+class TestOrganisationMembershipSeatsSummaryWithMaxChargedSeats:
+    """Tests for seats_summary method with max_charged_seats."""
+
+    def test_seats_summary_shows_charged_and_free_with_limit(self):
+        """Test seats_summary displays charged vs free breakdown when limit is set."""
+        # Arrange
+        organisation = OrganisationFactory()
+        membership_option = MembershipOptionFactory(
+            organisation=True,
+            max_charged_seats=5,
+        )
+        membership = OrganisationMembershipFactory(
+            organisation=organisation,
+            membership_option=membership_option,
+            seats=10,
+            approved=True,
+        )
+        # Act
+        summary = membership.seats_summary()
+        # Assert
+        assert "5 charged" in summary
+        assert "5 free" in summary
+
+    def test_seats_summary_without_charged_info_when_no_limit(self):
+        """Test seats_summary doesn't show charged/free when no limit."""
+        # Arrange
+        organisation = OrganisationFactory()
+        membership_option = MembershipOptionFactory(
+            organisation=True,
+            max_charged_seats=None,
+        )
+        membership = OrganisationMembershipFactory(
+            organisation=organisation,
+            membership_option=membership_option,
+            seats=10,
+            approved=True,
+        )
+        # Act
+        summary = membership.seats_summary()
+        # Assert
+        assert "charged" not in summary.lower()
+        assert "free" not in summary.lower()

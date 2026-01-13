@@ -1,4 +1,7 @@
 from datetime import timedelta
+from decimal import Decimal
+from unittest.mock import Mock
+from unittest.mock import patch
 
 import pytest
 from django.test import override_settings
@@ -229,7 +232,8 @@ class TestCreateOrganisationMembershipForm:
         assert membership.organisation == org
         assert membership.membership_option == option
         assert membership.start_date == timezone.localdate()
-        assert membership.seats == 5  # noqa: PLR2004
+        expected_seats = 5
+        assert membership.seats == expected_seats
         assert membership.expiry_date == membership.calculate_expiry_date()
         assert membership.created_datetime is not None
 
@@ -445,3 +449,118 @@ class TestCreateOrganisationMembershipForm:
         # Paid memberships should still not be auto-approved (pending payment)
         assert membership.approved_datetime is None
         assert membership.status().name == "PENDING"
+
+    @patch("ams.memberships.forms.MembershipBillingService")
+    def test_form_charges_only_max_charged_seats(self, mock_billing_service_class):
+        """Test that form charges only up to max_charged_seats, not all seats."""
+        # Arrange
+        mock_billing_service = Mock()
+        mock_billing_service.create_membership_invoice.return_value = None
+        mock_billing_service_class.return_value = mock_billing_service
+
+        organisation = OrganisationFactory()
+        membership_option = MembershipOptionFactory(
+            organisation=True,
+            cost=Decimal("1000.00"),
+            duration={"years": 1},
+            max_charged_seats=4,
+        )
+
+        form = CreateOrganisationMembershipForm(
+            organisation=organisation,
+            data={
+                "membership_option": membership_option.id,
+                "start_date": timezone.localdate().isoformat(),
+                "seat_count": 10,  # Requesting 10 seats
+            },
+        )
+
+        # Act
+        assert form.is_valid(), form.errors
+        membership = form.save()
+
+        # Assert
+        # Verify invoice was created with only 4 chargeable seats, not 10
+        mock_billing_service.create_membership_invoice.assert_called_once()
+        call_args = mock_billing_service.create_membership_invoice.call_args
+        seats_argument = call_args[0][2]  # 3rd positional arg is seat_count
+        expected_seats = 4
+        assert seats_argument == expected_seats
+
+        # Verify membership has all 10 seats allocated
+        membership.refresh_from_db()
+        expected_seats = 10
+        assert membership.seats == expected_seats
+
+    @patch("ams.memberships.forms.MembershipBillingService")
+    def test_form_charges_all_seats_without_limit(self, mock_billing_service_class):
+        """Test that form charges for all seats when no max_charged_seats."""
+        # Arrange
+        mock_billing_service = Mock()
+        mock_billing_service.create_membership_invoice.return_value = None
+        mock_billing_service_class.return_value = mock_billing_service
+
+        organisation = OrganisationFactory()
+        membership_option = MembershipOptionFactory(
+            organisation=True,
+            cost=Decimal("1000.00"),
+            duration={"years": 1},
+            max_charged_seats=None,  # No limit
+        )
+
+        form = CreateOrganisationMembershipForm(
+            organisation=organisation,
+            data={
+                "membership_option": membership_option.id,
+                "start_date": timezone.localdate().isoformat(),
+                "seat_count": 10,
+            },
+        )
+
+        # Act
+        assert form.is_valid(), form.errors
+        form.save()
+
+        # Assert
+        # Verify invoice was created with all 10 seats
+        mock_billing_service.create_membership_invoice.assert_called_once()
+        call_args = mock_billing_service.create_membership_invoice.call_args
+        seats_argument = call_args[0][2]
+        expected_seats = 10
+        assert seats_argument == expected_seats
+
+    @patch("ams.memberships.forms.MembershipBillingService")
+    def test_form_charges_partial_when_below_limit(self, mock_billing_service_class):
+        """Test form charges actual seats when below max_charged_seats limit."""
+        # Arrange
+        mock_billing_service = Mock()
+        mock_billing_service.create_membership_invoice.return_value = None
+        mock_billing_service_class.return_value = mock_billing_service
+
+        organisation = OrganisationFactory()
+        membership_option = MembershipOptionFactory(
+            organisation=True,
+            cost=Decimal("1000.00"),
+            duration={"years": 1},
+            max_charged_seats=10,
+        )
+
+        form = CreateOrganisationMembershipForm(
+            organisation=organisation,
+            data={
+                "membership_option": membership_option.id,
+                "start_date": timezone.localdate().isoformat(),
+                "seat_count": 3,  # Below limit
+            },
+        )
+
+        # Act
+        assert form.is_valid(), form.errors
+        form.save()
+
+        # Assert
+        # Verify invoice was created with 3 seats (actual count)
+        call_args = mock_billing_service.create_membership_invoice.call_args
+        seats_argument = call_args[0][2]
+        expected_seats = 3
+        assert seats_argument == expected_seats

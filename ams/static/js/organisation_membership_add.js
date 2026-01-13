@@ -63,9 +63,39 @@ document.addEventListener('DOMContentLoaded', function () {
       const expiryDate = addDuration(startDate, duration);
       expiryEl.textContent = formatDate(expiryDate);
 
-      // Calculate total cost
-      const totalCost = option.cost * seatCount;
+      // Calculate chargeable seats
+      const maxCharged = option.max_charged_seats;
+      let chargedSeats = seatCount;
+      let freeSeats = 0;
+
+      if (maxCharged && seatCount > maxCharged) {
+        chargedSeats = maxCharged;
+        freeSeats = seatCount - maxCharged;
+      }
+
+      // Calculate total cost (only for charged seats)
+      const totalCost = option.cost * chargedSeats;
       costEl.textContent = `$${totalCost.toFixed(2)}`;
+
+      // Show charged/free seats info if applicable
+      const infoBox = document.getElementById('charged-seats-info');
+      const infoMessage = document.getElementById('charged-seats-message');
+
+      if (infoBox && infoMessage) {
+        if (maxCharged && seatCount > maxCharged) {
+          infoMessage.innerHTML = `<strong>Note:</strong> First ${chargedSeats} seat(s) are charged at $${option.cost.toFixed(
+            2,
+          )} each. Additional ${freeSeats} seat(s) are free.`;
+          infoBox.classList.remove('d-none');
+        } else if (maxCharged) {
+          infoMessage.innerHTML = `<strong>Pricing:</strong> First ${maxCharged} seat(s) are charged at $${option.cost.toFixed(
+            2,
+          )} each. Additional seats are free.`;
+          infoBox.classList.remove('d-none');
+        } else {
+          infoBox.classList.add('d-none');
+        }
+      }
 
       // Update max seats on input if applicable
       if (seatInput && option.max_seats) {
@@ -74,6 +104,11 @@ document.addEventListener('DOMContentLoaded', function () {
     } else {
       expiryEl.textContent = '—';
       costEl.textContent = '—';
+
+      const infoBox = document.getElementById('charged-seats-info');
+      if (infoBox) {
+        infoBox.classList.add('d-none');
+      }
     }
   }
 

@@ -141,6 +141,9 @@ class CreateOrganisationMembershipView(
                 "days": days,
                 "cost": float(option.cost),
                 "max_seats": int(option.max_seats) if option.max_seats else None,
+                "max_charged_seats": int(option.max_charged_seats)
+                if option.max_charged_seats
+                else None,
             }
 
         context["membership_data_json"] = membership_data
@@ -270,6 +273,15 @@ class AddOrganisationSeatsView(
             context["prorata_cost_per_seat"] = str(
                 calculate_prorata_seat_cost(self.active_membership, 1),
             )
+
+            # Add max_charged_seats info for UI
+            if self.active_membership.membership_option.max_charged_seats:
+                context["max_charged_seats"] = int(
+                    self.active_membership.membership_option.max_charged_seats,
+                )
+                context["current_chargeable_seats"] = (
+                    self.active_membership.chargeable_seats
+                )
 
         return context
 

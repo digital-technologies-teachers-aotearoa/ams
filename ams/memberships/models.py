@@ -69,6 +69,7 @@ class MembershipOption(Model):
         "duration",
         "cost",
         "max_seats",
+        "max_charged_seats",
         "type",
     }
 
@@ -91,6 +92,16 @@ class MembershipOption(Model):
         blank=True,
         help_text=_(
             "Maximum number of seats for organisation memberships (optional limit)",
+        ),
+    )
+    max_charged_seats = DecimalField(
+        max_digits=10,
+        decimal_places=0,
+        null=True,
+        blank=True,
+        help_text=_(
+            "Maximum number of seats that will be charged (optional). If set, seats "
+            "beyond this limit are free. Must be ≤ max_seats if both are set.",
         ),
     )
     voting_rights = BooleanField(
@@ -118,7 +129,28 @@ class MembershipOption(Model):
     def clean(self):
         super().clean()
 
-        # Only enforce on updates
+        # Validate max_charged_seats ≤ max_seats if both are set
+        if self.max_charged_seats and self.max_seats:
+            if self.max_charged_seats > self.max_seats:
+                raise ValidationError(
+                    {
+                        "max_charged_seats": _(
+                            "Max charged seats cannot exceed max seats.",
+                        ),
+                    },
+                )
+
+        # max_charged_seats only applies to ORGANISATION type
+        if self.max_charged_seats and self.type != MembershipOptionType.ORGANISATION:
+            raise ValidationError(
+                {
+                    "max_charged_seats": _(
+                        "Max charged seats only applies to organisation memberships.",
+                    ),
+                },
+            )
+
+        # Only enforce immutability on updates
         if not self.pk:
             return
 
@@ -366,9 +398,31 @@ class OrganisationMembership(BaseMembership):
         """Check if all membership seats are occupied."""
         return self.occupied_seats >= int(self.seats)
 
+    @property
+    def chargeable_seats(self) -> int:
+        """Calculate number of seats that should be charged.
+
+        Returns minimum of actual seats and max_charged_seats (if set).
+        """
+        if self.membership_option.max_charged_seats:
+            return min(int(self.seats), int(self.membership_option.max_charged_seats))
+        return int(self.seats)
+
+    @property
+    def free_seats(self) -> int:
+        """Calculate number of free seats (not charged)."""
+        return int(self.seats) - self.chargeable_seats
+
     def seats_summary(self) -> str:
         """Return summary of seat status."""
         base = f"Occupied: {self.occupied_seats} / {self.seats}"
+
+        # Show charged vs free seats if max_charged_seats is set
+        if self.membership_option.max_charged_seats:
+            charged = self.chargeable_seats
+            free = self.free_seats
+            base += f" ({charged} charged, {free} free)"
+
         if self.membership_option.max_seats:
             max_seats = self.membership_option.max_seats
             if max_seats == 1:
