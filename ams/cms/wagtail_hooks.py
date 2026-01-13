@@ -7,12 +7,25 @@ from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 from wagtail import hooks
 from wagtail.admin.menu import MenuItem
+from wagtail.admin.rich_text.converters.html_to_contentstate import BlockElementHandler
+from wagtail.admin.rich_text.editors.draftail.features import BlockFeature
 from wagtail.admin.ui.components import Component
 from wagtail.admin.ui.tables import Column
 from wagtail.admin.viewsets.pages import PageListingViewSet
 
 from ams.cms.models.pages import ArticlePage
 from ams.utils.permissions import user_has_active_membership
+
+
+@hooks.register("register_icons")
+def register_icons(icons):
+    return [
+        *icons,
+        "cms/wagtail-icons/align-left.svg",
+        "cms/wagtail-icons/align-center.svg",
+        "cms/wagtail-icons/align-right.svg",
+        "cms/wagtail-icons/align-justify.svg",
+    ]
 
 
 class ArticlePageListingViewSet(PageListingViewSet):
@@ -88,7 +101,11 @@ if settings.WAGTAIL_AMS_ADMIN_HELPERS:
     @hooks.register("insert_global_admin_css")
     def global_admin_css():
         return format_html(
-            '<link rel="stylesheet" href="{}">',
+            """
+            <link rel="stylesheet" href="{}">
+            <link rel="stylesheet" href="{}">
+            """,
+            static("css/wagtail-admin.css"),
             static("css/wagtail-admin-helpers.min.css"),
         )
 
@@ -98,3 +115,62 @@ if settings.WAGTAIL_AMS_ADMIN_HELPERS:
             '<script src="{}"></script>',
             static("js/wagtail-admin-helpers.min.js"),
         )
+
+
+ALIGNMENTS = {
+    "align-left": {
+        "icon": "align-left",
+        "description": "Align left",
+    },
+    "align-center": {
+        "icon": "align-center",
+        "description": "Align center",
+    },
+    "align-right": {
+        "icon": "align-right",
+        "description": "Align right",
+    },
+    "align-justify": {
+        "icon": "align-justify",
+        "description": "Justify",
+    },
+}
+
+
+@hooks.register("register_rich_text_features")
+def register_alignment_features(features):
+    for classname, control in ALIGNMENTS.items():
+        feature_name = classname
+        block_type = classname.upper().replace("-", "_")
+
+        features.register_editor_plugin(
+            "draftail",
+            feature_name,
+            BlockFeature(
+                {
+                    "type": block_type,
+                    "icon": control["icon"],
+                    "description": control["description"],
+                },
+            ),
+        )
+
+        features.register_converter_rule(
+            "contentstate",
+            feature_name,
+            {
+                "from_database_format": {
+                    f'p[class="{classname}"]': BlockElementHandler(block_type),
+                },
+                "to_database_format": {
+                    "block_map": {
+                        block_type: {
+                            "element": "p",
+                            "props": {"class": classname},
+                        },
+                    },
+                },
+            },
+        )
+
+        features.default_features.append(feature_name)

@@ -155,6 +155,20 @@ div.lead-paragraph p {
   @extend .lead;
 }
 
+// Text alignment classes for rich text editor
+.align-left {
+  text-align: left;
+}
+.align-center {
+  text-align: center;
+}
+.align-right {
+  text-align: right;
+}
+.align-justify {
+  text-align: justify;
+}
+
 // Navbar
 /* Perfect mobile logo centering */
 #navbar-logo img {
