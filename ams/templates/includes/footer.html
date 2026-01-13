@@ -56,5 +56,12 @@
         </div>
       </div>
     {% endif %}
+    {% if settings.cms.AssociationSettings.footer_text %}
+      <div class="row border-top pt-3 mt-3">
+        <div class="col">
+          <div class="footer-text small text-muted">{{ settings.cms.AssociationSettings.footer_text|safe }}</div>
+        </div>
+      </div>
+    {% endif %}
   </div>
 </footer>
