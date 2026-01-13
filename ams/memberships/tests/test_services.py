@@ -7,6 +7,7 @@ import pytest
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 
+from ams.memberships.services import calculate_chargeable_seats
 from ams.memberships.services import calculate_prorata_seat_cost
 from ams.memberships.tests.factories import MembershipOptionFactory
 from ams.memberships.tests.factories import OrganisationMembershipFactory
@@ -539,3 +540,238 @@ class TestCalculateProrataSeatCost:
 
         # Should return $0 to avoid division by zero
         assert prorata_cost == Decimal("0.00")
+
+    def test_prorata_with_max_charged_seats_limit(self):
+        """Test pro-rata calculation respects max_charged_seats limit."""
+        # Arrange
+        organisation = OrganisationFactory()
+        membership_option = MembershipOptionFactory(
+            organisation=True,
+            cost=Decimal("1000.00"),
+            duration={"years": 1},
+            max_charged_seats=5,
+        )
+        start_date = timezone.localdate()
+        expiry_date = start_date + relativedelta(years=1)
+        membership = OrganisationMembershipFactory(
+            organisation=organisation,
+            membership_option=membership_option,
+            start_date=start_date,
+            expiry_date=expiry_date,
+            seats=0,
+            approved=True,
+        )
+        # Act
+        prorata_cost = calculate_prorata_seat_cost(membership, 10)
+        # Assert
+        # Should calculate for 5 seats (max_charged), not 10
+        # At start of period, should be close to $5000 (5 x $1000)
+        assert prorata_cost >= Decimal("4975.00")
+        assert prorata_cost <= Decimal("5000.00")
+
+    def test_prorata_with_partial_charge_when_near_limit(self):
+        """Test pro-rata when only some seats are chargeable."""
+        # Arrange
+        organisation = OrganisationFactory()
+        membership_option = MembershipOptionFactory(
+            organisation=True,
+            cost=Decimal("1000.00"),
+            duration={"years": 1},
+            max_charged_seats=4,
+        )
+        start_date = timezone.localdate()
+        expiry_date = start_date + relativedelta(years=1)
+        membership = OrganisationMembershipFactory(
+            organisation=organisation,
+            membership_option=membership_option,
+            start_date=start_date,
+            expiry_date=expiry_date,
+            seats=3,  # Already have 3
+            approved=True,
+        )
+        # Act
+        prorata_cost = calculate_prorata_seat_cost(membership, 5)
+        # Assert
+        # Can only charge for 1 more seat (4 - 3 = 1)
+        # At start of period, should be close to $1000 (1 x $1000)
+        assert prorata_cost >= Decimal("995.00")
+        assert prorata_cost <= Decimal("1000.00")
+
+    def test_prorata_zero_when_at_max_charged_limit(self):
+        """Test pro-rata returns $0 when already at max_charged_seats limit."""
+        # Arrange
+        organisation = OrganisationFactory()
+        membership_option = MembershipOptionFactory(
+            organisation=True,
+            cost=Decimal("1000.00"),
+            duration={"years": 1},
+            max_charged_seats=5,
+        )
+        start_date = timezone.localdate()
+        expiry_date = start_date + relativedelta(years=1)
+        membership = OrganisationMembershipFactory(
+            organisation=organisation,
+            membership_option=membership_option,
+            start_date=start_date,
+            expiry_date=expiry_date,
+            seats=5,  # Already at limit
+            approved=True,
+        )
+        # Act
+        prorata_cost = calculate_prorata_seat_cost(membership, 10)
+        # Assert
+        assert prorata_cost == Decimal("0.00")  # No charge for additional seats
+
+    def test_prorata_zero_cost_membership_with_max_charged(self):
+        """Test pro-rata with free membership that has max_charged_seats set."""
+        # Arrange
+        organisation = OrganisationFactory()
+        membership_option = MembershipOptionFactory(
+            organisation=True,
+            cost=Decimal("0.00"),  # Free membership
+            duration={"years": 1},
+            max_charged_seats=5,  # Limit set but doesn't matter
+        )
+        start_date = timezone.localdate()
+        expiry_date = start_date + relativedelta(years=1)
+        membership = OrganisationMembershipFactory(
+            organisation=organisation,
+            membership_option=membership_option,
+            start_date=start_date,
+            expiry_date=expiry_date,
+            seats=0,
+            approved=True,
+        )
+        # Act
+        prorata_cost = calculate_prorata_seat_cost(membership, 10)
+        # Assert
+        assert prorata_cost == Decimal("0.00")
+
+
+@pytest.mark.django_db
+class TestCalculateChargeableSeats:
+    """Tests for calculate_chargeable_seats function."""
+
+    def test_calculate_chargeable_seats_no_limit(self):
+        """Test that all seats are chargeable when no limit is set."""
+        # Arrange
+        organisation = OrganisationFactory()
+        membership_option = MembershipOptionFactory(
+            organisation=True,
+            cost=Decimal("1000.00"),
+            duration={"years": 1},
+            max_charged_seats=None,
+        )
+        membership = OrganisationMembershipFactory(
+            organisation=organisation,
+            membership_option=membership_option,
+            seats=5,
+            approved=True,
+        )
+        # Act
+        chargeable = calculate_chargeable_seats(membership, 3)
+        # Assert
+        expected_chargable = 3
+        assert chargeable == expected_chargable
+
+    def test_calculate_chargeable_seats_respects_limit(self):
+        """Test that chargeable seats caps at max_charged_seats."""
+        # Arrange
+        organisation = OrganisationFactory()
+        membership_option = MembershipOptionFactory(
+            organisation=True,
+            max_charged_seats=4,
+        )
+        membership = OrganisationMembershipFactory(
+            organisation=organisation,
+            membership_option=membership_option,
+            seats=0,  # Starting with no seats
+            approved=True,
+        )
+        # Act
+        chargeable = calculate_chargeable_seats(membership, 10)
+        # Assert
+        expected_chargable = 4
+        assert chargeable == expected_chargable
+
+    def test_calculate_chargeable_seats_accounts_for_current(self):
+        """Test that current seats are accounted for when calculating chargeable."""
+        # Arrange
+        organisation = OrganisationFactory()
+        membership_option = MembershipOptionFactory(
+            organisation=True,
+            max_charged_seats=4,
+        )
+        membership = OrganisationMembershipFactory(
+            organisation=organisation,
+            membership_option=membership_option,
+            seats=2,  # Already have 2 seats
+            approved=True,
+        )
+        # Act
+        chargeable = calculate_chargeable_seats(membership, 5)
+        # Assert
+        # Current: 2, Adding: 5, New total: 7
+        # Max charged: 4, Already charged: 2, Can charge: 4-2=2
+        expected_chargable = 2
+        assert chargeable == expected_chargable
+
+    def test_calculate_chargeable_seats_zero_when_at_limit(self):
+        """Test that no seats are chargeable when already at limit."""
+        # Arrange
+        organisation = OrganisationFactory()
+        membership_option = MembershipOptionFactory(
+            organisation=True,
+            max_charged_seats=5,
+        )
+        membership = OrganisationMembershipFactory(
+            organisation=organisation,
+            membership_option=membership_option,
+            seats=5,  # Already at limit
+            approved=True,
+        )
+        # Act
+        chargeable = calculate_chargeable_seats(membership, 10)
+        # Assert
+        assert chargeable == 0
+
+    def test_calculate_chargeable_seats_partial_near_limit(self):
+        """Test partial charging when adding seats near the limit."""
+        # Arrange
+        organisation = OrganisationFactory()
+        membership_option = MembershipOptionFactory(
+            organisation=True,
+            max_charged_seats=10,
+        )
+        membership = OrganisationMembershipFactory(
+            organisation=organisation,
+            membership_option=membership_option,
+            seats=8,  # 8 out of 10
+            approved=True,
+        )
+        # Act
+        chargeable = calculate_chargeable_seats(membership, 5)
+        # Assert
+        # Current: 8, Adding: 5, New total: 13
+        # Max charged: 10, Already charged: 8, Can charge: 10-8=2
+        expected_chargable = 2
+        assert chargeable == expected_chargable
+
+    def test_calculate_chargeable_seats_zero_to_add(self):
+        """Test behavior when adding zero seats."""
+        # Arrange
+        organisation = OrganisationFactory()
+        membership_option = MembershipOptionFactory(
+            organisation=True,
+            max_charged_seats=5,
+        )
+        membership = OrganisationMembershipFactory(
+            organisation=organisation,
+            membership_option=membership_option,
+            seats=3,
+            approved=True,
+        )
+        # Act
+        chargeable = calculate_chargeable_seats(membership, 0)
+        # Assert
+        assert chargeable == 0

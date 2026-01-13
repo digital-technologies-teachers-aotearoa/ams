@@ -123,6 +123,15 @@ class MembershipOptionForm(ModelForm):
             "Maximum number of seats for organisation memberships (optional limit)",
         ),
     )
+    max_charged_seats = DecimalField(
+        max_digits=10,
+        decimal_places=0,
+        required=False,
+        help_text=_(
+            "Maximum number of seats that will be charged (optional). If set, seats "
+            "beyond this limit are free. Must be ≤ max_seats if both are set.",
+        ),
+    )
     archived = BooleanField(
         required=False,
         help_text=_("Mark as archived to prevent new signups"),
@@ -138,6 +147,7 @@ class MembershipOptionForm(ModelForm):
             "invoice_reference",
             "invoice_due_days",
             "max_seats",
+            "max_charged_seats",
             "archived",
         ]
 
@@ -499,10 +509,18 @@ class CreateOrganisationMembershipForm(ModelForm):
                 # Save instance first to get primary key (but not committed yet)
                 instance.save()
 
+                # Calculate chargeable seats (respect max_charged_seats if set)
+                chargeable_seats = seat_count
+                if membership_option.max_charged_seats:
+                    chargeable_seats = min(
+                        seat_count,
+                        int(membership_option.max_charged_seats),
+                    )
+
                 invoice = billing_service.create_membership_invoice(
                     account,
                     membership_option,
-                    seat_count,
+                    chargeable_seats,
                     membership=instance,
                 )
                 if invoice:

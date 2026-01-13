@@ -28,6 +28,14 @@
               <p class="mb-1">
                 <strong>{% trans "Current Seats:" %}</strong> {{ current_seats }}
               </p>
+              {% if max_charged_seats %}
+                <p class="mb-1">
+                  <strong>{% trans "Charged Seats:" %}</strong> {{ current_chargeable_seats }} / {{ max_charged_seats }}
+                </p>
+                <p class="mb-1">
+                  <strong>{% trans "Free Seats:" %}</strong> {{ active_membership.free_seats }}
+                </p>
+              {% endif %}
               <p class="mb-1">
                 <strong>{% trans "Occupied:" %}</strong> {{ occupied_seats }}
               </p>
@@ -47,6 +55,19 @@
         </div>
         <!-- Form -->
         {% crispy form %}
+        <!-- Seats Breakdown -->
+        <div id="seats-breakdown" class="alert alert-warning d-none">
+          <h5 class="alert-heading">{% trans "Seats Breakdown" %}</h5>
+          <p class="mb-1">
+            <strong>{% trans "Seats being added:" %}</strong> <span id="breakdown-total">0</span>
+          </p>
+          <p class="mb-1">
+            <strong>{% trans "Charged seats:" %}</strong> <span id="breakdown-chargeable">0</span>
+          </p>
+          <p class="mb-1">
+            <strong>{% trans "Free seats:" %}</strong> <span id="breakdown-free">0</span>
+          </p>
+        </div>
       </div>
     </div>
   </div>
@@ -55,13 +76,40 @@
     (function() {
       // Get pre-calculated pro-rata cost for 1 seat from server
       const prorataCostPerSeat = parseFloat('{{ prorata_cost_per_seat }}');
+      const maxChargedSeats = {
+        {
+          max_charged_seats |
+            default: 'null'
+        }
+      };
+      const currentChargeableSeats = {
+        {
+          current_chargeable_seats |
+            default: '0'
+        }
+      };
 
       // Get form elements
       const seatsInput = document.getElementById('id_seats_to_add');
       const previewElement = document.getElementById('prorata-preview');
+      const breakdownBox = document.getElementById('seats-breakdown');
+      const breakdownTotal = document.getElementById('breakdown-total');
+      const breakdownChargeable = document.getElementById('breakdown-chargeable');
+      const breakdownFree = document.getElementById('breakdown-free');
 
       if (!seatsInput || !previewElement) {
         return;
+      }
+
+      // Function to calculate chargeable seats
+      function calculateChargeableSeats(seatsToAdd) {
+        if (!maxChargedSeats) {
+          return seatsToAdd;
+        }
+
+        // Calculate how many more seats we can charge for
+        const remainingChargeable = Math.max(0, maxChargedSeats - currentChargeableSeats);
+        return Math.min(seatsToAdd, remainingChargeable);
       }
 
       // Function to calculate and display pro-rata cost
@@ -70,18 +118,39 @@
 
         if (seats <= 0) {
           previewElement.textContent = '{% trans "Enter number of seats to see the cost." %}';
+          if (breakdownBox) {
+            breakdownBox.style.display = 'none';
+          }
           return;
         }
 
-        // Multiply pre-calculated cost per seat by number of seats
-        const prorataCost = (prorataCostPerSeat * seats).toFixed(2);
+        // Calculate chargeable and free seats
+        const chargeableSeats = calculateChargeableSeats(seats);
+        const freeSeats = seats - chargeableSeats;
+
+        // Multiply pre-calculated cost per seat by number of chargeable seats
+        const prorataCost = (prorataCostPerSeat * chargeableSeats).toFixed(2);
 
         // Format as currency
         const formattedCost = '$' + prorataCost;
 
         // Update preview
-        previewElement.textContent = '{% trans "Estimated cost:" %} ' + formattedCost +
-          ' {% trans "for" %} ' + seats + ' {% trans "seat(s)" %}';
+        if (chargeableSeats === seats) {
+          previewElement.textContent = '{% trans "Estimated cost:" %} ' + formattedCost +
+            ' {% trans "for" %} ' + seats + ' {% trans "seat(s)" %}';
+        } else {
+          previewElement.textContent = '{% trans "Estimated cost:" %} ' + formattedCost +
+            ' {% trans "for" %} ' + chargeableSeats + ' {% trans "charged seat(s)" %} ' +
+            '(' + freeSeats + ' {% trans "free" %})';
+        }
+
+        // Show breakdown if there are free seats
+        if (breakdownBox && maxChargedSeats) {
+          breakdownTotal.textContent = seats;
+          breakdownChargeable.textContent = chargeableSeats;
+          breakdownFree.textContent = freeSeats;
+          breakdownBox.style.display = 'block';
+        }
       }
 
       // Add event listener

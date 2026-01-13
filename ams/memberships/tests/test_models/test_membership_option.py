@@ -1,7 +1,11 @@
+from decimal import Decimal
+
 import pytest
+from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
 
 from ams.memberships.models import MembershipOption
+from ams.memberships.models import MembershipOptionType
 from ams.memberships.tests.factories import IndividualMembershipFactory
 from ams.memberships.tests.factories import MembershipOptionFactory
 from ams.memberships.tests.factories import OrganisationMembershipFactory
@@ -42,7 +46,8 @@ class TestMembershipOption:
             max_seats=20,
         )
         # Assert
-        assert option.max_seats == 20  # noqa: PLR2004
+        expected_seats = 20
+        assert option.max_seats == expected_seats
 
     def test_archived_defaults_false(self):
         # Arrange & Act
@@ -95,14 +100,16 @@ class TestMembershipOption:
         # Arrange & Act
         option = MembershipOptionFactory()
         # Assert
-        assert option.invoice_due_days == 60  # noqa: PLR2004
+        expected_days = 60
+        assert option.invoice_due_days == expected_days
 
     def test_invoice_due_days_can_be_customized(self):
         """Test that invoice_due_days can be set to custom value."""
         # Arrange & Act
         option = MembershipOptionFactory(invoice_due_days=30)
         # Assert
-        assert option.invoice_due_days == 30  # noqa: PLR2004
+        expected_days = 30
+        assert option.invoice_due_days == expected_days
 
     def test_invoice_due_days_is_not_immutable(self):
         """Test that invoice_due_days can be changed after creation."""
@@ -113,4 +120,104 @@ class TestMembershipOption:
         option.save()
         option.refresh_from_db()
         # Assert
-        assert option.invoice_due_days == 90  # noqa: PLR2004
+        expected_days = 90
+        assert option.invoice_due_days == expected_days
+
+
+class TestMembershipOptionMaxChargedSeats:
+    """Tests for max_charged_seats field on MembershipOption."""
+
+    def test_max_charged_seats_can_be_null(self):
+        """Test that max_charged_seats can be null (optional field)."""
+        # Arrange & Act
+        option = MembershipOptionFactory(
+            organisation=True,
+            max_charged_seats=None,
+        )
+        # Assert
+        assert option.max_charged_seats is None
+
+    def test_max_charged_seats_with_valid_value(self):
+        """Test setting a valid max_charged_seats value."""
+        # Arrange & Act
+        option = MembershipOptionFactory(
+            organisation=True,
+            max_seats=10,
+            max_charged_seats=5,
+        )
+        # Assert
+        expected_seats = 5
+        assert option.max_charged_seats == expected_seats
+
+    def test_max_charged_seats_cannot_exceed_max_seats(self):
+        """Test validation prevents max_charged_seats > max_seats."""
+        # Arrange - Create a membership option with invalid max_charged_seats
+        option_invalid = MembershipOption(
+            name="Test Option",
+            type=MembershipOptionType.ORGANISATION,
+            duration=relativedelta(years=1),
+            cost=Decimal("1000.00"),
+            max_seats=5,
+            max_charged_seats=10,  # Invalid: greater than max_seats
+        )
+        # Act & Assert
+        with pytest.raises(ValidationError) as exc:
+            option_invalid.full_clean()
+        assert "max_charged_seats" in exc.value.error_dict
+        assert "cannot exceed max seats" in str(exc.value).lower()
+
+    def test_max_charged_seats_only_for_organisation_type(self):
+        """Test validation prevents max_charged_seats on INDIVIDUAL memberships."""
+        # Arrange
+        option = MembershipOption(
+            name="Individual Test",
+            type=MembershipOptionType.INDIVIDUAL,
+            duration=relativedelta(years=1),
+            cost=Decimal("100.00"),
+            max_charged_seats=5,  # Invalid for individual
+        )
+        # Act & Assert
+        with pytest.raises(ValidationError) as exc:
+            option.full_clean()
+        assert "max_charged_seats" in exc.value.error_dict
+        assert "only applies to organisation" in str(exc.value).lower()
+
+    def test_max_charged_seats_is_immutable_after_creation(self):
+        """Test that max_charged_seats cannot be changed after creation."""
+        # Arrange - Create option with max_charged_seats
+        option = MembershipOptionFactory(
+            organisation=True,
+            max_seats=10,
+            max_charged_seats=5,
+        )
+        # Act - Try to change it
+        option.max_charged_seats = 7
+        # Assert
+        with pytest.raises(ValidationError) as exc:
+            option.full_clean()
+        assert "max_charged_seats" in exc.value.error_dict
+        assert "cannot be changed" in str(exc.value).lower()
+
+    def test_max_charged_seats_without_max_seats(self):
+        """Test that max_charged_seats can be set even without max_seats."""
+        # Arrange & Act
+        option = MembershipOptionFactory(
+            organisation=True,
+            max_seats=None,  # No overall limit
+            max_charged_seats=10,  # But limit on charged seats
+        )
+        # Assert
+        expected_charged_seats = 10
+        assert option.max_seats is None
+        assert option.max_charged_seats == expected_charged_seats
+
+    def test_max_charged_seats_equal_to_max_seats(self):
+        """Test that max_charged_seats can equal max_seats (edge case)."""
+        # Arrange & Act
+        option = MembershipOptionFactory(
+            organisation=True,
+            max_seats=10,
+            max_charged_seats=10,
+        )
+        # Assert
+        assert option.max_charged_seats == option.max_seats

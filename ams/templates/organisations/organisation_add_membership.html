@@ -14,6 +14,12 @@
         <h1>{% trans "Add Membership to" %} {{ organisation.name }}</h1>
         <p class="text-muted">{% trans "Select a membership option and the number of seats for this organisation." %}</p>
         {% crispy form %}
+        <div class="mb-4">
+          <div id="charged-seats-info" class="alert alert-info">
+            <h5 class="alert-heading">{% trans "Seat Pricing" %}</h5>
+            <p id="charged-seats-message" class="mb-0"></p>
+          </div>
+        </div>
       </div>
     </div>
   </div>

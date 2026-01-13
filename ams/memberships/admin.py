@@ -9,7 +9,15 @@ from ams.memberships.models import OrganisationMembership
 @admin.register(MembershipOption)
 class MembershipOptionAdmin(admin.ModelAdmin):
     form = MembershipOptionForm
-    list_display = ("name", "type", "duration_display", "cost", "max_seats", "archived")
+    list_display = (
+        "name",
+        "type",
+        "duration_display",
+        "cost",
+        "max_seats",
+        "max_charged_seats",
+        "archived",
+    )
     search_fields = ("name",)
     list_filter = ("type", "archived")
 
@@ -29,6 +37,7 @@ class MembershipOptionAdmin(admin.ModelAdmin):
                         "duration_display" if obj else "duration",
                         "cost",
                         "max_seats",
+                        "max_charged_seats",
                         "voting_rights",
                     ),
                     "description": "Note: These values are read only after creation.",
