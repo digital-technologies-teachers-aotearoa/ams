@@ -3,7 +3,18 @@ from wagtail.blocks import StructBlock
 
 
 class LeadParagraphBlock(StructBlock):
-    text = RichTextBlock(features=["bold", "italic", "link"], required=True)
+    text = RichTextBlock(
+        features=[
+            "bold",
+            "italic",
+            "link",
+            "align-left",
+            "align-center",
+            "align-right",
+            "align-justify",
+        ],
+        required=True,
+    )
 
     class Meta:
         icon = "pilcrow"

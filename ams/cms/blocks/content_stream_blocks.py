@@ -12,7 +12,24 @@ from ams.cms.blocks.lead_paragraph_block import LeadParagraphBlock
 
 class ContentStreamBlocks(StreamBlock):
     heading_block = HeadingBlock()
-    paragraph_block = RichTextBlock(icon="pilcrow")
+    paragraph_block = RichTextBlock(
+        icon="pilcrow",
+        features=[
+            "bold",
+            "italic",
+            "link",
+            "document-link",
+            "ol",
+            "ul",
+            "superscript",
+            "subscript",
+            "strikethrough",
+            "align-left",
+            "align-center",
+            "align-right",
+            "align-justify",
+        ],
+    )
     lead_paragraph_block = LeadParagraphBlock()
     image_block = CaptionedImageBlock()
     image_grid_block = ImageGridBlock()

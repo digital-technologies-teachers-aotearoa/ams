@@ -67,7 +67,14 @@ class FullWidthSectionBlock(StructBlock):
     )
     text = RichTextBlock(
         required=False,
-        features=["bold", "italic"],
+        features=[
+            "bold",
+            "italic",
+            "align-left",
+            "align-center",
+            "align-right",
+            "align-justify",
+        ],
         help_text="Optional introductory text below the heading",
     )
     background_image = ImageBlock(
