@@ -4,6 +4,7 @@ from wagtail.admin.panels import FieldPanel
 from wagtail.admin.panels import MultiFieldPanel
 from wagtail.contrib.settings.models import BaseSiteSetting
 from wagtail.contrib.settings.models import register_setting
+from wagtail.fields import RichTextField
 
 
 @register_setting
@@ -68,6 +69,19 @@ class AssociationSettings(BaseSiteSetting):
         blank=True,
         help_text="If set, a link will appear in the footer.",
     )
+    footer_text = RichTextField(
+        blank=True,
+        features=[
+            "bold",
+            "italic",
+            "link",
+            "align-left",
+            "align-center",
+            "align-right",
+            "align-justify",
+        ],
+        help_text="Optional footer text (e.g., copyright info, disclaimers).",
+    )
 
     panels = [
         MultiFieldPanel(
@@ -92,5 +106,11 @@ class AssociationSettings(BaseSiteSetting):
                 FieldPanel("facebook_url"),
             ],
             "Social networks",
+        ),
+        MultiFieldPanel(
+            [
+                FieldPanel("footer_text"),
+            ],
+            "Footer",
         ),
     ]
