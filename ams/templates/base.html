@@ -1,4 +1,4 @@
-{% load static i18n %}
+{% load static i18n breadcrumb_tags %}
 
 {% get_current_language as LANGUAGE_CODE %}
 <!DOCTYPE html>
@@ -10,6 +10,10 @@
       {% include "includes/header_desktop.html" %}
       <main class="flex-grow-1">
         <div class="container">
+          {% block breadcrumbs %}
+            {% breadcrumbs %}
+          {% endblock breadcrumbs %}
+
           {% include "includes/messages.html" %}
           {% block content %}
           {% endblock content %}

@@ -3,8 +3,11 @@ from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
 from django.core.paginator import Paginator
 from django.db import models
+from django.http import Http404
 from django.http import HttpResponseForbidden
+from django.shortcuts import redirect
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from wagtail.admin.panels import FieldPanel
 from wagtail.fields import RichTextField
 from wagtail.fields import StreamField
@@ -54,10 +57,19 @@ class ContentPage(Page):
         ),
     )
 
+    is_structure_only = models.BooleanField(
+        default=False,
+        help_text=_(
+            "If checked, this page cannot be viewed directly and will redirect to its "
+            "first child page.",
+        ),
+    )
+
     # Metadata
     content_panels = [
         *Page.content_panels,
         FieldPanel("visibility"),
+        FieldPanel("is_structure_only"),
         FieldPanel("body"),
     ]
     template = "cms/pages/content.html"
@@ -66,12 +78,24 @@ class ContentPage(Page):
     show_in_menus = True
 
     def serve(self, request, *args, **kwargs):
-        """Override serve to enforce visibility restrictions."""
+        """Override serve to enforce visibility restrictions and handle structure-only
+        pages."""
+        # Check visibility first
         if self.visibility == self.VISIBILITY_MEMBERS:
             if not user_has_active_membership(request.user):
                 return HttpResponseForbidden(
                     "This page is only available to members with an active membership.",
                 )
+
+        # Then check if structure-only
+        if self.is_structure_only:
+            # Find first live descendant (supports multi-level structure pages)
+            first_descendant = self.get_descendants().live().first()
+            if first_descendant:
+                return redirect(first_descendant.url)
+            # If no descendants, return 404
+            raise Http404(_("This page has no published content."))
+
         return super().serve(request, *args, **kwargs)
 
     def clean(self):
