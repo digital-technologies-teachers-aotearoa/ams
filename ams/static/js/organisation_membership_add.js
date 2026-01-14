@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // Get DOM elements
-  const optionSelect = document.getElementById('id_membership_option');
+  const radios = document.querySelectorAll('input[name="membership_option"]');
   const startInput = document.getElementById('id_start_date');
   const seatInput = document.getElementById('id_seat_count');
   const expiryEl = document.getElementById('membership-expiry-date');
@@ -22,9 +22,18 @@ document.addEventListener('DOMContentLoaded', function () {
   const infoMessage = document.getElementById('charged-seats-message');
 
   function updateCalculations() {
-    if (!optionSelect || !startInput) return;
+    const selectedRadio = document.querySelector(
+      'input[name="membership_option"]:checked'
+    );
+    if (!selectedRadio || !startInput) {
+      // Clear displays when no option selected
+      if (expiryEl) expiryEl.textContent = '—';
+      if (costEl) costEl.textContent = '—';
+      if (infoBox) infoBox.classList.add('d-none');
+      return;
+    }
 
-    const optionId = optionSelect.value;
+    const optionId = selectedRadio.value;
     const startVal = startInput.value;
     const seatCount = parseInt(seatInput ? seatInput.value : 1, 10) || 1;
 
@@ -74,9 +83,9 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // Event listeners
-  if (optionSelect) {
-    optionSelect.addEventListener('change', updateCalculations);
-  }
+  radios.forEach((radio) => {
+    radio.addEventListener('change', updateCalculations);
+  });
   if (startInput) {
     startInput.addEventListener('change', updateCalculations);
   }

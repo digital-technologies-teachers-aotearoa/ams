@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  const select = document.getElementById('id_membership_option');
+  const radios = document.querySelectorAll('input[name="membership_option"]');
   const startInput = document.getElementById('id_start_date');
   const endEl = document.getElementById('membership-end-date');
 
@@ -41,8 +41,14 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function updateEnd() {
-    if (!select || !startInput) return;
-    const val = select.value;
+    const selectedRadio = document.querySelector(
+      'input[name="membership_option"]:checked'
+    );
+    if (!selectedRadio || !startInput) {
+      if (endEl) endEl.textContent = '—';
+      return;
+    }
+    const val = selectedRadio.value;
     const startVal = startInput.value;
     if (val && startVal && membershipDurations && membershipDurations[val]) {
       const duration = membershipDurations[val];
@@ -54,9 +60,9 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  if (select) {
-    select.addEventListener('change', updateEnd);
-  }
+  radios.forEach((radio) => {
+    radio.addEventListener('change', updateEnd);
+  });
   if (startInput) {
     startInput.addEventListener('change', updateEnd);
   }

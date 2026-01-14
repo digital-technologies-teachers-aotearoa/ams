@@ -165,7 +165,7 @@ describe('Organisation Add Seats', () => {
     const fs = require('fs');
     const path = require('path');
     const sourceCode = fs.readFileSync(
-      path.join(__dirname, 'organisation_add_seats.js'),
+      path.join(__dirname, '../organisation_add_seats.js'),
       'utf8'
     );
     eval(sourceCode);

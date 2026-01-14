@@ -24,6 +24,7 @@ from django.forms import ModelForm
 from django.forms import MultiValueField
 from django.forms import MultiWidget
 from django.forms import NumberInput
+from django.forms import RadioSelect
 from django.forms import Select
 from django.forms import TextInput
 from django.utils import timezone
@@ -40,6 +41,7 @@ from ams.memberships.models import OrganisationMembership
 from ams.memberships.services import calculate_prorata_seat_cost
 from ams.organisations.models import Organisation
 from ams.utils.crispy_forms import Cancel
+from ams.utils.crispy_forms import PricingCardsRadio
 
 
 class MembershipDurationWidget(MultiWidget):
@@ -167,6 +169,7 @@ class CreateIndividualMembershipForm(ModelForm):
             archived=False,
         ).order_by("cost"),
         empty_label=None,
+        widget=RadioSelect,
     )
     start_date = DateField(
         label=_("Start date"),
@@ -185,15 +188,13 @@ class CreateIndividualMembershipForm(ModelForm):
         self.helper = FormHelper()
         self.helper.form_method = "post"
         self.helper.layout = Layout(
-            "membership_option",
+            PricingCardsRadio("membership_option"),
             "start_date",
             HTML("""
                 {% load i18n %}
                 <div class="mb-3">
-                    <p>
-                        <strong>{% translate "End date" %}:</strong>
-                        <span id="membership-end-date">—</span>
-                    </p>
+                    <label>{% translate "End date" %}:</label>
+                    <span id="membership-end-date">—</span>
                 </div>
             """),
             Submit("submit", "Register membership", css_class="btn btn-primary"),
@@ -313,6 +314,7 @@ class CreateOrganisationMembershipForm(ModelForm):
             archived=False,
         ).order_by("cost"),
         empty_label=None,
+        widget=RadioSelect,
         help_text=_("Select the type of membership for this organisation."),
     )
     start_date = DateField(
@@ -375,18 +377,18 @@ class CreateOrganisationMembershipForm(ModelForm):
         self.helper.form_method = "post"
         self.helper.add_layout(
             Layout(
-                "membership_option",
+                PricingCardsRadio("membership_option", show_org_fields=True),
                 "start_date",
                 "seat_count",
                 HTML("""
                     {% load i18n %}
                     <div class="mb-3">
                         <p>
-                            <strong>{% translate "Expiry date" %}:</strong>
+                            <label>{% translate "Expiry date" %}:</label>
                             <span id="membership-expiry-date">—</span>
                         </p>
                         <p>
-                            <strong>{% translate "Total cost" %}:</strong>
+                            <label>{% translate "Total cost" %}:</label>
                             <span id="membership-total-cost">—</span>
                         </p>
                     </div>

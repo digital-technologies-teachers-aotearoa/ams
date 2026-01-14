@@ -1,0 +1,30 @@
+// Pricing card styles for membership selection
+.pricing-card {
+  cursor: pointer;
+  border: 2px solid var(--bs-border-color);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+
+  &:hover {
+    border-color: var(--bs-primary);
+  }
+}
+
+.btn-check:checked + .pricing-card {
+  border-color: var(--bs-primary);
+  box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+  background-color: rgba(var(--bs-primary-rgb), 0.05);
+}
+
+.btn-check:focus-visible + .pricing-card {
+  outline: 2px solid var(--bs-primary);
+  outline-offset: 2px;
+}
+
+// Hide the actual radio input
+.btn-check {
+  position: absolute;
+  clip: rect(0, 0, 0, 0);
+  pointer-events: none;
+}
