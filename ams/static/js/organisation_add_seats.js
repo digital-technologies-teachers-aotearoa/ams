@@ -3,18 +3,18 @@
 document.addEventListener('DOMContentLoaded', function () {
   // Get pre-calculated pro-rata cost for 1 seat from server via data attributes
   const container = document.querySelector(
-    '.container[data-prorata-cost-per-seat]',
+    '.container[data-prorata-cost-per-seat]'
   );
   if (!container) return;
 
   const prorataCostPerSeat = parseFloat(
-    container.dataset.prorataCostPerSeat || '0',
+    container.dataset.prorataCostPerSeat || '0'
   );
   const maxChargedSeats = container.dataset.maxChargedSeats
     ? parseInt(container.dataset.maxChargedSeats)
     : null;
   const currentChargeableSeats = parseInt(
-    container.dataset.currentChargeableSeats || '0',
+    container.dataset.currentChargeableSeats || '0'
   );
 
   // Get form elements

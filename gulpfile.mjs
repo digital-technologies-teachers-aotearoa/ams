@@ -75,7 +75,7 @@ function styles() {
       sass({
         importer: tildeImporter,
         includePaths: [paths.sass],
-      }).on('error', sass.logError),
+      }).on('error', sass.logError)
     )
     .pipe(plumber()) // Checks for errors
     .pipe(postcss(processCss))
@@ -130,7 +130,7 @@ function copyIcons() {
   mkdirSync(paths.icons, { recursive: true });
 
   return src(`${paths.bootstrapIcons}/*.svg`, { allowEmpty: true }).pipe(
-    dest(paths.icons),
+    dest(paths.icons)
   );
 }
 
@@ -153,7 +153,7 @@ function initBrowserSync() {
         ],
       },
       notify: false,
-    },
+    }
   );
 }
 
@@ -163,7 +163,7 @@ function watchPaths() {
   watch(`${paths.templates}/**/*.html`).on('change', reload);
   watch([`${paths.js}/*.js`, `!${paths.js}/*.min.js`], scripts).on(
     'change',
-    reload,
+    reload
   );
 }
 
@@ -173,7 +173,7 @@ const build = parallel(
   scripts,
   vendorScripts,
   imgCompression,
-  copyIcons,
+  copyIcons
 );
 
 // Set up dev environment
