@@ -66,6 +66,26 @@ Additionally, the database will be available on `localhost:5432`.
     coverage run -m pytest && coverage html
     ```
 
+- Run JavaScript tests:
+
+    ```bash
+    docker-compose exec node npm test
+    ```
+
+    - Watch mode (auto-rerun on changes):
+
+        ```bash
+        docker-compose exec node npm run test:watch
+        ```
+
+    - Generate coverage report:
+
+        ```bash
+        docker-compose exec node npm run test:coverage
+        ```
+
+    Coverage reports are generated in `coverage/` directory.
+
 - Type checks:
 
     ```bash
