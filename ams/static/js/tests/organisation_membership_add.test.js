@@ -22,10 +22,8 @@ describe('Organisation Membership Add', () => {
         }
       }
       </script>
-      <select id="id_membership_option">
-        <option value="">Select...</option>
-        <option value="1">Example Option</option>
-      </select>
+      <input type="radio" name="membership_option" id="id_membership_option_0" value="" />
+      <input type="radio" name="membership_option" id="id_membership_option_1" value="1" checked />
       <input type="date" id="id_start_date" value="2026-01-14" />
       <input type="number" id="id_seat_count" value="1" />
       <div id="membership-expiry-date">—</div>
@@ -36,9 +34,14 @@ describe('Organisation Membership Add', () => {
     `;
     document.body.appendChild(container);
 
-    // Mock MembershipCalculator
+    // Mock MembershipCalculator with default return values
     global.MembershipCalculator = {
-      calculateNewMembership: jest.fn(),
+      calculateNewMembership: jest.fn().mockReturnValue({
+        expiryDateFormatted: '14/01/2027',
+        totalCostFormatted: '$50.00',
+        chargedSeats: 1,
+        freeSeats: 0,
+      }),
       updateSeatInfoBox: jest.fn(),
     };
 
@@ -64,7 +67,9 @@ describe('Organisation Membership Add', () => {
   });
 
   test('initializes with correct DOM elements', () => {
-    expect(document.getElementById('id_membership_option')).toBeTruthy();
+    expect(
+      document.querySelector('input[name="membership_option"]')
+    ).toBeTruthy();
     expect(document.getElementById('id_start_date')).toBeTruthy();
     expect(document.getElementById('id_seat_count')).toBeTruthy();
   });
@@ -77,23 +82,26 @@ describe('Organisation Membership Add', () => {
   });
 
   test('updates calculations when option changes', () => {
-    // Mock MembershipCalculator response
-    MembershipCalculator.calculateNewMembership.mockReturnValue({
-      expiryDateFormatted: '14/01/2027',
-      totalCostFormatted: '$50.00',
-      chargedSeats: 1,
-      freeSeats: 0,
-    });
+    // Clear previous calls from initialization
+    jest.clearAllMocks();
 
-    const optionSelect = document.getElementById('id_membership_option');
-    optionSelect.value = '1';
-    optionSelect.dispatchEvent(new Event('change'));
+    const optionRadio = document.getElementById('id_membership_option_1');
+    optionRadio.checked = true;
+    optionRadio.dispatchEvent(new Event('change'));
 
     // Verify MembershipCalculator was called
     expect(MembershipCalculator.calculateNewMembership).toHaveBeenCalled();
   });
 
   test('displays placeholder when no option selected', () => {
+    // Uncheck all radio buttons
+    const radios = document.querySelectorAll('input[name="membership_option"]');
+    radios.forEach((radio) => (radio.checked = false));
+
+    // Manually trigger updateCalculations
+    const startInput = document.getElementById('id_start_date');
+    startInput.dispatchEvent(new Event('change'));
+
     const expiryEl = document.getElementById('membership-expiry-date');
     const costEl = document.getElementById('membership-total-cost');
 

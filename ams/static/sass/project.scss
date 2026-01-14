@@ -2,6 +2,7 @@
 @import '~bootstrap/scss/bootstrap';
 @import 'partials/profile_pictures';
 @import 'partials/full_width_section_block';
+@import 'partials/pricing_cards';
 
 /* Rules as polyfill for new CSS rule: https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/margin-trim */
 .margin-trim {
@@ -186,4 +187,15 @@ div.lead-paragraph p {
 
 .navbar .nav-link.dropdown-toggle.submenu {
   padding: var(--bs-nav-link-padding-y) var(--bs-nav-link-padding-x);
+}
+
+/* Make all form labels bold */
+form {
+  .form-label,
+  label {
+    font-weight: 600;
+  }
+  span.asteriskField {
+    color: var(--bs-danger);
+  }
 }

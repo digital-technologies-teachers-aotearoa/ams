@@ -1,0 +1,69 @@
+{% load i18n %}
+
+<div class="row g-4 mb-3 align-items-stretch">
+  {% for radio in field %}
+    {% for option in field.field.queryset %}
+      {% if option.pk == radio.data.value.value %}
+        <div class="col-md-6 col-lg-4">
+          <input type="radio"
+                 class="btn-check"
+                 name="{{ field.name }}"
+                 id="{{ radio.id_for_label }}"
+                 value="{{ radio.data.value.value }}"
+                 {% if radio.data.selected %}checked{% endif %}
+                 {% if field.field.required %}required{% endif %} />
+          <label class="card h-100 pricing-card {% if radio.data.selected %}is-selected{% endif %}"
+                 for="{{ radio.id_for_label }}">
+            <div class="card-header fw-semibold text-center">{{ option.name }}</div>
+            <div class="card-body d-flex flex-column gap-3 pb-0">
+              {# Price block #}
+              <div class="text-center">
+                <div class="fs-2">
+                  <span class="fw-bold">${{ option.cost }}</span>
+                  {% if show_org_fields %}
+                    <span class="fs-6 text-muted">/ {% trans "seat" %}</span>
+                  {% endif %}
+                </div>
+                <div class="fw-bold text-muted">{{ option.duration_display }}</div>
+              </div>
+              {# Key highlights #}
+              <div class="d-flex flex-wrap justify-content-center gap-2">
+                {% if option.voting_rights %}
+                  <span class="badge bg-success">✓ {% trans "Voting rights" %}</span>
+                {% else %}
+                  <span class="badge bg-light text-muted border">✕ {% trans "No voting rights" %}</span>
+                {% endif %}
+                {% if show_org_fields and option.max_seats %}
+                  <span class="badge bg-secondary">{{ option.max_seats }} {% trans "seats max" %}</span>
+                {% endif %}
+              </div>
+              {# Secondary details #}
+              <dl class="row small text-muted mb-0 border-top pt-2">
+                <dt class="col-6">{% trans "Membership Type" %}</dt>
+                <dd class="col-6 text-end">
+                  {{ option.get_type_display }}
+                </dd>
+                <dt class="col-6">{% trans "Duration" %}</dt>
+                <dd class="col-6 text-end">
+                  {{ option.duration_display }}
+                </dd>
+                {% if show_org_fields %}
+                  {% if option.max_charged_seats %}
+                    <dt class="col-6">{% trans "Max charged seats" %}</dt>
+                    <dd class="col-6 text-end">
+                      {{ option.max_charged_seats }}
+                    </dd>
+                  {% endif %}
+                {% endif %}
+              </dl>
+            </div>
+            <div class="card-footer text-center text-muted small">
+              {% trans "Payment due" %} {{ option.invoice_due_days }} {% trans "days" %}
+            </div>
+          </label>
+        </div>
+      {% endif %}
+    {% endfor %}
+  {% endfor %}
+</div>
+{% if field.errors %}<div class="invalid-feedback d-block">{{ field.errors }}</div>{% endif %}

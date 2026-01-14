@@ -7,13 +7,9 @@
 {% endblock title %}
 
 {% block content %}
-  <div class="row">
-    <div class="col-md-8 col-lg-6">
-      <h1>{% translate "Apply for Membership" %}</h1>
-      <p>{% translate "Select a membership option and submit to apply." %}</p>
-      {% crispy form %}
-    </div>
-  </div>
+  <h1>{% translate "Apply for Membership" %}</h1>
+  <p>{% translate "Select a membership option and submit to apply." %}</p>
+  {% crispy form %}
   {{ membership_durations_json|json_script:"membership-durations-data" }}
   <script src="{% static 'js/membership_apply.js' %}"></script>
 {% endblock content %}
