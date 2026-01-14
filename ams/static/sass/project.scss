@@ -3,6 +3,7 @@
 @import 'partials/profile_pictures';
 @import 'partials/full_width_section_block';
 @import 'partials/pricing_cards';
+@import 'partials/breadcrumbs';
 
 /* Rules as polyfill for new CSS rule: https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/margin-trim */
 .margin-trim {
@@ -57,7 +58,7 @@ body {
 
 main > .container {
   // Spacing from top of page to content (under navbar of 66px)
-  padding-top: calc(3rem + 66px);
+  padding-top: calc(1rem + 66px);
   // Spacing from bottom of content to footer
   padding-bottom: 3rem;
 }

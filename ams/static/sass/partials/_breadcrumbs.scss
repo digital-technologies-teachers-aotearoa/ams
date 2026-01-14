@@ -1,0 +1,41 @@
+// Breadcrumb styling
+.breadcrumb-nav {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+
+  .breadcrumb {
+    background-color: transparent;
+    padding: 0;
+    margin-bottom: 0;
+  }
+
+  .breadcrumb-item {
+    font-size: 0.875rem;
+
+    a {
+      color: var(--bs-link-color);
+      text-decoration: none;
+
+      &:hover {
+        color: var(--bs-link-hover-color);
+        text-decoration: underline;
+      }
+    }
+
+    &.active {
+      color: var(--bs-secondary);
+    }
+  }
+}
+
+// Responsive adjustments
+@include media-breakpoint-down(sm) {
+  .breadcrumb-nav {
+    margin-top: 0.75rem;
+    margin-bottom: 0.75rem;
+
+    .breadcrumb-item {
+      font-size: 0.8125rem;
+    }
+  }
+}
