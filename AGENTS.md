@@ -61,16 +61,17 @@ docker compose -f docker-compose.yml run --rm django <command>
 
 ### Essential Commands
 
-| Task             | Command                                                                                     |
-| ---------------- | ------------------------------------------------------------------------------------------- |
-| Run server       | `docker-compose exec django python manage.py runserver 0.0.0.0:8000`                        |
-| Run tests        | `docker-compose exec django pytest` or `docker-compose exec django pytest ams/<app>/tests/` |
-| Django shell     | `docker-compose exec django python manage.py shell`                                         |
-| Make migrations  | `docker compose run --rm django python manage.py makemigrations <app>`                      |
-| Run migrations   | `docker-compose exec django python manage.py migrate`                                       |
-| Create superuser | `docker compose run --rm django python manage.py createsuperuser`                           |
-| View logs        | `docker-compose logs -f django`                                                             |
-| Restart service  | `docker-compose restart <service>`                                                          |
+| Task                 | Command                                                                                     |
+| -------------------- | ------------------------------------------------------------------------------------------- |
+| Run server           | `docker-compose exec django python manage.py runserver 0.0.0.0:8000`                        |
+| Run Django tests     | `docker-compose exec django pytest` or `docker-compose exec django pytest ams/<app>/tests/` |
+| Run JavaScript tests | `docker-compose exec node npm test`                                                         |
+| Django shell         | `docker-compose exec django python manage.py shell`                                         |
+| Make migrations      | `docker compose run --rm django python manage.py makemigrations <app>`                      |
+| Run migrations       | `docker-compose exec django python manage.py migrate`                                       |
+| Create superuser     | `docker compose run --rm django python manage.py createsuperuser`                           |
+| View logs            | `docker-compose logs -f django`                                                             |
+| Restart service      | `docker-compose restart <service>`                                                          |
 
 **IMPORTANT:**
 
