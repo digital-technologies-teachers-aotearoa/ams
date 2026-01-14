@@ -67,7 +67,7 @@ const MembershipCalculator = (function () {
     // Calculate how many more seats can be charged
     const remainingChargeable = Math.max(
       0,
-      maxChargedSeats - currentChargeableSeats,
+      maxChargedSeats - currentChargeableSeats
     );
     const chargedSeats = Math.min(totalSeats, remainingChargeable);
     const freeSeats = totalSeats - chargedSeats;

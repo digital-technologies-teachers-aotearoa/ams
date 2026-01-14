@@ -2,12 +2,12 @@ document.addEventListener('DOMContentLoaded', function () {
   const path = window.location.pathname;
   if (path.startsWith('/cms/images/')) {
     insertBanner(
-      '⚠️ All images uploaded are public. Private content should be uploaded as documents.',
+      '⚠️ All images uploaded are public. Private content should be uploaded as documents.'
     );
   }
   if (path.startsWith('/cms/documents/')) {
     insertBanner(
-      '🔒 All documents uploaded are private to users with an active membership.',
+      '🔒 All documents uploaded are private to users with an active membership.'
     );
   }
   if (path.startsWith('/cms/pages/')) {
@@ -31,7 +31,7 @@ function insertBanner(message) {
 function hidePagePrivacyControls() {
   // Find the (public) visibility section.
   const publicSection = document.querySelector(
-    'section[aria-labelledby="status-sidebar-visible-to-all"]',
+    'section[aria-labelledby="status-sidebar-visible-to-all"]'
   );
   if (!publicSection) return;
 
@@ -50,7 +50,7 @@ function hidePagePrivacyControls() {
 
 function addThemeSettingsImportExport() {
   const footer = document.querySelector(
-    'nav.actions.actions--primary.footer__container',
+    'nav.actions.actions--primary.footer__container'
   );
   if (!footer) return;
 
@@ -133,7 +133,7 @@ function importThemeSettings(event) {
       }
 
       const confirmed = confirm(
-        'This will overwrite your current settings. Continue?',
+        'This will overwrite your current settings. Continue?'
       );
 
       if (!confirmed) return;
