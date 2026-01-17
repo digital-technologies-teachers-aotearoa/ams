@@ -4,9 +4,12 @@ import pytest
 from django.contrib.admin.sites import AdminSite
 
 from ams.memberships.admin import IndividualMembershipAdmin
+from ams.memberships.admin import MembershipOptionAdmin
 from ams.memberships.models import IndividualMembership
+from ams.memberships.models import MembershipOption
 
 from .factories import IndividualMembershipFactory
+from .factories import MembershipOptionFactory
 
 pytestmark = pytest.mark.django_db
 
@@ -53,3 +56,40 @@ class TestIndividualMembershipAdmin:
 
         # Assert
         assert "Expired" in status
+
+
+class TestMembershipOptionAdmin:
+    def test_archived_field_accessible_on_creation(self):
+        """Test that archived field is accessible when creating a MembershipOption."""
+        # Arrange
+        admin = MembershipOptionAdmin(MembershipOption, AdminSite())
+        request = None  # Request is not used by get_fieldsets in this case
+
+        # Act
+        fieldsets = admin.get_fieldsets(request, obj=None)
+
+        # Assert - archived field should be present in the fieldsets
+        all_fields = []
+        for _name, options in fieldsets:
+            all_fields.extend(options.get("fields", []))
+
+        assert "archived" in all_fields, (
+            "archived field should be accessible on creation"
+        )
+
+    def test_archived_field_accessible_on_update(self):
+        """Test that archived field is accessible when updating a MembershipOption."""
+        # Arrange
+        membership_option = MembershipOptionFactory()
+        admin = MembershipOptionAdmin(MembershipOption, AdminSite())
+        request = None  # Request is not used by get_fieldsets in this case
+
+        # Act
+        fieldsets = admin.get_fieldsets(request, obj=membership_option)
+
+        # Assert - archived field should be present in the fieldsets
+        all_fields = []
+        for _name, options in fieldsets:
+            all_fields.extend(options.get("fields", []))
+
+        assert "archived" in all_fields, "archived field should be accessible on update"

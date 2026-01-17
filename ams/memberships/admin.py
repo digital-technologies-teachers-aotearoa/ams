@@ -49,6 +49,12 @@ class MembershipOptionAdmin(admin.ModelAdmin):
                     "fields": ("invoice_due_days", "invoice_reference"),
                 },
             ),
+            (
+                "Visibility",
+                {
+                    "fields": ("archived",),
+                },
+            ),
         )
 
     def get_readonly_fields(self, request, obj=None):
