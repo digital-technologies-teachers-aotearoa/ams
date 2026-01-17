@@ -1,5 +1,6 @@
 import logging
 
+from allauth.account.models import EmailAddress
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
@@ -314,7 +315,20 @@ def _validate_invite(member, request, action: str):  # noqa: PLR0911
         )
 
     if not member.user and member.invite_email:
-        if request.user.email.lower() != member.invite_email.lower():
+        # Get all verified email addresses for the user (primary + secondary)
+        user_emails = list(
+            EmailAddress.objects.filter(
+                user=request.user,
+                verified=True,
+            ).values_list("email", flat=True),
+        )
+        # Always include the user's primary email even if not in EmailAddress model
+        if request.user.email and request.user.email not in user_emails:
+            user_emails.append(request.user.email)
+
+        # Check if invite email matches any of the user's verified emails
+        invite_email_lower = member.invite_email.lower()
+        if not any(email.lower() == invite_email_lower for email in user_emails):
             return (
                 _("This invitation is not valid for your account."),
                 messages.ERROR,

@@ -2,6 +2,7 @@ from datetime import timedelta
 from http import HTTPStatus
 
 import pytest
+from allauth.account.models import EmailAddress
 from django.urls import reverse
 from django.utils import timezone
 
@@ -439,3 +440,84 @@ class TestAcceptOrganisationInviteView:
         assert any("revoked" in str(m).lower() for m in messages)
         member.refresh_from_db()
         assert member.accepted_datetime is None
+
+    def test_accept_invite_sent_to_secondary_verified_email(self, client):
+        """Test user can accept invite sent to their secondary verified email."""
+        org = OrganisationFactory()
+        secondary_email = "secondary@example.com"
+
+        # Create invite for non-user with secondary email
+        member = OrganisationMemberFactory(
+            organisation=org,
+            user=None,  # No user yet
+            invite_email=secondary_email,
+            accepted_datetime=None,
+        )
+
+        # Create user with different primary email
+        user = UserFactory(email="primary@example.com")
+
+        # Add secondary verified email to the user
+        EmailAddress.objects.create(
+            user=user,
+            email=secondary_email,
+            verified=True,
+            primary=False,
+        )
+
+        client.force_login(user)
+        url = reverse(
+            "organisations:accept_invite",
+            kwargs={"invite_token": member.invite_token},
+        )
+
+        response = client.get(url)
+
+        # Should redirect (success)
+        assert response.status_code == HTTPStatus.FOUND
+
+        # Member should be accepted and linked to user
+        member.refresh_from_db()
+        assert member.accepted_datetime is not None
+        assert member.user == user
+
+    def test_accept_invite_sent_to_unverified_secondary_email_fails(self, client):
+        """Test user cannot accept invite sent to their unverified secondary email."""
+        org = OrganisationFactory()
+        unverified_email = "unverified@example.com"
+
+        # Create invite for non-user
+        member = OrganisationMemberFactory(
+            organisation=org,
+            user=None,
+            invite_email=unverified_email,
+            accepted_datetime=None,
+        )
+
+        # Create user with different primary email
+        user = UserFactory(email="primary@example.com")
+
+        # Add UNVERIFIED secondary email to the user
+        EmailAddress.objects.create(
+            user=user,
+            email=unverified_email,
+            verified=False,  # Not verified
+            primary=False,
+        )
+
+        client.force_login(user)
+        url = reverse(
+            "organisations:accept_invite",
+            kwargs={"invite_token": member.invite_token},
+        )
+
+        response = client.get(url)
+
+        # Should redirect to home (not allowed)
+        assert response.status_code == HTTPStatus.FOUND
+        assert response.url == reverse("users:redirect")
+
+        # Member should NOT be accepted
+        member.refresh_from_db()
+        assert member.accepted_datetime is None
+        assert member.user is None
