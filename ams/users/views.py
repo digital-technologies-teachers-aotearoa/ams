@@ -1,3 +1,4 @@
+from allauth.account.models import EmailAddress
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import Q
@@ -40,9 +41,25 @@ class UserDetailView(
         # Organizations - separate pending invitations from accepted memberships
         # Query for invites by both user and email to catch invites sent before signup
 
+        # Get all verified email addresses for this user (primary + secondary)
+        user_emails = list(
+            EmailAddress.objects.filter(
+                user=user,
+                verified=True,
+            ).values_list("email", flat=True),
+        )
+        # Always include the user's primary email even if not in EmailAddress model
+        if user.email and user.email not in user_emails:
+            user_emails.append(user.email)
+
+        # Build Q object for case-insensitive email matching
+        email_q = Q()
+        for email in user_emails:
+            email_q |= Q(invite_email__iexact=email)
+
         all_org_members = (
             OrganisationMember.objects.filter(
-                Q(user=user) | Q(invite_email__iexact=user.email),
+                Q(user=user) | email_q,
             )
             .select_related(
                 "organisation",

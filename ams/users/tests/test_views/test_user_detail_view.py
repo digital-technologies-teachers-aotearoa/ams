@@ -1,6 +1,7 @@
 from http import HTTPStatus
 
 import pytest
+from allauth.account.models import EmailAddress
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import PermissionDenied
@@ -228,3 +229,71 @@ class TestUserDetailView:
         assert len(accepted_organisations) == 1
         assert accepted_organisations[0].uuid == accepted_invite.uuid
         assert response.context_data["has_organisations"] is True
+
+    def test_shows_pending_invites_sent_to_secondary_email(
+        self,
+        user: User,
+        rf: RequestFactory,
+    ):
+        """Test that pending invites sent to user's secondary email are shown."""
+        # Add a secondary verified email to the user
+        secondary_email = "secondary@example.com"
+        EmailAddress.objects.create(
+            user=user,
+            email=secondary_email,
+            verified=True,
+            primary=False,
+        )
+
+        organisation = OrganisationFactory()
+
+        # Create an invite to the secondary email
+        invite = OrganisationMemberFactory(
+            invite=True,  # Sets user=None
+            invite_email=secondary_email,
+            organisation=organisation,
+        )
+
+        request = rf.get("/fake-url/")
+        request.user = user
+        response = user_detail_view(request, username=user.username)
+
+        assert response.status_code == HTTPStatus.OK
+        pending_invitations = list(
+            response.context_data["pending_invitation_table"].data,
+        )
+        assert len(pending_invitations) == 1
+        assert pending_invitations[0].uuid == invite.uuid
+        assert response.context_data["has_pending_invitations"] is True
+
+    def test_does_not_show_invites_to_unverified_secondary_email(
+        self,
+        user: User,
+        rf: RequestFactory,
+    ):
+        """Test that invites to unverified secondary emails are NOT shown."""
+        # Add an UNVERIFIED secondary email
+        unverified_email = "unverified@example.com"
+        EmailAddress.objects.create(
+            user=user,
+            email=unverified_email,
+            verified=False,  # Not verified
+            primary=False,
+        )
+
+        organisation = OrganisationFactory()
+
+        # Create an invite to the unverified email
+        OrganisationMemberFactory(
+            invite=True,
+            invite_email=unverified_email,
+            organisation=organisation,
+        )
+
+        request = rf.get("/fake-url/")
+        request.user = user
+        response = user_detail_view(request, username=user.username)
+
+        assert response.status_code == HTTPStatus.OK
+        # Should NOT see the invite
+        assert response.context_data["has_pending_invitations"] is False
