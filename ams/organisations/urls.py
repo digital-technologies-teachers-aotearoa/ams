@@ -53,4 +53,9 @@ urlpatterns = [
         views.revoke_organisation_invite_view,
         name="revoke_invite",
     ),
+    path(
+        "<uuid:uuid>/member/<uuid:member_uuid>/resend-invite/",
+        views.resend_organisation_invite_view,
+        name="resend_invite",
+    ),
 ]

@@ -878,3 +878,92 @@ class RevokeOrganisationInviteView(LoginRequiredMixin, OrganisationAdminMixin, V
 
 
 revoke_organisation_invite_view = RevokeOrganisationInviteView.as_view()
+
+
+class ResendOrganisationInviteView(LoginRequiredMixin, OrganisationAdminMixin, View):
+    """
+    View for resending a pending organisation invite.
+    Only staff/admin or organisation admins can resend invites.
+    Can only resend invites that are pending (not accepted, declined, or revoked).
+    """
+
+    def get_object(self):
+        """Get the organisation by UUID for permission checking."""
+        uuid = self.kwargs.get("uuid")
+        return get_object_or_404(Organisation, uuid=uuid)
+
+    def post(self, request, *args, **kwargs):
+        """Resend the specified invite."""
+        organisation = self.get_object()
+        member_uuid = kwargs.get("member_uuid")
+
+        # Get the member invite
+        member = get_object_or_404(
+            OrganisationMember,
+            uuid=member_uuid,
+            organisation=organisation,
+        )
+
+        # Check if already accepted
+        if member.accepted_datetime:
+            messages.error(
+                request,
+                _("Cannot resend an invite that has already been accepted."),
+            )
+            return redirect(
+                reverse("organisations:detail", kwargs={"uuid": organisation.uuid}),
+            )
+
+        # Check if already declined
+        if member.declined_datetime:
+            messages.error(
+                request,
+                _("Cannot resend an invite that has already been declined."),
+            )
+            return redirect(
+                reverse("organisations:detail", kwargs={"uuid": organisation.uuid}),
+            )
+
+        # Check if already revoked
+        if member.revoked_datetime:
+            messages.error(
+                request,
+                _("Cannot resend an invite that has already been revoked."),
+            )
+            return redirect(
+                reverse("organisations:detail", kwargs={"uuid": organisation.uuid}),
+            )
+
+        # Resend the invite email
+        invite_email = member.invite_email or (
+            member.user.email if member.user else "unknown"
+        )
+
+        # Update last_sent_datetime
+        member.last_sent_datetime = timezone.now()
+        member.save()
+
+        # Send the email
+        send_organisation_invite_email(request, member)
+
+        # Log the resend action
+        logger.info(
+            "Organisation invite resent: email=%s, organisation=%s, resent_by=%s, "
+            "original_invite_date=%s",
+            invite_email,
+            organisation.name,
+            request.user.email,
+            member.created_datetime,
+        )
+
+        messages.success(
+            request,
+            _("Invitation successfully resent to %(email)s.") % {"email": invite_email},
+        )
+
+        return redirect(
+            reverse("organisations:detail", kwargs={"uuid": organisation.uuid}),
+        )
+
+
+resend_organisation_invite_view = ResendOrganisationInviteView.as_view()
