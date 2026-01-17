@@ -169,6 +169,14 @@ class ArticlePage(Page):
         help_text="Shown on cards that link to the full article",
     )
     author = models.CharField(max_length=255, blank=True)
+    cover_image = models.ForeignKey(
+        "wagtailimages.Image",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+        help_text="Shown on cards that link to the full article",
+    )
 
     body = StreamField(
         ContentStreamBlocks(),
@@ -182,6 +190,7 @@ class ArticlePage(Page):
     content_panels = [
         *Page.content_panels,
         FieldPanel("publication_date"),
+        FieldPanel("cover_image"),
         FieldPanel("author"),
         FieldPanel("summary"),
         FieldPanel("body"),

@@ -200,3 +200,12 @@ form {
     color: var(--bs-danger);
   }
 }
+
+// Limit size of card images
+.card-img-top {
+  max-height: 250px;
+
+  &:empty {
+    height: 250px;
+  }
+}
