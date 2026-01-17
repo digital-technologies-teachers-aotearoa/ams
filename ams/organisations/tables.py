@@ -40,6 +40,7 @@ class OrganisationMemberTable(Table):
     )
     actions = Column(
         verbose_name="Actions",
+        empty_values=(),
         orderable=False,
     )
 
@@ -80,8 +81,12 @@ class OrganisationMemberTable(Table):
         if self.request and record.user == self.request.user:
             return ""
 
-        # For pending invites, show revoke action
-        if not record.is_active():
+        # For pending invites (not accepted and not declined), show revoke action
+        if (
+            record.accepted_datetime is None
+            and record.declined_datetime is None
+            and record.revoked_datetime is None
+        ):
             context = {
                 "member": record,
                 "organisation": self.organisation,
