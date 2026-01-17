@@ -7,9 +7,9 @@
     <h1 class="text-body-emphasis">{{ page.title }}</h1>
     {% if page.intro %}<p class="lead mb-0">{{ page.intro|richtext }}</p>{% endif %}
     {% if articles %}
-      <div class="row row-cols-1 row-cols-md-2 g-4">
+      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         {% for article in articles %}
-          {% include "cms/partials/article_card.html" with article=article %}
+          <div class="col">{% include "cms/partials/article_card.html" with article=article %}</div>
         {% endfor %}
       </div>
       {# Pagination controls #}

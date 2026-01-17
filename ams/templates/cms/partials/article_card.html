@@ -1,17 +1,19 @@
-{% load wagtailcore_tags %}
+{% load wagtailcore_tags wagtailimages_tags %}
 
-<div class="col">
-  <div class="card h-100">
-    <div class="card-body">
-      <h5 class="card-title">
-        <a href="{% pageurl article %}" class="text-decoration-none">{{ article.title }}</a>
-      </h5>
-      <p class="card-text text-muted small">
-        {{ article.publication_date|date:"F j, Y" }}
-        {% if article.author %}· by {{ article.author }}{% endif %}
-      </p>
-      <p class="card-text">{{ article.summary }}</p>
-      <a href="{% pageurl article %}" class="btn btn-sm btn-outline-primary">Read more</a>
-    </div>
+<div class="card h-100 w-100">
+  {% if article.cover_image %}
+    {% image article.cover_image fill-600x450 loading="lazy" class="card-img-top object-fit-cover" %}
+  {% else %}
+    <div class="card-img-top bg-light"></div>
+  {% endif %}
+  <div class="card-body">
+    <h5 class="card-title">{{ article.title }}</h5>
+    <p class="card-text text-muted small">
+      {{ article.publication_date|date:"F j, Y" }}
+      {% if article.author %}· by {{ article.author }}{% endif %}
+    </p>
+    <p class="card-text">{{ article.summary }}</p>
+    <a href="{% pageurl article %}"
+       class="btn btn-sm btn-outline-primary stretched-link">Read more</a>
   </div>
 </div>
