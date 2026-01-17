@@ -90,6 +90,13 @@ class OrganisationMemberTable(Table):
             context = {
                 "member": record,
                 "organisation": self.organisation,
+                "resend_invite_url": reverse(
+                    "organisations:resend_invite",
+                    kwargs={
+                        "uuid": self.organisation.uuid,
+                        "member_uuid": record.uuid,
+                    },
+                ),
                 "revoke_invite_url": reverse(
                     "organisations:revoke_invite",
                     kwargs={

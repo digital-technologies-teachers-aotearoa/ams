@@ -137,6 +137,10 @@ class OrganisationMember(Model):
     accepted_datetime = DateTimeField(null=True)
     declined_datetime = DateTimeField(null=True)
     revoked_datetime = DateTimeField(null=True)
+    last_sent_datetime = DateTimeField(
+        null=True,
+        help_text=_("Timestamp of when invite was last sent/resent"),
+    )
     role = CharField(
         max_length=10,
         choices=Role.choices,
