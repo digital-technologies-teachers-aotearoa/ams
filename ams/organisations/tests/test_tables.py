@@ -12,7 +12,10 @@ from ams.billing.tests.factories import InvoiceFactory
 from ams.memberships.models import MembershipOptionType
 from ams.memberships.tests.factories import OrganisationMembershipFactory
 from ams.organisations.tables import OrganisationMembershipTable
+from ams.organisations.tables import OrganisationMemberTable
 from ams.organisations.tests.factories import OrganisationFactory
+from ams.organisations.tests.factories import OrganisationMemberFactory
+from ams.users.tests.factories import UserFactory
 
 pytestmark = pytest.mark.django_db
 
@@ -362,3 +365,148 @@ class TestOrganisationMembershipTableActionsColumn:
         html = table.render_actions(membership)
 
         assert "Cancel Membership" not in html
+
+
+class TestOrganisationMemberTable:
+    """Tests for OrganisationMemberTable actions column."""
+
+    def test_render_actions_shows_revoke_for_pending_invite(self):
+        """Test that actions column shows revoke option for pending invites."""
+        org = OrganisationFactory()
+        # Create a pending invite (no accepted_datetime, no declined_datetime)
+        member = OrganisationMemberFactory(
+            organisation=org,
+            invite=True,  # Creates without user
+            accepted_datetime=None,
+            declined_datetime=None,
+            revoked_datetime=None,
+        )
+
+        # Create mock request
+        request_user = UserFactory()
+
+        class MockRequest:
+            user = request_user
+
+        table = OrganisationMemberTable(
+            [member],
+            request=MockRequest(),
+            organisation=org,
+        )
+        html = table.render_actions(member)
+
+        assert "Revoke" in html or "revoke" in html.lower()
+
+    def test_render_actions_does_not_show_revoke_for_accepted_invite(self):
+        """Test that actions column does not show revoke for accepted invites."""
+        org = OrganisationFactory()
+        user = UserFactory()
+        # Create an accepted invite
+        member = OrganisationMemberFactory(
+            organisation=org,
+            user=user,
+            accepted_datetime=timezone.now(),
+            declined_datetime=None,
+            revoked_datetime=None,
+        )
+
+        # Create mock request with different user
+        request_user = UserFactory()
+
+        class MockRequest:
+            user = request_user
+
+        table = OrganisationMemberTable(
+            [member],
+            request=MockRequest(),
+            organisation=org,
+        )
+        html = table.render_actions(member)
+
+        # Should show member actions, not revoke
+        assert "Revoke" not in html
+        assert "revoke_invite" not in html.lower()
+        # Should show remove or role management actions instead
+        assert "Remove" in html or "Admin" in html or html != ""
+
+    def test_render_actions_does_not_show_revoke_for_declined_invite(self):
+        """Test that actions column does not show revoke for declined invites."""
+        org = OrganisationFactory()
+        # Create a declined invite
+        member = OrganisationMemberFactory(
+            organisation=org,
+            invite=True,
+            accepted_datetime=None,
+            declined_datetime=timezone.now(),
+            revoked_datetime=None,
+        )
+
+        # Create mock request
+        request_user = UserFactory()
+
+        class MockRequest:
+            user = request_user
+
+        table = OrganisationMemberTable(
+            [member],
+            request=MockRequest(),
+            organisation=org,
+        )
+        html = table.render_actions(member)
+
+        # Declined invites should not show revoke option
+        assert "Revoke" not in html
+        assert "revoke" not in html.lower()
+
+    def test_render_actions_does_not_show_revoke_for_already_revoked_invite(self):
+        """Test that actions column does not show revoke for already revoked invites."""
+        org = OrganisationFactory()
+        # Create an already revoked invite
+        member = OrganisationMemberFactory(
+            organisation=org,
+            invite=True,
+            accepted_datetime=None,
+            declined_datetime=None,
+            revoked_datetime=timezone.now(),
+        )
+
+        # Create mock request
+        request_user = UserFactory()
+
+        class MockRequest:
+            user = request_user
+
+        table = OrganisationMemberTable(
+            [member],
+            request=MockRequest(),
+            organisation=org,
+        )
+        html = table.render_actions(member)
+
+        # Already revoked invites should not show revoke option again
+        assert "Revoke" not in html
+        assert "revoke" not in html.lower()
+
+    def test_render_actions_does_not_show_actions_for_current_user(self):
+        """Test that actions column shows nothing for the current user."""
+        org = OrganisationFactory()
+        current_user = UserFactory()
+        # Create a member that is the current user
+        member = OrganisationMemberFactory(
+            organisation=org,
+            user=current_user,
+            accepted_datetime=timezone.now(),
+        )
+
+        class MockRequest:
+            user = current_user
+
+        table = OrganisationMemberTable(
+            [member],
+            request=MockRequest(),
+            organisation=org,
+        )
+        html = table.render_actions(member)
+
+        # Should not show any actions for current user
+        assert html == ""
