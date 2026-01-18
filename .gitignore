@@ -293,3 +293,4 @@ docs/site/
 # AI
 .ai/
 .claude/
+.playwright-mcp/
