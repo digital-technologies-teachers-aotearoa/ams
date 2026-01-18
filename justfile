@@ -34,3 +34,8 @@ logs *args:
 # manage: Executes `manage.py` command.
 manage +args:
     @docker compose run --rm django python ./manage.py {{args}}
+
+# Run Jest test suite
+jest *args:
+    @echo "Running Jest test suite..."
+    @docker compose run --rm node jest {{args}}
