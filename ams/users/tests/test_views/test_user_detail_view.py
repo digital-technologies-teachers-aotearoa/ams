@@ -12,6 +12,9 @@ from django.utils import timezone
 
 from ams.organisations.tests.factories import OrganisationFactory
 from ams.organisations.tests.factories import OrganisationMemberFactory
+from ams.users.models import ProfileField
+from ams.users.models import ProfileFieldGroup
+from ams.users.models import ProfileFieldResponse
 from ams.users.models import User
 from ams.users.tests.factories import UserFactory
 from ams.users.views import user_detail_view
@@ -297,3 +300,145 @@ class TestUserDetailView:
         assert response.status_code == HTTPStatus.OK
         # Should NOT see the invite
         assert response.context_data["has_pending_invitations"] is False
+
+    def test_profile_completion_context_no_fields(self, user: User, rf: RequestFactory):
+        """Test profile completion context when no profile fields exist."""
+        request = rf.get("/fake-url/")
+        request.user = user
+        response = user_detail_view(request, username=user.username)
+
+        assert response.status_code == HTTPStatus.OK
+        assert response.context_data["profile_completion_percentage"] == 100  # noqa: PLR2004
+        assert response.context_data["profile_incomplete_count"] == 0
+
+    def test_profile_completion_context_with_incomplete_profile(
+        self,
+        user: User,
+        rf: RequestFactory,
+    ):
+        """Test profile completion context when profile is incomplete."""
+        # Create profile fields
+        group = ProfileFieldGroup.objects.create(
+            name_translations={"en": "Test Group"},
+            order=1,
+            is_active=True,
+        )
+        field1 = ProfileField.objects.create(
+            field_key="field1",
+            field_type=ProfileField.FieldType.TEXT,
+            label_translations={"en": "Field 1"},
+            group=group,
+            is_active=True,
+        )
+        ProfileField.objects.create(
+            field_key="field2",
+            field_type=ProfileField.FieldType.TEXT,
+            label_translations={"en": "Field 2"},
+            group=group,
+            is_active=True,
+        )
+
+        # User has filled only one of two fields
+        ProfileFieldResponse.objects.create(
+            user=user,
+            profile_field=field1,
+            value="Test",
+        )
+
+        request = rf.get("/fake-url/")
+        request.user = user
+        response = user_detail_view(request, username=user.username)
+
+        assert response.status_code == HTTPStatus.OK
+        assert response.context_data["profile_completion_percentage"] == 50  # noqa: PLR2004
+        assert response.context_data["profile_incomplete_count"] == 1
+
+    def test_profile_completion_context_with_complete_profile(
+        self,
+        user: User,
+        rf: RequestFactory,
+    ):
+        """Test profile completion context when profile is complete."""
+        # Create profile fields
+        group = ProfileFieldGroup.objects.create(
+            name_translations={"en": "Test Group"},
+            order=1,
+            is_active=True,
+        )
+        field1 = ProfileField.objects.create(
+            field_key="field1",
+            field_type=ProfileField.FieldType.TEXT,
+            label_translations={"en": "Field 1"},
+            group=group,
+            is_active=True,
+        )
+        field2 = ProfileField.objects.create(
+            field_key="field2",
+            field_type=ProfileField.FieldType.TEXT,
+            label_translations={"en": "Field 2"},
+            group=group,
+            is_active=True,
+        )
+
+        # User has filled all fields
+        ProfileFieldResponse.objects.create(
+            user=user,
+            profile_field=field1,
+            value="Test 1",
+        )
+        ProfileFieldResponse.objects.create(
+            user=user,
+            profile_field=field2,
+            value="Test 2",
+        )
+
+        request = rf.get("/fake-url/")
+        request.user = user
+        response = user_detail_view(request, username=user.username)
+
+        assert response.status_code == HTTPStatus.OK
+        assert response.context_data["profile_completion_percentage"] == 100  # noqa: PLR2004
+        assert response.context_data["profile_incomplete_count"] == 0
+
+    def test_profile_completion_ignores_inactive_fields(
+        self,
+        user: User,
+        rf: RequestFactory,
+    ):
+        """Test profile completion only counts active fields."""
+        # Create profile fields
+        group = ProfileFieldGroup.objects.create(
+            name_translations={"en": "Test Group"},
+            order=1,
+            is_active=True,
+        )
+        active_field = ProfileField.objects.create(
+            field_key="active",
+            field_type=ProfileField.FieldType.TEXT,
+            label_translations={"en": "Active Field"},
+            group=group,
+            is_active=True,
+        )
+        ProfileField.objects.create(
+            field_key="inactive",
+            field_type=ProfileField.FieldType.TEXT,
+            label_translations={"en": "Inactive Field"},
+            group=group,
+            is_active=False,
+        )
+
+        # User has filled the active field only
+        ProfileFieldResponse.objects.create(
+            user=user,
+            profile_field=active_field,
+            value="Test",
+        )
+
+        request = rf.get("/fake-url/")
+        request.user = user
+        response = user_detail_view(request, username=user.username)
+
+        assert response.status_code == HTTPStatus.OK
+        # Should be 100% complete (1/1 active fields filled)
+        assert response.context_data["profile_completion_percentage"] == 100  # noqa: PLR2004
+        assert response.context_data["profile_incomplete_count"] == 0

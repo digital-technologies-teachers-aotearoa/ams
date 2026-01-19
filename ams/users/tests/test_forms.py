@@ -40,6 +40,9 @@ class TestUserAdminCreationForm:
                 "email": user.email,
                 "password1": user.password,
                 "password2": user.password,
+                "first_name": "Test",
+                "last_name": "User",
+                "username": "testuser123",
             },
         )
 

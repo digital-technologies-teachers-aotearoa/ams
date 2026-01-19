@@ -23,6 +23,22 @@
          role="button">Update my e-mails</a>
       <a class="btn btn-primary" href="{% url 'mfa_index' %}" role="button">Manage MFA</a>
     </div>
+    <!-- Profile Completion Section -->
+    {% if profile_incomplete_count is not None %}
+      <div class="mt-4">
+        {% if profile_incomplete_count > 0 %}
+          <div class="alert alert-warning" role="alert">
+            {% icon "exclamation-triangle-fill" %}
+            {% if profile_incomplete_count == 1 %}
+              1 profile field remaining.
+            {% else %}
+              {{ profile_incomplete_count }} profile fields remaining.
+            {% endif %}
+            <a href="{% url 'users:update' %}" class="alert-link">Complete your profile</a>
+          </div>
+        {% endif %}
+      </div>
+    {% endif %}
     <!-- Memberships Section -->
     <div class="mt-4">
       <h3 class="mb-3">Memberships</h3>
