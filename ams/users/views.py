@@ -13,6 +13,8 @@ from ams.organisations.models import OrganisationMember
 from ams.terms.mixins import TermsRequiredMixin
 from ams.users.forms import UserUpdateForm
 from ams.users.mixins import UserSelfOrStaffMixin
+from ams.users.models import ProfileField
+from ams.users.models import ProfileFieldResponse
 from ams.users.models import User
 from ams.users.tables import MembershipTable
 from ams.users.tables import OrganisationTable
@@ -84,6 +86,18 @@ class UserDetailView(
         ).order_by("-accepted_datetime")
         context["organisation_table"] = OrganisationTable(accepted_organisations)
         context["has_organisations"] = accepted_organisations.exists()
+
+        # Profile completion tracking
+        total_fields = ProfileField.objects.filter(is_active=True).count()
+        if total_fields > 0:
+            responses_count = ProfileFieldResponse.objects.filter(user=user).count()
+            context["profile_completion_percentage"] = int(
+                (responses_count / total_fields) * 100,
+            )
+            context["profile_incomplete_count"] = total_fields - responses_count
+        else:
+            context["profile_completion_percentage"] = 100
+            context["profile_incomplete_count"] = 0
 
         return context
 
