@@ -61,10 +61,17 @@ class ProfileFieldAdmin(admin.ModelAdmin):
         "field_type",
         "group",
         "is_read_only",
+        "counts_toward_completion",
         "order",
         "is_active",
     ]
-    list_filter = ["field_type", "group", "is_read_only", "is_active"]
+    list_filter = [
+        "field_type",
+        "group",
+        "is_read_only",
+        "counts_toward_completion",
+        "is_active",
+    ]
     list_editable = ["order", "is_active"]
     search_fields = ["field_key"]
     fieldsets = (
@@ -87,9 +94,13 @@ class ProfileFieldAdmin(admin.ModelAdmin):
             },
         ),
         (
-            _("Permissions"),
+            _("Behaviour"),
             {
-                "fields": ("is_read_only", "is_required_for_membership"),
+                "fields": (
+                    "is_read_only",
+                    "is_required_for_membership",
+                    "counts_toward_completion",
+                ),
             },
         ),
     )

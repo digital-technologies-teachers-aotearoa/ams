@@ -88,9 +88,16 @@ class UserDetailView(
         context["has_organisations"] = accepted_organisations.exists()
 
         # Profile completion tracking
-        total_fields = ProfileField.objects.filter(is_active=True).count()
+        total_fields = ProfileField.objects.filter(
+            is_active=True,
+            counts_toward_completion=True,
+        ).count()
         if total_fields > 0:
-            responses_count = ProfileFieldResponse.objects.filter(user=user).count()
+            responses_count = ProfileFieldResponse.objects.filter(
+                user=user,
+                profile_field__counts_toward_completion=True,
+                profile_field__is_active=True,
+            ).count()
             context["profile_completion_percentage"] = int(
                 (responses_count / total_fields) * 100,
             )
