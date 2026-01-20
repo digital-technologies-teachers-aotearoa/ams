@@ -265,6 +265,8 @@ TEMPLATES = [
                 "icon": "config.templatetags.icon",
                 "translate_url": "config.templatetags.translate_url",
                 "theme": "ams.cms.templatetags.theme",
+                "breadcrumbs": "ams.utils.templatetags.breadcrumbs",
+                "utils": "ams.utils.templatetags.utils",
             },
         },
     },

@@ -1,0 +1,28 @@
+{% load static %}
+
+<div class="options-widget" data-widget-name="{{ widget.name }}">
+  <table>
+    <thead>
+      <tr>
+        <th>Value</th>
+        {% for lang_code, lang_name in widget.languages %}
+          <th data-lang-code="{{ lang_code }}">{{ lang_name }}</th>
+        {% endfor %}
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody class="options-table-body">
+      <!-- Rows will be added by JavaScript -->
+    </tbody>
+  </table>
+  <button type="button" class="button add-option-row">Add Choice</button>
+  <input type="hidden"
+         name="{{ widget.name }}"
+         value=""
+         class="options-hidden-input" />
+  <!-- Store initial data for JavaScript -->
+  {# djlint:off #}
+  <script class="options-initial-data" type="application/json">{{ value_json|safe }}</script>
+  {# djlint:on #}
+</div>
+<script src="{% static 'js/options_widget.js' %}"></script>

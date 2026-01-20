@@ -1,0 +1,32 @@
+{% load static utils %}
+
+<div class="translation-widget" data-widget-name="{{ widget.name }}">
+  <table>
+    <thead>
+      <tr>
+        <th>Language</th>
+        <th>Translation</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for lang_code, lang_name in widget.languages %}
+        <tr data-lang="{{ lang_code }}">
+          <td>
+            <strong>{{ lang_name }} label</strong>
+          </td>
+          <td>
+            <input type="text"
+                   name="{{ widget.name }}_{{ lang_code }}"
+                   value="{{ value|get_item:lang_code }}"
+                   data-lang="{{ lang_code }}" />
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <input type="hidden"
+         name="{{ widget.name }}"
+         value=""
+         class="translation-hidden-input" />
+</div>
+<script src="{% static 'js/translation_widget.js' %}"></script>

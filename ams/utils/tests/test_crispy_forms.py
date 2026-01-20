@@ -2,7 +2,6 @@
 
 import pytest
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Field
 from django import forms
 from django.template import Context
 from django.urls import reverse
@@ -118,26 +117,14 @@ class TestProfileFieldWithBadges:
 
         return _create_profile_field
 
-    def _get_label_during_render(self, form, field_name, layout_obj):
-        """Helper to capture the label value during rendering."""
-        captured_label = None
-
-        # Monkey-patch Field.render to capture label
-
-        original_render = Field.render
-
-        def capture_render(self_field, form_arg, context_arg, **kwargs_arg):
-            nonlocal captured_label
-            captured_label = form_arg.fields[field_name].label
-            return original_render(self_field, form_arg, context_arg, **kwargs_arg)
-
-        Field.render = capture_render
-        try:
-            layout_obj.render(form, context=Context())
-        finally:
-            Field.render = original_render
-
-        return captured_label
+    def _render_field_to_html(self, form, layout_obj):
+        """Helper to render a layout object to HTML string and also return the label."""
+        context = Context()
+        html = layout_obj.render(form, context)
+        # Also capture the label that was modified by the layout object
+        field_name = layout_obj.field_name
+        label = form[field_name].label
+        return html, label
 
     # Badge Rendering Tests
 
@@ -151,17 +138,11 @@ class TestProfileFieldWithBadges:
         profile_field = profile_field_factory(counts_toward_completion=True)
         layout_obj = ProfileFieldWithBadges("test_field", profile_field=profile_field)
 
-        # Capture label during rendering
-        label_during_render = self._get_label_during_render(
-            simple_form,
-            "test_field",
-            layout_obj,
-        )
+        rendered, label = self._render_field_to_html(simple_form, layout_obj)
 
         # Badge should be in the label
-        assert '<span class="badge bg-primary">Recommended</span>' in str(
-            label_during_render,
-        )
+        assert '<span class="badge bg-primary">Recommended</span>' in str(label)
+        assert "Test Field" in str(label)
 
     def test_no_recommended_badge_when_field_is_required(
         self,
@@ -182,9 +163,10 @@ class TestProfileFieldWithBadges:
         profile_field = profile_field_factory(counts_toward_completion=True)
         layout_obj = ProfileFieldWithBadges("test_field", profile_field=profile_field)
 
-        rendered = layout_obj.render(form, context=Context())
+        rendered, label = self._render_field_to_html(form, layout_obj)
 
-        assert "Recommended" not in rendered
+        # Should not show Recommended badge because field is required
+        assert "Recommended" not in str(label)
 
     def test_no_recommended_badge_when_not_counts_toward_completion(
         self,
@@ -196,9 +178,9 @@ class TestProfileFieldWithBadges:
         profile_field = profile_field_factory(counts_toward_completion=False)
         layout_obj = ProfileFieldWithBadges("test_field", profile_field=profile_field)
 
-        rendered = layout_obj.render(simple_form, context=Context())
+        rendered, label = self._render_field_to_html(simple_form, layout_obj)
 
-        assert "Recommended" not in rendered
+        assert "Recommended" not in str(label)
 
     def test_required_membership_badge_shown(
         self,
@@ -209,16 +191,13 @@ class TestProfileFieldWithBadges:
         profile_field = profile_field_factory(is_required_for_membership=True)
         layout_obj = ProfileFieldWithBadges("test_field", profile_field=profile_field)
 
-        label_during_render = self._get_label_during_render(
-            simple_form,
-            "test_field",
-            layout_obj,
-        )
+        rendered, label = self._render_field_to_html(simple_form, layout_obj)
 
         assert (
             '<span class="badge bg-warning text-dark">Required for membership</span>'
-            in str(label_during_render)
+            in str(label)
         )
+        assert "Test Field" in str(label)
 
     def test_no_required_membership_badge_when_false(
         self,
@@ -230,9 +209,9 @@ class TestProfileFieldWithBadges:
         profile_field = profile_field_factory(is_required_for_membership=False)
         layout_obj = ProfileFieldWithBadges("test_field", profile_field=profile_field)
 
-        rendered = layout_obj.render(simple_form, context=Context())
+        rendered, label = self._render_field_to_html(simple_form, layout_obj)
 
-        assert "Required for membership" not in rendered
+        assert "Required for membership" not in str(label)
 
     def test_both_badges_when_both_conditions_met(
         self,
@@ -246,19 +225,14 @@ class TestProfileFieldWithBadges:
         )
         layout_obj = ProfileFieldWithBadges("test_field", profile_field=profile_field)
 
-        label_during_render = self._get_label_during_render(
-            simple_form,
-            "test_field",
-            layout_obj,
-        )
+        rendered, label = self._render_field_to_html(simple_form, layout_obj)
 
-        assert '<span class="badge bg-primary">Recommended</span>' in str(
-            label_during_render,
-        )
+        assert '<span class="badge bg-primary">Recommended</span>' in str(label)
         assert (
             '<span class="badge bg-warning text-dark">Required for membership</span>'
-            in str(label_during_render)
+            in str(label)
         )
+        assert "Test Field" in str(label)
 
     def test_no_badges_when_both_conditions_false(
         self,
@@ -272,10 +246,10 @@ class TestProfileFieldWithBadges:
         )
         layout_obj = ProfileFieldWithBadges("test_field", profile_field=profile_field)
 
-        rendered = layout_obj.render(simple_form, context=Context())
+        rendered, label = self._render_field_to_html(simple_form, layout_obj)
 
-        assert "Recommended" not in rendered
-        assert "Required for membership" not in rendered
+        assert "Recommended" not in str(label)
+        assert "Required for membership" not in str(label)
 
     # Edge Cases
 
@@ -283,10 +257,10 @@ class TestProfileFieldWithBadges:
         """Test that field renders without badges when profile_field is None."""
         layout_obj = ProfileFieldWithBadges("test_field", profile_field=None)
 
-        rendered = layout_obj.render(simple_form, context=Context())
+        rendered, label = self._render_field_to_html(simple_form, layout_obj)
 
-        assert "Recommended" not in rendered
-        assert "Required for membership" not in rendered
+        assert "Recommended" not in str(label)
+        assert "Required for membership" not in str(label)
         # Should still render the field
         assert 'name="test_field"' in rendered
 
@@ -302,14 +276,11 @@ class TestProfileFieldWithBadges:
         )
         layout_obj = ProfileFieldWithBadges("test_field", profile_field=profile_field)
 
-        label_during_render = self._get_label_during_render(
-            simple_form,
-            "test_field",
-            layout_obj,
-        )
+        rendered, label = self._render_field_to_html(simple_form, layout_obj)
 
         # Label should be unchanged (no badges added)
-        assert label_during_render == "Test Field"
+        assert label == "Test Field"
+        assert "badge" not in str(label)
 
     def test_label_contains_badges_when_present(
         self,
@@ -320,17 +291,11 @@ class TestProfileFieldWithBadges:
         profile_field = profile_field_factory(counts_toward_completion=True)
         layout_obj = ProfileFieldWithBadges("test_field", profile_field=profile_field)
 
-        label_during_render = self._get_label_during_render(
-            simple_form,
-            "test_field",
-            layout_obj,
-        )
+        rendered, label = self._render_field_to_html(simple_form, layout_obj)
 
         # Label should contain both original text and badge HTML
-        assert "Test Field" in str(label_during_render)
-        assert '<span class="badge bg-primary">Recommended</span>' in str(
-            label_during_render,
-        )
+        assert "Test Field" in str(label)
+        assert '<span class="badge bg-primary">Recommended</span>' in str(label)
 
     # Field Rendering Tests
 
@@ -413,13 +378,10 @@ class TestProfileFieldWithBadges:
 
         # Render with Māori language
         with override("mi"):
-            label_during_render = self._get_label_during_render(
-                simple_form,
-                "test_field",
-                layout_obj,
-            )
+            rendered, label = self._render_field_to_html(simple_form, layout_obj)
 
         # Badge text should be translated (checking for badge HTML structure)
         # The gettext function will translate if translations exist, otherwise fallback
         # to English
-        assert '<span class="badge' in str(label_during_render)
+        assert '<span class="badge' in str(label)
+        assert "Test Field" in str(label) or "Āpure Whakamātau" in str(label)

@@ -1,0 +1,48 @@
+/**
+ * Admin Widget Styles
+ * Custom styling for Django admin widgets
+ */
+
+.translation-widget,
+.options-widget {
+  table {
+    thead th {
+      font-weight: 600;
+    }
+
+    tbody td {
+      vertical-align: middle;
+    }
+  }
+}
+
+.translation-widget {
+  input[type='text'] {
+    min-width: 20rem;
+  }
+}
+
+.options-widget {
+  .btn-remove-row {
+    background-color: var(--delete-button-bg);
+    color: var(--button-fg);
+
+    &:hover {
+      background-color: var(--delete-button-hover-bg);
+    }
+  }
+
+  .add-option-row {
+    margin: 8px;
+    padding: 4px;
+  }
+
+  input[type='text'].option-value {
+    font-family: monospace;
+    width: 8rem;
+  }
+
+  input[type='text'].option-label {
+    min-width: 10rem;
+  }
+}
