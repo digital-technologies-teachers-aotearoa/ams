@@ -442,3 +442,185 @@ class TestUserDetailView:
         # Should be 100% complete (1/1 active fields filled)
         assert response.context_data["profile_completion_percentage"] == 100  # noqa: PLR2004
         assert response.context_data["profile_incomplete_count"] == 0
+
+    def test_profile_completion_excludes_non_counting_fields(
+        self,
+        user: User,
+        rf: RequestFactory,
+    ):
+        """Test profile completion excludes fields not counting toward completion."""
+        # Create profile fields
+        group = ProfileFieldGroup.objects.create(
+            name_translations={"en": "Test Group"},
+            order=1,
+            is_active=True,
+        )
+        counting_field = ProfileField.objects.create(
+            field_key="counting",
+            field_type=ProfileField.FieldType.TEXT,
+            label_translations={"en": "Counting Field"},
+            group=group,
+            is_active=True,
+            counts_toward_completion=True,
+        )
+        non_counting_field = ProfileField.objects.create(
+            field_key="non_counting",
+            field_type=ProfileField.FieldType.TEXT,
+            label_translations={"en": "Non-Counting Field"},
+            group=group,
+            is_active=True,
+            counts_toward_completion=False,
+        )
+
+        # User has filled both fields
+        ProfileFieldResponse.objects.create(
+            user=user,
+            profile_field=counting_field,
+            value="Test 1",
+        )
+        ProfileFieldResponse.objects.create(
+            user=user,
+            profile_field=non_counting_field,
+            value="Test 2",
+        )
+
+        request = rf.get("/fake-url/")
+        request.user = user
+        response = user_detail_view(request, username=user.username)
+
+        assert response.status_code == HTTPStatus.OK
+        # Should be 100% complete (1/1 counting fields filled)
+        assert response.context_data["profile_completion_percentage"] == 100  # noqa: PLR2004
+        assert response.context_data["profile_incomplete_count"] == 0
+
+    def test_profile_completion_incomplete_with_non_counting_fields(
+        self,
+        user: User,
+        rf: RequestFactory,
+    ):
+        """Test profile completion when only non-counting fields are filled."""
+        # Create profile fields
+        group = ProfileFieldGroup.objects.create(
+            name_translations={"en": "Test Group"},
+            order=1,
+            is_active=True,
+        )
+        ProfileField.objects.create(
+            field_key="counting1",
+            field_type=ProfileField.FieldType.TEXT,
+            label_translations={"en": "Counting Field 1"},
+            group=group,
+            is_active=True,
+            counts_toward_completion=True,
+        )
+        ProfileField.objects.create(
+            field_key="counting2",
+            field_type=ProfileField.FieldType.TEXT,
+            label_translations={"en": "Counting Field 2"},
+            group=group,
+            is_active=True,
+            counts_toward_completion=True,
+        )
+        non_counting_field = ProfileField.objects.create(
+            field_key="non_counting",
+            field_type=ProfileField.FieldType.TEXT,
+            label_translations={"en": "Non-Counting Field"},
+            group=group,
+            is_active=True,
+            counts_toward_completion=False,
+        )
+
+        # User has filled only the non-counting field
+        ProfileFieldResponse.objects.create(
+            user=user,
+            profile_field=non_counting_field,
+            value="Test",
+        )
+
+        request = rf.get("/fake-url/")
+        request.user = user
+        response = user_detail_view(request, username=user.username)
+
+        assert response.status_code == HTTPStatus.OK
+        # Should be 0% complete (0/2 counting fields filled)
+        assert response.context_data["profile_completion_percentage"] == 0
+        assert response.context_data["profile_incomplete_count"] == 2  # noqa: PLR2004
+
+    def test_profile_completion_mixed_counting_fields(
+        self,
+        user: User,
+        rf: RequestFactory,
+    ):
+        """Test profile completion with mixed counting and non-counting fields."""
+        # Create profile fields
+        group = ProfileFieldGroup.objects.create(
+            name_translations={"en": "Test Group"},
+            order=1,
+            is_active=True,
+        )
+        counting_field1 = ProfileField.objects.create(
+            field_key="counting1",
+            field_type=ProfileField.FieldType.TEXT,
+            label_translations={"en": "Counting Field 1"},
+            group=group,
+            is_active=True,
+            counts_toward_completion=True,
+        )
+        counting_field2 = ProfileField.objects.create(
+            field_key="counting2",
+            field_type=ProfileField.FieldType.TEXT,
+            label_translations={"en": "Counting Field 2"},
+            group=group,
+            is_active=True,
+            counts_toward_completion=True,
+        )
+        ProfileField.objects.create(
+            field_key="counting3",
+            field_type=ProfileField.FieldType.TEXT,
+            label_translations={"en": "Counting Field 3"},
+            group=group,
+            is_active=True,
+            counts_toward_completion=True,
+        )
+        non_counting_field1 = ProfileField.objects.create(
+            field_key="non_counting1",
+            field_type=ProfileField.FieldType.TEXT,
+            label_translations={"en": "Non-Counting Field 1"},
+            group=group,
+            is_active=True,
+            counts_toward_completion=False,
+        )
+        ProfileField.objects.create(
+            field_key="non_counting2",
+            field_type=ProfileField.FieldType.TEXT,
+            label_translations={"en": "Non-Counting Field 2"},
+            group=group,
+            is_active=True,
+            counts_toward_completion=False,
+        )
+
+        # User has filled 2 counting fields and 1 non-counting field
+        ProfileFieldResponse.objects.create(
+            user=user,
+            profile_field=counting_field1,
+            value="Test 1",
+        )
+        ProfileFieldResponse.objects.create(
+            user=user,
+            profile_field=counting_field2,
+            value="Test 2",
+        )
+        ProfileFieldResponse.objects.create(
+            user=user,
+            profile_field=non_counting_field1,
+            value="Test 3",
+        )
+
+        request = rf.get("/fake-url/")
+        request.user = user
+        response = user_detail_view(request, username=user.username)
+
+        assert response.status_code == HTTPStatus.OK
+        # Should be 66% complete (2/3 counting fields filled)
+        assert response.context_data["profile_completion_percentage"] == 66  # noqa: PLR2004
+        assert response.context_data["profile_incomplete_count"] == 1

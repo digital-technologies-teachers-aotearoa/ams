@@ -444,6 +444,16 @@ class TestProfileField:
         )
         assert str(text_field) in ["Teaching Subject", "Kaupapa Whakaako"]
 
+    def test_counts_toward_completion_default(self, profile_group):
+        """Test counts_toward_completion defaults to True."""
+        field = ProfileField.objects.create(
+            field_key="test_field",
+            field_type=ProfileField.FieldType.TEXT,
+            label_translations={"en": "Test"},
+            group=profile_group,
+        )
+        assert field.counts_toward_completion is True
+
     def test_unique_together(self, profile_group):
         """Test unique_together constraint on group and field_key."""
         text_field = ProfileField.objects.create(

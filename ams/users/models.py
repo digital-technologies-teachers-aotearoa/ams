@@ -286,6 +286,11 @@ class ProfileField(Model):
         default=False,
         help_text=_("Required before membership purchase"),
     )
+    counts_toward_completion = BooleanField(
+        _("recommended to complete"),
+        default=True,
+        help_text=_("Include this field in profile completion percentage"),
+    )
     order = IntegerField(
         _("order"),
         default=0,

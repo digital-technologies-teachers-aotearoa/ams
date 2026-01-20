@@ -30,6 +30,7 @@ from ams.users.models import ProfileField
 from ams.users.models import ProfileFieldResponse
 from ams.users.models import User
 from ams.utils.crispy_forms import Cancel
+from ams.utils.crispy_forms import ProfileFieldWithBadges
 
 
 class UserAdminChangeForm(admin_forms.UserChangeForm):
@@ -312,9 +313,15 @@ class UserUpdateForm(ModelForm):
             group_fields = group_data["fields"]
             description = group.get_description(language_code)
 
+            # Wrap each field with ProfileFieldWithBadges layout object
+            wrapped_fields = [
+                ProfileFieldWithBadges(field.field_key, profile_field=field)
+                for field in group_fields
+            ]
+
             fieldset = Fieldset(
                 group_name,
-                *[field.field_key for field in group_fields],
+                *wrapped_fields,
                 css_class="profile-field-group",
             )
             if description:
