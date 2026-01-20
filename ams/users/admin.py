@@ -13,6 +13,8 @@ from ams.users.forms import UserAdminCreationForm
 from ams.users.models import ProfileField
 from ams.users.models import ProfileFieldGroup
 from ams.users.models import User
+from ams.users.widgets import OptionsWidget
+from ams.users.widgets import TranslationWidget
 
 if settings.DJANGO_ADMIN_FORCE_ALLAUTH:
     # Force the `admin` sign in process to go through the `django-allauth` workflow:
@@ -49,6 +51,13 @@ class ProfileFieldGroupAdmin(admin.ModelAdmin):
     def active_field_count(self, obj):
         """Returns count of active fields in group."""
         return obj.fields.filter(is_active=True).count()
+
+    def formfield_for_dbfield(self, db_field, request, **kwargs):
+        """Use custom widgets for translation fields."""
+        if db_field.name in ("name_translations", "description_translations"):
+            kwargs["widget"] = TranslationWidget()
+            kwargs["help_text"] = ""
+        return super().formfield_for_dbfield(db_field, request, **kwargs)
 
 
 @admin.register(ProfileField)
@@ -110,6 +119,16 @@ class ProfileFieldAdmin(admin.ModelAdmin):
         if obj and obj.pk:
             return ["field_key"]
         return []
+
+    def formfield_for_dbfield(self, db_field, request, **kwargs):
+        """Use custom widgets for translation fields."""
+        if db_field.name in ("label_translations", "help_text_translations"):
+            kwargs["widget"] = TranslationWidget()
+            kwargs["help_text"] = ""
+        elif db_field.name == "options":
+            kwargs["widget"] = OptionsWidget()
+            kwargs["help_text"] = ""
+        return super().formfield_for_dbfield(db_field, request, **kwargs)
 
 
 @admin.register(User)

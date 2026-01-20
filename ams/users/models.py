@@ -352,7 +352,7 @@ class ProfileField(Model):
         if not language_code:
             language_code = get_language()
 
-        choices_list = self.options.get("choices", [])
+        choices_list = (self.options or {}).get("choices", [])
         result = []
 
         for choice in choices_list:
@@ -396,7 +396,7 @@ class ProfileField(Model):
             self.FieldType.RADIO,
             self.FieldType.CHECKBOX,
         ]:
-            if not self.options.get("choices"):
+            if not (self.options or {}).get("choices"):
                 raise ValidationError(
                     {
                         "options": _(
@@ -407,7 +407,7 @@ class ProfileField(Model):
                 )
 
             # Validate each choice has label_translations
-            for choice in self.options.get("choices", []):
+            for choice in (self.options or {}).get("choices", []):
                 if not choice.get("label_translations"):
                     raise ValidationError(
                         {"options": _("Each choice must have label_translations.")},
