@@ -39,6 +39,7 @@ django_settings_module = "config.settings.test"
 blank_line_after_tag = "load,extends,endblock"
 custom_blocks = "element,slot"
 close_void_tags = true
+exclude = "ams/templates/emails"
 format_css = false
 format_js = true
 # TODO: remove T002 when fixed https://github.com/djlint/djLint/issues/687

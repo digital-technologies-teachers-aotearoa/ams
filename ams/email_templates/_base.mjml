@@ -1,0 +1,54 @@
+<mjml>
+  <mj-head>
+    <mj-title>{{ subject }}</mj-title>
+    <mj-preview>{{ preview_text }}</mj-preview>
+    <mj-attributes>
+      <mj-all font-family="Arial, sans-serif" />
+      <mj-text font-size="16px" color="#333333" line-height="1.6" />
+      <mj-section background-color="#ffffff" padding="20px" />
+    </mj-attributes>
+    <mj-style inline="inline">
+      .link {
+        color: #0056b3;
+        text-decoration: none;
+      }
+      .link:hover {
+        text-decoration: underline;
+      }
+    </mj-style>
+  </mj-head>
+  <mj-body background-color="#f8f9fa">
+    <!-- Header -->
+    <mj-section background-color="#0056b3" padding="20px">
+      <mj-column>
+        <mj-text
+          font-size="24px"
+          color="#ffffff"
+          font-weight="bold"
+          align="center"
+        >
+          {{ site_name|default:"AMS" }}
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Content will be inserted here by child templates -->
+    <mj-raw> {% block content %}{% endblock %} </mj-raw>
+
+    <!-- Footer -->
+    <mj-section background-color="#f8f9fa" padding="20px">
+      <mj-column>
+        <mj-divider border-color="#dee2e6" />
+        <mj-text
+          font-size="12px"
+          color="#6c757d"
+          align="center"
+          padding-top="10px"
+        >
+          {% load i18n %} {% trans "This is an automated message. Please do not
+          reply to this email." %}
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

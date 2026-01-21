@@ -52,16 +52,14 @@
       "extensions": [
         "davidanson.vscode-markdownlint",
         "mrmlnc.vscode-duplicate",
-        // python
         "ms-python.python",
         "ms-python.vscode-pylance",
         "charliermarsh.ruff",
-        // django
         "batisteo.vscode-django",
         "monosans.djlint",
-        // formatting
         "editorconfig.editorconfig",
-        "esbenp.prettier-vscode"
+        "esbenp.prettier-vscode",
+        "mjmlio.vscode-mjml"
       ]
     }
   },

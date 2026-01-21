@@ -6,6 +6,7 @@
 import { src, dest, parallel, series, task, watch } from 'gulp';
 import pjson from './package.json' with { type: 'json' };
 import { mkdirSync } from 'fs';
+import { Transform } from 'stream';
 
 // Plugins
 import autoprefixer from 'autoprefixer';
@@ -13,6 +14,8 @@ import browserSyncLib from 'browser-sync';
 import concat from 'gulp-concat';
 import tildeImporter from 'node-sass-tilde-importer';
 import cssnano from 'cssnano';
+import mjmlGulp from 'gulp-mjml';
+import mjmlEngine from 'mjml';
 import pixrem from 'pixrem';
 import plumber from 'gulp-plumber';
 import postcss from 'gulp-postcss';
@@ -45,6 +48,8 @@ function pathsConfig() {
     fonts: `${appName}/static/fonts`,
     images: `${appName}/static/images`,
     js: `${appName}/static/js`,
+    mjml: `${appName}/email_templates`,
+    emailTemplates: `${appName}/templates/emails`,
   };
 }
 
@@ -134,6 +139,38 @@ function copyIcons() {
   );
 }
 
+// Helper function to prepend Django template tags to compiled MJML
+function prependDjangoTags() {
+  return new Transform({
+    objectMode: true,
+    transform(file, encoding, callback) {
+      if (file.isBuffer()) {
+        const content = file.contents.toString();
+        // Prepend {% load i18n %} before the DOCTYPE
+        const modifiedContent = '{% load i18n %}\n' + content;
+        file.contents = Buffer.from(modifiedContent);
+      }
+      callback(null, file);
+    },
+  });
+}
+
+// Compile MJML email templates to HTML
+function mjml() {
+  // Ensure output directory exists
+  mkdirSync(paths.emailTemplates, { recursive: true });
+
+  return src([`${paths.mjml}/**/*.mjml`, `!${paths.mjml}/**/_*.mjml`])
+    .pipe(plumber()) // Checks for errors
+    .pipe(
+      mjmlGulp(mjmlEngine, {
+        validationLevel: 'soft', // Use 'strict' in production
+      })
+    )
+    .pipe(prependDjangoTags()) // Add Django template tags
+    .pipe(dest(paths.emailTemplates));
+}
+
 // Browser sync server for live reload
 function initBrowserSync() {
   browserSync.init(
@@ -165,6 +202,7 @@ function watchPaths() {
     'change',
     reload
   );
+  watch(`${paths.mjml}/**/*.mjml`, mjml);
 }
 
 // Generate all assets
@@ -173,7 +211,8 @@ const build = parallel(
   scripts,
   vendorScripts,
   imgCompression,
-  copyIcons
+  copyIcons,
+  mjml
 );
 
 // Set up dev environment
@@ -183,3 +222,4 @@ task('default', series(build, dev));
 task('build', build);
 task('dev', dev);
 task('icons', copyIcons);
+task('mjml', mjml);

@@ -302,6 +302,10 @@ EMAIL_BACKEND = env(
 )
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-timeout
 EMAIL_TIMEOUT = 5
+# Plaintext email generation settings
+# If a .txt template doesn't exist, plaintext is auto-generated from HTML
+EMAIL_PLAINTEXT_IGNORE_LINKS = False  # Include link URLs in plaintext
+EMAIL_PLAINTEXT_BODY_WIDTH = 78  # Characters per line in plaintext
 
 # ADMIN
 # ------------------------------------------------------------------------------
