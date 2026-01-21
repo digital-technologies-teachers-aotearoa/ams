@@ -274,6 +274,8 @@ ams/media/
 .ipython/
 ams/static/css/
 ams/templates/icons/*.svg
+ams/templates/emails/*.html
+ams/templates/emails/*.txt
 vendors.js
 *.min.js
 *.min.js.map
