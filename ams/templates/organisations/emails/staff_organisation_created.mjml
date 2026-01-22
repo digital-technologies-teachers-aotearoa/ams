@@ -1,0 +1,122 @@
+<mjml>
+  <mj-head>
+    <mj-title>{% trans "New Organisation Created" %}</mj-title>
+    <!-- prettier-ignore -->
+    <mj-preview>
+      {% blocktrans with org_name=organisation.name %}
+      A new organisation {{ org_name }} has been created
+      {% endblocktrans %}
+    </mj-preview>
+    <mj-attributes>
+      <mj-include path="../../_email_includes/_head_attributes.mjml" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body background-color="#f8f9fa">
+    <!-- Header Section -->
+    <mj-section mj-class="section-header-primary">
+      <mj-column>
+        <mj-text mj-class="header-primary">
+          {% trans "New Organisation Created" %}
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <mj-section mj-class="section-content">
+      <mj-column>
+        <!-- prettier-ignore -->
+        <mj-text mj-class="text-body">
+          {% blocktrans with org_name=organisation.name %}
+          A new organisation <strong>{{ org_name }}</strong> has been created.
+          {% endblocktrans %}
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Organisation Details Section -->
+    <mj-section mj-class="section-detail-box">
+      <mj-column>
+        <mj-text mj-class="text-section-heading">
+          {% trans "Organisation Details" %}
+        </mj-text>
+        <mj-table>
+          <tr>
+            <td style="padding: 8px 0; font-weight: bold; width: 40%">
+              {% trans "Name:" %}
+            </td>
+            <td style="padding: 8px 0">{{ organisation.name }}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; font-weight: bold">
+              {% trans "Contact Name:" %}
+            </td>
+            <td style="padding: 8px 0">{{ organisation.contact_name }}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; font-weight: bold">
+              {% trans "Email:" %}
+            </td>
+            <td style="padding: 8px 0">{{ organisation.email }}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; font-weight: bold">
+              {% trans "Phone:" %}
+            </td>
+            <td style="padding: 8px 0">{{ organisation.telephone }}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; font-weight: bold">
+              {% trans "Postal Address:" %}
+            </td>
+            <td style="padding: 8px 0">{{ organisation.postal_address }}</td>
+          </tr>
+          {% if organisation.postal_suburb %}
+          <tr>
+            <td style="padding: 8px 0; font-weight: bold">
+              {% trans "Postal Suburb:" %}
+            </td>
+            <td style="padding: 8px 0">{{ organisation.postal_suburb }}</td>
+          </tr>
+          {% endif %}
+          <tr>
+            <td style="padding: 8px 0; font-weight: bold">
+              {% trans "Postal City:" %}
+            </td>
+            <td style="padding: 8px 0">{{ organisation.postal_city }}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; font-weight: bold">
+              {% trans "Postal Code:" %}
+            </td>
+            <td style="padding: 8px 0">{{ organisation.postal_code }}</td>
+          </tr>
+        </mj-table>
+      </mj-column>
+    </mj-section>
+
+    <!-- Created By Section -->
+    <mj-section mj-class="section-detail-box">
+      <mj-column>
+        <mj-text mj-class="text-section-heading">
+          {% trans "Created By" %}
+        </mj-text>
+        <mj-table>
+          <tr>
+            <td style="padding: 8px 0; font-weight: bold; width: 40%">
+              {% trans "Name:" %}
+            </td>
+            <td style="padding: 8px 0">{{ creator_name }}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; font-weight: bold">
+              {% trans "Email:" %}
+            </td>
+            <td style="padding: 8px 0">{{ creator_email }}</td>
+          </tr>
+        </mj-table>
+      </mj-column>
+    </mj-section>
+
+    <!-- Footer Section -->
+    <mj-include path="../../_email_includes/_staff_footer.mjml" />
+  </mj-body>
+</mjml>

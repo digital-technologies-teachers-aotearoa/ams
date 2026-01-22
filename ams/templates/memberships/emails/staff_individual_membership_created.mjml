@@ -1,0 +1,112 @@
+<mjml>
+  <mj-head>
+    <mj-title>{% trans "New Individual Membership" %}</mj-title>
+    <!-- prettier-ignore -->
+    <mj-preview>
+      {% blocktrans with user_name=user_full_name %}
+      A new membership has been purchased for {{ user_name }}
+      {% endblocktrans %}
+    </mj-preview>
+    <mj-attributes>
+      <mj-include path="../../_email_includes/_head_attributes.mjml" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body background-color="#f8f9fa">
+    <!-- Header Section -->
+    <mj-section mj-class="section-header-primary">
+      <mj-column>
+        <mj-text mj-class="header-primary">
+          {% trans "New Individual Membership" %}
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <mj-section mj-class="section-content">
+      <mj-column>
+        <!-- prettier-ignore -->
+        <mj-text mj-class="text-body">
+          {% blocktrans with user_name=user_full_name %}
+          A new membership has been purchased for <strong>{{ user_name }}</strong>.
+          {% endblocktrans %}
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Warning Box for Approval Required -->
+    <mj-include
+      path="../../_email_includes/_warning_free_membership_approval.mjml"
+    />
+
+    <!-- Membership Details Section -->
+    <mj-section mj-class="section-detail-box">
+      <mj-column>
+        <mj-text mj-class="text-section-heading">
+          {% trans "Membership Details" %}
+        </mj-text>
+        <mj-table>
+          <tr>
+            <td style="padding: 8px 0; font-weight: bold; width: 40%">
+              {% trans "Member:" %}
+            </td>
+            <td style="padding: 8px 0">{{ user_full_name }}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; font-weight: bold">
+              {% trans "Email:" %}
+            </td>
+            <td style="padding: 8px 0">{{ user_email }}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; font-weight: bold">
+              {% trans "Membership Type:" %}
+            </td>
+            <td style="padding: 8px 0">{{ membership_option.name }}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; font-weight: bold">
+              {% trans "Start Date:" %}
+            </td>
+            <td style="padding: 8px 0">{{ start_date|date:"d/m/Y" }}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; font-weight: bold">
+              {% trans "Expiry Date:" %}
+            </td>
+            <td style="padding: 8px 0">{{ expiry_date|date:"d/m/Y" }}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; font-weight: bold">
+              {% trans "Cost:" %}
+            </td>
+            <td style="padding: 8px 0">${{ cost }}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; font-weight: bold">
+              {% trans "Status:" %}
+            </td>
+            <td style="padding: 8px 0">
+              {% if requires_approval %}
+              <strong style="color: #ffc107"
+                >{% trans "Pending Approval" %}</strong
+              >
+              {% else %}
+              <strong style="color: #28a745">{% trans "Approved" %}</strong>
+              {% endif %}
+            </td>
+          </tr>
+          {% if invoice_number %}
+          <tr>
+            <td style="padding: 8px 0; font-weight: bold">
+              {% trans "Invoice Number:" %}
+            </td>
+            <td style="padding: 8px 0">{{ invoice_number }}</td>
+          </tr>
+          {% endif %}
+        </mj-table>
+      </mj-column>
+    </mj-section>
+
+    <!-- Footer Section -->
+    <mj-include path="../../_email_includes/_staff_footer.mjml" />
+  </mj-body>
+</mjml>

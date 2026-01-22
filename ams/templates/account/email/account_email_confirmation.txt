@@ -1,0 +1,29 @@
+{% load i18n %}{% load account %}
+{% user_display user as user_display %}
+========================================
+{% trans "Confirm Your Email" %}
+========================================
+
+{% blocktrans with site_name=current_site.name site_domain=current_site.domain %}
+You're receiving this email because user {{ user_display }} has given your email address to register an account on {{ site_domain }}.
+{% endblocktrans %}
+
+{% if code %}
+{% trans "Your email verification code is listed below. Please enter it in your open browser window." %}
+
+{% trans "Verification Code:" %}
+{{ code }}
+{% else %}
+{% trans "To confirm this is correct, click the button below:" %}
+
+{% trans "To verify your email address, visit:" %}
+{{ activate_url }}
+{% endif %}
+
+----------------------------------------
+{% trans "If you did not create this account, you can safely ignore this email." %}
+{% if activate_url %}
+
+{% trans "If the button doesn't work, copy and paste this link into your browser:" %}
+{{ activate_url }}
+{% endif %}

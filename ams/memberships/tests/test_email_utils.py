@@ -132,9 +132,13 @@ class TestSendStaffOrganisationMembershipNotification:
         assert len(mailoutbox) == 1
         # Email should not crash due to missing invoice
 
-    @patch("ams.memberships.email_utils.send_mail")
+    @patch("ams.memberships.email_utils.send_templated_email")
     @patch("ams.memberships.email_utils.logger")
-    def test_email_failure_graceful_handling(self, mock_logger, mock_send_mail):
+    def test_email_failure_graceful_handling(
+        self,
+        mock_logger,
+        mock_send_templated_email,
+    ):
         """Test that email failures are handled gracefully without raising."""
         # Create staff user
         UserFactory(is_staff=True, email="staff@example.com")
@@ -149,8 +153,8 @@ class TestSendStaffOrganisationMembershipNotification:
             membership_option=membership_option,
         )
 
-        # Mock send_mail to raise exception
-        mock_send_mail.side_effect = SMTPException("SMTP server error")
+        # Mock send_templated_email to raise exception
+        mock_send_templated_email.side_effect = SMTPException("SMTP server error")
 
         # Send notification (should not raise exception)
         send_staff_organisation_membership_notification(membership)
@@ -307,9 +311,13 @@ class TestSendStaffOrganisationSeatsAddedNotification:
         assert len(mailoutbox) == 1
         # Email should not crash due to missing invoice
 
-    @patch("ams.memberships.email_utils.send_mail")
+    @patch("ams.memberships.email_utils.send_templated_email")
     @patch("ams.memberships.email_utils.logger")
-    def test_email_failure_graceful_handling(self, mock_logger, mock_send_mail):
+    def test_email_failure_graceful_handling(
+        self,
+        mock_logger,
+        mock_send_templated_email,
+    ):
         """Test that email failures are handled gracefully without raising."""
         # Create staff user
         UserFactory(is_staff=True, email="staff@example.com")
@@ -328,8 +336,8 @@ class TestSendStaffOrganisationSeatsAddedNotification:
         mock_invoice = Mock()
         mock_invoice.invoice_number = "INV-12345"
 
-        # Mock send_mail to raise exception
-        mock_send_mail.side_effect = SMTPException("SMTP server error")
+        # Mock send_templated_email to raise exception
+        mock_send_templated_email.side_effect = SMTPException("SMTP server error")
 
         # Send notification (should not raise exception)
         send_staff_organisation_seats_added_notification(
@@ -453,9 +461,13 @@ class TestSendStaffIndividualMembershipNotification:
         assert len(mailoutbox) == 1
         # Email should not crash due to missing invoice
 
-    @patch("ams.memberships.email_utils.send_mail")
+    @patch("ams.memberships.email_utils.send_templated_email")
     @patch("ams.memberships.email_utils.logger")
-    def test_email_failure_graceful_handling(self, mock_logger, mock_send_mail):
+    def test_email_failure_graceful_handling(
+        self,
+        mock_logger,
+        mock_send_templated_email,
+    ):
         """Test that email failures are handled gracefully without raising."""
         # Create staff user
         UserFactory(is_staff=True, email="staff@example.com")
@@ -470,8 +482,8 @@ class TestSendStaffIndividualMembershipNotification:
             membership_option=membership_option,
         )
 
-        # Mock send_mail to raise exception
-        mock_send_mail.side_effect = SMTPException("SMTP server error")
+        # Mock send_templated_email to raise exception
+        mock_send_templated_email.side_effect = SMTPException("SMTP server error")
 
         # Send notification (should not raise exception)
         send_staff_individual_membership_notification(membership)

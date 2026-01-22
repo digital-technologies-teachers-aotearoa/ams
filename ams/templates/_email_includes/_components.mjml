@@ -1,0 +1,265 @@
+<!--
+  COMPONENT LIBRARY - Copy these patterns as needed
+
+  This file is NOT included in email templates - it's a reference library.
+  Copy and paste these patterns into your email templates as needed.
+
+  Color Palette:
+  - Primary Blue: #0056b3 (headers, links, primary actions)
+  - Success Green: #28a745 (success confirmations, primary action buttons)
+  - Info Cyan: #17a2b8 (information boxes, invites)
+  - Warning Yellow: #ffc107 (warning boxes)
+  - Secondary Gray: #6c757d (footer text, secondary elements)
+  - Background: #f8f9fa (page background)
+  - Border: #dee2e6 (dividers, borders)
+  - Text: #333333 (body text), #495057 (section headings)
+
+  Available mj-class declarations (defined in _head_styles.mjml):
+  - Header Classes: header-primary, header-secondary, header-light
+  - Section Classes: section-header-primary, section-header-light, section-info-box,
+    section-warning-box, section-detail-box, section-content, section-button
+  - Text Classes: text-body, text-small, text-footer, text-section-heading,
+    text-warning, text-code
+  - Button Classes: btn-primary, btn-secondary, btn-info
+  - Other: divider-standard
+-->
+
+<!-- ============================================ -->
+<!-- HEADER PATTERNS -->
+<!-- ============================================ -->
+
+<!-- PRIMARY BLUE HEADER -->
+<mj-section mj-class="section-header-primary">
+  <mj-column>
+    <mj-text mj-class="header-primary">
+      {% trans "Title" %}
+    </mj-text>
+  </mj-column>
+</mj-section>
+
+<!-- SUCCESS GREEN HEADER (custom background color, use mj-class for text) -->
+<mj-section background-color="#28a745" padding="30px 20px">
+  <mj-column>
+    <mj-text mj-class="header-primary">
+      {% trans "Title" %}
+    </mj-text>
+  </mj-column>
+</mj-section>
+
+<!-- INFO CYAN HEADER (custom background color, use mj-class for text) -->
+<mj-section background-color="#17a2b8" padding="30px 20px">
+  <mj-column>
+    <mj-text mj-class="header-primary">
+      {% trans "Title" %}
+    </mj-text>
+  </mj-column>
+</mj-section>
+
+<!-- LIGHT HEADER (light background with colored text) -->
+<mj-section mj-class="section-header-light">
+  <mj-column>
+    <mj-text mj-class="header-light">
+      {% trans "Title" %}
+    </mj-text>
+  </mj-column>
+</mj-section>
+
+<!-- HEADER WITH SECONDARY TEXT -->
+<mj-section mj-class="section-header-primary">
+  <mj-column>
+    <mj-text mj-class="header-primary">
+      {% trans "Main Title" %}
+    </mj-text>
+    <mj-text mj-class="header-secondary">
+      {% trans "Subtitle or reference number" %}
+    </mj-text>
+  </mj-column>
+</mj-section>
+
+<!-- ============================================ -->
+<!-- INFO/WARNING BOXES -->
+<!-- ============================================ -->
+
+<!-- INFO BOX (cyan border) -->
+<mj-section mj-class="section-info-box">
+  <mj-column>
+    <mj-text mj-class="text-small">
+      {% trans "Information message here" %}
+    </mj-text>
+  </mj-column>
+</mj-section>
+
+<!-- WARNING BOX (yellow border) -->
+<mj-section mj-class="section-warning-box">
+  <mj-column>
+    <mj-text mj-class="text-warning">
+      {% trans "⚠ Warning message here" %}
+    </mj-text>
+  </mj-column>
+</mj-section>
+
+<!-- ============================================ -->
+<!-- DETAILS TABLE (bordered white box) -->
+<!-- ============================================ -->
+
+<mj-section mj-class="section-detail-box">
+  <mj-column>
+    <mj-text mj-class="text-section-heading">
+      {% trans "Section Title" %}
+    </mj-text>
+    <mj-table>
+      <tr>
+        <td style="padding: 8px 0; font-weight: bold; width: 40%">
+          {% trans "Label:" %}
+        </td>
+        <td style="padding: 8px 0">{{ value }}</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px 0; font-weight: bold">
+          {% trans "Another Label:" %}
+        </td>
+        <td style="padding: 8px 0">{{ another_value }}</td>
+      </tr>
+    </mj-table>
+  </mj-column>
+</mj-section>
+
+<!-- NOTE: Table cell styles (<td style="...">) cannot use mj-class -->
+
+<!-- ============================================ -->
+<!-- BUTTONS -->
+<!-- ============================================ -->
+
+<!-- PRIMARY GREEN BUTTON -->
+<mj-section mj-class="section-button">
+  <mj-column>
+    <mj-button mj-class="btn-primary" href="{{ action_url }}">
+      {% trans "Primary Action" %}
+    </mj-button>
+  </mj-column>
+</mj-section>
+
+<!-- PRIMARY BLUE BUTTON -->
+<mj-section mj-class="section-button">
+  <mj-column>
+    <mj-button mj-class="btn-info" href="{{ action_url }}">
+      {% trans "Primary Action" %}
+    </mj-button>
+  </mj-column>
+</mj-section>
+
+<!-- SECONDARY GRAY BUTTON -->
+<mj-section mj-class="section-button">
+  <mj-column>
+    <mj-button mj-class="btn-secondary" href="{{ action_url }}">
+      {% trans "Secondary Action" %}
+    </mj-button>
+  </mj-column>
+</mj-section>
+
+<!-- TWO BUTTONS SIDE BY SIDE -->
+<mj-section padding="30px 20px">
+  <mj-column>
+    <mj-button mj-class="btn-primary" href="{{ primary_url }}">
+      {% trans "Accept" %}
+    </mj-button>
+  </mj-column>
+  <mj-column>
+    <mj-button mj-class="btn-secondary" href="{{ secondary_url }}">
+      {% trans "Decline" %}
+    </mj-button>
+  </mj-column>
+</mj-section>
+
+<!-- ============================================ -->
+<!-- CONTENT SECTIONS -->
+<!-- ============================================ -->
+
+<!-- STANDARD CONTENT SECTION (white background) -->
+<mj-section mj-class="section-content">
+  <mj-column>
+    <mj-text mj-class="text-body">
+      {% trans "Your content here" %}
+    </mj-text>
+  </mj-column>
+</mj-section>
+
+<!-- ============================================ -->
+<!-- FOOTER PATTERNS -->
+<!-- ============================================ -->
+
+<!-- SIMPLE FOOTER (use shared _footer.mjml include) -->
+<mj-include path="../_email_includes/_footer.mjml" />
+
+<!-- STAFF FOOTER (use shared _staff_footer.mjml include) -->
+<mj-include path="../_email_includes/_staff_footer.mjml" />
+
+<!-- CUSTOM FOOTER WITH MESSAGE -->
+<mj-section padding="20px">
+  <mj-column>
+    <mj-divider mj-class="divider-standard" />
+    <mj-text mj-class="text-footer">
+      {% trans "Custom footer message here" %}
+    </mj-text>
+  </mj-column>
+</mj-section>
+
+<!-- FOOTER WITH URL FALLBACK -->
+<mj-section padding="20px">
+  <mj-column>
+    <mj-divider mj-class="divider-standard" />
+    <mj-text mj-class="text-footer">
+      {% trans "If the button above doesn't work, copy and paste this link into your browser:" %}
+    </mj-text>
+    <mj-text mj-class="text-footer">
+      <a href="{{ action_url }}" style="color: #28a745; word-break: break-all">
+        {{ action_url }}
+      </a>
+    </mj-text>
+  </mj-column>
+</mj-section>
+
+<!-- NOTE: Link styles within mj-text must remain inline -->
+
+<!-- ============================================ -->
+<!-- DIVIDERS -->
+<!-- ============================================ -->
+
+<!-- STANDARD DIVIDER -->
+<mj-divider mj-class="divider-standard" />
+
+<!-- ============================================ -->
+<!-- TEXT PATTERNS -->
+<!-- ============================================ -->
+
+<!-- LARGE CODE/NUMBER DISPLAY -->
+<mj-text mj-class="text-code">
+  {{ code }}
+</mj-text>
+
+<!-- BODY TEXT -->
+<mj-text mj-class="text-body">
+  {% trans "Standard body text" %}
+</mj-text>
+
+<!-- SMALL TEXT (for info boxes, disclaimers) -->
+<mj-text mj-class="text-small">
+  {% trans "Small text for disclaimers or info boxes" %}
+</mj-text>
+
+<!-- ============================================ -->
+<!-- STATUS BADGE (inside table cell) -->
+<!-- ============================================ -->
+
+<!-- Copy this snippet into a <td> element -->
+<!-- Expected context: requires_approval (bool) -->
+<!-- EXAMPLE: -->
+<!--
+<td style="padding: 8px 0">
+  {% if requires_approval %}
+  <strong style="color: #ffc107">{% trans "Pending Approval" %}</strong>
+  {% else %}
+  <strong style="color: #28a745">{% trans "Approved" %}</strong>
+  {% endif %}
+</td>
+-->

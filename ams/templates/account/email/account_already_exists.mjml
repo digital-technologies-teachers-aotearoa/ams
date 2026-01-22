@@ -1,0 +1,82 @@
+<mjml>
+  <mj-head>
+    <mj-title>{% trans "Account Already Exists" %}</mj-title>
+    <!-- prettier-ignore -->
+    <mj-preview>{% trans "An account with this email address already exists" %}</mj-preview>
+    <mj-attributes>
+      <mj-include path="../../_email_includes/_head_attributes.mjml" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body background-color="#f8f9fa">
+    <!-- Header Section -->
+    <mj-section mj-class="section-header-primary">
+      <mj-column>
+        <mj-text mj-class="header-primary">
+          {% trans "Account Already Exists" %}
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Content Section -->
+    <mj-section mj-class="section-content">
+      <mj-column>
+        <!-- prettier-ignore -->
+        <mj-text mj-class="text-body">
+          {% blocktrans with site_name=current_site.name %}
+          You're receiving this email because you (or someone else) attempted to create an account on {{ site_name }} using this email address.
+          {% endblocktrans %}
+        </mj-text>
+
+        <!-- prettier-ignore -->
+        <mj-text mj-class="text-body" padding-top="20px">
+          {% trans "However, an account with this email address already exists." %}
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Info Box Section -->
+    <mj-section mj-class="section-info-box">
+      <mj-column>
+        <!-- prettier-ignore -->
+        <mj-text mj-class="text-small">
+          {% trans "If you already have an account, you can log in using your existing credentials." %}
+        </mj-text>
+        <!-- prettier-ignore -->
+        <mj-text mj-class="text-small" padding-top="10px">
+          {% trans "If you've forgotten your password, you can use the password reset option to regain access to your account." %}
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Button Section -->
+    <mj-section padding="30px 20px">
+      <mj-column>
+        <mj-button
+          mj-class="btn-info"
+          href="https://{{ current_site.domain }}/accounts/login/"
+        >
+          {% trans "Log In" %}
+        </mj-button>
+      </mj-column>
+      <mj-column>
+        <mj-button
+          mj-class="btn-secondary"
+          href="https://{{ current_site.domain }}/accounts/password/reset/"
+        >
+          {% trans "Reset Password" %}
+        </mj-button>
+      </mj-column>
+    </mj-section>
+
+    <!-- Footer Section -->
+    <mj-section padding="20px">
+      <mj-column>
+        <mj-divider mj-class="divider-standard" />
+        <!-- prettier-ignore -->
+        <mj-text mj-class="text-footer" align="center">
+          {% trans "If you did not attempt to create an account, you can safely ignore this email." %}
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

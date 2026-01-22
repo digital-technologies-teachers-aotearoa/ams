@@ -2,12 +2,12 @@ from datetime import date
 from typing import Any
 
 from django.contrib.auth.models import User
-from django.core.mail import send_mail
 
 from ams.billing.models import Account
 from ams.billing.models import Invoice
 from ams.billing.services import BillingService
 from ams.memberships.models import Organisation
+from ams.utils.email import send_templated_email
 
 
 class MockBillingService(BillingService):
@@ -45,21 +45,16 @@ class MockBillingService(BillingService):
         return invoice
 
     def email_invoice(self, invoice: Invoice) -> None:
-        subject = f"Invoice {invoice.invoice_number}"
-        message = (
-            f"Dear {invoice.account.user.get_full_name()},\n\n"
-            f"Your invoice {invoice.invoice_number} has been issued.\n"
-            f"Issue Date: {invoice.issue_date}\n"
-            f"Due Date: {invoice.due_date}\n"
-            f"Amount Due: {invoice.due}\n\n"
-            "Thank you."
-        )
-        recipient = [invoice.account.user.email]
-        send_mail(
-            subject,
-            message,
-            "billing@ams.local",
-            recipient,
+        send_templated_email(
+            subject=f"Invoice {invoice.invoice_number}",
+            template_name="billing/emails/mock_invoice",
+            context={
+                "invoice": invoice,
+                "account": invoice.account,
+                "user_name": invoice.account.user.get_full_name(),
+            },
+            recipient_list=[invoice.account.user.email],
+            from_email="billing@ams.local",
             fail_silently=True,
         )
 

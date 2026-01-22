@@ -1,14 +1,18 @@
 {% load i18n %}
+========================================
 {% trans "New Organisation Membership" %}
+========================================
 
-{% blocktrans with org_name=organisation.name %}A new membership has been purchased for {{ org_name }}.{% endblocktrans %}
+{% blocktrans with org_name=organisation.name %}
+A new membership has been purchased for {{ org_name }}.
+{% endblocktrans %}
 
 {% if requires_approval and is_free %}
-⚠ ACTION REQUIRED: This free membership requires manual approval in Django admin.
+⚠ {% trans "ACTION REQUIRED: This free membership requires manual approval in Django admin." %}
 {% endif %}
 
-{% trans "Membership Details" %}
-------------------------
+{% trans "Membership Details" %}:
+--------------------------
 {% trans "Organisation:" %} {{ organisation.name }}
 {% trans "Membership Type:" %} {{ membership_option.name }}
 {% trans "Seats:" %} {{ seats }}
@@ -16,7 +20,6 @@
 {% trans "Expiry Date:" %} {{ expiry_date|date:"d/m/Y" }}
 {% trans "Cost:" %} ${{ cost }}
 {% trans "Status:" %} {% if requires_approval %}{% trans "Pending Approval" %}{% else %}{% trans "Approved" %}{% endif %}
-{% if invoice_number %}{% trans "Invoice Number:" %} {{ invoice_number }}{% endif %}
-
-------------------------
-{% trans "You're receiving this because you are a staff member. Contact your administrator to change notification settings." %}
+{% if invoice_number %}
+{% trans "Invoice Number:" %} {{ invoice_number }}
+{% endif %}

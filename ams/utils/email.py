@@ -30,11 +30,12 @@ def send_templated_email(  # noqa: PLR0913
 
     Args:
         subject: The email subject line.
-        template_name: The base name of the template (without extension).
-                      For example, "organisation_invite" will load:
-                      - emails/organisation_invite.html (compiled from MJML)
-                      - emails/organisation_invite.txt (optional, auto-generated i
-                        missing)
+        template_name: Full path to template (without extension).
+                      For example, "organisations/emails/organisation_invite" will load:
+                      - organisations/emails/organisation_invite.html
+                            (compiled from MJML)
+                      - organisations/emails/organisation_invite.txt
+                            (optional, auto-generated if missing)
         context: Dictionary of context variables for template rendering.
         recipient_list: List of recipient email addresses.
         from_email: Sender email address. If None, uses DEFAULT_FROM_EMAIL.
@@ -55,7 +56,7 @@ def send_templated_email(  # noqa: PLR0913
     Example:
         >>> send_templated_email(
         ...     subject="Welcome!",
-        ...     template_name="organisation_invite",
+        ...     template_name="organisations/emails/organisation_invite",
         ...     context={"organisation": org, "accept_url": url},
         ...     recipient_list=["user@example.com"],
         ... )
@@ -67,7 +68,7 @@ def send_templated_email(  # noqa: PLR0913
     # Render HTML version first (needed for auto-generation)
     try:
         html_content = render_to_string(
-            f"emails/{template_name}.html",
+            f"{template_name}.html",
             context,
         )
     except Exception:
@@ -83,7 +84,7 @@ def send_templated_email(  # noqa: PLR0913
     try:
         # Try to render .txt template first
         text_content = render_to_string(
-            f"emails/{template_name}.txt",
+            f"{template_name}.txt",
             context,
         )
     except TemplateDoesNotExist:

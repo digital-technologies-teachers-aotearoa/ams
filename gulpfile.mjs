@@ -48,8 +48,7 @@ function pathsConfig() {
     fonts: `${appName}/static/fonts`,
     images: `${appName}/static/images`,
     js: `${appName}/static/js`,
-    mjml: `${appName}/email_templates`,
-    emailTemplates: `${appName}/templates/emails`,
+    mjml: `${appName}/templates`,
   };
 }
 
@@ -157,18 +156,21 @@ function prependDjangoTags() {
 
 // Compile MJML email templates to HTML
 function mjml() {
-  // Ensure output directory exists
-  mkdirSync(paths.emailTemplates, { recursive: true });
-
-  return src([`${paths.mjml}/**/*.mjml`, `!${paths.mjml}/**/_*.mjml`])
+  // Find all MJML files in the ams directory, excluding files starting with _
+  return src([`${paths.app}/**/*.mjml`, `!${paths.app}/**/_*.mjml`])
     .pipe(plumber()) // Checks for errors
     .pipe(
       mjmlGulp(mjmlEngine, {
-        validationLevel: 'soft', // Use 'strict' in production
+        validationLevel: 'strict',
       })
     )
     .pipe(prependDjangoTags()) // Add Django template tags
-    .pipe(dest(paths.emailTemplates));
+    .pipe(
+      dest((file) => {
+        // Output to the same directory as the source file
+        return file.base;
+      })
+    );
 }
 
 // Browser sync server for live reload
@@ -202,7 +204,7 @@ function watchPaths() {
     'change',
     reload
   );
-  watch(`${paths.mjml}/**/*.mjml`, mjml);
+  watch(`${paths.app}/**/*.mjml`, mjml);
 }
 
 // Generate all assets

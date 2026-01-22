@@ -1,28 +1,43 @@
 {% load i18n %}
+========================================
 {% trans "You've been invited!" %}
+========================================
 
-{% blocktrans with org_name=organisation.name %}You have been invited to join {{ org_name }} as a member.{% endblocktrans %}
+{% blocktrans with org_name=organisation.name %}
+You have been invited to join {{ org_name }} as a member.
+{% endblocktrans %}
 
-{% trans "Organisation Details" %}
-------------------------
+{% trans "Organisation Details" %}:
+--------------------------
 {% trans "Name:" %} {{ organisation.name }}
 {% trans "Contact:" %} {{ organisation.contact_name }}
 {% trans "Email:" %} {{ organisation.email }}
 {% trans "Phone:" %} {{ organisation.telephone }}
-{% if organisation.city %}{% trans "Location:" %} {{ organisation.city }}{% endif %}
+{% if organisation.city %}
+{% trans "Location:" %} {{ organisation.city }}
+{% endif %}
 
-{% trans "Accept or Decline" %}
-------------------------
-{% trans "Accept this invitation:" %}
+{% trans "To accept this invitation, visit:" %}
 {{ accept_url }}
 
-{% trans "Decline this invitation:" %}
+{% trans "To decline this invitation, visit:" %}
 {{ decline_url }}
 
 {% if user_exists %}
-{% trans "Click the accept link above to join the organisation, or the decline link if you're not interested." %}
+{% trans "Click the button above to accept this invitation and join the organisation." %}
 {% else %}
-{% trans "You'll need to create an account to accept this invitation. Click the accept link above to get started, or the decline link if you're not interested." %}
+{% trans "You'll need to create an account to accept this invitation." %}
+
+{% trans "Click the button above to get started." %}
 {% endif %}
 
+----------------------------------------
 {% trans "If you did not expect this invitation, you can decline it or safely ignore this email." %}
+
+{% trans "If the buttons above don't work, copy and paste these links into your browser:" %}
+
+{% trans "Accept:" %}
+{{ accept_url }}
+
+{% trans "Decline:" %}
+{{ decline_url }}

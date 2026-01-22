@@ -43,3 +43,4 @@ nav:
       - developer/deployment.md
       - developer/wagtail-cms.md
       - developer/theme-system.md
+      - developer/email-templates.md
