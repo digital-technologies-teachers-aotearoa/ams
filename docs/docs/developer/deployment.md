@@ -65,11 +65,22 @@ The following environment variables are available, with some required for runnin
 | `AMS_NOTIFY_STAFF_MEMBERSHIP_EVENTS` | ⚪ Optional | `True` | Notifies staff of membership creation events (default `True`) |
 | `AMS_REQUIRE_FREE_MEMBERSHIP_APPROVAL` | ⚪ Optional | `False` | Require manual approval of free memberships (default `False`) |
 | `SENTRY_DSN` | 🔴 Required | `https://123@456.ingest.de.sentry.io/789` | The DSN value for Sentry observability |
-| `SENTRY_LOG_LEVEL` | ⚪ Optional | `ERROR` | The level to log at (default `INFO`) |
+| `SENTRY_LOG_LEVEL` | ⚪ Optional | `40` | The level to log at (default `20`) |
 | `SENTRY_ENVIRONMENT` | ⚪ Optional | `dev` | The environment value for observability (default `production`) |
 | `SENTRY_TRACES_SAMPLE_RATE` | ⚪ Optional | `1.0` | A flot of the rate to sample at (default `0.0`) |
 | `LOGTAIL_SOURCE_TOKEN` | 🔴 Required | `123456789abcdef` | The application token for logging observability |
 | `LOGTAIL_INGESTING_HOST` | 🔴 Required | `s123456.eu-nbg-2.betterstackdata.com` | The host fo ingesting logs for observability |
+
+#### Available values
+
+##### `SENTRY_LOG_LEVEL`
+
+- `50`: Critical
+- `40`: Error
+- `30`: Warning
+- `20`: Info
+- `10`: Debug
+- `0`: Not set
 
 ## Deployment steps
 
