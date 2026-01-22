@@ -270,8 +270,8 @@ class SendTemplatedEmailAutoGenerationTests(TestCase):
                     "city": "Wellington",
                 },
             )(),
-            "accept_url": "https://example.com/accept/token123",
-            "decline_url": "https://example.com/decline/token123",
+            "signup_url": "https://example.com/signup/token123",
+            "email_settings_url": "https://example.com/settings/email",
             "user_exists": False,
         }
 
@@ -295,8 +295,8 @@ class SendTemplatedEmailAutoGenerationTests(TestCase):
         assert "Wellington" in plaintext
 
         # Check links are included
-        assert "https://example.com/accept/token123" in plaintext
-        assert "https://example.com/decline/token123" in plaintext
+        assert "https://example.com/signup/token123" in plaintext
+        assert "https://example.com/settings/email" in plaintext
 
     @override_settings(EMAIL_PLAINTEXT_IGNORE_LINKS=True)
     def test_auto_generation_respects_ignore_links_setting(self):

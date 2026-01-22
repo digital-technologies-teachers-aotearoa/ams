@@ -77,6 +77,8 @@
 
     <!-- Action Buttons Section -->
     <mj-section padding="30px 20px">
+      <mj-raw>{% if user_exists %}</mj-raw>
+      <!-- Existing users: Show Accept and Decline buttons -->
       <mj-column>
         <mj-button mj-class="btn-primary" href="{{ accept_url }}">
           {% trans "Accept Invitation" %}
@@ -87,6 +89,14 @@
           {% trans "Decline Invitation" %}
         </mj-button>
       </mj-column>
+      <mj-raw>{% else %}</mj-raw>
+      <!-- New users: Show Sign Up button -->
+      <mj-column>
+        <mj-button mj-class="btn-primary" href="{{ signup_url }}">
+          {% trans "Sign Up to Accept" %}
+        </mj-button>
+      </mj-column>
+      <mj-raw>{% endif %}</mj-raw>
     </mj-section>
 
     <!-- Info Box Section -->
@@ -95,12 +105,21 @@
         <!-- prettier-ignore -->
         <mj-text mj-class="text-small">
           {% if user_exists %}
-            {% trans "Click the button above to accept this invitation and join the organisation." %}
+            {% trans "Click the button above to sign in and respond to this invitation." %}
           {% else %}
-            {% trans "You'll need to create an account to accept this invitation." %}
+            {% trans "You'll need to create an account and verify your email address to accept this invitation." %}
             <br />
             <br />
-            {% trans "Click the button above to get started." %}
+            {% blocktrans trimmed %}
+            After signing up, you'll see this invitation on your dashboard where you can accept or decline it.
+            {% endblocktrans %}
+            <br />
+            <br />
+            {% blocktrans trimmed %}
+            If you already have an account with a different email address, you can
+            <a href="{{ email_settings_url }}" style="color: #007bff;">add this email address to your existing account</a>
+            instead of creating a new one.
+            {% endblocktrans %}
           {% endif %}
         </mj-text>
       </mj-column>
@@ -114,6 +133,7 @@
         <mj-text mj-class="text-footer">
           {% trans "If you did not expect this invitation, you can decline it or safely ignore this email." %}
         </mj-text>
+        <mj-raw>{% if user_exists %}</mj-raw>
         <!-- prettier-ignore -->
         <mj-text mj-class="text-footer">
           {% trans "If the buttons above don't work, copy and paste these links into your browser:" %}
@@ -134,6 +154,20 @@
             >{{ decline_url }}</a
           >
         </mj-text>
+        <mj-raw>{% else %}</mj-raw>
+        <!-- prettier-ignore -->
+        <mj-text mj-class="text-footer">
+          {% trans "If the button above doesn't work, copy and paste this link into your browser:" %}
+        </mj-text>
+        <mj-text mj-class="text-footer">
+          <strong>{% trans "Sign Up:" %}</strong><br />
+          <a
+            href="{{ signup_url }}"
+            style="color: #28a745; word-break: break-all"
+            >{{ signup_url }}</a
+          >
+        </mj-text>
+        <mj-raw>{% endif %}</mj-raw>
       </mj-column>
     </mj-section>
   </mj-body>

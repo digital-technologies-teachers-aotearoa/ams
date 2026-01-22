@@ -1,6 +1,7 @@
 """Email utilities for organisation-related notifications."""
 
 import logging
+from urllib.parse import urlencode
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -25,20 +26,39 @@ def send_organisation_invite_email(request, member: OrganisationMember):
     organisation = member.organisation
     invite_token = member.invite_token
     email = member.invite_email
+    user_exists = member.user is not None
 
     # Build the acceptance and decline URLs
-    accept_url = request.build_absolute_uri(
-        reverse(
-            "organisations:accept_invite",
-            kwargs={"invite_token": invite_token},
-        ),
+    accept_path = reverse(
+        "organisations:accept_invite",
+        kwargs={"invite_token": invite_token},
     )
-    decline_url = request.build_absolute_uri(
-        reverse(
-            "organisations:decline_invite",
-            kwargs={"invite_token": invite_token},
-        ),
+    decline_path = reverse(
+        "organisations:decline_invite",
+        kwargs={"invite_token": invite_token},
     )
+
+    # Build absolute URLs
+    accept_absolute_url = request.build_absolute_uri(accept_path)
+    decline_absolute_url = request.build_absolute_uri(decline_path)
+
+    # For existing users, wrap accept/decline URLs with login redirect
+    if user_exists:
+        login_path = reverse("account_login")
+        accept_url = request.build_absolute_uri(
+            f"{login_path}?{urlencode({'next': accept_path})}",
+        )
+        decline_url = request.build_absolute_uri(
+            f"{login_path}?{urlencode({'next': decline_path})}",
+        )
+    else:
+        # For new users, link directly to accept/decline (which will redirect to login)
+        accept_url = accept_absolute_url
+        decline_url = decline_absolute_url
+
+    # Build signup and email settings URLs
+    signup_url = request.build_absolute_uri(reverse("account_signup"))
+    email_settings_url = request.build_absolute_uri(reverse("account_email"))
 
     # Build subject and send email
     subject = _(
@@ -52,7 +72,9 @@ def send_organisation_invite_email(request, member: OrganisationMember):
             "organisation": organisation,
             "accept_url": accept_url,
             "decline_url": decline_url,
-            "user_exists": member.user is not None,
+            "signup_url": signup_url,
+            "email_settings_url": email_settings_url,
+            "user_exists": user_exists,
         },
         recipient_list=[email],
         fail_silently=False,
