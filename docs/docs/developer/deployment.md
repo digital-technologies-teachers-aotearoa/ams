@@ -44,7 +44,6 @@ The following environment variables are available, with some required for runnin
 | `MAILGUN_API_KEY` | 🔴 Required | `redacted-api-key` | The API key for Mailgun |
 | `MAILGUN_DOMAIN` | 🔴 Required | `sandbox.mailgun.org` | The domain for Mailgun |
 | `MAILGUN_API_URL` | 🔴 Required | `https://api.mailgun.net` | The API URL for Mailgun |
-| `SENTRY_DSN` | 🔴 Required | `https://123@456.ingest.de.sentry.io/789` | The DSN value for Sentry observability |
 | `AMS_BILLING_SERVICE_CLASS` | 🔴 Required | `ams.billing.providers.xero.XeroBillingService` | The provider to use for billing |
 | `AMS_BILLING_EMAIL_WHITELIST_REGEX` | ⚪ Optional | `@domain.com` | Allowed emails to send billing emails to (sends all emails when unset) |
 | `DISCOURSE_REDIRECT_DOMAIN` | 🔴 Required | `https://forum.ams.com` | The domain of the forum to send users to |
@@ -62,9 +61,15 @@ The following environment variables are available, with some required for runnin
 | `DJANGO_MEDIA_PRIVATE_REGION_NAME` | ⚪ Optional | `syd1` | Name of the region to use  for private media storage |
 | `DJANGO_MEDIA_PRIVATE_CUSTOM_DOMAIN` | ⚪ Optional | `https://private-media.ams.com` | Custom URL to use when connecting to private media storage, including scheme. |
 | `DJANGO_WAGTAIL_AMS_ADMIN_HELPERS` | ⚪ Optional | `True` | Shows helper text within the Wagtail CMS admin. |
-| `AMS_NOTIFY_STAFF_ORGANISATION_EVENTS` | ⚪ Optional | `True` | Notifies staff of organisation creation events. |
-| `AMS_NOTIFY_STAFF_MEMBERSHIP_EVENTS` | ⚪ Optional | `True` | Notifies staff of membership creation events. |
-| `AMS_REQUIRE_FREE_MEMBERSHIP_APPROVAL` | ⚪ Optional | `False` | Require manual approval of free memberships. |
+| `AMS_NOTIFY_STAFF_ORGANISATION_EVENTS` | ⚪ Optional | `True` | Notifies staff of organisation creation events (default `True`) |
+| `AMS_NOTIFY_STAFF_MEMBERSHIP_EVENTS` | ⚪ Optional | `True` | Notifies staff of membership creation events (default `True`) |
+| `AMS_REQUIRE_FREE_MEMBERSHIP_APPROVAL` | ⚪ Optional | `False` | Require manual approval of free memberships (default `False`) |
+| `SENTRY_DSN` | 🔴 Required | `https://123@456.ingest.de.sentry.io/789` | The DSN value for Sentry observability |
+| `SENTRY_LOG_LEVEL` | ⚪ Optional | `ERROR` | The level to log at (default `INFO`) |
+| `SENTRY_ENVIRONMENT` | ⚪ Optional | `dev` | The environment value for observability (default `production`) |
+| `SENTRY_TRACES_SAMPLE_RATE` | ⚪ Optional | `1.0` | A flot of the rate to sample at (default `0.0`) |
+| `LOGTAIL_SOURCE_TOKEN` | 🔴 Required | `123456789abcdef` | The application token for logging observability |
+| `LOGTAIL_INGESTING_HOST` | 🔴 Required | `s123456.eu-nbg-2.betterstackdata.com` | The host fo ingesting logs for observability |
 
 ## Deployment steps
 

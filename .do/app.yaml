@@ -67,9 +67,6 @@ jobs:
       - key: MAILGUN_API_URL
         scope: RUN_AND_BUILD_TIME
         value: ${MAILGUN_API_URL}
-      - key: SENTRY_DSN
-        scope: RUN_AND_BUILD_TIME
-        value: ${SENTRY_DSN}
       - key: DJANGO_SETTINGS_MODULE
         scope: RUN_AND_BUILD_TIME
         value: config.settings.production
@@ -121,9 +118,6 @@ jobs:
       - key: DJANGO_EMAIL_SUBJECT_PREFIX
         scope: RUN_AND_BUILD_TIME
         value: ${DJANGO_EMAIL_SUBJECT_PREFIX}
-      - key: SENTRY_ENVIRONMENT
-        scope: RUN_AND_BUILD_TIME
-        value: dev
       - key: XERO_CLIENT_ID
         scope: RUN_AND_BUILD_TIME
         value: ${XERO_CLIENT_ID}
@@ -145,6 +139,24 @@ jobs:
       - key: XERO_CURRENCY_CODE
         scope: RUN_AND_BUILD_TIME
         value: ${XERO_CURRENCY_CODE}
+      - key: SENTRY_DSN
+        scope: RUN_AND_BUILD_TIME
+        value: ${SENTRY_DSN}
+      - key: SENTRY_LOG_LEVEL
+        scope: RUN_AND_BUILD_TIME
+        value: ${SENTRY_LOG_LEVEL}
+      - key: SENTRY_ENVIRONMENT
+        scope: RUN_AND_BUILD_TIME
+        value: ${SENTRY_ENVIRONMENT}
+      - key: SENTRY_TRACES_SAMPLE_RATE
+        scope: RUN_AND_BUILD_TIME
+        value: ${SENTRY_TRACES_SAMPLE_RATE}
+      - key: LOGTAIL_SOURCE_TOKEN
+        scope: RUN_AND_BUILD_TIME
+        value: ${LOGTAIL_SOURCE_TOKEN}
+      - key: LOGTAIL_INGESTING_HOST
+        scope: RUN_AND_BUILD_TIME
+        value: ${LOGTAIL_INGESTING_HOST}
   - name: fetch-invoice-updates
     instance_count: 1
     instance_size_slug: apps-s-1vcpu-1gb-fixed
@@ -197,9 +209,6 @@ jobs:
       - key: MAILGUN_API_URL
         scope: RUN_AND_BUILD_TIME
         value: ${MAILGUN_API_URL}
-      - key: SENTRY_DSN
-        scope: RUN_AND_BUILD_TIME
-        value: ${SENTRY_DSN}
       - key: DJANGO_SETTINGS_MODULE
         scope: RUN_AND_BUILD_TIME
         value: config.settings.production
@@ -251,9 +260,6 @@ jobs:
       - key: DJANGO_EMAIL_SUBJECT_PREFIX
         scope: RUN_AND_BUILD_TIME
         value: ${DJANGO_EMAIL_SUBJECT_PREFIX}
-      - key: SENTRY_ENVIRONMENT
-        scope: RUN_AND_BUILD_TIME
-        value: dev
       - key: XERO_CLIENT_ID
         scope: RUN_AND_BUILD_TIME
         value: ${XERO_CLIENT_ID}
@@ -275,6 +281,24 @@ jobs:
       - key: XERO_CURRENCY_CODE
         scope: RUN_AND_BUILD_TIME
         value: ${XERO_CURRENCY_CODE}
+      - key: SENTRY_DSN
+        scope: RUN_AND_BUILD_TIME
+        value: ${SENTRY_DSN}
+      - key: SENTRY_LOG_LEVEL
+        scope: RUN_AND_BUILD_TIME
+        value: ${SENTRY_LOG_LEVEL}
+      - key: SENTRY_ENVIRONMENT
+        scope: RUN_AND_BUILD_TIME
+        value: ${SENTRY_ENVIRONMENT}
+      - key: SENTRY_TRACES_SAMPLE_RATE
+        scope: RUN_AND_BUILD_TIME
+        value: ${SENTRY_TRACES_SAMPLE_RATE}
+      - key: LOGTAIL_SOURCE_TOKEN
+        scope: RUN_AND_BUILD_TIME
+        value: ${LOGTAIL_SOURCE_TOKEN}
+      - key: LOGTAIL_INGESTING_HOST
+        scope: RUN_AND_BUILD_TIME
+        value: ${LOGTAIL_INGESTING_HOST}
 
 maintenance: {}
 region: syd
@@ -327,9 +351,6 @@ services:
       - key: MAILGUN_API_URL
         scope: RUN_AND_BUILD_TIME
         value: ${MAILGUN_API_URL}
-      - key: SENTRY_DSN
-        scope: RUN_AND_BUILD_TIME
-        value: ${SENTRY_DSN}
       - key: DJANGO_SETTINGS_MODULE
         scope: RUN_AND_BUILD_TIME
         value: config.settings.production
@@ -381,9 +402,6 @@ services:
       - key: DJANGO_EMAIL_SUBJECT_PREFIX
         scope: RUN_AND_BUILD_TIME
         value: ${DJANGO_EMAIL_SUBJECT_PREFIX}
-      - key: SENTRY_ENVIRONMENT
-        scope: RUN_AND_BUILD_TIME
-        value: dev
       - key: XERO_CLIENT_ID
         scope: RUN_AND_BUILD_TIME
         value: ${XERO_CLIENT_ID}
@@ -405,3 +423,21 @@ services:
       - key: XERO_CURRENCY_CODE
         scope: RUN_AND_BUILD_TIME
         value: ${XERO_CURRENCY_CODE}
+      - key: SENTRY_DSN
+        scope: RUN_AND_BUILD_TIME
+        value: ${SENTRY_DSN}
+      - key: SENTRY_LOG_LEVEL
+        scope: RUN_AND_BUILD_TIME
+        value: ${SENTRY_LOG_LEVEL}
+      - key: SENTRY_ENVIRONMENT
+        scope: RUN_AND_BUILD_TIME
+        value: ${SENTRY_ENVIRONMENT}
+      - key: SENTRY_TRACES_SAMPLE_RATE
+        scope: RUN_AND_BUILD_TIME
+        value: ${SENTRY_TRACES_SAMPLE_RATE}
+      - key: LOGTAIL_SOURCE_TOKEN
+        scope: RUN_AND_BUILD_TIME
+        value: ${LOGTAIL_SOURCE_TOKEN}
+      - key: LOGTAIL_INGESTING_HOST
+        scope: RUN_AND_BUILD_TIME
+        value: ${LOGTAIL_INGESTING_HOST}
