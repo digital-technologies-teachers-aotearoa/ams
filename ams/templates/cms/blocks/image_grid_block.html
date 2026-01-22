@@ -1,16 +1,60 @@
-{% load wagtailcore_tags %}
+{% load wagtailcore_tags wagtailimages_tags %}
 
-<div class="image-grid row row-cols-2 row-cols-lg-{{ self.columns }} g-4 {% if self.image_alignment == 'center' %}justify-content-center{% endif %}">
+<div class="image-grid row row-cols-2 row-cols-lg-{{ self.columns }} g-4 {% if self.image_alignment == 'center' %}justify-content-center{% endif %} {% if self.image_vertical_alignment == 'center' %}align-items-center{% endif %}">
   {% for item in self.items %}
     <div class="col">
-      {% if item.link_page or item.link_url %}
-        <a href="{% if item.link_page %}{% pageurl item.link_page %}{% else %}{{ item.link_url }}{% endif %}"
-           class="image-grid__item text-center d-block">
-          {% include "cms/blocks/partials/image_grid_item_content.html" %}
-        </a>
-      {% else %}
-        <div class="image-grid__item text-center">{% include "cms/blocks/partials/image_grid_item_content.html" %}</div>
-      {% endif %}
+      <div class="image-grid__item text-center">
+        <div class="position-relative">
+          <div class="image-grid__item__image">
+            {% if item.image_scaling == "fit" %}
+              {% if self.border_style == "rounded" %}
+                {% image item.image max-300x300 loading="lazy" class="img-fluid rounded-4" %}
+              {% elif self.border_style == "circle" %}
+                <div class="circle-responsive">{% image item.image max-300x300 loading="lazy" class="img-fluid" %}</div>
+              {% else %}
+                {% image item.image max-300x300 loading="lazy" class="img-fluid" %}
+              {% endif %}
+            {% else %}
+              {% if self.border_style == "rounded" %}
+                {% image item.image fill-300x300 loading="lazy" class="img-fluid rounded-4" %}
+              {% elif self.border_style == "circle" %}
+                <div class="circle-responsive">{% image item.image fill-300x300 loading="lazy" class="img-fluid" %}</div>
+              {% else %}
+                {% image item.image fill-300x300 loading="lazy" class="img-fluid" %}
+              {% endif %}
+            {% endif %}
+          </div>
+          {% comment %} (item.title and item.link_page) or (item.title and item.link_url) {% endcomment %}
+          {% if item.title and item.link_page or item.title and item.link_url %}
+            <a href="{% if item.link_page %}{% pageurl item.link_page %}{% else %}{{ item.link_url }}{% endif %}"
+               class="stretched-link">
+              <h4 class="image-grid__item__title h5 mb-2 {% if self.text_alignment == 'center' %} text-center {% else %} text-start {% endif %}">
+                {{ item.title }}
+              </h4>
+            </a>
+          {% else %}
+            {% if item.title %}
+              <h4 class="image-grid__item__title h5 mb-2 {% if self.text_alignment == 'center' %} text-center {% else %} text-start {% endif %}">
+                {{ item.title }}
+              </h4>
+            {% endif %}
+            {% if item.link_page or item.link_url %}
+              <a href="{% if item.link_page %}{% pageurl item.link_page %}{% else %}{{ item.link_url }}{% endif %}"
+                 class="stretched-link"></a>
+            {% endif %}
+          {% endif %}
+        </div>
+        {% if item.subtitle %}
+          <p class="image-grid__item__subtitle text-muted mb-2 {% if self.text_alignment == 'center' %} text-center {% else %} text-start {% endif %}">
+            {{ item.subtitle }}
+          </p>
+        {% endif %}
+        {% if item.description %}
+          <div class="image-grid__item__description {% if self.text_alignment == 'center' %} text-center {% else %} text-start {% endif %}">
+            {{ item.description|richtext }}
+          </div>
+        {% endif %}
+      </div>
     </div>
   {% endfor %}
 </div>

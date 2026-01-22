@@ -81,6 +81,15 @@ class ImageGridBlock(StructBlock):
         required=True,
         help_text="Alignment of items within grid (if space available)",
     )
+    image_vertical_alignment = ChoiceBlock(
+        choices=[
+            ("top", "Top"),
+            ("center", "Center"),
+        ],
+        default="center",
+        required=True,
+        help_text="Vertical alignment of items within grid",
+    )
     text_alignment = ChoiceBlock(
         choices=[
             ("left", "Left"),
