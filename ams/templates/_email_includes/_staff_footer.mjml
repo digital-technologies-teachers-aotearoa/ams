@@ -1,0 +1,10 @@
+<!-- Staff notification footer -->
+<mj-section padding="20px">
+  <mj-column>
+    <mj-divider mj-class="divider-standard" />
+    <mj-text mj-class="text-footer">
+      {% load i18n %}
+      {% trans "You're receiving this because you are a staff member. Contact your administrator to change notification settings." %}
+    </mj-text>
+  </mj-column>
+</mj-section>

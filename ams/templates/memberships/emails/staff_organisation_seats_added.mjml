@@ -1,0 +1,94 @@
+<mjml>
+  <mj-head>
+    <mj-title>{% trans "Seats Added to Organisation Membership" %}</mj-title>
+    <!-- prettier-ignore -->
+    <mj-preview>
+      {% blocktrans with org_name=organisation.name seats=seats_added %}
+      {{ seats }} additional seat(s) have been purchased for {{ org_name }}
+      {% endblocktrans %}
+    </mj-preview
+    >
+    <mj-attributes>
+      <mj-include path="../../_email_includes/_head_attributes.mjml" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body background-color="#f8f9fa">
+    <!-- Header Section -->
+    <mj-section mj-class="section-header-primary">
+      <mj-column>
+        <mj-text mj-class="header-primary">
+          {% trans "Seats Added to Organisation Membership" %}
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <mj-section mj-class="section-content">
+      <mj-column>
+        <!-- prettier-ignore -->
+        <mj-text mj-class="text-body">
+          {% blocktrans with org_name=organisation.name seats=seats_added %}
+          <strong>{{ seats }}</strong> additional seat(s) have been purchased for <strong>{{ org_name }}</strong>.
+          {% endblocktrans %}
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Purchase Details Section -->
+    <mj-section mj-class="section-detail-box">
+      <mj-column>
+        <mj-text mj-class="text-section-heading">
+          {% trans "Purchase Details" %}
+        </mj-text>
+        <mj-table>
+          <tr>
+            <td style="padding: 8px 0; font-weight: bold; width: 40%">
+              {% trans "Organisation:" %}
+            </td>
+            <td style="padding: 8px 0">{{ organisation.name }}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; font-weight: bold">
+              {% trans "Membership Type:" %}
+            </td>
+            <td style="padding: 8px 0">{{ membership_option.name }}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; font-weight: bold">
+              {% trans "Seats Added:" %}
+            </td>
+            <td style="padding: 8px 0">{{ seats_added }}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; font-weight: bold">
+              {% trans "New Total Seats:" %}
+            </td>
+            <td style="padding: 8px 0">{{ new_total_seats }}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; font-weight: bold">
+              {% trans "Pro-Rata Cost:" %}
+            </td>
+            <td style="padding: 8px 0">${{ prorata_cost }}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; font-weight: bold">
+              {% trans "Expiry Date:" %}
+            </td>
+            <td style="padding: 8px 0">{{ expiry_date|date:"d/m/Y" }}</td>
+          </tr>
+          {% if invoice_number %}
+          <tr>
+            <td style="padding: 8px 0; font-weight: bold">
+              {% trans "Invoice Number:" %}
+            </td>
+            <td style="padding: 8px 0">{{ invoice_number }}</td>
+          </tr>
+          {% endif %}
+        </mj-table>
+      </mj-column>
+    </mj-section>
+
+    <!-- Footer Section -->
+    <mj-include path="../../_email_includes/_staff_footer.mjml" />
+  </mj-body>
+</mjml>

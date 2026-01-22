@@ -1,55 +1,41 @@
 <mjml>
   <mj-head>
     <mj-title>{% trans "Organisation Invitation" %}</mj-title>
-    <mj-preview
-      >{% blocktrans with org_name=organisation.name %}You have been invited to
-      join {{ org_name }}{% endblocktrans %}</mj-preview
-    >
+    <!-- prettier-ignore -->
+    <mj-preview>
+      {% blocktrans with org_name=organisation.name %}
+      You have been invited to join {{ org_name }}
+      {% endblocktrans %}
+    </mj-preview>
     <mj-attributes>
-      <mj-all font-family="Arial, sans-serif" />
-      <mj-text font-size="16px" color="#333333" line-height="1.6" />
-      <mj-button
-        font-size="16px"
-        font-weight="bold"
-        border-radius="5px"
-        padding="12px 30px"
-      />
+      <mj-include path="../../_email_includes/_head_attributes.mjml" />
     </mj-attributes>
   </mj-head>
   <mj-body background-color="#f8f9fa">
     <!-- Header Section -->
-    <mj-section background-color="#f8f9fa" padding="30px 20px">
+    <mj-section mj-class="section-header-primary">
       <mj-column>
-        <mj-text
-          font-size="28px"
-          font-weight="bold"
-          color="#0056b3"
-          align="center"
-        >
+        <mj-text mj-class="header-primary">
           {% trans "You've been invited!" %}
         </mj-text>
-        <mj-text font-size="16px" align="center" padding-top="10px">
-          {% blocktrans with org_name=organisation.name %} You have been invited
-          to join <strong>{{ org_name }}</strong> as a member. {% endblocktrans
-          %}
+      </mj-column>
+    </mj-section>
+
+    <mj-section mj-class="section-content">
+      <mj-column>
+        <!-- prettier-ignore -->
+        <mj-text mj-class="text-body">
+        {% blocktrans with org_name=organisation.name %}
+        You have been invited to join <strong>{{ org_name }}</strong> as a member.
+        {% endblocktrans %}
         </mj-text>
       </mj-column>
     </mj-section>
 
     <!-- Organisation Details Section -->
-    <mj-section
-      background-color="#ffffff"
-      border="1px solid #dee2e6"
-      border-radius="8px"
-      padding="20px"
-    >
+    <mj-section mj-class="section-detail-box">
       <mj-column>
-        <mj-text
-          font-size="18px"
-          font-weight="bold"
-          color="#495057"
-          padding-bottom="10px"
-        >
+        <mj-text mj-class="text-section-heading">
           {% trans "Organisation Details" %}
         </mj-text>
         <mj-table>
@@ -92,30 +78,30 @@
     <!-- Action Buttons Section -->
     <mj-section padding="30px 20px">
       <mj-column>
-        <mj-button background-color="#28a745" href="{{ accept_url }}">
+        <mj-button mj-class="btn-primary" href="{{ accept_url }}">
           {% trans "Accept Invitation" %}
         </mj-button>
       </mj-column>
       <mj-column>
-        <mj-button background-color="#6c757d" href="{{ decline_url }}">
-          {% trans "Decline" %}
+        <mj-button mj-class="btn-secondary" href="{{ decline_url }}">
+          {% trans "Decline Invitation" %}
         </mj-button>
       </mj-column>
     </mj-section>
 
     <!-- Info Box Section -->
-    <mj-section
-      background-color="#f8f9fa"
-      border-left="4px solid #17a2b8"
-      padding="15px"
-    >
+    <mj-section mj-class="section-info-box">
       <mj-column>
-        <mj-text font-size="14px">
-          {% if user_exists %} {% trans "Click the button above to accept this
-          invitation and join the organisation." %} {% else %} {% trans "You'll
-          need to create an account to accept this invitation." %}
-          <br /><br />
-          {% trans "Click the button above to get started." %} {% endif %}
+        <!-- prettier-ignore -->
+        <mj-text mj-class="text-small">
+          {% if user_exists %}
+            {% trans "Click the button above to accept this invitation and join the organisation." %}
+          {% else %}
+            {% trans "You'll need to create an account to accept this invitation." %}
+            <br />
+            <br />
+            {% trans "Click the button above to get started." %}
+          {% endif %}
         </mj-text>
       </mj-column>
     </mj-section>
@@ -123,16 +109,16 @@
     <!-- Footer Section -->
     <mj-section padding="20px">
       <mj-column>
-        <mj-divider border-color="#dee2e6" />
-        <mj-text font-size="12px" color="#6c757d" padding-top="10px">
-          {% trans "If you did not expect this invitation, you can decline it or
-          safely ignore this email." %}
+        <mj-divider mj-class="divider-standard" />
+        <!-- prettier-ignore -->
+        <mj-text mj-class="text-footer">
+          {% trans "If you did not expect this invitation, you can decline it or safely ignore this email." %}
         </mj-text>
-        <mj-text font-size="12px" color="#6c757d" padding-top="10px">
-          {% trans "If the buttons above don't work, copy and paste these links
-          into your browser:" %}
+        <!-- prettier-ignore -->
+        <mj-text mj-class="text-footer">
+          {% trans "If the buttons above don't work, copy and paste these links into your browser:" %}
         </mj-text>
-        <mj-text font-size="12px" padding-top="10px">
+        <mj-text mj-class="text-footer">
           <strong>{% trans "Accept:" %}</strong><br />
           <a
             href="{{ accept_url }}"
@@ -140,7 +126,7 @@
             >{{ accept_url }}</a
           >
         </mj-text>
-        <mj-text font-size="12px" padding-top="10px">
+        <mj-text mj-class="text-footer">
           <strong>{% trans "Decline:" %}</strong><br />
           <a
             href="{{ decline_url }}"

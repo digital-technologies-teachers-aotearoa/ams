@@ -1,0 +1,23 @@
+{% load i18n %}
+========================================
+{% trans "Account Already Exists" %}
+========================================
+
+{% blocktrans with site_name=current_site.name %}
+You're receiving this email because you (or someone else) attempted to create an account on {{ site_name }} using this email address.
+{% endblocktrans %}
+
+{% trans "However, an account with this email address already exists." %}
+
+{% trans "If you already have an account, you can log in using your existing credentials." %}
+
+{% trans "If you've forgotten your password, you can use the password reset option to regain access to your account." %}
+
+{% trans "To log in, visit:" %}
+https://{{ current_site.domain }}/accounts/login/
+
+{% trans "To reset your password, visit:" %}
+https://{{ current_site.domain }}/accounts/password/reset/
+
+----------------------------------------
+{% trans "If you did not attempt to create an account, you can safely ignore this email." %}

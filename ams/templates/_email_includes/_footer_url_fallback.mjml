@@ -1,0 +1,15 @@
+<!-- Footer with fallback URL for when buttons don't work -->
+<!-- Expected context: action_url (string) -->
+<mj-section padding="20px">
+  <mj-column>
+    <mj-divider mj-class="divider-standard" />
+    <mj-text mj-class="text-footer">
+      {% trans "If the button above doesn't work, copy and paste this link into your browser:" %}
+    </mj-text>
+    <mj-text mj-class="text-footer">
+      <a href="{{ action_url }}" style="color: #28a745; word-break: break-all">
+        {{ action_url }}
+      </a>
+    </mj-text>
+  </mj-column>
+</mj-section>

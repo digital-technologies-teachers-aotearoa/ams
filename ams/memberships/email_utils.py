@@ -4,9 +4,9 @@ import logging
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
 from django.utils.translation import gettext_lazy as _
+
+from ams.utils.email import send_templated_email
 
 User = get_user_model()
 logger = logging.getLogger(__name__)
@@ -68,26 +68,13 @@ def send_staff_organisation_membership_notification(membership):
         "is_free": membership.membership_option.cost == 0,
     }
 
-    # Render HTML email
-    html_message = render_to_string(
-        "memberships/emails/staff_organisation_membership_created.html",
-        context,
-    )
-
-    # Render plain text email
-    text_message = render_to_string(
-        "memberships/emails/staff_organisation_membership_created.txt",
-        context,
-    )
-
     # Send email with error handling
     try:
-        send_mail(
+        send_templated_email(
             subject=subject,
-            message=text_message,
-            from_email=None,  # Use DEFAULT_FROM_EMAIL
+            template_name="memberships/emails/staff_organisation_membership_created",
+            context=context,
             recipient_list=staff_emails,
-            html_message=html_message,
             fail_silently=False,
         )
     except Exception:
@@ -145,26 +132,13 @@ def send_staff_organisation_seats_added_notification(
         "expiry_date": membership.expiry_date,
     }
 
-    # Render HTML email
-    html_message = render_to_string(
-        "memberships/emails/staff_organisation_seats_added.html",
-        context,
-    )
-
-    # Render plain text email
-    text_message = render_to_string(
-        "memberships/emails/staff_organisation_seats_added.txt",
-        context,
-    )
-
     # Send email with error handling
     try:
-        send_mail(
+        send_templated_email(
             subject=subject,
-            message=text_message,
-            from_email=None,  # Use DEFAULT_FROM_EMAIL
+            template_name="memberships/emails/staff_organisation_seats_added",
+            context=context,
             recipient_list=staff_emails,
-            html_message=html_message,
             fail_silently=False,
         )
     except Exception:
@@ -230,26 +204,13 @@ def send_staff_individual_membership_notification(membership):
         "is_free": membership.membership_option.cost == 0,
     }
 
-    # Render HTML email
-    html_message = render_to_string(
-        "memberships/emails/staff_individual_membership_created.html",
-        context,
-    )
-
-    # Render plain text email
-    text_message = render_to_string(
-        "memberships/emails/staff_individual_membership_created.txt",
-        context,
-    )
-
     # Send email with error handling
     try:
-        send_mail(
+        send_templated_email(
             subject=subject,
-            message=text_message,
-            from_email=None,  # Use DEFAULT_FROM_EMAIL
+            template_name="memberships/emails/staff_individual_membership_created",
+            context=context,
             recipient_list=staff_emails,
-            html_message=html_message,
             fail_silently=False,
         )
     except Exception:

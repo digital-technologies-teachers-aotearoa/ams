@@ -1,0 +1,17 @@
+<!-- Standard email footer -->
+<!-- Note: Many templates use custom footers with specific messaging or action URLs -->
+<!-- This is a generic footer for templates that don't need custom footer content -->
+<mj-section padding="20px">
+  <mj-column>
+    <mj-divider border-color="#dee2e6" />
+    <mj-text
+      font-size="12px"
+      color="#6c757d"
+      padding-top="10px"
+      align="center"
+    >
+      {% load i18n %}
+      {% trans "This is an automated message. Please do not reply to this email." %}
+    </mj-text>
+  </mj-column>
+</mj-section>

@@ -1,17 +1,20 @@
 {% load i18n %}
+========================================
 {% trans "Seats Added to Organisation Membership" %}
+========================================
 
-{% blocktrans with org_name=organisation.name seats=seats_added %}{{ seats }} additional seat(s) have been purchased for {{ org_name }}.{% endblocktrans %}
+{% blocktrans with org_name=organisation.name seats=seats_added %}
+{{ seats }} additional seat(s) have been purchased for {{ org_name }}.
+{% endblocktrans %}
 
-{% trans "Purchase Details" %}
-------------------------
+{% trans "Purchase Details" %}:
+--------------------------
 {% trans "Organisation:" %} {{ organisation.name }}
 {% trans "Membership Type:" %} {{ membership_option.name }}
 {% trans "Seats Added:" %} {{ seats_added }}
 {% trans "New Total Seats:" %} {{ new_total_seats }}
 {% trans "Pro-Rata Cost:" %} ${{ prorata_cost }}
 {% trans "Expiry Date:" %} {{ expiry_date|date:"d/m/Y" }}
-{% if invoice_number %}{% trans "Invoice Number:" %} {{ invoice_number }}{% endif %}
-
-------------------------
-{% trans "You're receiving this because you are a staff member. Contact your administrator to change notification settings." %}
+{% if invoice_number %}
+{% trans "Invoice Number:" %} {{ invoice_number }}
+{% endif %}

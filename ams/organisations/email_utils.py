@@ -4,12 +4,11 @@ import logging
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from ams.organisations.models import OrganisationMember
+from ams.utils.email import send_templated_email
 
 User = get_user_model()
 logger = logging.getLogger(__name__)
@@ -41,40 +40,21 @@ def send_organisation_invite_email(request, member: OrganisationMember):
         ),
     )
 
-    # Render email content
+    # Build subject and send email
     subject = _(
         "You've been invited to join %(organisation_name)s",
     ) % {"organisation_name": organisation.name}
 
-    # Render HTML email
-    html_message = render_to_string(
-        "organisations/emails/organisation_invite.html",
-        {
-            "organisation": organisation,
-            "accept_url": accept_url,
-            "decline_url": decline_url,
-            "user_exists": member.user is not None,
-        },
-    )
-
-    # Render plain text email
-    text_message = render_to_string(
-        "organisations/emails/organisation_invite.txt",
-        {
-            "organisation": organisation,
-            "accept_url": accept_url,
-            "decline_url": decline_url,
-            "user_exists": member.user is not None,
-        },
-    )
-
-    # Send email
-    send_mail(
+    send_templated_email(
         subject=subject,
-        message=text_message,
-        from_email=None,  # Use DEFAULT_FROM_EMAIL
+        template_name="organisations/emails/organisation_invite",
+        context={
+            "organisation": organisation,
+            "accept_url": accept_url,
+            "decline_url": decline_url,
+            "user_exists": member.user is not None,
+        },
         recipient_list=[email],
-        html_message=html_message,
         fail_silently=False,
     )
 
@@ -113,26 +93,13 @@ def send_staff_organisation_created_notification(organisation, creator):
         "creator_email": creator.email,
     }
 
-    # Render HTML email
-    html_message = render_to_string(
-        "organisations/emails/staff_organisation_created.html",
-        context,
-    )
-
-    # Render plain text email
-    text_message = render_to_string(
-        "organisations/emails/staff_organisation_created.txt",
-        context,
-    )
-
     # Send email with error handling
     try:
-        send_mail(
+        send_templated_email(
             subject=subject,
-            message=text_message,
-            from_email=None,  # Use DEFAULT_FROM_EMAIL
+            template_name="organisations/emails/staff_organisation_created",
+            context=context,
             recipient_list=staff_emails,
-            html_message=html_message,
             fail_silently=False,
         )
     except Exception:

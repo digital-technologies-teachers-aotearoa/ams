@@ -1,0 +1,105 @@
+<mjml>
+  <mj-head>
+    <mj-title>{% trans "Invoice" %} {{ invoice.invoice_number }}</mj-title>
+    <!-- prettier-ignore -->
+    <mj-preview>
+      {% blocktrans with invoice_number=invoice.invoice_number %}
+      Your invoice {{ invoice_number }} has been issued
+      {% endblocktrans %}
+    </mj-preview>
+    <mj-attributes>
+      <mj-include path="../../_email_includes/_head_attributes.mjml" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body background-color="#f8f9fa">
+    <!-- Header Section -->
+    <mj-section mj-class="section-header-primary">
+      <mj-column>
+        <mj-text mj-class="header-primary"> {% trans "Invoice" %} </mj-text>
+        <mj-text mj-class="header-secondary">
+          #{{ invoice.invoice_number }}
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Greeting Section -->
+    <mj-section mj-class="section-header-light">
+      <mj-column>
+        <!-- prettier-ignore -->
+        <mj-text mj-class="text-body">
+          {% blocktrans with name=user_name %}
+          Dear {{ name }},
+          {% endblocktrans %}
+        </mj-text>
+        <!-- prettier-ignore -->
+        <mj-text mj-class="text-body" padding-top="10px">
+          {% trans "Your invoice has been issued. Please find the details below." %}
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Invoice Details Section -->
+    <mj-section mj-class="section-detail-box">
+      <mj-column>
+        <mj-text mj-class="text-section-heading">
+          {% trans "Invoice Details" %}
+        </mj-text>
+        <mj-table>
+          <tr>
+            <td style="padding: 8px 0; font-weight: bold; width: 40%">
+              {% trans "Invoice Number:" %}
+            </td>
+            <td style="padding: 8px 0">{{ invoice.invoice_number }}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; font-weight: bold">
+              {% trans "Issue Date:" %}
+            </td>
+            <td style="padding: 8px 0">
+              {{ invoice.issue_date|date:"d/m/Y" }}
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; font-weight: bold">
+              {% trans "Due Date:" %}
+            </td>
+            <td style="padding: 8px 0">{{ invoice.due_date|date:"d/m/Y" }}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; font-weight: bold">
+              {% trans "Amount:" %}
+            </td>
+            <td style="padding: 8px 0">{{ invoice.amount }}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; font-weight: bold; font-size: 18px">
+              {% trans "Amount Due:" %}
+            </td>
+            <td
+              style="
+                padding: 8px 0;
+                font-weight: bold;
+                font-size: 18px;
+                color: #0056b3;
+              "
+            >
+              {{ invoice.due }}
+            </td>
+          </tr>
+        </mj-table>
+      </mj-column>
+    </mj-section>
+
+    <!-- Thank You Section -->
+    <mj-section padding="30px 20px">
+      <mj-column>
+        <mj-text mj-class="text-body" align="center">
+          {% trans "Thank you for your business!" %}
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Footer Section -->
+    <mj-include path="../../_email_includes/_footer.mjml" />
+  </mj-body>
+</mjml>

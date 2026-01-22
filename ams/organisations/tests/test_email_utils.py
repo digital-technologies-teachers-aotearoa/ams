@@ -81,9 +81,13 @@ class TestSendStaffOrganisationCreatedNotification:
         # Assert no email was sent
         assert len(mailoutbox) == 0
 
-    @patch("ams.organisations.email_utils.send_mail")
+    @patch("ams.organisations.email_utils.send_templated_email")
     @patch("ams.organisations.email_utils.logger")
-    def test_email_failure_graceful_handling(self, mock_logger, mock_send_mail):
+    def test_email_failure_graceful_handling(
+        self,
+        mock_logger,
+        mock_send_templated_email,
+    ):
         """Test that email failures are handled gracefully without raising."""
         # Create staff user
         UserFactory(is_staff=True, email="staff@example.com")
@@ -92,8 +96,8 @@ class TestSendStaffOrganisationCreatedNotification:
         creator = UserFactory(email="creator@example.com")
         organisation = OrganisationFactory()
 
-        # Mock send_mail to raise exception
-        mock_send_mail.side_effect = SMTPException("SMTP server error")
+        # Mock send_templated_email to raise exception
+        mock_send_templated_email.side_effect = SMTPException("SMTP server error")
 
         # Send notification (should not raise exception)
         send_staff_organisation_created_notification(organisation, creator)

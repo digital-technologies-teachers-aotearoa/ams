@@ -1,0 +1,74 @@
+<mjml>
+  <mj-head>
+    <mj-title>{% trans "Confirm Your Email Address" %}</mj-title>
+    <!-- prettier-ignore -->
+    <mj-preview>{% trans "Please confirm your email address to complete your registration" %}</mj-preview>
+    <mj-attributes>
+      <mj-include path="../../_email_includes/_head_attributes.mjml" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body background-color="#f8f9fa">
+    <!-- Header Section -->
+    <mj-section mj-class="section-header-primary">
+      <mj-column>
+        <mj-text mj-class="header-primary">
+          {% trans "Confirm Your Email" %}
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Content Section -->
+    <mj-section mj-class="section-content">
+      <mj-column>
+        <!-- prettier-ignore -->
+        <mj-text mj-class="text-body">
+          {% load account %}
+          {% user_display user as user_display %}
+          {% blocktrans with site_name=current_site.name site_domain=current_site.domain %}
+          You're receiving this email because user {{ user_display }} has given your email address to register an account on {{ site_domain }}.
+          {% endblocktrans %}
+        </mj-text>
+
+        {% if code %}
+        <!-- prettier-ignore -->
+        <mj-text mj-class="text-body" padding-top="20px">
+          {% trans "Your email verification code is listed below. Please enter it in your open browser window." %}
+        </mj-text>
+        <mj-text mj-class="text-code">
+          {{ code }}
+        </mj-text>
+        {% else %}
+        <mj-text mj-class="text-body" padding-top="20px">
+          {% trans "To confirm this is correct, click the button below:" %}
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Button Section -->
+    <mj-section mj-class="section-button">
+      <mj-column>
+        <mj-button mj-class="btn-primary" href="{{ activate_url }}">
+          {% trans "Verify Email Address" %}
+        </mj-button>
+      </mj-column>
+    </mj-section>
+    {% endif %}
+
+    <!-- Security Notice Section -->
+    <mj-section mj-class="section-info-box">
+      <mj-column>
+        <!-- prettier-ignore -->
+        <mj-text mj-class="text-small">
+          {% trans "If you did not create this account, you can safely ignore this email." %}
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    {% if activate_url %}
+    <!-- Footer with URL -->
+    <mj-raw>{% with action_url=activate_url %}</mj-raw>
+    <mj-include path="../../_email_includes/_footer_url_fallback.mjml" />
+    <mj-raw>{% endwith %}</mj-raw>
+    {% endif %}
+  </mj-body>
+</mjml>

@@ -1,23 +1,26 @@
 {% load i18n %}
+========================================
 {% trans "New Organisation Created" %}
+========================================
 
-{% blocktrans with org_name=organisation.name %}A new organisation {{ org_name }} has been created.{% endblocktrans %}
+{% blocktrans with org_name=organisation.name %}
+A new organisation {{ org_name }} has been created.
+{% endblocktrans %}
 
-{% trans "Organisation Details" %}
-------------------------
+{% trans "Organisation Details" %}:
+--------------------------
 {% trans "Name:" %} {{ organisation.name }}
 {% trans "Contact Name:" %} {{ organisation.contact_name }}
 {% trans "Email:" %} {{ organisation.email }}
 {% trans "Phone:" %} {{ organisation.telephone }}
 {% trans "Postal Address:" %} {{ organisation.postal_address }}
-{% if organisation.postal_suburb %}{% trans "Postal Suburb:" %} {{ organisation.postal_suburb }}{% endif %}
+{% if organisation.postal_suburb %}
+{% trans "Postal Suburb:" %} {{ organisation.postal_suburb }}
+{% endif %}
 {% trans "Postal City:" %} {{ organisation.postal_city }}
 {% trans "Postal Code:" %} {{ organisation.postal_code }}
 
-{% trans "Created By" %}
-------------------------
+{% trans "Created By" %}:
+--------------------------
 {% trans "Name:" %} {{ creator_name }}
 {% trans "Email:" %} {{ creator_email }}
-
-------------------------
-{% trans "You're receiving this because you are a staff member. Contact your administrator to change notification settings." %}

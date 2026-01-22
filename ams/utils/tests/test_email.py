@@ -18,7 +18,7 @@ class SendTemplatedEmailTests(TestCase):
         """Test sending an email with both HTML and text templates."""
         # Arrange
         subject = "Test Email"
-        template_name = "organisation_invite"
+        template_name = "organisations/emails/organisation_invite"
         context = {
             "organisation": type(
                 "Organisation",
@@ -82,7 +82,7 @@ class SendTemplatedEmailTests(TestCase):
         # Act
         send_templated_email(
             subject="Test",
-            template_name="organisation_invite",
+            template_name="organisations/emails/organisation_invite",
             context=context,
             recipient_list=["test@example.com"],
             from_email=custom_from_email,
@@ -116,7 +116,7 @@ class SendTemplatedEmailTests(TestCase):
         # Act
         send_templated_email(
             subject="Test",
-            template_name="organisation_invite",
+            template_name="organisations/emails/organisation_invite",
             context=context,
             recipient_list=["test@example.com"],
         )
@@ -175,7 +175,7 @@ class SendTemplatedEmailTests(TestCase):
         # Act
         send_templated_email(
             subject="Test",
-            template_name="organisation_invite",
+            template_name="organisations/emails/organisation_invite",
             context=context,
             recipient_list=["test@example.com"],
         )
@@ -193,7 +193,10 @@ class SendTemplatedEmailAutoGenerationTests(TestCase):
 
     def _get_txt_template_path(self):
         """Helper to get the path to the .txt template."""
-        return Path(settings.APPS_DIR) / "templates/emails/organisation_invite.txt"
+        return (
+            Path(settings.APPS_DIR)
+            / "templates/organisations/emails/organisation_invite.txt"
+        )
 
     def setUp(self):
         """Back up the .txt template if it exists."""
@@ -235,7 +238,7 @@ class SendTemplatedEmailAutoGenerationTests(TestCase):
         # Act
         result = send_templated_email(
             subject="Test Auto-Generation",
-            template_name="organisation_invite",
+            template_name="organisations/emails/organisation_invite",
             context=context,
             recipient_list=["test@example.com"],
         )
@@ -275,7 +278,7 @@ class SendTemplatedEmailAutoGenerationTests(TestCase):
         # Act
         send_templated_email(
             subject="Test Quality",
-            template_name="organisation_invite",
+            template_name="organisations/emails/organisation_invite",
             context=context,
             recipient_list=["test@example.com"],
         )
@@ -319,7 +322,7 @@ class SendTemplatedEmailAutoGenerationTests(TestCase):
         # Act
         send_templated_email(
             subject="Test Ignore Links",
-            template_name="organisation_invite",
+            template_name="organisations/emails/organisation_invite",
             context=context,
             recipient_list=["test@example.com"],
         )
@@ -354,7 +357,7 @@ class SendTemplatedEmailAutoGenerationTests(TestCase):
         # Act
         send_templated_email(
             subject="Test Body Width",
-            template_name="organisation_invite",
+            template_name="organisations/emails/organisation_invite",
             context=context,
             recipient_list=["test@example.com"],
         )

@@ -1,0 +1,20 @@
+{% load i18n %}
+========================================
+{% trans "Invoice" %} #{{ invoice.invoice_number }}
+========================================
+
+{% blocktrans with name=user_name %}
+Dear {{ name }},
+{% endblocktrans %}
+
+{% trans "Your invoice has been issued. Please find the details below." %}
+
+{% trans "Invoice Details" %}:
+--------------------------
+{% trans "Invoice Number:" %} {{ invoice.invoice_number }}
+{% trans "Issue Date:" %} {{ invoice.issue_date|date:"d/m/Y" }}
+{% trans "Due Date:" %} {{ invoice.due_date|date:"d/m/Y" }}
+{% trans "Amount:" %} {{ invoice.amount }}
+{% trans "Amount Due:" %} {{ invoice.due }}
+
+{% trans "Thank you for your business!" %}
