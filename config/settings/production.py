@@ -106,10 +106,11 @@ ANYMAIL = {
 # https://docs.djangoproject.com/en/dev/ref/settings/#logging
 # See https://docs.djangoproject.com/en/dev/topics/logging for
 # more details on how to customize your logging configuration.
-
+LOGTAIL_SOURCE_TOKEN = env("LOGTAIL_SOURCE_TOKEN")
+LOGTAIL_INGESTING_HOST = env("LOGTAIL_INGESTING_HOST")
 LOGGING = {
     "version": 1,
-    "disable_existing_loggers": True,
+    "disable_existing_loggers": False,
     "formatters": {
         "verbose": {
             "format": "%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s",
@@ -121,16 +122,31 @@ LOGGING = {
             "class": "logging.StreamHandler",
             "formatter": "verbose",
         },
+        "logtail": {
+            "class": "logtail.LogtailHandler",
+            "source_token": LOGTAIL_SOURCE_TOKEN,
+            "host": f"https://{LOGTAIL_INGESTING_HOST}",
+        },
     },
     "root": {"level": "INFO", "handlers": ["console"]},
     "loggers": {
+        "": {
+            "handlers": [
+                "logtail",
+            ],
+            "level": "INFO",
+        },
         "django.db.backends": {
             "level": "ERROR",
             "handlers": ["console"],
             "propagate": False,
         },
         # Errors logged by the SDK itself
-        "sentry_sdk": {"level": "ERROR", "handlers": ["console"], "propagate": False},
+        "sentry_sdk": {
+            "level": "ERROR",
+            "handlers": ["console"],
+            "propagate": False,
+        },
         "django.security.DisallowedHost": {
             "level": "ERROR",
             "handlers": ["console"],
@@ -139,10 +155,12 @@ LOGGING = {
     },
 }
 
-# Sentry
+# Better Stack (uses Sentry SDK)
 # ------------------------------------------------------------------------------
 SENTRY_DSN = env("SENTRY_DSN")
-SENTRY_LOG_LEVEL = env.int("DJANGO_SENTRY_LOG_LEVEL", logging.INFO)
+SENTRY_LOG_LEVEL = env.int("SENTRY_LOG_LEVEL", logging.INFO)
+SENTRY_ENVIRONMENT = env("SENTRY_ENVIRONMENT", default="production")
+SENTRY_TRACES_SAMPLE_RATE = env.float("SENTRY_TRACES_SAMPLE_RATE", default=0.0)
 
 sentry_logging = LoggingIntegration(
     level=SENTRY_LOG_LEVEL,  # Capture info and above as breadcrumbs
@@ -152,8 +170,8 @@ integrations = [sentry_logging, DjangoIntegration(), RedisIntegration()]
 sentry_sdk.init(
     dsn=SENTRY_DSN,
     integrations=integrations,
-    environment=env("SENTRY_ENVIRONMENT", default="production"),
-    traces_sample_rate=env.float("SENTRY_TRACES_SAMPLE_RATE", default=0.0),
+    environment=SENTRY_ENVIRONMENT,
+    traces_sample_rate=SENTRY_TRACES_SAMPLE_RATE,
 )
 
 
