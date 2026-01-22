@@ -138,6 +138,12 @@ class MembershipOptionForm(ModelForm):
         required=False,
         help_text=_("Mark as archived to prevent new signups"),
     )
+    order = IntegerField(
+        label=_("Display Order"),
+        initial=0,
+        min_value=0,
+        help_text=_("Display order (lower numbers appear first)"),
+    )
 
     class Meta:
         model = MembershipOption
@@ -151,6 +157,7 @@ class MembershipOptionForm(ModelForm):
             "max_seats",
             "max_charged_seats",
             "archived",
+            "order",
         ]
 
 
@@ -167,7 +174,7 @@ class CreateIndividualMembershipForm(ModelForm):
         queryset=MembershipOption.objects.filter(
             type=MembershipOptionType.INDIVIDUAL,
             archived=False,
-        ).order_by("cost"),
+        ),
         empty_label=None,
         widget=RadioSelect,
     )
@@ -312,7 +319,7 @@ class CreateOrganisationMembershipForm(ModelForm):
         queryset=MembershipOption.objects.filter(
             type=MembershipOptionType.ORGANISATION,
             archived=False,
-        ).order_by("cost"),
+        ),
         empty_label=None,
         widget=RadioSelect,
         help_text=_("Select the type of membership for this organisation."),

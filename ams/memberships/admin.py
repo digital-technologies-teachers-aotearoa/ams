@@ -14,6 +14,7 @@ from ams.memberships.models import OrganisationMembership
 class MembershipOptionAdmin(admin.ModelAdmin):
     form = MembershipOptionForm
     list_display = (
+        "order",
         "name",
         "type",
         "duration_display",
@@ -22,6 +23,8 @@ class MembershipOptionAdmin(admin.ModelAdmin):
         "max_charged_seats",
         "archived",
     )
+    list_display_links = ("name",)
+    list_editable = ("order",)
     search_fields = ("name",)
     list_filter = ("type", "archived")
 
@@ -56,7 +59,10 @@ class MembershipOptionAdmin(admin.ModelAdmin):
             (
                 "Visibility",
                 {
-                    "fields": ("archived",),
+                    "fields": (
+                        "order",
+                        "archived",
+                    ),
                 },
             ),
         )

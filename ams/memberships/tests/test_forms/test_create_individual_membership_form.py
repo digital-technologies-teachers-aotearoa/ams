@@ -193,3 +193,55 @@ def test_paid_membership_unchanged_when_approval_required():
     # Paid memberships should still not be auto-approved (pending payment)
     assert membership.approved_datetime is None
     assert membership.status().name == "PENDING"
+
+
+def test_membership_options_ordered_by_order_field():
+    """Test that membership options are ordered by order field, then cost."""
+    user = UserFactory()
+
+    # Create membership options with specific order values
+    option_high_order = MembershipOptionFactory(
+        name="High Order Option",
+        type=MembershipOptionType.INDIVIDUAL,
+        cost=10.00,
+        order=30,
+        archived=False,
+    )
+    option_low_order = MembershipOptionFactory(
+        name="Low Order Option",
+        type=MembershipOptionType.INDIVIDUAL,
+        cost=50.00,
+        order=10,
+        archived=False,
+    )
+    option_mid_order = MembershipOptionFactory(
+        name="Mid Order Option",
+        type=MembershipOptionType.INDIVIDUAL,
+        cost=25.00,
+        order=20,
+        archived=False,
+    )
+    # Same order as low, but higher cost (should appear after low_order)
+    option_same_order_high_cost = MembershipOptionFactory(
+        name="Same Order High Cost",
+        type=MembershipOptionType.INDIVIDUAL,
+        cost=100.00,
+        order=10,
+        archived=False,
+    )
+
+    # Create the form and check queryset ordering
+    form = CreateIndividualMembershipForm(user=user)
+    queryset = form.fields["membership_option"].queryset
+    option_ids = list(queryset.values_list("id", flat=True))
+
+    # Expected order: order 10 (low_order, then same_order_high_cost by cost),
+    # then order 20 (mid_order), then order 30 (high_order)
+    expected_order = [
+        option_low_order.id,
+        option_same_order_high_cost.id,
+        option_mid_order.id,
+        option_high_order.id,
+    ]
+
+    assert option_ids == expected_order

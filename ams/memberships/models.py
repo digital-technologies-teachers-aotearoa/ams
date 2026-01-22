@@ -12,6 +12,7 @@ from django.db.models import DecimalField
 from django.db.models import ForeignKey
 from django.db.models import IntegerField
 from django.db.models import Model
+from django.db.models import PositiveIntegerField
 from django.db.models import QuerySet
 from django.db.models import TextChoices
 from django.utils import timezone
@@ -112,9 +113,14 @@ class MembershipOption(Model):
         default=False,
         help_text=_("Mark as archived to prevent new signups"),
     )
+    order = PositiveIntegerField(
+        default=0,
+        help_text=_("Display order (lower numbers appear first)"),
+    )
 
     class Meta:
         unique_together = (("name", "type"),)
+        ordering = ["order", "cost"]
 
     def __str__(self):
         return (

@@ -564,3 +564,54 @@ class TestCreateOrganisationMembershipForm:
         seats_argument = call_args[0][2]
         expected_seats = 3
         assert seats_argument == expected_seats
+
+    def test_membership_options_ordered_by_order_field(self):
+        """Test that membership options are ordered by order field, then cost."""
+        org = OrganisationFactory()
+
+        # Create membership options with specific order values
+        option_high_order = MembershipOptionFactory(
+            name="High Order Option",
+            type=MembershipOptionType.ORGANISATION,
+            cost=100.00,
+            order=50,
+            archived=False,
+        )
+        option_low_order = MembershipOptionFactory(
+            name="Low Order Option",
+            type=MembershipOptionType.ORGANISATION,
+            cost=200.00,
+            order=5,
+            archived=False,
+        )
+        option_mid_order = MembershipOptionFactory(
+            name="Mid Order Option",
+            type=MembershipOptionType.ORGANISATION,
+            cost=150.00,
+            order=25,
+            archived=False,
+        )
+        # Same order as low, but higher cost (should appear after low_order)
+        option_same_order_high_cost = MembershipOptionFactory(
+            name="Same Order High Cost",
+            type=MembershipOptionType.ORGANISATION,
+            cost=500.00,
+            order=5,
+            archived=False,
+        )
+
+        # Create the form and check queryset ordering
+        form = CreateOrganisationMembershipForm(organisation=org)
+        queryset = form.fields["membership_option"].queryset
+        option_ids = list(queryset.values_list("id", flat=True))
+
+        # Expected order: order 5 (low_order, then same_order_high_cost by cost),
+        # then order 25 (mid_order), then order 50 (high_order)
+        expected_order = [
+            option_low_order.id,
+            option_same_order_high_cost.id,
+            option_mid_order.id,
+            option_high_order.id,
+        ]
+
+        assert option_ids == expected_order
