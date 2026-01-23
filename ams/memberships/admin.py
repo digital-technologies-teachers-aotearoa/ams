@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.http import HttpResponseRedirect
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from ams.memberships.forms import MembershipOptionForm
@@ -148,7 +149,11 @@ class MembershipOptionAdmin(admin.ModelAdmin):
                 messages.SUCCESS,
             )
             # Redirect to list view
-            return HttpResponseRedirect(self.get_success_url())
+            return HttpResponseRedirect(
+                reverse(
+                    f"admin:{self.model._meta.app_label}_{self.model._meta.model_name}_changelist",  # noqa: SLF001
+                ),
+            )
 
         # For GET requests, show the default confirmation page
         return super().delete_view(request, object_id, extra_context)
