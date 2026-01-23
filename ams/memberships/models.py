@@ -156,6 +156,9 @@ class MembershipOption(Model):
                 },
             )
 
+        # Validate uniqueness constraints (name + type combination)
+        self.validate_unique()
+
         # Only enforce immutability on updates
         if not self.pk:
             return

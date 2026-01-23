@@ -123,6 +123,66 @@ class TestMembershipOption:
         expected_days = 90
         assert option.invoice_due_days == expected_days
 
+    def test_unique_name_type_constraint_on_create(self):
+        """Test that creating duplicate name+type raises ValidationError."""
+        # Arrange
+        MembershipOptionFactory(
+            name="Duplicate Test",
+            type=MembershipOptionType.INDIVIDUAL,
+        )
+
+        # Act & Assert
+        duplicate = MembershipOption(
+            name="Duplicate Test",
+            type=MembershipOptionType.INDIVIDUAL,
+            duration=relativedelta(years=1),
+            cost=Decimal("100.00"),
+        )
+        with pytest.raises(ValidationError) as exc:
+            duplicate.full_clean()
+
+        # Verify the error is about uniqueness
+        assert "__all__" in exc.value.error_dict or "name" in exc.value.error_dict
+
+    def test_unique_name_type_constraint_on_update(self):
+        """Test that updating to duplicate name+type raises ValidationError."""
+        # Arrange
+        MembershipOptionFactory(
+            name="Original",
+            type=MembershipOptionType.INDIVIDUAL,
+        )
+        option_to_update = MembershipOptionFactory(
+            name="Different",
+            type=MembershipOptionType.INDIVIDUAL,
+        )
+
+        # Act - Try to change name to create duplicate
+        option_to_update.name = "Original"
+
+        # Assert
+        with pytest.raises(ValidationError) as exc:
+            option_to_update.full_clean()
+
+        assert "__all__" in exc.value.error_dict or "name" in exc.value.error_dict
+
+    def test_same_name_different_type_allowed(self):
+        """Test that same name with different type is allowed."""
+        # Arrange
+        MembershipOptionFactory(
+            name="Gold",
+            type=MembershipOptionType.INDIVIDUAL,
+        )
+
+        # Act & Assert - should not raise
+        option = MembershipOption(
+            name="Gold",
+            type=MembershipOptionType.ORGANISATION,
+            duration=relativedelta(years=1),
+            cost=Decimal("100.00"),
+        )
+        option.full_clean()  # Should pass validation
+        option.save()  # Should save successfully
+
 
 class TestMembershipOptionMaxChargedSeats:
     """Tests for max_charged_seats field on MembershipOption."""
