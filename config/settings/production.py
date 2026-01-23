@@ -1,4 +1,3 @@
-# ruff: noqa: E501
 import logging
 
 import sentry_sdk
@@ -108,49 +107,72 @@ ANYMAIL = {
 # more details on how to customize your logging configuration.
 LOGTAIL_SOURCE_TOKEN = env("LOGTAIL_SOURCE_TOKEN")
 LOGTAIL_INGESTING_HOST = env("LOGTAIL_INGESTING_HOST")
+LOG_LEVEL = "DEBUG" if DEBUG else "INFO"  # noqa: F405
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
+        # Human-readable logs for Digital Ocean console
         "verbose": {
-            "format": "%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s",
+            "format": "%(levelname)s %(asctime)s %(name)s %(message)s",
+        },
+        # Structured logs for Logtail
+        "json": {
+            "()": "pythonjsonlogger.jsonlogger.JsonFormatter",
+            "format": "%(levelname)s %(asctime)s %(name)s %(message)s",
         },
     },
     "handlers": {
+        # DigitalOcean captures stdout/stderr automatically
         "console": {
-            "level": "DEBUG",
             "class": "logging.StreamHandler",
+            "level": LOG_LEVEL,
             "formatter": "verbose",
         },
+        # Better Stack Logtail
         "logtail": {
             "class": "logtail.LogtailHandler",
+            "level": LOG_LEVEL,
+            "formatter": "json",
             "source_token": LOGTAIL_SOURCE_TOKEN,
             "host": f"https://{LOGTAIL_INGESTING_HOST}",
         },
     },
-    "root": {"level": "INFO", "handlers": ["console"]},
+    # Root logger: everything flows through here
+    "root": {
+        "level": LOG_LEVEL,
+        "handlers": ["console", "logtail"],
+    },
     "loggers": {
-        "": {
-            "handlers": [
-                "logtail",
-            ],
-            "level": "INFO",
+        # Django 500 errors
+        "django.request": {
+            "level": "ERROR",
+            "propagate": True,
         },
+        # Avoid SQL noise in prod
         "django.db.backends": {
             "level": "ERROR",
-            "handlers": ["console"],
             "propagate": False,
         },
-        # Errors logged by the SDK itself
-        "sentry_sdk": {
-            "level": "ERROR",
-            "handlers": ["console"],
-            "propagate": False,
-        },
+        # DisallowedHost spam protection
         "django.security.DisallowedHost": {
             "level": "ERROR",
-            "handlers": ["console"],
             "propagate": False,
+        },
+        # Prevent Sentry SDK from logging about itself
+        "sentry_sdk": {
+            "level": "ERROR",
+            "propagate": False,
+        },
+        # Gunicorn logger integration
+        "gunicorn.error": {
+            "level": "INFO",
+            "propagate": True,
+        },
+        # Set to WARNING if log volume too high
+        "gunicorn.access": {
+            "level": "INFO",
+            "propagate": True,
         },
     },
 }
