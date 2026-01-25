@@ -15,6 +15,7 @@ from django.db.models import Model
 from django.db.models import PositiveIntegerField
 from django.db.models import QuerySet
 from django.db.models import TextChoices
+from django.db.models import TextField
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from relativedeltafield import RelativeDeltaField
@@ -75,6 +76,13 @@ class MembershipOption(Model):
     }
 
     name = CharField(max_length=255)
+    description = TextField(
+        blank=True,
+        help_text=_(
+            "Optional description of this membership option shown to users when "
+            "selecting. Keep concise for best display on pricing cards.",
+        ),
+    )
     type = CharField(max_length=255, choices=MembershipOptionType)
     duration = RelativeDeltaField()
     cost = DecimalField(max_digits=10, decimal_places=2)

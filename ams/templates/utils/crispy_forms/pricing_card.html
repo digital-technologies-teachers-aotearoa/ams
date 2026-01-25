@@ -37,6 +37,10 @@
                   <span class="badge bg-secondary">{{ option.max_seats }} {% trans "seats max" %}</span>
                 {% endif %}
               </div>
+              {# Description #}
+              {% if option.description %}
+                <div class="text-center small text-muted px-2">{{ option.description|linebreaksbr }}</div>
+              {% endif %}
               {# Secondary details #}
               <dl class="row small text-muted mb-0 border-top pt-2">
                 <dt class="col-6">{% trans "Membership Type" %}</dt>

@@ -183,6 +183,35 @@ class TestMembershipOption:
         option.full_clean()  # Should pass validation
         option.save()  # Should save successfully
 
+    def test_description_is_optional(self):
+        """Test that description field is optional and defaults to empty string."""
+        # Arrange & Act
+        option = MembershipOptionFactory()
+        # Assert
+        assert option.description == ""
+
+    def test_description_can_be_set(self):
+        """Test that description can be set and retrieved."""
+        # Arrange
+        description_text = "This is a premium membership with extra benefits"
+        # Act
+        option = MembershipOptionFactory(description=description_text)
+        # Assert
+        assert option.description == description_text
+
+    def test_description_allows_multiline_text(self):
+        """Test that description field supports multiline text."""
+        # Arrange
+        multiline_description = (
+            "First line of description\nSecond line of description\nThird line"
+        )
+        # Act
+        option = MembershipOptionFactory(description=multiline_description)
+        option.refresh_from_db()
+        # Assert
+        assert option.description == multiline_description
+        assert "\n" in option.description
+
 
 class TestMembershipOptionMaxChargedSeats:
     """Tests for max_charged_seats field on MembershipOption."""

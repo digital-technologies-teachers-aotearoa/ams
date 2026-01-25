@@ -26,6 +26,7 @@ from django.forms import MultiWidget
 from django.forms import NumberInput
 from django.forms import RadioSelect
 from django.forms import Select
+from django.forms import Textarea
 from django.forms import TextInput
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -93,6 +94,15 @@ class MembershipDurationField(MultiValueField):
 
 class MembershipOptionForm(ModelForm):
     name = CharField(label=_("Name"), max_length=255)
+    description = CharField(
+        label=_("Description"),
+        required=False,
+        widget=Textarea(attrs={"rows": 3, "class": "form-control"}),
+        help_text=_(
+            "Optional description of this membership option shown to users when "
+            "selecting. Keep concise for best display on pricing cards.",
+        ),
+    )
     type = ChoiceField(
         label=_("Type"),
         choices=MembershipOptionType.choices,
@@ -149,6 +159,7 @@ class MembershipOptionForm(ModelForm):
         model = MembershipOption
         fields = [
             "name",
+            "description",
             "type",
             "duration",
             "cost",
