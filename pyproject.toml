@@ -37,7 +37,7 @@ django_settings_module = "config.settings.test"
 # ==== djLint ====
 [tool.djlint]
 blank_line_after_tag = "load,extends,endblock"
-custom_blocks = "element,slot"
+custom_blocks = "element,slot,cache"
 close_void_tags = true
 exclude = "ams/templates/emails"
 format_css = false
