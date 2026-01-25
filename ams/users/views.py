@@ -35,7 +35,11 @@ class UserDetailView(
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.object
-        memberships = user.individual_memberships.all().order_by("-start_date")
+        memberships = (
+            user.individual_memberships.all()
+            .prefetch_related("invoices")
+            .order_by("-start_date")
+        )
         context["membership_table"] = MembershipTable(memberships)
         context["has_memberships"] = memberships.exists()
         context["has_active_membership"] = user_has_active_membership(user)

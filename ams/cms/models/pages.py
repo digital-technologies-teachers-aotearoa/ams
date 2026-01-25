@@ -138,6 +138,7 @@ class ArticlesIndexPage(Page):
         articles = (
             ArticlePage.objects.child_of(self)
             .live()
+            .select_related("cover_image")
             .filter(publication_date__lte=timezone.now())
             .order_by("-publication_date")
         )
