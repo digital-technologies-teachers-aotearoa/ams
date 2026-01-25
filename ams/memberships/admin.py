@@ -34,7 +34,7 @@ class MembershipOptionAdmin(admin.ModelAdmin):
             (
                 None,
                 {
-                    "fields": ("name",),
+                    "fields": ("name", "description"),
                 },
             ),
             (

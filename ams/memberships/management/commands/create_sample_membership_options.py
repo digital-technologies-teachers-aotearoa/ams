@@ -25,6 +25,10 @@ class Command(management.base.BaseCommand):
                 "duration": relativedelta(months=1),
                 "cost": 49.99,
                 "invoice_reference": "AMS Membership",
+                "description": (
+                    "Perfect for trying out our membership benefits with a one-month "
+                    "commitment."
+                ),
             },
         )
         MembershipOption.objects.update_or_create(
@@ -43,6 +47,7 @@ class Command(management.base.BaseCommand):
                 "duration": relativedelta(days=1),
                 "cost": 0,
                 "invoice_reference": "AMS Membership",
+                "description": "Free trial membership to explore our community.",
             },
         )
         MembershipOption.objects.update_or_create(
@@ -53,6 +58,9 @@ class Command(management.base.BaseCommand):
                 "cost": 99.99,
                 "invoice_reference": "AMS Membership",
                 "archived": False,
+                "description": (
+                    "Flexible monthly organisation membership with unlimited seats. "
+                ),
             },
         )
         MembershipOption.objects.update_or_create(
@@ -63,6 +71,10 @@ class Command(management.base.BaseCommand):
                 "cost": 999.99,
                 "invoice_reference": "AMS Membership",
                 "archived": False,
+                "description": (
+                    "Annual organisation membership with unlimited seats for your "
+                    "entire team. Great for larger schools."
+                ),
             },
         )
         MembershipOption.objects.update_or_create(
@@ -74,6 +86,7 @@ class Command(management.base.BaseCommand):
                 "invoice_reference": "AMS Membership",
                 "max_seats": 5,
                 "archived": False,
+                "description": "Ideal for small teams with up to 5 members.",
             },
         )
 

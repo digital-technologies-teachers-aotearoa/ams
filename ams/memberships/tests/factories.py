@@ -17,6 +17,7 @@ from ams.users.tests.factories import UserFactory
 
 class MembershipOptionFactory(DjangoModelFactory[MembershipOption]):
     name = Faker("word")
+    description = ""
     type = Faker(
         "random_element",
         elements=[t.value for t in MembershipOptionType],
