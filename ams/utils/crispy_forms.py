@@ -41,7 +41,7 @@ class PricingCardsRadio(LayoutObject):
         show_org_fields (bool): Show organisation-specific fields
     """
 
-    TEMPLATE = "utils/crispy_forms/card_radio.html"
+    TEMPLATE = "utils/crispy_forms/pricing_card.html"
 
     def __init__(self, field_name, show_org_fields=False, **kwargs):  # noqa: FBT002
         self.field_name = field_name
