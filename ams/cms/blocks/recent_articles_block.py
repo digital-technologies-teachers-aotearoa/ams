@@ -34,6 +34,7 @@ class RecentArticlesBlock(StructBlock):
         articles: list[ArticlePage] = list(
             ArticlePage.objects.live()
             .public()
+            .select_related("cover_image")
             .filter(publication_date__lte=timezone.now())
             .order_by("-publication_date")[:count],
         )
