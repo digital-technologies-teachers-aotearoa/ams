@@ -15,7 +15,7 @@
           <label class="card h-100 pricing-card {% if radio.data.selected %}is-selected{% endif %}"
                  for="{{ radio.id_for_label }}">
             <div class="card-header fw-semibold text-center">{{ option.name }}</div>
-            <div class="card-body d-flex flex-column gap-3 pb-0">
+            <div class="card-body d-flex flex-column gap-3 pb-0 pt-2">
               {# Price block #}
               <div class="text-center">
                 <div class="fs-2">
@@ -57,9 +57,11 @@
                 {% endif %}
               </dl>
             </div>
-            <div class="card-footer text-center text-muted small">
-              {% trans "Payment due" %} {{ option.invoice_due_days }} {% trans "days" %}
-            </div>
+            {% if option.cost > 0 %}
+              <div class="card-footer text-center text-muted small">
+                {% trans "Payment due" %} {{ option.invoice_due_days }} {% trans "days" %}
+              </div>
+            {% endif %}
           </label>
         </div>
       {% endif %}
