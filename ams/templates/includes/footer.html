@@ -1,4 +1,4 @@
-{% load i18n menu_tags translate_url icon %}
+{% load i18n menu_tags translate_url icon cache %}
 
 <footer class="footer mt-auto py-3"
         data-bs-theme="{{ settings.cms.ThemeSettings.footer_colour_mode }}">
@@ -29,13 +29,19 @@
         </div>
       </div>
       <div class="col-12 col-md-4 col-lg-2 mb-3">
-        {% flat_menu 'footer-1' template="cms/menu/footer_menu.html" max_levels=1 show_menu_heading=True %}
+        {% cache 300 footer_menu_1 LANGUAGE_CODE %}
+          {% flat_menu 'footer-1' template="cms/menu/footer_menu.html" max_levels=1 show_menu_heading=True %}
+        {% endcache %}
       </div>
       <div class="col-12 col-md-4 col-lg-2 mb-3">
-        {% flat_menu 'footer-2' template="cms/menu/footer_menu.html" max_levels=1 show_menu_heading=True %}
+        {% cache 300 footer_menu_2 LANGUAGE_CODE %}
+          {% flat_menu 'footer-2' template="cms/menu/footer_menu.html" max_levels=1 show_menu_heading=True %}
+        {% endcache %}
       </div>
       <div class="col-12 col-md-4 col-lg-2 mb-3">
-        {% flat_menu 'footer-3' template="cms/menu/footer_menu.html" max_levels=1 show_menu_heading=True %}
+        {% cache 300 footer_menu_3 LANGUAGE_CODE %}
+          {% flat_menu 'footer-3' template="cms/menu/footer_menu.html" max_levels=1 show_menu_heading=True %}
+        {% endcache %}
       </div>
     </div>
     {% if LANGUAGES|length > 1 %}

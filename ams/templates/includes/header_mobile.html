@@ -1,4 +1,4 @@
-{% load i18n menu_tags translate_url %}
+{% load i18n menu_tags translate_url cache %}
 
 <div class="offcanvas offcanvas-start" tabindex="-1" id="mainNavOffcanvas">
   <div class="offcanvas-header">
@@ -7,7 +7,9 @@
   </div>
   <div class="offcanvas-body">
     <ul class="nav flex-column gap-2">
-      {% main_menu template="cms/menu/mobile_top_level_item.html" sub_menu_template="cms/menu/mobile_child_item.html" max_levels=2 %}
+      {% cache 300 main_menu_mobile LANGUAGE_CODE %}
+        {% main_menu template="cms/menu/mobile_top_level_item.html" sub_menu_template="cms/menu/mobile_child_item.html" max_levels=2 %}
+      {% endcache %}
       <li>
         <hr />
       </li>
