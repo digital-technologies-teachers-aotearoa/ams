@@ -663,3 +663,313 @@ class TestUserUpdateFormWithProfileFields:
 
         assert hasattr(form, "helper")
         assert form.helper.form_method == "post"
+
+    def test_checkbox_field_bug_reproduction(self, profile_group):
+        """
+        Reproduce exact bug: User selects 2 of 4 options,
+        database gets ['False', 'False'], form reopens with all checked.
+        """
+        user = UserFactory()
+
+        # Admin creates checkbox with 4 options
+        checkbox_field = ProfileField.objects.create(
+            field_key="test_interests",
+            field_type=ProfileField.FieldType.CHECKBOX,
+            label_translations={"en": "Interests"},
+            options={
+                "choices": [
+                    {"value": "math", "label_translations": {"en": "Math"}},
+                    {"value": "science", "label_translations": {"en": "Science"}},
+                    {"value": "history", "label_translations": {"en": "History"}},
+                    {"value": "art", "label_translations": {"en": "Art"}},
+                ],
+            },
+            group=profile_group,
+            is_active=True,
+        )
+
+        # User selects 2 options
+        form = UserUpdateForm(
+            data={
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "username": user.username,
+                "test_interests": ["math", "science"],
+            },
+            instance=user,
+        )
+
+        assert form.is_valid(), f"Form errors: {form.errors}"
+        form.save()
+
+        # Verify what was actually saved
+        response = ProfileFieldResponse.objects.get(
+            user=user,
+            profile_field=checkbox_field,
+        )
+        saved_value = response.get_value()
+
+        # Should be correct values, NOT ['False', 'False']
+        assert saved_value == ["math", "science"], (
+            f"Expected ['math', 'science'], got {saved_value}"
+        )
+        assert response.value == '["math", "science"]', (
+            f"Raw value should be JSON array, got {response.value}"
+        )
+
+        # Reload form
+        form2 = UserUpdateForm(instance=user)
+        initial = form2.fields["test_interests"].initial
+
+        # Should have correct initial value
+        assert initial == ["math", "science"]
+
+        # Render form HTML
+        html = str(form2["test_interests"])
+        checked_count = html.count("checked")
+
+        # Should have exactly 2 checked, not 4
+        expected_count = 2
+        assert checked_count == expected_count, (
+            f"Expected 2 checked, got {checked_count}"
+        )
+
+    def test_checkbox_handles_corrupted_false_values(self, profile_group):
+        """
+        Test how form handles database with ['False', 'False'] values.
+        This simulates the bug state for recovery testing.
+        """
+        user = UserFactory()
+
+        checkbox_field = ProfileField.objects.create(
+            field_key="corrupted_field",
+            field_type=ProfileField.FieldType.CHECKBOX,
+            label_translations={"en": "Corrupted Field"},
+            options={
+                "choices": [
+                    {"value": "opt1", "label_translations": {"en": "Option 1"}},
+                    {"value": "opt2", "label_translations": {"en": "Option 2"}},
+                    {"value": "opt3", "label_translations": {"en": "Option 3"}},
+                    {"value": "opt4", "label_translations": {"en": "Option 4"}},
+                ],
+            },
+            group=profile_group,
+            is_active=True,
+        )
+
+        # Manually create corrupted data (simulating bug)
+        response = ProfileFieldResponse.objects.create(
+            user=user,
+            profile_field=checkbox_field,
+        )
+        response.value = '["False", "False"]'  # Corrupted value
+        response.save()
+
+        # Load form - should handle gracefully
+        form = UserUpdateForm(instance=user)
+        initial = form.fields["corrupted_field"].initial
+
+        # "False" is not a valid choice, so initial should be []
+        assert initial == ["False", "False"], (
+            "Should load corrupted values as-is initially"
+        )
+
+        # Render form HTML
+        html = str(form["corrupted_field"])
+        checked_count = html.count("checked")
+        # Invalid values should not check any boxes
+        assert checked_count == 0, (
+            f"Invalid values should not check any boxes, got {checked_count}"
+        )
+
+    def test_checkbox_empty_selection(self, profile_group):
+        """Test checkbox with no selections deletes response."""
+        user = UserFactory()
+
+        checkbox_field = ProfileField.objects.create(
+            field_key="test_empty",
+            field_type=ProfileField.FieldType.CHECKBOX,
+            label_translations={"en": "Empty Test"},
+            options={
+                "choices": [
+                    {"value": "opt1", "label_translations": {"en": "Option 1"}},
+                    {"value": "opt2", "label_translations": {"en": "Option 2"}},
+                ],
+            },
+            group=profile_group,
+            is_active=True,
+        )
+
+        # Create initial response
+        ProfileFieldResponse.objects.create(
+            user=user,
+            profile_field=checkbox_field,
+            value='["opt1"]',
+        )
+
+        # Submit form with no checkboxes selected (empty list)
+        form = UserUpdateForm(
+            data={
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "username": user.username,
+                "test_empty": [],
+            },
+            instance=user,
+        )
+
+        assert form.is_valid()
+        form.save()
+
+        # Response should be deleted
+        assert not ProfileFieldResponse.objects.filter(
+            user=user,
+            profile_field=checkbox_field,
+        ).exists()
+
+    def test_checkbox_single_selection(self, profile_group):
+        """Test checkbox with single selection."""
+        user = UserFactory()
+
+        checkbox_field = ProfileField.objects.create(
+            field_key="test_single",
+            field_type=ProfileField.FieldType.CHECKBOX,
+            label_translations={"en": "Single Test"},
+            options={
+                "choices": [
+                    {"value": "opt1", "label_translations": {"en": "Option 1"}},
+                    {"value": "opt2", "label_translations": {"en": "Option 2"}},
+                ],
+            },
+            group=profile_group,
+            is_active=True,
+        )
+
+        # Submit with one checkbox selected
+        form = UserUpdateForm(
+            data={
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "username": user.username,
+                "test_single": ["opt1"],
+            },
+            instance=user,
+        )
+
+        assert form.is_valid()
+        form.save()
+
+        response = ProfileFieldResponse.objects.get(
+            user=user,
+            profile_field=checkbox_field,
+        )
+        assert response.get_value() == ["opt1"]
+
+    def test_checkbox_all_selections(self, profile_group):
+        """Test checkbox with all options selected."""
+        user = UserFactory()
+
+        checkbox_field = ProfileField.objects.create(
+            field_key="test_all",
+            field_type=ProfileField.FieldType.CHECKBOX,
+            label_translations={"en": "All Test"},
+            options={
+                "choices": [
+                    {"value": "opt1", "label_translations": {"en": "Option 1"}},
+                    {"value": "opt2", "label_translations": {"en": "Option 2"}},
+                    {"value": "opt3", "label_translations": {"en": "Option 3"}},
+                ],
+            },
+            group=profile_group,
+            is_active=True,
+        )
+
+        # Submit with all checkboxes selected
+        form = UserUpdateForm(
+            data={
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "username": user.username,
+                "test_all": ["opt1", "opt2", "opt3"],
+            },
+            instance=user,
+        )
+
+        assert form.is_valid()
+        form.save()
+
+        response = ProfileFieldResponse.objects.get(
+            user=user,
+            profile_field=checkbox_field,
+        )
+        assert response.get_value() == ["opt1", "opt2", "opt3"]
+
+    def test_checkbox_with_boolean_false_values(self, profile_group):
+        """Test that checkbox rejects boolean False values if they somehow get
+        through.
+        """
+        user = UserFactory()
+
+        checkbox_field = ProfileField.objects.create(
+            field_key="test_boolean_false",
+            field_type=ProfileField.FieldType.CHECKBOX,
+            label_translations={"en": "Boolean False Test"},
+            options={
+                "choices": [
+                    {"value": "opt1", "label_translations": {"en": "Option 1"}},
+                    {"value": "opt2", "label_translations": {"en": "Option 2"}},
+                ],
+            },
+            group=profile_group,
+            is_active=True,
+        )
+
+        # Create a response directly with boolean False values (simulating the bug)
+        response = ProfileFieldResponse.objects.create(
+            user=user,
+            profile_field=checkbox_field,
+        )
+        # Directly set value with boolean False - this would convert to string "False"
+        response.set_value([False, False])
+        response.save()
+
+        # Check what was actually saved
+        response.refresh_from_db()
+        saved_value = response.get_value()
+
+        # After fix, this should be empty list
+        assert saved_value == [], f"Expected [], got {saved_value}"
+
+    def test_checkbox_with_string_false_values(self, profile_group):
+        """Test that checkbox filters out string 'False' values."""
+        user = UserFactory()
+
+        checkbox_field = ProfileField.objects.create(
+            field_key="test_string_false",
+            field_type=ProfileField.FieldType.CHECKBOX,
+            label_translations={"en": "String False Test"},
+            options={
+                "choices": [
+                    {"value": "opt1", "label_translations": {"en": "Option 1"}},
+                    {"value": "opt2", "label_translations": {"en": "Option 2"}},
+                ],
+            },
+            group=profile_group,
+            is_active=True,
+        )
+
+        # Create a response directly with string "False" values (exact bug scenario)
+        response = ProfileFieldResponse.objects.create(
+            user=user,
+            profile_field=checkbox_field,
+        )
+        response.set_value(["False", "False"])
+        response.save()
+
+        # Check what was actually saved
+        response.refresh_from_db()
+        saved_value = response.get_value()
+
+        # "False" is not a valid choice (opt1, opt2), so should be filtered out
+        # After fix, this should be empty list
+        assert saved_value == [], f"Expected [], got {saved_value}"

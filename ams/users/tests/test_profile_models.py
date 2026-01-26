@@ -695,3 +695,114 @@ class TestProfileFieldResponse:
         response.value = "Updated"
         response.save()
         assert response.updated_datetime > first_update
+
+    def test_set_value_filters_false_values_in_checkbox_list(self, profile_group):
+        """Test that set_value filters out False values from checkbox lists."""
+        user = UserFactory()
+        checkbox_field = ProfileField.objects.create(
+            field_key="subjects",
+            field_type=ProfileField.FieldType.CHECKBOX,
+            label_translations={"en": "Subjects"},
+            options={
+                "choices": [
+                    {"value": "math", "label_translations": {"en": "Math"}},
+                    {"value": "science", "label_translations": {"en": "Science"}},
+                ],
+            },
+            group=profile_group,
+            is_active=True,
+        )
+        response = ProfileFieldResponse.objects.create(
+            user=user,
+            profile_field=checkbox_field,
+        )
+
+        # Try to set list with False values (boolean)
+        response.set_value(["math", False, "science", None, ""])
+        response.save()
+
+        # Should only keep valid string values
+        assert response.get_value() == ["math", "science"]
+
+    def test_set_value_filters_string_false_in_checkbox_list(self, profile_group):
+        """Test that set_value filters out string "False" from checkbox lists."""
+        user = UserFactory()
+        checkbox_field = ProfileField.objects.create(
+            field_key="subjects",
+            field_type=ProfileField.FieldType.CHECKBOX,
+            label_translations={"en": "Subjects"},
+            options={
+                "choices": [
+                    {"value": "math", "label_translations": {"en": "Math"}},
+                    {"value": "science", "label_translations": {"en": "Science"}},
+                ],
+            },
+            group=profile_group,
+            is_active=True,
+        )
+        response = ProfileFieldResponse.objects.create(
+            user=user,
+            profile_field=checkbox_field,
+        )
+
+        # Try to set list with string "False" values (the bug scenario)
+        response.set_value(["False", "math", "False"])
+        response.save()
+
+        # Should only keep "math", filtering out "False"
+        assert response.get_value() == ["math"]
+
+    def test_set_value_handles_all_false_checkbox_list(self, profile_group):
+        """Test that set_value with all False values results in empty list."""
+        user = UserFactory()
+        checkbox_field = ProfileField.objects.create(
+            field_key="subjects",
+            field_type=ProfileField.FieldType.CHECKBOX,
+            label_translations={"en": "Subjects"},
+            options={
+                "choices": [
+                    {"value": "math", "label_translations": {"en": "Math"}},
+                    {"value": "science", "label_translations": {"en": "Science"}},
+                ],
+            },
+            group=profile_group,
+            is_active=True,
+        )
+        response = ProfileFieldResponse.objects.create(
+            user=user,
+            profile_field=checkbox_field,
+        )
+
+        # Set list with only False values
+        response.set_value([False, False])
+        response.save()
+
+        # Should result in empty list
+        assert response.get_value() == []
+        assert response.value == "[]"
+
+    def test_set_value_checkbox_filters_dont_affect_other_types(self, profile_group):
+        """Test that False filtering only applies to checkbox fields, not other
+        types.
+        """
+        user = UserFactory()
+
+        # Create a text field (not checkbox)
+        text_field = ProfileField.objects.create(
+            field_key="description",
+            field_type=ProfileField.FieldType.TEXT,
+            label_translations={"en": "Description"},
+            group=profile_group,
+            is_active=True,
+        )
+        response = ProfileFieldResponse.objects.create(
+            user=user,
+            profile_field=text_field,
+        )
+
+        # For text fields, even string "False" should be stored as-is
+        response.set_value("False")
+        response.save()
+
+        # Should not be filtered (text fields can contain "False" as valid text)
+        assert response.get_value() == "False"
