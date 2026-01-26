@@ -487,6 +487,15 @@ class ProfileFieldResponse(Model):
 
         # For checkbox fields (lists), encode as JSON
         if isinstance(value, list):
+            # For checkbox fields, filter out invalid values
+            if self.profile_field.field_type == ProfileField.FieldType.CHECKBOX:
+                # Keep only valid non-empty strings (exclude empty strings and "False")
+                value = [
+                    item
+                    for item in value
+                    if isinstance(item, str) and item.strip() and item != "False"
+                ]
+
             self.value = json.dumps(value)
         else:
             self.value = str(value)
