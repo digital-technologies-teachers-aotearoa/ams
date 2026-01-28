@@ -49,8 +49,6 @@ services:
       dockerfile: ./compose/local/node/Dockerfile
     image: ams_node
     container_name: ams_node
-    depends_on:
-      - django
     volumes:
       - .:/app:z
       - ams_node_modules:/app/node_modules
