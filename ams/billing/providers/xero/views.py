@@ -66,7 +66,7 @@ def fetch_updated_invoice_details(
     }
 
     logger.info(
-        "%sStarting deferred invoice fetch (after HTTP response)",
+        "%sStarting invoice fetch",
         log_prefix,
     )
 
