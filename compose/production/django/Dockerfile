@@ -116,6 +116,8 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
   gettext \
   # entrypoint
   wait-for-it \
+  # supervisor for process management
+  supervisor \
   # cleaning up unused files
   && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
   && rm -rf /var/lib/apt/lists/*
@@ -139,6 +141,8 @@ COPY --chown=django:django ./compose/production/django/start /start
 RUN sed -i 's/\r$//g' /start  # Normalize potential Windows line endings.
 RUN chmod +x /start
 
+# Copy and prepare supervisor configuration.
+COPY --chown=django:django ./compose/production/django/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Copy application source code AND previously built static assets from client-builder stage.
 COPY --from=client-builder --chown=django:django ${APP_HOME} ${APP_HOME}
