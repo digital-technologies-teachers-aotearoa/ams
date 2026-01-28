@@ -6,13 +6,5 @@ set -o nounset
 
 python /app/manage.py collectstatic --noinput
 
-exec /usr/local/bin/gunicorn config.wsgi \
-    --bind 0.0.0.0:5000 \
-    --workers 2 \
-    --threads 1 \
-    --timeout 30
-    --chdir=/app \
-    --access-logfile - \
-    --error-logfile - \
-    --log-level info \
-    --capture-output
+# Start both gunicorn and qcluster via supervisor
+exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
