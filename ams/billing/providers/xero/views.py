@@ -5,7 +5,6 @@ import json
 import logging
 import time
 import uuid
-from collections.abc import Callable
 from typing import Any
 
 from django.conf import settings
@@ -20,6 +19,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from ams.billing.models import Invoice
 from ams.billing.providers.xero.service import XeroBillingService
+from ams.billing.providers.xero.tasks.enqueue_tasks import enqueue_invoice_update_task
 from ams.billing.services import BillingService
 from ams.billing.services import get_billing_service
 from ams.organisations.mixins import user_is_organisation_admin
@@ -271,37 +271,6 @@ def verify_request_signature(request: HttpRequest) -> bool:
     return signature == generated_signature
 
 
-class AfterHttpResponse(HttpResponse):
-    """HTTP response that executes a callback after the response is closed.
-
-    This allows for deferred execution of tasks after sending the HTTP response,
-    useful for webhook handlers that need to acknowledge receipt quickly before
-    performing potentially slow processing.
-
-    Attributes:
-        on_close: Callable to execute after the response is closed.
-    """
-
-    def __init__(self, on_close: Callable[[], Any], *args: Any, **kwargs: Any) -> None:
-        """Initialize the response with a close callback.
-
-        Args:
-            on_close: Function to call after the response is closed.
-            *args: Arguments to pass to HttpResponse.
-            **kwargs: Keyword arguments to pass to HttpResponse.
-        """
-        super().__init__(*args, **kwargs)
-        self.on_close = on_close
-
-    def close(self) -> None:
-        """Close the response and execute the on_close callback."""
-        super().close()
-        try:
-            self.on_close()
-        except Exception:
-            logger.exception("Error in deferred webhook processing")
-
-
 @login_required
 def invoice_redirect(request: HttpRequest, invoice_number: str) -> HttpResponse:
     """Redirect to the online invoice URL.
@@ -453,11 +422,13 @@ def xero_webhooks(request: HttpRequest) -> HttpResponse:
     )
 
     if has_invoice_updates:
+        task_id = enqueue_invoice_update_task(webhook_id=webhook_id)
+        logger.info(
+            "Invoice update task enqueued [%s] - task_id=%s",
+            webhook_id,
+            task_id,
+        )
+    else:
+        logger.debug("No invoice updates needed [%s]", webhook_id)
 
-        def on_close_with_logging() -> None:
-            fetch_updated_invoice_details(webhook_id=webhook_id)
-
-        return AfterHttpResponse(on_close=on_close_with_logging, status=200)
-
-    logger.debug("No invoice updates needed [%s]", webhook_id)
     return HttpResponse(status=200)

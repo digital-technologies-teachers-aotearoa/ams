@@ -17,6 +17,33 @@ These secrets are then passed through to the DigitalOcean deployment step, and r
 By running an [AMS Docker image](https://ghcr.io/digital-technologies-teachers-aotearoa/ams-django), the software can be deployed in a production environment.
 This can be run on any managed platform that supports Docker containers, such as [DigitalOcean](https://www.digitalocean.com/), or you can manage it yourself with a system such as [Kubernetes](https://kubernetes.io/).
 
+### Container Architecture
+
+The application is deployed using a two-container architecture for better resource isolation and independent scaling:
+
+**Web Container (`django`):**
+- Runs gunicorn to serve HTTP requests
+- Handles webhook endpoints and API traffic
+- Instance size: `apps-s-1vcpu-0.5gb` (512MB RAM)
+
+**Worker Container (`django-worker`):**
+- Runs Django-Q task queue for asynchronous processing
+- Processes background tasks (e.g., Xero invoice updates)
+- Instance size: `apps-s-1vcpu-0.5gb` (512MB RAM)
+
+**Benefits:**
+- Independent scaling of web and worker processes
+- Better resource isolation between request handling and background tasks
+- More cost-effective than a single larger container
+- Improved fault isolation
+
+**Scaling Options:**
+
+For high-traffic deployments:
+1. **Horizontal scaling:** Increase `instance_count` for web containers
+2. **Vertical scaling:** Upgrade to `apps-s-1vcpu-1gb` for more workers per container
+3. **Worker scaling:** Adjust worker count via `Q_CLUSTER["workers"]` setting and container size
+
 ### Requirements
 
 - Postgres database
@@ -24,6 +51,41 @@ This can be run on any managed platform that supports Docker containers, such as
     - Media storage requires Amazon S3, DigitalOcean Spaces, or [any other compatible providers listed here](https://django-storages.readthedocs.io/en/latest/backends/s3_compatible/index.html).
     - Additional details regarding media related environment variables can be found on [this settings page](https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html#settings), matching settings by suffix (for example: `AWS_S3_ENDPOINT_URL` and `DJANGO_MEDIA_PUBLIC_ENDPOINT_URL` are equivalent).
     - Files uploaded have ACLs applied to them so buckets currently don't require  policies applied to them.
+
+### Container Resources
+
+**Memory Requirements:**
+
+The Django container runs both the gunicorn web server and Django Q task queue worker using supervisord. Memory requirements depend on your deployment configuration:
+
+- **Minimum (single worker):** 512MB RAM
+    - Gunicorn: 1 worker
+    - Django Q: 1 worker
+    - Suitable for low-traffic sites or development environments
+    - Limited request throughput
+
+- **Recommended (production):** 1GB RAM
+    - Gunicorn: 2 workers (or more based on traffic)
+    - Django Q: 1 worker
+    - Better performance under load
+    - Headroom for traffic spikes
+
+**Worker Configuration:**
+
+The number of gunicorn workers is configured in `compose/production/django/supervisord.conf`. The current configuration uses:
+
+- **1 gunicorn worker** (optimized for 512MB containers)
+- **1 Django Q worker** (configured in `config/settings/production.py`)
+
+To increase throughput on containers with more memory, edit the `--workers` parameter in the supervisord configuration.
+
+**Scaling Options:**
+
+For high-traffic deployments, consider:
+
+1. Increasing container memory to 1GB+ and adding more gunicorn workers
+2. Running Django Q in a separate container for better isolation and independent scaling
+3. Horizontal scaling with multiple web containers behind a load balancer
 
 ### Environment variables
 

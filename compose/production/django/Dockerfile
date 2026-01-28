@@ -129,16 +129,23 @@ RUN pip install --no-cache-dir --no-index --find-links=/wheels/ /wheels/* \
 
 
 # Copy and prepare entrypoint script.
-COPY --chown=django:django ./compose/production/django/entrypoint /entrypoint
+COPY --chown=django:django ./compose/production/django/entrypoint.sh /entrypoint
 RUN sed -i 's/\r$//g' /entrypoint  # Normalize potential Windows line endings.
 RUN chmod +x /entrypoint
 
 
-# Copy and prepare start script.
-COPY --chown=django:django ./compose/production/django/start /start
-RUN sed -i 's/\r$//g' /start  # Normalize potential Windows line endings.
-RUN chmod +x /start
+# Copy and prepare web start script.
+COPY --chown=django:django ./compose/production/django/start-web /start-web
+RUN sed -i 's/\r$//g' /start-web  # Normalize potential Windows line endings.
+RUN chmod +x /start-web
 
+# Copy and prepare worker start script.
+COPY --chown=django:django ./compose/production/django/start-worker /start-worker
+RUN sed -i 's/\r$//g' /start-worker  # Normalize potential Windows line endings.
+RUN chmod +x /start-worker
+
+# Create backward compatibility symlink for old start script.
+RUN ln -s /start-web /start
 
 # Copy application source code AND previously built static assets from client-builder stage.
 COPY --from=client-builder --chown=django:django ${APP_HOME} ${APP_HOME}

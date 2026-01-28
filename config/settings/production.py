@@ -7,6 +7,7 @@ from sentry_sdk.integrations.logging import LoggingIntegration
 from config.settings.base import *  # noqa: F403
 from config.settings.base import DATABASES
 from config.settings.base import INSTALLED_APPS
+from config.settings.base import Q_CLUSTER
 from config.settings.base import env
 
 # GENERAL
@@ -20,6 +21,11 @@ ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["dtta.org.nz"])
 # DATABASES
 # ------------------------------------------------------------------------------
 DATABASES["default"]["CONN_MAX_AGE"] = env.int("CONN_MAX_AGE", default=60)
+# Add connection timeout to prevent hung connections
+DATABASES["default"]["OPTIONS"] = {
+    "connect_timeout": 10,
+    "options": "-c statement_timeout=30000",  # 30 second query timeout
+}
 
 # SECURITY
 # ------------------------------------------------------------------------------
@@ -97,6 +103,12 @@ ANYMAIL = {
     "MAILGUN_SENDER_DOMAIN": env("MAILGUN_DOMAIN"),
     "MAILGUN_API_URL": env("MAILGUN_API_URL", default="https://api.mailgun.net/v3"),
 }
+
+# Django-Q2 - Production settings
+# ------------------------------------------------------------------------------
+Q_CLUSTER["workers"] = 1
+Q_CLUSTER["poll"] = 1
+Q_CLUSTER["save_limit"] = 5000  # Keep more history in production
 
 
 # LOGGING

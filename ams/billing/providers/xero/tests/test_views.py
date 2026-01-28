@@ -18,7 +18,6 @@ from django.test import RequestFactory
 from ams.billing.models import Invoice
 from ams.billing.providers.mock.service import MockBillingService
 from ams.billing.providers.xero.service import XeroBillingService
-from ams.billing.providers.xero.views import AfterHttpResponse
 from ams.billing.providers.xero.views import fetch_updated_invoice_details
 from ams.billing.providers.xero.views import invoice_redirect
 from ams.billing.providers.xero.views import process_invoice_update_events
@@ -394,13 +393,13 @@ class TestXeroWebhooks:
         response = xero_webhooks(request)
         assert response.status_code == HTTPStatus.UNAUTHORIZED
 
-    def test_webhook_with_invoice_updates_returns_after_response(
+    def test_webhook_with_invoice_updates_enqueues_task(
         self,
         xero_settings,
         rf: RequestFactory,
         webhook_payload,
     ):
-        """Test that webhook with invoice updates returns AfterHttpResponse."""
+        """Test that webhook with invoice updates enqueues async task."""
         payload_bytes = json.dumps(webhook_payload).encode("utf-8")
 
         signature = base64.b64encode(
@@ -419,23 +418,30 @@ class TestXeroWebhooks:
         request.META["HTTP_X_XERO_SIGNATURE"] = signature
         request._body = payload_bytes
 
-        with patch(
-            "ams.billing.providers.xero.views.get_billing_service",
-        ) as mock_get_service:
+        with (
+            patch(
+                "ams.billing.providers.xero.views.get_billing_service",
+            ) as mock_get_service,
+            patch(
+                "ams.billing.providers.xero.views.enqueue_invoice_update_task",
+            ) as mock_enqueue,
+        ):
             mock_service = Mock(spec=XeroBillingService)
             mock_get_service.return_value = mock_service
+            mock_enqueue.return_value = "test-task-id-123"
 
             response = xero_webhooks(request)
 
         assert response.status_code == HTTPStatus.OK
-        assert isinstance(response, AfterHttpResponse)
+        # Verify task was enqueued
+        mock_enqueue.assert_called_once()
 
-    def test_webhook_without_invoice_updates_returns_normal_response(
+    def test_webhook_without_invoice_updates_does_not_enqueue_task(
         self,
         xero_settings,
         rf: RequestFactory,
     ):
-        """Test that webhook without invoice updates returns normal HttpResponse."""
+        """Test that webhook without invoice updates does not enqueue task."""
         payload = {
             "events": [
                 {
@@ -464,47 +470,22 @@ class TestXeroWebhooks:
         request.META["HTTP_X_XERO_SIGNATURE"] = signature
         request._body = payload_bytes
 
-        with patch(
-            "ams.billing.providers.xero.views.get_billing_service",
-        ) as mock_get_service:
+        with (
+            patch(
+                "ams.billing.providers.xero.views.get_billing_service",
+            ) as mock_get_service,
+            patch(
+                "ams.billing.providers.xero.views.enqueue_invoice_update_task",
+            ) as mock_enqueue,
+        ):
             mock_service = Mock(spec=XeroBillingService)
             mock_get_service.return_value = mock_service
 
             response = xero_webhooks(request)
 
         assert response.status_code == HTTPStatus.OK
-        assert not isinstance(response, AfterHttpResponse)
-
-
-class TestAfterHttpResponse:
-    """Tests for AfterHttpResponse callback mechanism."""
-
-    def test_after_http_response_calls_callback_on_close(self):
-        """Test that callback is called when response is closed."""
-        callback_called = []
-
-        def test_callback():
-            callback_called.append(True)
-
-        response = AfterHttpResponse(
-            on_close=test_callback,
-            status=200,
-        )
-
-        assert callback_called == []
-        response.close()
-        assert callback_called == [True]
-
-    def test_after_http_response_accepts_content(self):
-        """Test that AfterHttpResponse accepts content parameter."""
-        response = AfterHttpResponse(
-            on_close=lambda: None,
-            content="test content",
-            status=200,
-        )
-
-        assert response.content == b"test content"
-        assert response.status_code == HTTPStatus.OK
+        # Verify task was NOT enqueued
+        mock_enqueue.assert_not_called()
 
 
 class TestInvoiceRedirect:
