@@ -4,7 +4,10 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
+echo "[START] Collecting static files..."
 python /app/manage.py collectstatic --noinput
+echo "[START] Static files collected successfully"
 
 # Start both gunicorn and qcluster via supervisor
+echo "[START] Starting supervisor..."
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
