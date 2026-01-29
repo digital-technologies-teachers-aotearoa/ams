@@ -131,7 +131,7 @@ RUN pip install --no-cache-dir --no-index --find-links=/wheels/ /wheels/* \
 
 
 # Copy and prepare entrypoint script.
-COPY --chown=django:django ./compose/production/django/entrypoint /entrypoint
+COPY --chown=django:django ./compose/production/django/entrypoint.sh /entrypoint
 RUN sed -i 's/\r$//g' /entrypoint  # Normalize potential Windows line endings.
 RUN chmod +x /entrypoint
 
