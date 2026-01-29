@@ -17,35 +17,41 @@ wait-for-it "${POSTGRES_HOST}:${POSTGRES_PORT}" -t 30
 echo "PostgreSQL port is open, verifying database is ready..."
 
 # Now verify the database is actually ready by attempting to connect
-# Using Python since we have Django and psycopg2 available
-python << END
+# Using Python since we have Django and psycopg available
+python << 'END'
 import sys
 import time
-import psycopg
+import os
 
 max_attempts = 30
 attempt = 0
 
+# Get connection parameters from environment
+db_params = {
+    "dbname": os.environ.get("POSTGRES_DB"),
+    "user": os.environ.get("POSTGRES_USER"),
+    "password": os.environ.get("POSTGRES_PASSWORD"),
+    "host": os.environ.get("POSTGRES_HOST"),
+    "port": os.environ.get("POSTGRES_PORT"),
+    "connect_timeout": 5
+}
+
 while attempt < max_attempts:
     try:
-        conn = psycopg.connect(
-            dbname="${POSTGRES_DB}",
-            user="${POSTGRES_USER}",
-            password="${POSTGRES_PASSWORD}",
-            host="${POSTGRES_HOST}",
-            port="${POSTGRES_PORT}",
-            connect_timeout=5
-        )
+        import psycopg
+        conn = psycopg.connect(**db_params)
         conn.close()
         print("PostgreSQL is ready and accepting connections!", file=sys.stderr)
         sys.exit(0)
-    except psycopg.OperationalError as e:
+    except Exception as e:
         attempt += 1
-        print(f"PostgreSQL not ready yet (attempt {attempt}/{max_attempts}): {e}", file=sys.stderr)
+        # Log error without exposing sensitive details
+        error_type = type(e).__name__
+        print(f"PostgreSQL not ready yet (attempt {attempt}/{max_attempts}): {error_type}", file=sys.stderr)
         if attempt < max_attempts:
             time.sleep(1)
         else:
-            print("Failed to connect to PostgreSQL after maximum attempts", file=sys.stderr)
+            print(f"Failed to connect to PostgreSQL after maximum attempts: {error_type}", file=sys.stderr)
             sys.exit(1)
 END
 
