@@ -25,6 +25,41 @@ This can be run on any managed platform that supports Docker containers, such as
     - Additional details regarding media related environment variables can be found on [this settings page](https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html#settings), matching settings by suffix (for example: `AWS_S3_ENDPOINT_URL` and `DJANGO_MEDIA_PUBLIC_ENDPOINT_URL` are equivalent).
     - Files uploaded have ACLs applied to them so buckets currently don't require  policies applied to them.
 
+### Container Resources
+
+**Memory Requirements:**
+
+The Django container runs both the gunicorn web server and Django Q task queue worker using supervisord. Memory requirements depend on your deployment configuration:
+
+- **Minimum (single worker):** 512MB RAM
+    - Gunicorn: 1 worker
+    - Django Q: 1 worker
+    - Suitable for low-traffic sites or development environments
+    - Limited request throughput
+
+- **Recommended (production):** 1GB RAM
+    - Gunicorn: 2 workers (or more based on traffic)
+    - Django Q: 1 worker
+    - Better performance under load
+    - Headroom for traffic spikes
+
+**Worker Configuration:**
+
+The number of gunicorn workers is configured in `compose/production/django/supervisord.conf`. The current configuration uses:
+
+- **1 gunicorn worker** (optimized for 512MB containers)
+- **1 Django Q worker** (configured in `config/settings/production.py`)
+
+To increase throughput on containers with more memory, edit the `--workers` parameter in the supervisord configuration.
+
+**Scaling Options:**
+
+For high-traffic deployments, consider:
+
+1. Increasing container memory to 1GB+ and adding more gunicorn workers
+2. Running Django Q in a separate container for better isolation and independent scaling
+3. Horizontal scaling with multiple web containers behind a load balancer
+
 ### Environment variables
 
 The following environment variables are available, with some required for running AMS:

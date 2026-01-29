@@ -8,6 +8,10 @@ echo "[START] Collecting static files..."
 python /app/manage.py collectstatic --noinput
 echo "[START] Static files collected successfully"
 
+# Log memory status before starting services
+echo "[START] Memory status before starting services:"
+grep -E "MemTotal|MemAvailable" /proc/meminfo || echo "Memory info not available"
+
 # Start both gunicorn and qcluster via supervisor
 echo "[START] Starting supervisor..."
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf

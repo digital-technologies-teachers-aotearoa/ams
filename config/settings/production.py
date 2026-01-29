@@ -21,6 +21,11 @@ ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["dtta.org.nz"])
 # DATABASES
 # ------------------------------------------------------------------------------
 DATABASES["default"]["CONN_MAX_AGE"] = env.int("CONN_MAX_AGE", default=60)
+# Add connection timeout to prevent hung connections
+DATABASES["default"]["OPTIONS"] = {
+    "connect_timeout": 10,
+    "options": "-c statement_timeout=30000",  # 30 second query timeout
+}
 
 # SECURITY
 # ------------------------------------------------------------------------------
