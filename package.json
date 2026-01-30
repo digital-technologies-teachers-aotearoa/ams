@@ -26,7 +26,7 @@
     "node-sass-tilde-importer": "^1.0.2",
     "pixrem": "^5.0.0",
     "postcss": "^8.3.11",
-    "sass": "1.77.6"
+    "sass": "1.97.3"
   },
   "engines": {
     "node": "25.2"
