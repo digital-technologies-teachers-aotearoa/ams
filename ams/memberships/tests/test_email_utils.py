@@ -833,3 +833,134 @@ class TestEmailNotificationWhenNotificationsDisabled:
         # Email should NOT be sent
         # (notifications disabled, not a free membership approval)
         assert len(mailoutbox) == 0
+
+
+@pytest.mark.django_db
+class TestOrganisationMembershipEmailPricing:
+    """Tests for organisation membership email pricing display."""
+
+    def test_organisation_membership_displays_total_cost(self, mailoutbox):
+        """Test that email displays total cost (seats x per-seat price)."""
+        # Create staff user
+        UserFactory(is_staff=True, email="staff@example.com")
+
+        # Create organisation membership: 5 seats at $100/seat
+        organisation = OrganisationFactory(name="Test Organisation")
+        membership_option = MembershipOptionFactory(
+            type=MembershipOptionType.ORGANISATION,
+            name="Standard Membership",
+            cost=Decimal("100.00"),
+        )
+        membership = OrganisationMembershipFactory(
+            organisation=organisation,
+            membership_option=membership_option,
+            seats=5,
+            approved_datetime=timezone.now(),
+        )
+
+        # Send notification
+        send_staff_organisation_membership_notification(membership)
+
+        # Assert email was sent
+        assert len(mailoutbox) == 1
+        email = mailoutbox[0]
+
+        # Check that total cost is displayed ($500)
+        assert "$500" in email.body
+        # Check that breakdown is shown
+        assert "5" in email.body  # seats
+        assert "$100" in email.body  # per-seat cost
+
+    def test_organisation_membership_with_free_seats(self, mailoutbox):
+        """Test that email correctly displays cost when some seats are free."""
+        # Create staff user
+        UserFactory(is_staff=True, email="staff@example.com")
+
+        # Create organisation membership option with max_charged_seats
+        organisation = OrganisationFactory(name="Test Organisation")
+        membership_option = MembershipOptionFactory(
+            type=MembershipOptionType.ORGANISATION,
+            name="Limited Charging Membership",
+            cost=Decimal("100.00"),
+            max_charged_seats=4,  # Only charge for 4 seats
+        )
+        membership = OrganisationMembershipFactory(
+            organisation=organisation,
+            membership_option=membership_option,
+            seats=6,  # 6 total seats, but only 4 charged
+            approved_datetime=timezone.now(),
+        )
+
+        # Send notification
+        send_staff_organisation_membership_notification(membership)
+
+        # Assert email was sent
+        assert len(mailoutbox) == 1
+        email = mailoutbox[0]
+
+        # Check that total cost is $400 (not $600)
+        assert "$400" in email.body
+        # Check that it mentions free seats
+        assert "2 free seat" in email.body
+        assert "4 charged seat" in email.body
+
+    def test_organisation_membership_zero_cost(self, mailoutbox):
+        """Test that email displays $0 cost correctly for free memberships."""
+        # Create staff user
+        UserFactory(is_staff=True, email="staff@example.com")
+
+        # Create free organisation membership
+        organisation = OrganisationFactory(name="Test Organisation")
+        membership_option = MembershipOptionFactory(
+            type=MembershipOptionType.ORGANISATION,
+            name="Free Membership",
+            cost=Decimal("0.00"),
+        )
+        membership = OrganisationMembershipFactory(
+            organisation=organisation,
+            membership_option=membership_option,
+            seats=5,
+            approved_datetime=timezone.now(),
+        )
+
+        # Send notification
+        send_staff_organisation_membership_notification(membership)
+
+        # Assert email was sent
+        assert len(mailoutbox) == 1
+        email = mailoutbox[0]
+
+        # Check that cost is displayed as $0
+        assert "$0" in email.body
+        # Should not crash or display errors
+
+    def test_organisation_membership_single_seat(self, mailoutbox):
+        """Test that email displays correctly for single seat (pluralization)."""
+        # Create staff user
+        UserFactory(is_staff=True, email="staff@example.com")
+
+        # Create organisation membership with single seat
+        organisation = OrganisationFactory(name="Test Organisation")
+        membership_option = MembershipOptionFactory(
+            type=MembershipOptionType.ORGANISATION,
+            name="Single Seat Membership",
+            cost=Decimal("150.00"),
+        )
+        membership = OrganisationMembershipFactory(
+            organisation=organisation,
+            membership_option=membership_option,
+            seats=1,
+            approved_datetime=timezone.now(),
+        )
+
+        # Send notification
+        send_staff_organisation_membership_notification(membership)
+
+        # Assert email was sent
+        assert len(mailoutbox) == 1
+        email = mailoutbox[0]
+
+        # Check that cost is displayed correctly
+        assert "$150" in email.body
+        # Check proper pluralization (should be "1 seat" not "1 seats")
+        assert "1 seat" in email.body

@@ -58,7 +58,13 @@ def send_staff_organisation_membership_notification(membership):
         "seats": membership.seats,
         "start_date": membership.start_date,
         "expiry_date": membership.expiry_date,
-        "cost": membership.membership_option.cost,
+        # Pricing fields
+        "cost_per_seat": membership.membership_option.cost,
+        "chargeable_seats": membership.chargeable_seats,
+        "total_cost": membership.membership_option.cost * membership.chargeable_seats,
+        "free_seats": membership.free_seats,
+        "has_free_seats": membership.free_seats > 0,
+        # Other fields
         "invoice_number": (
             membership.invoices.first().invoice_number
             if membership.invoices.exists()
