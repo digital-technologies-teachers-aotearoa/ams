@@ -78,7 +78,18 @@
             <td style="padding: 8px 0; font-weight: bold">
               {% trans "Cost:" %}
             </td>
-            <td style="padding: 8px 0">${{ cost }}</td>
+            <td style="padding: 8px 0">
+              ${{ total_cost }}
+              <br/>
+              <small style="color: #6c757d;">
+                {% if has_free_seats %}
+                  ({{ chargeable_seats }} {% trans "charged seat" %}{{ chargeable_seats|pluralize }} × ${{ cost_per_seat }}/{% trans "seat" %},
+                  {{ free_seats }} {% trans "free seat" %}{{ free_seats|pluralize }})
+                {% else %}
+                  ({{ seats }} {% trans "seat" %}{{ seats|pluralize }} × ${{ cost_per_seat }}/{% trans "seat" %})
+                {% endif %}
+              </small>
+            </td>
           </tr>
           <tr>
             <td style="padding: 8px 0; font-weight: bold">
