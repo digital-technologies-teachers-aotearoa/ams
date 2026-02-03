@@ -18,7 +18,7 @@ A new membership has been purchased for {{ org_name }}.
 {% trans "Seats:" %} {{ seats }}
 {% trans "Start Date:" %} {{ start_date|date:"d/m/Y" }}
 {% trans "Expiry Date:" %} {{ expiry_date|date:"d/m/Y" }}
-{% trans "Cost:" %} ${{ cost }}
+{% trans "Cost:" %} ${{ total_cost }}{% if has_free_seats %} ({{ chargeable_seats }} charged seat{{ chargeable_seats|pluralize }}, {{ free_seats }} free seat{{ free_seats|pluralize }}){% else %} ({{ seats }} seat{{ seats|pluralize }} × ${{ cost_per_seat }}/seat){% endif %}
 {% trans "Status:" %} {% if requires_approval %}{% trans "Pending Approval" %}{% else %}{% trans "Approved" %}{% endif %}
 {% if invoice_number %}
 {% trans "Invoice Number:" %} {{ invoice_number }}
