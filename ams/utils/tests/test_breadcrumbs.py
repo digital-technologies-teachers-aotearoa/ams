@@ -147,6 +147,14 @@ class TestGetUserDashboardLabel:
         assert hasattr(request, "breadcrumb_cache")
         assert "user_name" in request.breadcrumb_cache
 
+    def test_returns_default_label_when_user_not_found(self, db):
+        """Test that it returns default label when user doesn't exist."""
+        request = RequestFactory().get("/")
+
+        result = _get_user_dashboard_label(request, username="nonexistent")
+
+        assert result == "User"
+
 
 class TestGetCurrentViewName:
     """Tests for get_current_view_name function."""

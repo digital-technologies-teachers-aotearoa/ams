@@ -145,9 +145,12 @@ def _get_user_dashboard_label(request, **kwargs):
     """Get user dashboard label using user's full name."""
 
     def get_name():
-        if username := kwargs.get("username"):
-            user = User.objects.get(username=username)
-            return user.get_full_name()
+        try:
+            if username := kwargs.get("username"):
+                user = User.objects.get(username=username)
+                return user.get_full_name()
+        except User.DoesNotExist:
+            pass
         return _("User")
 
     return _get_cached_value(request, "user_name", get_name)
