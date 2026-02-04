@@ -7,7 +7,6 @@ from django_tables2.tables import Table
 
 from ams.memberships.models import IndividualMembership
 from ams.organisations.models import OrganisationMember
-from ams.utils.permissions import organisation_has_active_membership
 from ams.utils.tables import MembershipStatusBadgeColumn
 
 
@@ -113,14 +112,12 @@ class OrganisationTable(Table):
     )
 
     def render_membership(self, record):
-        """Render the membership status badge."""
+        """Render the membership status badge using annotated value."""
         return mark_safe(  # noqa: S308
             render_to_string(
                 "users/tables/organisation_membership_column.html",
                 {
-                    "active_membership": organisation_has_active_membership(
-                        record.organisation,
-                    ),
+                    "active_membership": record.org_has_active_membership,
                 },
             ),
         )

@@ -1,14 +1,18 @@
 from allauth.account.models import EmailAddress
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
+from django.db.models import Exists
+from django.db.models import OuterRef
 from django.db.models import Q
 from django.db.models import QuerySet
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView
 from django.views.generic import RedirectView
 from django.views.generic import UpdateView
 
+from ams.memberships.models import OrganisationMembership
 from ams.organisations.models import OrganisationMember
 from ams.terms.mixins import TermsRequiredMixin
 from ams.users.forms import UserUpdateForm
@@ -63,14 +67,21 @@ class UserDetailView(
         for email in user_emails:
             email_q |= Q(invite_email__iexact=email)
 
+        # Create subquery for active memberships
+        active_membership_subquery = OrganisationMembership.objects.filter(
+            organisation=OuterRef("organisation"),
+            approved_datetime__isnull=False,
+            cancelled_datetime__isnull=True,
+            start_date__lte=timezone.localdate(),
+            expiry_date__gt=timezone.localdate(),
+        )
+
         all_org_members = (
             OrganisationMember.objects.filter(
                 Q(user=user) | email_q,
             )
-            .select_related(
-                "organisation",
-            )
-            .prefetch_related("organisation__organisation_memberships")
+            .select_related("organisation")
+            .annotate(org_has_active_membership=Exists(active_membership_subquery))
         )
 
         # Pending invitations (not yet accepted, declined, or revoked)
