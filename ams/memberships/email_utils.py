@@ -4,12 +4,43 @@ import logging
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from ams.utils.email import send_templated_email
 
 User = get_user_model()
 logger = logging.getLogger(__name__)
+
+
+def build_admin_url(model_name: str, object_id: int) -> str:
+    """
+    Build an absolute URL to a Django admin change page.
+
+    Args:
+        model_name: The model name ("individualmembership", "organisationmembership")
+        object_id: The primary key of the object to edit
+
+    Returns:
+        Absolute URL to the admin change page
+    """
+
+    # Build the admin URL pattern
+    admin_path = reverse(
+        f"admin:memberships_{model_name}_change",
+        kwargs={"object_id": object_id},
+    )
+
+    # Build absolute URL using settings
+    protocol = "https" if settings.DEPLOYED else "http"
+
+    # Skip port in production (DEPLOYED=True) or when using standard ports
+    if settings.DEPLOYED or settings.SITE_PORT in (80, 443):
+        port_suffix = ""
+    else:
+        port_suffix = f":{settings.SITE_PORT}"
+
+    return f"{protocol}://{settings.SITE_DOMAIN}{port_suffix}{admin_path}"
 
 
 def send_staff_organisation_membership_notification(membership):
@@ -72,6 +103,7 @@ def send_staff_organisation_membership_notification(membership):
         ),
         "requires_approval": membership.approved_datetime is None,
         "is_free": membership.membership_option.cost == 0,
+        "admin_url": build_admin_url("organisationmembership", membership.pk),
     }
 
     # Send email with error handling
@@ -136,6 +168,7 @@ def send_staff_organisation_seats_added_notification(
         "prorata_cost": prorata_cost,
         "invoice_number": invoice.invoice_number if invoice else None,
         "expiry_date": membership.expiry_date,
+        "admin_url": build_admin_url("organisationmembership", membership.pk),
     }
 
     # Send email with error handling
@@ -208,6 +241,7 @@ def send_staff_individual_membership_notification(membership):
         ),
         "requires_approval": membership.approved_datetime is None,
         "is_free": membership.membership_option.cost == 0,
+        "admin_url": build_admin_url("individualmembership", membership.pk),
     }
 
     # Send email with error handling

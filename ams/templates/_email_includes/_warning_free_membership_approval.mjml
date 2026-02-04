@@ -1,11 +1,21 @@
 <!-- Warning box for free memberships requiring approval -->
-<!-- Expected context: requires_approval (bool), is_free (bool) -->
+<!-- Expected context: requires_approval (bool), is_free (bool), admin_url (str) -->
 <mj-raw>{% if requires_approval and is_free %}</mj-raw>
 <mj-section mj-class="section-warning-box">
   <mj-column>
+    <!-- prettier-ignore -->
     <mj-text mj-class="text-warning" font-weight="bold">
       {% trans "⚠ ACTION REQUIRED: This free membership requires manual approval in Django admin." %}
     </mj-text>
+  </mj-column>
+</mj-section>
+
+<!-- Admin Action Button -->
+<mj-section mj-class="section-button">
+  <mj-column>
+    <mj-button mj-class="btn-info" href="{{ admin_url }}">
+      {% trans "Review & Approve in Admin" %}
+    </mj-button>
   </mj-column>
 </mj-section>
 <mj-raw>{% endif %}</mj-raw>
