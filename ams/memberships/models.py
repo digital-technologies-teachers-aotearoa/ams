@@ -10,6 +10,7 @@ from django.db.models import DateField
 from django.db.models import DateTimeField
 from django.db.models import DecimalField
 from django.db.models import ForeignKey
+from django.db.models import Index
 from django.db.models import IntegerField
 from django.db.models import Model
 from django.db.models import PositiveIntegerField
@@ -312,6 +313,18 @@ class IndividualMembership(BaseMembership):
     class Meta:
         verbose_name = "Membership: Individual"
         verbose_name_plural = "Membership: Individual"
+        indexes = [
+            Index(
+                fields=[
+                    "user",
+                    "approved_datetime",
+                    "cancelled_datetime",
+                    "start_date",
+                    "expiry_date",
+                ],
+                name="idx_indiv_mem_active",
+            ),
+        ]
 
     def __str__(self):
         return (
@@ -371,6 +384,18 @@ class OrganisationMembership(BaseMembership):
     class Meta:
         verbose_name = "Membership: Organisation"
         verbose_name_plural = "Membership: Organisation"
+        indexes = [
+            Index(
+                fields=[
+                    "organisation",
+                    "approved_datetime",
+                    "cancelled_datetime",
+                    "start_date",
+                    "expiry_date",
+                ],
+                name="idx_org_mem_active",
+            ),
+        ]
 
     def __str__(self):
         return (
