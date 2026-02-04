@@ -117,6 +117,20 @@
       </mj-column>
     </mj-section>
 
+    <!-- Admin Action Section -->
+    <mj-section mj-class="section-button">
+      <mj-column>
+        <!-- prettier-ignore -->
+        <mj-button mj-class="btn-info" href="{{ admin_url }}">
+          {% if requires_approval %}
+          {% trans "Review & Approve in Admin" %}
+          {% else %}
+          {% trans "View in Admin" %}
+          {% endif %}
+        </mj-button>
+      </mj-column>
+    </mj-section>
+
     <!-- Footer Section -->
     <mj-include path="../../_email_includes/_staff_footer.mjml" />
   </mj-body>

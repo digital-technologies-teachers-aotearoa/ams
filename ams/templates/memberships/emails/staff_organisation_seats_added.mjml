@@ -88,6 +88,15 @@
       </mj-column>
     </mj-section>
 
+    <!-- Admin Action Section -->
+    <mj-section mj-class="section-button">
+      <mj-column>
+        <mj-button mj-class="btn-info" href="{{ admin_url }}">
+          {% trans "View Membership in Admin" %}
+        </mj-button>
+      </mj-column>
+    </mj-section>
+
     <!-- Footer Section -->
     <mj-include path="../../_email_includes/_staff_footer.mjml" />
   </mj-body>
