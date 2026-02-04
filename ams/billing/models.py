@@ -6,6 +6,7 @@ from django.db.models import CheckConstraint
 from django.db.models import DateField
 from django.db.models import DecimalField
 from django.db.models import ForeignKey
+from django.db.models import Index
 from django.db.models import Model
 from django.db.models import OneToOneField
 from django.db.models import Q
@@ -72,6 +73,18 @@ class Invoice(Model):
         blank=True,
         related_name="invoices",
     )
+
+    class Meta:
+        indexes = [
+            Index(
+                fields=["individual_membership", "paid_date"],
+                name="idx_invoice_indiv",
+            ),
+            Index(
+                fields=["organisation_membership", "paid_date"],
+                name="idx_invoice_org",
+            ),
+        ]
 
     def __str__(self):
         return f"Invoice {self.invoice_number} for {self.account}"

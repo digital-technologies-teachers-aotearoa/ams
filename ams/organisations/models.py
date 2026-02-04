@@ -5,6 +5,7 @@ from django.db.models import BooleanField
 from django.db.models import CharField
 from django.db.models import DateTimeField
 from django.db.models import ForeignKey
+from django.db.models import Index
 from django.db.models import Model
 from django.db.models import Q
 from django.db.models import QuerySet
@@ -159,6 +160,12 @@ class OrganisationMember(Model):
                     revoked_datetime__isnull=True,
                 ),
                 name="unique_active_org_member",
+            ),
+        ]
+        indexes = [
+            Index(
+                fields=["organisation", "accepted_datetime", "user"],
+                name="idx_org_member_seats",
             ),
         ]
 
