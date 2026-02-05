@@ -29,6 +29,7 @@ from ams.billing.models import Account
 from ams.billing.models import Invoice
 from ams.billing.providers.xero.models import XeroContact
 from ams.billing.providers.xero.rate_limiting import handle_rate_limit
+from ams.billing.providers.xero.rate_limiting import retry_transient_errors
 from ams.billing.services import BillingService
 from ams.memberships.models import Organisation
 
@@ -122,6 +123,7 @@ class XeroBillingService(BillingService):
         return connections
 
     @handle_rate_limit()
+    @retry_transient_errors()
     def _create_xero_contact(self, contact_params: dict[str, Any]) -> str:
         """Create a new contact in Xero.
 
@@ -143,6 +145,7 @@ class XeroBillingService(BillingService):
         return contact_id
 
     @handle_rate_limit()
+    @retry_transient_errors()
     def _update_xero_contact(
         self,
         contact_id: str,
@@ -162,6 +165,7 @@ class XeroBillingService(BillingService):
         api_instance.update_contact(settings.XERO_TENANT_ID, contact_id, contacts)
 
     @handle_rate_limit()
+    @retry_transient_errors()
     def _get_xero_contact_by_account_number(
         self,
         account_number: str,
@@ -192,6 +196,7 @@ class XeroBillingService(BillingService):
         return None
 
     @handle_rate_limit()
+    @retry_transient_errors()
     def _create_xero_invoice(
         self,
         contact_id: str,
@@ -228,6 +233,7 @@ class XeroBillingService(BillingService):
         return response_invoice
 
     @handle_rate_limit()
+    @retry_transient_errors()
     def _email_invoice(self, billing_service_invoice_id: str) -> None:
         """Send an invoice email via Xero.
 
@@ -242,6 +248,7 @@ class XeroBillingService(BillingService):
         )
 
     @handle_rate_limit()
+    @retry_transient_errors()
     def _get_xero_invoices(
         self,
         billing_service_invoice_ids: list[str],
@@ -263,6 +270,7 @@ class XeroBillingService(BillingService):
         return invoices
 
     @handle_rate_limit()
+    @retry_transient_errors()
     def _get_online_invoice_url(self, billing_service_invoice_id: str) -> str:
         """Get the online invoice URL from Xero.
 
