@@ -1,12 +1,18 @@
+# ruff: noqa: PLR2004
+
 """Tests for Xero rate limiting utilities."""
 
 from unittest.mock import Mock
+from unittest.mock import patch
 
 import pytest
+from xero_python.exceptions import HTTPStatusException
 from xero_python.exceptions import RateLimitException
 
 from ams.billing.providers.xero.rate_limiting import XeroRateLimitError
+from ams.billing.providers.xero.rate_limiting import XeroTransientError
 from ams.billing.providers.xero.rate_limiting import handle_rate_limit
+from ams.billing.providers.xero.rate_limiting import retry_transient_errors
 
 
 class TestHandleRateLimit:
@@ -53,7 +59,7 @@ class TestHandleRateLimit:
             decorated()
 
         error = exc_info.value
-        assert error.retry_after == 30  # noqa: PLR2004
+        assert error.retry_after == 30
         assert "30 seconds" in str(error)
         assert mock_func.call_count == 1
 
@@ -149,3 +155,245 @@ class TestHandleRateLimit:
         error = exc_info.value
         assert error.retry_after is None
         assert "Billing system busy" in str(error)
+
+
+class TestRetryTransientErrors:
+    """Tests for retry_transient_errors decorator."""
+
+    def test_successful_call_no_retry(self):
+        """Successful calls pass through without retry."""
+        mock_func = Mock(return_value="success")
+        decorated = retry_transient_errors()(mock_func)
+
+        result = decorated()
+
+        assert result == "success"
+        assert mock_func.call_count == 1
+
+    @patch("ams.billing.providers.xero.rate_limiting.time.sleep")
+    def test_retries_404_error_then_succeeds(self, mock_sleep):
+        """404 error triggers retry and eventually succeeds."""
+        mock_func = Mock()
+        mock_func.side_effect = [
+            HTTPStatusException(status=404, reason="Not Found"),
+            "success",
+        ]
+
+        decorated = retry_transient_errors()(mock_func)
+        result = decorated()
+
+        assert result == "success"
+        assert mock_func.call_count == 2
+        mock_sleep.assert_called_once_with(1.0)
+
+    @patch("ams.billing.providers.xero.rate_limiting.time.sleep")
+    def test_retries_504_error_then_succeeds(self, mock_sleep):
+        """504 error triggers retry and eventually succeeds."""
+        mock_func = Mock()
+        mock_func.side_effect = [
+            HTTPStatusException(status=504, reason="Gateway Timeout"),
+            "success",
+        ]
+
+        decorated = retry_transient_errors()(mock_func)
+        result = decorated()
+
+        assert result == "success"
+        assert mock_func.call_count == 2
+        mock_sleep.assert_called_once_with(1.0)
+
+    @patch("ams.billing.providers.xero.rate_limiting.time.sleep")
+    def test_exponential_backoff_timing(self, mock_sleep):
+        """Backoff follows exponential pattern: 1s, 2s, 4s."""
+        mock_func = Mock()
+        mock_func.side_effect = [
+            HTTPStatusException(status=503, reason="Service Unavailable"),
+            HTTPStatusException(status=503, reason="Service Unavailable"),
+            HTTPStatusException(status=503, reason="Service Unavailable"),
+            "success",
+        ]
+
+        decorated = retry_transient_errors()(mock_func)
+        result = decorated()
+
+        assert result == "success"
+        assert mock_func.call_count == 4
+        # Verify exponential backoff: 1s, 2s, 4s
+        assert mock_sleep.call_count == 3
+        assert mock_sleep.call_args_list[0][0][0] == 1.0
+        assert mock_sleep.call_args_list[1][0][0] == 2.0
+        assert mock_sleep.call_args_list[2][0][0] == 4.0
+
+    @patch("ams.billing.providers.xero.rate_limiting.time.sleep")
+    def test_raises_transient_error_after_max_retries(self, mock_sleep):
+        """XeroTransientError raised after exhausting all retries."""
+        mock_func = Mock()
+        mock_func.side_effect = HTTPStatusException(
+            status=500,
+            reason="Internal Server Error",
+        )
+
+        decorated = retry_transient_errors()(mock_func)
+
+        with pytest.raises(XeroTransientError) as exc_info:
+            decorated()
+
+        error = exc_info.value
+        assert error.status_code == 500
+        assert error.attempts == 4  # Initial + 3 retries
+        assert isinstance(error.original_exception, HTTPStatusException)
+        assert "4 attempts" in str(error)
+        assert "HTTP 500" in str(error)
+
+        # Verify we tried 4 times total (initial + 3 retries)
+        assert mock_func.call_count == 4
+        # Verify backoff was applied 3 times
+        assert mock_sleep.call_count == 3
+
+    def test_non_retryable_400_propagates_immediately(self):
+        """400 errors don't trigger retry."""
+        mock_func = Mock()
+        mock_func.side_effect = HTTPStatusException(status=400, reason="Bad Request")
+
+        decorated = retry_transient_errors()(mock_func)
+
+        with pytest.raises(HTTPStatusException) as exc_info:
+            decorated()
+
+        # Should fail immediately without retry
+        assert exc_info.value.status == 400
+        assert mock_func.call_count == 1
+
+    def test_non_retryable_401_propagates_immediately(self):
+        """401 errors don't trigger retry."""
+        mock_func = Mock()
+        mock_func.side_effect = HTTPStatusException(status=401, reason="Unauthorized")
+
+        decorated = retry_transient_errors()(mock_func)
+
+        with pytest.raises(HTTPStatusException) as exc_info:
+            decorated()
+
+        assert exc_info.value.status == 401
+        assert mock_func.call_count == 1
+
+    def test_non_retryable_403_propagates_immediately(self):
+        """403 errors don't trigger retry."""
+        mock_func = Mock()
+        mock_func.side_effect = HTTPStatusException(status=403, reason="Forbidden")
+
+        decorated = retry_transient_errors()(mock_func)
+
+        with pytest.raises(HTTPStatusException) as exc_info:
+            decorated()
+
+        assert exc_info.value.status == 403
+        assert mock_func.call_count == 1
+
+    @patch("ams.billing.providers.xero.rate_limiting.time.sleep")
+    def test_works_with_rate_limit_decorator(self, mock_sleep):
+        """Both decorators work together correctly."""
+
+        @handle_rate_limit()
+        @retry_transient_errors()
+        def test_function():
+            """Test function with both decorators."""
+            # Simulate a transient error
+            raise HTTPStatusException(status=504, reason="Gateway Timeout")
+
+        with pytest.raises(XeroTransientError):
+            test_function()
+
+        # Should have tried 4 times (initial + 3 retries)
+        assert mock_sleep.call_count == 3
+
+    @patch("ams.billing.providers.xero.rate_limiting.time.sleep")
+    def test_each_transient_status_code(self, mock_sleep):
+        """Test 404, 500, 502, 503, 504 all trigger retry."""
+        transient_codes = [404, 500, 502, 503, 504]
+
+        for status_code in transient_codes:
+            mock_sleep.reset_mock()
+            mock_func = Mock()
+            mock_func.side_effect = [
+                HTTPStatusException(status=status_code, reason="Error"),
+                "success",
+            ]
+
+            decorated = retry_transient_errors()(mock_func)
+            result = decorated()
+
+            assert result == "success", f"Failed for status code {status_code}"
+            assert mock_func.call_count == 2, f"Wrong call count for {status_code}"
+            mock_sleep.assert_called_once_with(1.0)
+
+    def test_preserves_function_metadata(self):
+        """Decorator preserves __name__ and __doc__."""
+
+        @retry_transient_errors()
+        def test_function():
+            """Test docstring."""
+            return "result"
+
+        assert test_function.__name__ == "test_function"
+        assert test_function.__doc__ == "Test docstring."
+
+    @patch("ams.billing.providers.xero.rate_limiting.time.sleep")
+    def test_custom_max_retries(self, mock_sleep):
+        """Test custom max_retries parameter."""
+        mock_func = Mock()
+        mock_func.side_effect = HTTPStatusException(status=500, reason="Error")
+
+        decorated = retry_transient_errors(max_retries=2)(mock_func)
+
+        with pytest.raises(XeroTransientError) as exc_info:
+            decorated()
+
+        # Should try 3 times total (initial + 2 retries)
+        assert mock_func.call_count == 3
+        assert exc_info.value.attempts == 3
+        assert mock_sleep.call_count == 2
+
+    @patch("ams.billing.providers.xero.rate_limiting.time.sleep")
+    def test_custom_base_backoff(self, mock_sleep):
+        """Test custom base_backoff parameter."""
+        mock_func = Mock()
+        mock_func.side_effect = [
+            HTTPStatusException(status=500, reason="Error"),
+            HTTPStatusException(status=500, reason="Error"),
+            "success",
+        ]
+
+        decorated = retry_transient_errors(base_backoff=2)(mock_func)
+        result = decorated()
+
+        assert result == "success"
+        # Backoff should be 2s, 4s (base=2, exponential)
+        assert mock_sleep.call_args_list[0][0][0] == 2.0
+        assert mock_sleep.call_args_list[1][0][0] == 4.0
+
+    @patch("ams.billing.providers.xero.rate_limiting.time.sleep")
+    def test_handles_exception_with_none_status(self, mock_sleep):
+        """Test handling of HTTPStatusException with None status."""
+        mock_func = Mock()
+
+        # Create exception and mock getattr to return None for status
+        HTTPStatusException(status=200, reason="OK")
+
+        def mock_side_effect(*args, **kwargs):
+            # Create an exception where getattr returns None for 'status'
+            exc = HTTPStatusException(status=200, reason="OK")
+            # Use object.__setattr__ to bypass property setter
+            object.__setattr__(exc, "_status", None)
+            raise exc
+
+        mock_func.side_effect = mock_side_effect
+
+        decorated = retry_transient_errors()(mock_func)
+
+        # Should not retry if status is None (not in TRANSIENT_STATUS_CODES)
+        with pytest.raises(HTTPStatusException):
+            decorated()
+
+        assert mock_func.call_count == 1
+        mock_sleep.assert_not_called()
