@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('billing', '0002_xeromutex_xerocontact'),
-        ('users', '0003_organisationtype_organisation_organisationmember'),
+        ('organisations', '0002_alter_organisation_table_and_more'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
@@ -58,7 +58,7 @@ class Migration(migrations.Migration):
                 ('cancelled_datetime', models.DateTimeField(null=True)),
                 ('invoice', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='organisation_memberships', to='billing.invoice')),
                 ('membership_option', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='organisation_memberships', to='memberships.membershipoption')),
-                ('organisation', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='organisation_memberships', to='users.organisation')),
+                ('organisation', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='organisation_memberships', to='organisations.organisation')),
             ],
             options={
                 'verbose_name': 'Membership: Organisation',

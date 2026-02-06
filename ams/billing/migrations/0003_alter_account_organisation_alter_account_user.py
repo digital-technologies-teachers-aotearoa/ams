@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('billing', '0002_xeromutex_xerocontact'),
-        ('users', '0003_organisationtype_organisation_organisationmember'),
+        ('organisations', '0002_alter_organisation_table_and_more'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='account',
             name='organisation',
-            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='account', to='users.organisation'),
+            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='account', to='organisations.organisation'),
         ),
         migrations.AlterField(
             model_name='account',
