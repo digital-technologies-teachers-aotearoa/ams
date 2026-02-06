@@ -2,7 +2,7 @@ python-slugify==8.0.4
 Pillow==11.3.0 # pyup: != 11.2.0
 argon2-cffi==25.1.0
 whitenoise==6.11.0
-redis==6.4.0
+redis==7.1.0
 hiredis==3.3.0
 html2text==2025.4.15
 
