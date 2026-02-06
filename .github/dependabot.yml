@@ -13,6 +13,8 @@ updates:
       github-actions:
         patterns:
           - '*'
+    commit-message:
+      prefix: 'chore(deps)'
 
   # Enable version updates for Docker
   - package-ecosystem: 'docker'
@@ -34,6 +36,8 @@ updates:
       docker-python:
         patterns:
           - '*'
+    commit-message:
+      prefix: 'chore(deps)'
 
   - package-ecosystem: 'docker'
     # Look for a `Dockerfile` in the listed directories
@@ -46,6 +50,8 @@ updates:
     # Every weekday
     schedule:
       interval: 'daily'
+    commit-message:
+      prefix: 'chore(deps)'
 
   # Enable version updates for Python/Pip - Production
   - package-ecosystem: 'pip'
@@ -60,6 +66,8 @@ updates:
         update-types:
           - 'minor'
           - 'patch'
+    commit-message:
+      prefix: 'chore(deps)'
 
   # Enable version updates for javascript/npm
   - package-ecosystem: 'npm'
@@ -73,3 +81,5 @@ updates:
         update-types:
           - 'minor'
           - 'patch'
+    commit-message:
+      prefix: 'chore(deps)'
