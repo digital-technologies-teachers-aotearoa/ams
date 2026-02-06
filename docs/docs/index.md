@@ -1,12 +1,26 @@
-# Kia ora!
+# Association Management Software (AMS)
 
-!!! warning
+## What is Association Management Software?
 
-    🚧 This software is in early development. Information may be incomplete or subject to change. 🚧
+AMS is a comprehensive, open-source platform designed specifically for membership associations, professional bodies, clubs, and community organizations.
+Built with Django and Wagtail CMS, AMS provides everything you need to manage your association in one integrated system.
 
-Welcome to the documentation for the Association Management Software (AMS) developed by DTTA.
-This documentation aims to provide information on:
+Developed by the Digital Technologies Teachers Aotearoa (DTTA) to meet their own operational needs, AMS brings together membership management, integrated billing, content publishing, and community engagement in a single, cohesive platform.
 
-- How to install and run the software as a website administrator.
-- How to configure and manage the sofware as an association staff member.
-- How to use the software as an association member.
+<!-- [Screenshot: Member dashboard overview showing membership status, profile completion, and quick actions] -->
+
+Want to learn more?
+
+- **[Read more about the features of AMS](features.md)**
+
+## Getting Started
+
+Ready to explore AMS?
+
+- **[Administrator Guide](admin/index.md):** Configure and manage your AMS instance
+- **[Developer Documentation](developer/index.md):** Develop or deploy AMS
+
+<!-- markdownlint-disable -->
+<style>
+.md-sidebar--primary { display: none;}
+</style>
