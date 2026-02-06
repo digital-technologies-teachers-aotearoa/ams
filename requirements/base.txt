@@ -22,7 +22,7 @@ django-imagekit==6.0.0
 
 # Wagtail
 # ------------------------------------------------------------------------------
-wagtail==7.2.1
+wagtail==7.3
 wagtailmenus==4.0.5
 wagtail-color-panel==1.7.1
 
