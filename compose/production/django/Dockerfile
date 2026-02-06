@@ -135,17 +135,17 @@ RUN chmod +x /entrypoint
 
 
 # Copy and prepare web start script.
-COPY --chown=django:django ./compose/production/django/start-web /start-web
-RUN sed -i 's/\r$//g' /start-web  # Normalize potential Windows line endings.
-RUN chmod +x /start-web
+COPY --chown=django:django ./compose/production/django/start-web.sh /start-web.sh
+RUN sed -i 's/\r$//g' /start-web.sh  # Normalize potential Windows line endings.
+RUN chmod +x /start-web.sh
 
 # Copy and prepare worker start script.
-COPY --chown=django:django ./compose/production/django/start-worker /start-worker
-RUN sed -i 's/\r$//g' /start-worker  # Normalize potential Windows line endings.
-RUN chmod +x /start-worker
+COPY --chown=django:django ./compose/production/django/start-worker.sh /start-worker.sh
+RUN sed -i 's/\r$//g' /start-worker.sh  # Normalize potential Windows line endings.
+RUN chmod +x /start-worker.sh
 
 # Create backward compatibility symlink for old start script.
-RUN ln -s /start-web /start
+RUN ln -s /start-web.sh /start
 
 # Copy application source code AND previously built static assets from client-builder stage.
 COPY --from=client-builder --chown=django:django ${APP_HOME} ${APP_HOME}

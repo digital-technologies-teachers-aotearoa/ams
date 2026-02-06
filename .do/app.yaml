@@ -313,7 +313,7 @@ services:
       repository: ams-django
     instance_count: 1
     instance_size_slug: apps-s-1vcpu-0.5gb
-    run_command: /start-web
+    run_command: /start-web.sh
     envs:
       - key: SITE_DOMAIN
         scope: RUN_AND_BUILD_TIME
@@ -450,7 +450,7 @@ services:
       repository: ams-django
     instance_count: 1
     instance_size_slug: apps-s-1vcpu-0.5gb
-    run_command: /start-worker
+    run_command: /start-worker.sh
     envs:
       - key: SITE_DOMAIN
         scope: RUN_AND_BUILD_TIME
