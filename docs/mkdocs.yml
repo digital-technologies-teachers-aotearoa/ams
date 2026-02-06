@@ -4,15 +4,12 @@ repo_name: AMS on GitHub
 
 theme:
   name: material
-  custom_dir: overrides
   features:
     - toc.follow
     - navigation.indexes
     - navigation.tabs
     - navigation.tabs.sticky
     - navigation.tracking
-extra_css:
-  - assets/stylesheets/main.css
 
 markdown_extensions:
   - tables
@@ -24,8 +21,7 @@ markdown_extensions:
 
 nav:
   - Home: index.md
-  - User guide:
-      - user/index.md
+  - Features: features.md
   - Website administrator guide:
       - admin/index.md
       - admin/cms.md

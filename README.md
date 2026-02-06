@@ -1,8 +1,8 @@
-# Association Management Software
+# Association Management Software (AMS)
 
-Software for managing an association with users, memberships, forums, and more.
+**The open-source platform for modern association management**
 
-[**Explore the docs »**](https://digital-technologies-teachers-aotearoa.github.io/ams/)
+[**Explore the Documentation »**](https://digital-technologies-teachers-aotearoa.github.io/ams/)
 
 [View Demo](https://ams-dev-forum.dtta.org.nz/)
 &middot;
@@ -10,77 +10,84 @@ Software for managing an association with users, memberships, forums, and more.
 &middot;
 [Request Feature](https://github.com/digital-technologies-teachers-aotearoa/ams/issues/new?template=feature_request.md)
 
-## Original README
+<!-- [Screenshot: Main member dashboard showing membership status and navigation] -->
 
-The following content is being migrated to the official documentation.
+## What is AMS?
 
-### Settings
+Association Management Software (AMS) is a comprehensive, open-source platform designed specifically for membership associations, professional bodies, clubs, and community organizations.
+Built by the Digital Technologies Teachers Aotearoa (DTTA) for their own operational needs, AMS provides everything required to manage a modern association in one integrated system.
 
-Moved to [settings](https://cookiecutter-django.readthedocs.io/en/latest/1-getting-started/settings.html).
+Unlike fragmented solutions that require multiple separate platforms for membership management, billing, content publishing, and community engagement, AMS delivers an all-in-one solution.
+Whether you are managing individual memberships, organization-based memberships with seat allocation, or hybrid models, AMS handles the complexity while providing a seamless experience for both administrators and members.
 
-### Basic Commands
+Developed with New Zealand associations in mind, AMS includes native support for Xero accounting integration, and bilingual content (English and Te Reo Māori), while remaining flexible enough to serve associations worldwide.
 
-#### Setting Up Your Users
+## Key Features
 
-- To create a **normal user account**, just go to Sign Up and fill out the form. Once you submit it, you'll see a "Verify Your E-mail Address" page. Go to your console to see a simulated email verification message. Copy the link into your browser. Now the user's email should be verified and ready to go.
+### All-in-One Solution
 
-- To create a **superuser account**, use this command:
+AMS consolidates essential association management functions into a single platform, eliminating the need to integrate and maintain multiple separate systems. Members access everything through one unified portal with single sign-on authentication across all services.
 
-      $ python manage.py createsuperuser
+<!-- [Screenshot: Membership application form with custom profile fields] -->
 
-For convenience, you can keep your normal user logged in on Chrome and your superuser logged in on Firefox (or similar), so that you can see how the site behaves for both kinds of users.
+### Membership Management
 
-#### Type checks
+- **Individual and Organization Memberships:** Support for both individual members and organization-based memberships with seat allocation and management
+- **Flexible Membership Types:** Configure multiple membership tiers with different pricing and renewal cycles
+- **Member Self-Service:** Members can update their profiles, manage organization seats, and track their membership status independently
 
-Running type checks with mypy:
+<!-- [Screenshot: Organization membership management with seat allocation] -->
 
-    $ mypy ams
+### Integrated Billing
 
-#### Test coverage
+- **Xero Integration:** Integration with Xero accounting software for seamless invoice generation and payment tracking
+- **Automated Invoicing:** Automatic invoice creation for membership applications
+- **Payment Tracking:** Real-time synchronization between AMS and Xero for accurate financial records
 
-To run the tests, check your test coverage, and generate an HTML coverage report:
+<!-- [Screenshot: Xero invoice integration showing automatic billing] -->
 
-    $ coverage run -m pytest
-    $ coverage html
-    $ open htmlcov/index.html
+### Content Management System
 
-##### Running tests with pytest
+- **Wagtail CMS:** Powerful, user-friendly content management powered by Wagtail, allowing rich, structured content with reusable blocks and components
+- **Multi-Language Support:** Path-based multi-language routing with full support for English and Te Reo Māori
+- **Preview and Workflow:** Draft, preview, and publish content with editorial workflow controls
 
-    $ pytest
+<!-- [Screenshot: Wagtail CMS page editor with multi-language content] -->
 
-#### Live reloading and Sass CSS compilation
+### Community Forum
 
-Moved to [Live reloading and SASS compilation](https://cookiecutter-django.readthedocs.io/en/latest/2-local-development/developing-locally.html#using-webpack-or-gulp).
+- **Discourse Integration:** Seamless integration with Discourse forum platform for member discussions
+- **Single Sign-On:** Members use the same credentials across AMS and the forum with OAuth2 SSO
+- **Membership-Based Access:** Automatic access control based on active membership status
 
-#### Email Server
+<!-- [Screenshot: Forum integration with SSO login] -->
 
-In development, it is often nice to be able to see emails that are being sent from your application. For that reason local SMTP server [Mailpit](https://github.com/axllent/mailpit) with a web interface is available as docker container.
+### Customization and Branding
 
-Container mailpit will start automatically when you will run all docker containers.
-Please check [cookiecutter-django Docker documentation](https://cookiecutter-django.readthedocs.io/en/latest/2-local-development/developing-locally-docker.html) for more details how to start all containers.
+- **Theme Customization:** Customize colors, logos, and branding to match your association's identity
+- **Custom Profile Fields:** Add association-specific fields to member profiles without code changes
+- **Bootstrap-Based Styling:** Modern, responsive design built on Bootstrap 5 with CSS variable customization
 
-With Mailpit running, to view messages that are sent by your application, open your browser and go to `http://127.0.0.1:8025`
+<!-- [Screenshot: Admin panel showing association branding customization] -->
 
-#### Sentry
+## Why Choose AMS?
 
-Sentry is an error logging aggregator service. You can sign up for a free account at <https://sentry.io/signup/?code=cookiecutter> or download and host it yourself.
-The system is set up with reasonable defaults, including 404 logging and integration with the WSGI application.
+### Open Source and Self-Hosted
 
-You must set the DSN url in production.
+AMS is released under an open-source license, providing complete transparency and freedom from vendor lock-in. Self-host on your own infrastructure for full control over your data, security, and privacy. No per-user pricing, no feature paywalls, and no forced upgrades.
 
-### Deployment
+### Built for Associations, by Associations
 
-The following details how to deploy this application.
+Developed by DTTA to solve real operational challenges faced by membership associations, AMS includes features that matter in practice—not just in theory. The platform continues to evolve based on actual association needs and operational experience.
 
-#### Docker
+### Comprehensive Solution
 
-See detailed [cookiecutter-django Docker documentation](https://cookiecutter-django.readthedocs.io/en/latest/3-deployment/deployment-with-docker.html).
+Stop managing multiple platforms, integrations, and vendor relationships. AMS consolidates membership management, billing, content publishing, and community forums into one cohesive system, reducing administrative overhead and improving the member experience.
 
-#### Custom Bootstrap Compilation
+### Active Development
 
-The generated CSS is set up with automatic Bootstrap recompilation with variables of your choice.
-Bootstrap v5 is installed using npm and customised by tweaking your variables in `static/sass/custom_bootstrap_vars`.
+AMS is under active development with regular updates, improvements, and new features. Built on modern, well-supported technologies (Django, Wagtail, PostgreSQL), the platform benefits from both dedicated development and the broader open-source ecosystem.
 
-You can find a list of available variables [in the bootstrap source](https://github.com/twbs/bootstrap/blob/v5.1.3/scss/_variables.scss), or get explanations on them in the [Bootstrap docs](https://getbootstrap.com/docs/5.1/customize/sass/).
+## Getting Started
 
-Bootstrap's javascript as well as its dependencies are concatenated into a single file: `static/js/vendors.js`.
+To install and configure AMS for your association, please refer to the [installation guide](https://digital-technologies-teachers-aotearoa.github.io/ams/) in the documentation. The documentation provides comprehensive instructions for administrators, association staff, and developers.
