@@ -68,6 +68,10 @@ updates:
           - 'patch'
     commit-message:
       prefix: 'chore(deps)'
+    ignore:
+      - dependency-name: 'django'
+        update-types:
+          - 'version-update:semver-major'
 
   # Enable version updates for javascript/npm
   - package-ecosystem: 'npm'
