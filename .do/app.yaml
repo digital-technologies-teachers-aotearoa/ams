@@ -303,7 +303,7 @@ jobs:
 maintenance: {}
 region: syd
 services:
-  - name: web-server
+  - name: django
     http_port: 5000
     image:
       digest: ${django_digest}
@@ -441,6 +441,7 @@ services:
       - key: LOGTAIL_INGESTING_HOST
         scope: RUN_AND_BUILD_TIME
         value: ${LOGTAIL_INGESTING_HOST}
+workers:
   - name: task-worker
     image:
       digest: ${django_digest}
