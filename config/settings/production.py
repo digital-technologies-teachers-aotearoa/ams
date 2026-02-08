@@ -107,7 +107,7 @@ ANYMAIL = {
 # Django-Q2 - Production settings
 # ------------------------------------------------------------------------------
 Q_CLUSTER["workers"] = 1
-Q_CLUSTER["poll"] = 1
+Q_CLUSTER["poll"] = 5
 Q_CLUSTER["save_limit"] = 5000  # Keep more history in production
 
 

@@ -453,7 +453,7 @@ Q_CLUSTER = {
     "queue_limit": 100,  # Max tasks in queue
     "bulk": 1,  # Process tasks one at a time
     "orm": "default",  # Use default database
-    "poll": 1,
+    "poll": 5,
     "ack_failures": True,  # Keep failed tasks in database for inspection
     "save_limit": 1000,  # Keep last 1000 successful tasks
     "catch_up": False,  # Don't process tasks that are too old
