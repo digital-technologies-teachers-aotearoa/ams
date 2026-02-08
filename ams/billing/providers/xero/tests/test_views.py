@@ -295,8 +295,8 @@ class TestFetchUpdatedInvoiceDetails:
         # Should not call update_invoices if no invoices need updating
         mock_service.update_invoices.assert_not_called()
 
-    def test_fetch_limits_to_30_invoices(self, xero_settings, account_user):
-        """Test that fetch is limited to 30 invoices at a time."""
+    def test_fetch_limits_invoices(self, xero_settings, account_user):
+        """Test that fetch is limited to 10 invoices at a time."""
         # Create 35 invoices needing updates
         for i in range(35):
             Invoice.objects.create(
@@ -319,10 +319,10 @@ class TestFetchUpdatedInvoiceDetails:
 
             fetch_updated_invoice_details()
 
-        # Should only fetch 30
+        # Should only fetch 10
         mock_service.update_invoices.assert_called_once()
         call_args = mock_service.update_invoices.call_args[0][0]
-        assert len(call_args) == 30  # noqa: PLR2004
+        assert len(call_args) == 10  # noqa: PLR2004
 
     def test_fetch_logs_exceptions(self, xero_settings, invoice_user):
         """Test that exceptions are logged."""

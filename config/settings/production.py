@@ -7,7 +7,6 @@ from sentry_sdk.integrations.logging import LoggingIntegration
 from config.settings.base import *  # noqa: F403
 from config.settings.base import DATABASES
 from config.settings.base import INSTALLED_APPS
-from config.settings.base import Q_CLUSTER
 from config.settings.base import env
 
 # GENERAL
@@ -103,13 +102,6 @@ ANYMAIL = {
     "MAILGUN_SENDER_DOMAIN": env("MAILGUN_DOMAIN"),
     "MAILGUN_API_URL": env("MAILGUN_API_URL", default="https://api.mailgun.net/v3"),
 }
-
-# Django-Q2 - Production settings
-# ------------------------------------------------------------------------------
-Q_CLUSTER["workers"] = 1
-Q_CLUSTER["poll"] = 5
-Q_CLUSTER["save_limit"] = 5000  # Keep more history in production
-
 
 # LOGGING
 # ------------------------------------------------------------------------------

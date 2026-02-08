@@ -446,18 +446,19 @@ DOCUMENTATION_URL = env(
 Q_CLUSTER = {
     # Use Django ORM as broker (no Redis needed)
     "name": "ams",
+    "orm": "default",  # Use default database
     "workers": 1,  # Single worker for low-volume workload
+    "poll": 5,  # Seconds
+    "queue_limit": 3,  # Keep almost no tasks in memory
+    "recycle": 50,  # Restart worker frequently to release memory
+    "max_rss": 350000,  # ~350MB cap (KB units)
+    "save_limit": 3,  # Don't store success results
+    "catch_up": False,  # Avoid schedule backlog memory spikes
     "timeout": 60,  # Task timeout in seconds
     "retry": 240,  # Failed task retry delay in seconds (4 minutes)
     "max_attempts": 10,  # Maximum retry attempts
-    "queue_limit": 100,  # Max tasks in queue
     "bulk": 1,  # Process tasks one at a time
-    "orm": "default",  # Use default database
-    "poll": 5,
     "ack_failures": True,  # Keep failed tasks in database for inspection
-    "save_limit": 1000,  # Keep last 1000 successful tasks
-    "catch_up": False,  # Don't process tasks that are too old
-    "cpu_affinity": 1,  # Run on single CPU core
     "label": "Django-Q",
 }
 

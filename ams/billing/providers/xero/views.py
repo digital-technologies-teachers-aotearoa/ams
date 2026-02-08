@@ -26,7 +26,7 @@ from ams.organisations.mixins import user_is_organisation_admin
 
 logger = logging.getLogger(__name__)
 
-INVOICE_FETCH_UPDATE_LIMIT = 30
+INVOICE_FETCH_UPDATE_LIMIT = 10
 
 
 @transaction.atomic
