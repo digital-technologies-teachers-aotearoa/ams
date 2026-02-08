@@ -9,7 +9,6 @@ from django.views.decorators.http import require_http_methods
 from ams.terms.forms import TermAcceptanceForm
 from ams.terms.helpers import get_latest_term_versions
 from ams.terms.helpers import get_pending_term_versions_for_user
-from ams.terms.helpers import invalidate_pending_terms_cache
 from ams.terms.models import TermAcceptance
 
 
@@ -43,7 +42,7 @@ def accept_terms_view(request):
     On POST, records acceptance and redirects to next term or original destination.
 
     GET: Display the first pending term with acceptance form
-    POST: Record acceptance, invalidate cache, redirect to next term or destination
+    POST: Record acceptance, redirect to next term or destination
     """
     pending_versions = get_pending_term_versions_for_user(request.user)
 
@@ -60,18 +59,19 @@ def accept_terms_view(request):
     if request.method == "POST":
         form = TermAcceptanceForm(request.POST, term_version=term_version)
         if form.is_valid():
-            # Record acceptance
-            TermAcceptance.objects.create(
+            # Record acceptance (or get existing if already accepted)
+            # Using get_or_create prevents UniqueViolation if user already accepted
+            # this term (e.g., via another tab, cached data, or race condition)
+            TermAcceptance.objects.get_or_create(
                 user=request.user,
                 term_version=term_version,
-                ip_address=get_client_ip(request),
-                # Truncate for safety
-                user_agent=request.headers.get("user-agent", "")[:500],
-                source="web",
+                defaults={
+                    "ip_address": get_client_ip(request),
+                    # Truncate for safety
+                    "user_agent": request.headers.get("user-agent", "")[:500],
+                    "source": "web",
+                },
             )
-
-            # Invalidate cache
-            invalidate_pending_terms_cache(request.user)
 
             # Redirect to self with same 'next' parameter
             # This will show the next pending term, or redirect to destination

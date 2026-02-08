@@ -204,6 +204,45 @@ class TestAcceptTermsView:
         ).count()
         assert acceptances_count == 1
 
+    def test_accepting_already_accepted_term_does_not_error(self, client: Client):
+        """Test that accepting an already-accepted term handles gracefully.
+
+        This simulates the race condition where:
+        1. User accepts a term
+        2. Due to cache or multiple tabs, they're shown the same term again
+        3. They click accept again
+        4. Should not raise UniqueViolation error (bug report scenario)
+        """
+        user = UserFactory()
+        client.force_login(user)
+
+        term_version = TermVersionFactory(
+            is_active=True,
+            date_active=timezone.now() - timedelta(days=1),
+        )
+
+        # First acceptance
+        response1 = client.post(
+            reverse("terms:accept"),
+            data={"next": "/home/"},
+        )
+        assert response1.status_code == HTTPStatus.FOUND  # Successful redirect
+
+        # Accept again (simulating race condition/cached data)
+        # This should not raise a 500 error
+        response2 = client.post(
+            reverse("terms:accept"),
+            data={"next": "/home/"},
+        )
+        assert response2.status_code == HTTPStatus.FOUND  # Should still redirect
+
+        # Should only have one acceptance record
+        acceptances_count = TermAcceptance.objects.filter(
+            user=user,
+            term_version=term_version,
+        ).count()
+        assert acceptances_count == 1
+
     def test_displays_progress_indicator(self, client: Client):
         """Test that progress indicator is displayed correctly."""
         user = UserFactory()
