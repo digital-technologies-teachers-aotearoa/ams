@@ -2,7 +2,6 @@
 
 from typing import TYPE_CHECKING
 
-from django.core.cache import cache
 from django.utils import timezone
 
 from ams.terms.models import TermAcceptance
@@ -43,12 +42,6 @@ def get_pending_term_versions_for_user(user: "User") -> "list[TermVersion]":
     if not user.is_authenticated:
         return []
 
-    # Check cache first (5-minute TTL)
-    cache_key = f"pending_terms_{user.id}"
-    cached_result = cache.get(cache_key)
-    if cached_result is not None:
-        return cached_result
-
     now = timezone.now()
 
     # Get all current (active and enforceable) term versions
@@ -87,9 +80,6 @@ def get_pending_term_versions_for_user(user: "User") -> "list[TermVersion]":
     # Sort deterministically by term.key
     # This ensures users always see terms in the same order
     pending_versions.sort(key=lambda v: v.term.key)
-
-    # Cache for 5 minutes (300 seconds)
-    cache.set(cache_key, pending_versions, 300)
 
     return pending_versions
 
@@ -138,17 +128,3 @@ def get_latest_term_versions() -> "list[TermVersion]":
     latest_versions.sort(key=lambda v: v.term.key)
 
     return latest_versions
-
-
-def invalidate_pending_terms_cache(user: "User") -> None:
-    """
-    Invalidate the cached pending terms for a user.
-
-    Should be called after a user accepts a term version to ensure
-    fresh data on the next check.
-
-    Args:
-        user: The User instance whose cache to invalidate
-    """
-    cache_key = f"pending_terms_{user.id}"
-    cache.delete(cache_key)

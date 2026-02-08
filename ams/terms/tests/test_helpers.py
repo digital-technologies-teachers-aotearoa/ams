@@ -9,7 +9,6 @@ from django.utils import timezone
 
 from ams.terms.helpers import get_latest_term_versions
 from ams.terms.helpers import get_pending_term_versions_for_user
-from ams.terms.helpers import invalidate_pending_terms_cache
 from ams.terms.tests.factories import TermAcceptanceFactory
 from ams.terms.tests.factories import TermFactory
 from ams.terms.tests.factories import TermVersionFactory
@@ -278,55 +277,6 @@ class TestGetPendingTermVersionsForUser:
         assert len(result) == expected_terms
         assert result[0] == version_a2  # Latest for term A
         assert result[1] == version_b3  # Latest for term B
-
-    def test_caching_behavior(self):
-        """Test that results are cached for 5 minutes."""
-        user = UserFactory()
-        TermVersionFactory(
-            is_active=True,
-            date_active=timezone.now() - timedelta(days=1),
-        )
-
-        # First call - should query database
-        result1 = get_pending_term_versions_for_user(user)
-
-        # Create another version (should not appear due to caching)
-        TermVersionFactory(
-            is_active=True,
-            date_active=timezone.now() - timedelta(days=1),
-        )
-
-        # Second call - should use cache
-        result2 = get_pending_term_versions_for_user(user)
-
-        assert len(result1) == 1
-        assert len(result2) == 1  # Still 1 due to cache
-
-    def test_cache_invalidation(self):
-        """Test that cache can be invalidated."""
-        user = UserFactory()
-        TermVersionFactory(
-            is_active=True,
-            date_active=timezone.now() - timedelta(days=1),
-        )
-
-        # First call - cache result
-        result1 = get_pending_term_versions_for_user(user)
-        assert len(result1) == 1
-
-        # Invalidate cache
-        invalidate_pending_terms_cache(user)
-
-        # Create another version
-        TermVersionFactory(
-            is_active=True,
-            date_active=timezone.now() - timedelta(days=1),
-        )
-
-        # Second call - should see new version
-        result2 = get_pending_term_versions_for_user(user)
-        expected_terms = 2
-        assert len(result2) == expected_terms
 
     def test_returns_only_current_versions_not_all_active(self):
         """Test that only current versions are returned
