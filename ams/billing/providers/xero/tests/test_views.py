@@ -296,7 +296,7 @@ class TestFetchUpdatedInvoiceDetails:
         mock_service.update_invoices.assert_not_called()
 
     def test_fetch_limits_invoices(self, xero_settings, account_user):
-        """Test that fetch is limited to 10 invoices at a time."""
+        """Test that fetch is limited to 25 invoices at a time."""
         # Create 35 invoices needing updates
         for i in range(35):
             Invoice.objects.create(
@@ -319,10 +319,10 @@ class TestFetchUpdatedInvoiceDetails:
 
             fetch_updated_invoice_details()
 
-        # Should only fetch 10
+        # Should only fetch 25
         mock_service.update_invoices.assert_called_once()
         call_args = mock_service.update_invoices.call_args[0][0]
-        assert len(call_args) == 10  # noqa: PLR2004
+        assert len(call_args) == 25  # noqa: PLR2004
 
     def test_fetch_logs_exceptions(self, xero_settings, invoice_user):
         """Test that exceptions are logged."""
@@ -418,23 +418,15 @@ class TestXeroWebhooks:
         request.META["HTTP_X_XERO_SIGNATURE"] = signature
         request._body = payload_bytes
 
-        with (
-            patch(
-                "ams.billing.providers.xero.views.get_billing_service",
-            ) as mock_get_service,
-            patch(
-                "ams.billing.providers.xero.views.enqueue_invoice_update_task",
-            ) as mock_enqueue,
-        ):
+        with patch(
+            "ams.billing.providers.xero.views.get_billing_service",
+        ) as mock_get_service:
             mock_service = Mock(spec=XeroBillingService)
             mock_get_service.return_value = mock_service
-            mock_enqueue.return_value = "test-task-id-123"
 
             response = xero_webhooks(request)
 
         assert response.status_code == HTTPStatus.OK
-        # Verify task was enqueued
-        mock_enqueue.assert_called_once()
 
     def test_webhook_without_invoice_updates_does_not_enqueue_task(
         self,
@@ -470,22 +462,15 @@ class TestXeroWebhooks:
         request.META["HTTP_X_XERO_SIGNATURE"] = signature
         request._body = payload_bytes
 
-        with (
-            patch(
-                "ams.billing.providers.xero.views.get_billing_service",
-            ) as mock_get_service,
-            patch(
-                "ams.billing.providers.xero.views.enqueue_invoice_update_task",
-            ) as mock_enqueue,
-        ):
+        with patch(
+            "ams.billing.providers.xero.views.get_billing_service",
+        ) as mock_get_service:
             mock_service = Mock(spec=XeroBillingService)
             mock_get_service.return_value = mock_service
 
             response = xero_webhooks(request)
 
         assert response.status_code == HTTPStatus.OK
-        # Verify task was NOT enqueued
-        mock_enqueue.assert_not_called()
 
 
 class TestInvoiceRedirect:

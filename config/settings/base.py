@@ -117,7 +117,6 @@ THIRD_PARTY_APPS = [
     "taggit",
     "storages",
     "imagekit",
-    "django_q",
     "wagtail_color_panel",
 ]
 
@@ -441,26 +440,6 @@ DOCUMENTATION_URL = env(
     default="https://digital-technologies-teachers-aotearoa.github.io/ams/",
 )
 
-# Django-Q2 Task Queue
-# ------------------------------------------------------------------------------
-Q_CLUSTER = {
-    # Use Django ORM as broker (no Redis needed)
-    "name": "ams",
-    "orm": "default",  # Use default database
-    "workers": 1,  # Single worker for low-volume workload
-    "poll": 5,  # Seconds
-    "queue_limit": 3,  # Keep almost no tasks in memory
-    "recycle": 50,  # Restart worker frequently to release memory
-    "max_rss": 350000,  # ~350MB cap (KB units)
-    "save_limit": 3,  # Don't store success results
-    "catch_up": False,  # Avoid schedule backlog memory spikes
-    "timeout": 60,  # Task timeout in seconds
-    "retry": 240,  # Failed task retry delay in seconds (4 minutes)
-    "max_attempts": 10,  # Maximum retry attempts
-    "bulk": 1,  # Process tasks one at a time
-    "ack_failures": True,  # Keep failed tasks in database for inspection
-    "label": "Django-Q",
-}
 
 # Other settings
 # ------------------------------------------------------------------------------
