@@ -183,8 +183,8 @@ def process_invoice_update_events(
         return False
 
     processed_count = 0
-    invoice_update_count = 0
     other_event_types = set()
+    invoice_ids_to_update = []
 
     for event in events:
         event_category = event.get("eventCategory")
@@ -206,29 +206,24 @@ def process_invoice_update_events(
             and event_type == "UPDATE"
             and tenant_id == settings.XERO_TENANT_ID
         ):
-            billing_service_invoice_id: str = resource_id
-            updated_count = Invoice.objects.filter(
-                billing_service_invoice_id=billing_service_invoice_id,
-            ).update(update_needed=True)
-
-            if updated_count > 0:
-                invoice_update_count += 1
-                logger.info(
-                    "%sMarked invoice for update: xero_id=%s, updated=%d record(s)",
-                    log_prefix,
-                    billing_service_invoice_id,
-                    updated_count,
-                )
-            else:
-                logger.debug(
-                    "%sInvoice not found locally: xero_id=%s",
-                    log_prefix,
-                    billing_service_invoice_id,
-                )
-
+            invoice_ids_to_update.append(resource_id)
             processed_count += 1
         else:
             other_event_types.add(f"{event_category}:{event_type}")
+
+    invoice_update_count = 0
+    if invoice_ids_to_update:
+        invoice_update_count = Invoice.objects.filter(
+            billing_service_invoice_id__in=invoice_ids_to_update,
+        ).update(update_needed=True)
+
+        logger.info(
+            "%sMarked %d invoice(s) for update from %d event(s): xero_ids=%s",
+            log_prefix,
+            invoice_update_count,
+            len(invoice_ids_to_update),
+            ", ".join(invoice_ids_to_update),
+        )
 
     if other_event_types:
         logger.debug(

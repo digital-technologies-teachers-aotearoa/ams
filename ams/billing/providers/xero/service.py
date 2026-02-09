@@ -545,6 +545,8 @@ class XeroBillingService(BillingService):
         invoices: list[AccountingInvoice] = self._get_xero_invoices(
             billing_service_invoice_ids,
         )
+
+        invoices_to_update = []
         for accounting_invoice in invoices:
             invoice = Invoice.objects.get(
                 billing_service_invoice_id=accounting_invoice.invoice_id,
@@ -556,7 +558,21 @@ class XeroBillingService(BillingService):
             invoice.due = accounting_invoice.amount_due
             invoice.paid_date = accounting_invoice.fully_paid_on_date
             invoice.update_needed = False
-            invoice.save()
+            invoices_to_update.append(invoice)
+
+        if invoices_to_update:
+            Invoice.objects.bulk_update(
+                invoices_to_update,
+                fields=[
+                    "amount",
+                    "issue_date",
+                    "due_date",
+                    "paid",
+                    "due",
+                    "paid_date",
+                    "update_needed",
+                ],
+            )
 
 
 class MockXeroBillingService(XeroBillingService):

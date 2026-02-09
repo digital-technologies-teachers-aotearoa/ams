@@ -84,6 +84,14 @@ class Invoice(Model):
                 fields=["organisation_membership", "paid_date"],
                 name="idx_invoice_org",
             ),
+            Index(
+                fields=["billing_service_invoice_id"],
+                name="idx_invoice_xero_id",
+            ),
+            Index(
+                fields=["update_needed"],
+                name="idx_invoice_update_flag",
+            ),
         ]
 
     def __str__(self):
