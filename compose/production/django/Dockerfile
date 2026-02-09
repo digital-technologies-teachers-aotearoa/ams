@@ -139,11 +139,6 @@ COPY --chown=django:django ./compose/production/django/start-web.sh /start-web.s
 RUN sed -i 's/\r$//g' /start-web.sh  # Normalize potential Windows line endings.
 RUN chmod +x /start-web.sh
 
-# Copy and prepare worker start script.
-COPY --chown=django:django ./compose/production/django/start-worker.sh /start-worker.sh
-RUN sed -i 's/\r$//g' /start-worker.sh  # Normalize potential Windows line endings.
-RUN chmod +x /start-worker.sh
-
 # Create backward compatibility symlink for old start script.
 RUN ln -s /start-web.sh /start
 

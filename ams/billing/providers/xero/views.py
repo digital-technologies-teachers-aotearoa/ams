@@ -19,14 +19,13 @@ from django.views.decorators.csrf import csrf_exempt
 
 from ams.billing.models import Invoice
 from ams.billing.providers.xero.service import XeroBillingService
-from ams.billing.providers.xero.tasks.enqueue_tasks import enqueue_invoice_update_task
 from ams.billing.services import BillingService
 from ams.billing.services import get_billing_service
 from ams.organisations.mixins import user_is_organisation_admin
 
 logger = logging.getLogger(__name__)
 
-INVOICE_FETCH_UPDATE_LIMIT = 10
+INVOICE_FETCH_UPDATE_LIMIT = 25
 
 
 @transaction.atomic
@@ -411,6 +410,14 @@ def xero_webhooks(request: HttpRequest) -> HttpResponse:
         process_duration_ms,
     )
 
+    if has_invoice_updates:
+        logger.info(
+            "Marked invoices for update [%s] - will be processed by cron job",
+            webhook_id,
+        )
+    else:
+        logger.debug("No invoice updates needed [%s]", webhook_id)
+
     total_duration_ms = (time.perf_counter() - start_time) * 1000
     logger.info(
         "Webhook response sent [%s] - status=200, total_time=%.2f ms, "
@@ -420,15 +427,5 @@ def xero_webhooks(request: HttpRequest) -> HttpResponse:
         sig_duration_ms,
         process_duration_ms,
     )
-
-    if has_invoice_updates:
-        task_id = enqueue_invoice_update_task(webhook_id=webhook_id)
-        logger.info(
-            "Invoice update task enqueued [%s] - task_id=%s",
-            webhook_id,
-            task_id,
-        )
-    else:
-        logger.debug("No invoice updates needed [%s]", webhook_id)
 
     return HttpResponse(status=200)
