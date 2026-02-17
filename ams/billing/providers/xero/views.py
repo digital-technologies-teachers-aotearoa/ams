@@ -255,6 +255,24 @@ def verify_request_signature(request: HttpRequest) -> bool:
         True if the signature is valid, False otherwise.
     """
     signature = request.headers.get("x-xero-signature")
+
+    logger.debug(
+        "Signature verification - received_signature=%s, body_length=%d, "
+        "webhook_key_configured=%s",
+        signature,
+        len(request.body) if request.body else 0,
+        bool(settings.XERO_WEBHOOK_KEY),
+    )
+
+    if settings.XERO_WEBHOOK_KEY:
+        logger.debug(
+            "Webhook key info - length=%d, first_4_chars=%s",
+            len(settings.XERO_WEBHOOK_KEY),
+            settings.XERO_WEBHOOK_KEY[:4]
+            if len(settings.XERO_WEBHOOK_KEY) >= 4  # noqa: PLR2004
+            else "***",
+        )
+
     generated_signature = base64.b64encode(
         hmac.new(
             bytes(settings.XERO_WEBHOOK_KEY, "utf8"),
@@ -262,7 +280,21 @@ def verify_request_signature(request: HttpRequest) -> bool:
             hashlib.sha256,
         ).digest(),
     ).decode("utf-8")
-    return signature == generated_signature
+
+    logger.debug(
+        "Signature verification - generated_signature=%s",
+        generated_signature,
+    )
+
+    is_valid = signature == generated_signature
+
+    logger.debug(
+        "Signature verification result - is_valid=%s, signatures_match=%s",
+        is_valid,
+        "YES" if is_valid else "NO",
+    )
+
+    return is_valid
 
 
 @login_required
