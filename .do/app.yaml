@@ -142,12 +142,12 @@ jobs:
       - key: SENTRY_DSN
         scope: RUN_AND_BUILD_TIME
         value: ${SENTRY_DSN}
-      - key: SENTRY_LOG_LEVEL
-        scope: RUN_AND_BUILD_TIME
-        value: ${SENTRY_LOG_LEVEL}
       - key: SENTRY_ENVIRONMENT
         scope: RUN_AND_BUILD_TIME
         value: ${SENTRY_ENVIRONMENT}
+      - key: SENTRY_LOG_LEVEL
+        scope: RUN_AND_BUILD_TIME
+        value: ${SENTRY_LOG_LEVEL}
       - key: SENTRY_TRACES_SAMPLE_RATE
         scope: RUN_AND_BUILD_TIME
         value: ${SENTRY_TRACES_SAMPLE_RATE}
@@ -284,12 +284,12 @@ jobs:
       - key: SENTRY_DSN
         scope: RUN_AND_BUILD_TIME
         value: ${SENTRY_DSN}
-      - key: SENTRY_LOG_LEVEL
-        scope: RUN_AND_BUILD_TIME
-        value: ${SENTRY_LOG_LEVEL}
       - key: SENTRY_ENVIRONMENT
         scope: RUN_AND_BUILD_TIME
         value: ${SENTRY_ENVIRONMENT}
+      - key: SENTRY_LOG_LEVEL
+        scope: RUN_AND_BUILD_TIME
+        value: ${SENTRY_LOG_LEVEL}
       - key: SENTRY_TRACES_SAMPLE_RATE
         scope: RUN_AND_BUILD_TIME
         value: ${SENTRY_TRACES_SAMPLE_RATE}
@@ -426,12 +426,12 @@ services:
       - key: SENTRY_DSN
         scope: RUN_AND_BUILD_TIME
         value: ${SENTRY_DSN}
-      - key: SENTRY_LOG_LEVEL
-        scope: RUN_AND_BUILD_TIME
-        value: ${SENTRY_LOG_LEVEL}
       - key: SENTRY_ENVIRONMENT
         scope: RUN_AND_BUILD_TIME
         value: ${SENTRY_ENVIRONMENT}
+      - key: SENTRY_LOG_LEVEL
+        scope: RUN_AND_BUILD_TIME
+        value: ${SENTRY_LOG_LEVEL}
       - key: SENTRY_TRACES_SAMPLE_RATE
         scope: RUN_AND_BUILD_TIME
         value: ${SENTRY_TRACES_SAMPLE_RATE}
