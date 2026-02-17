@@ -110,7 +110,7 @@ ANYMAIL = {
 # more details on how to customize your logging configuration.
 LOGTAIL_SOURCE_TOKEN = env("LOGTAIL_SOURCE_TOKEN")
 LOGTAIL_INGESTING_HOST = env("LOGTAIL_INGESTING_HOST")
-LOG_LEVEL = "DEBUG" if DEBUG else "INFO"  # noqa: F405
+LOG_LEVEL = env("DJANGO_LOG_LEVEL", default="INFO")
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -167,6 +167,13 @@ LOGGING = {
             "level": "ERROR",
             "propagate": False,
         },
+        # Prevent urllib3 logs from re-entering the Logtail handler during flush
+        # (HTTP POSTs to Better Stack are logged by urllib3, which feeds back into
+        # the queue and causes an infinite loop on shutdown)
+        "urllib3": {
+            "level": "WARNING",
+            "propagate": False,
+        },
         # Gunicorn logger integration
         "gunicorn.error": {
             "level": "INFO",
@@ -183,7 +190,7 @@ LOGGING = {
 # Better Stack (uses Sentry SDK)
 # ------------------------------------------------------------------------------
 SENTRY_DSN = env("SENTRY_DSN")
-SENTRY_LOG_LEVEL = env.int("SENTRY_LOG_LEVEL", logging.INFO)
+SENTRY_LOG_LEVEL = env.int("SENTRY_LOG_LEVEL", default=logging.INFO)
 SENTRY_ENVIRONMENT = env("SENTRY_ENVIRONMENT", default="production")
 SENTRY_TRACES_SAMPLE_RATE = env.float("SENTRY_TRACES_SAMPLE_RATE", default=0.0)
 

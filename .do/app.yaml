@@ -139,15 +139,18 @@ jobs:
       - key: XERO_CURRENCY_CODE
         scope: RUN_AND_BUILD_TIME
         value: ${XERO_CURRENCY_CODE}
+      - key: DJANGO_LOG_LEVEL
+        scope: RUN_AND_BUILD_TIME
+        value: ${DJANGO_LOG_LEVEL}
       - key: SENTRY_DSN
         scope: RUN_AND_BUILD_TIME
         value: ${SENTRY_DSN}
-      - key: SENTRY_LOG_LEVEL
-        scope: RUN_AND_BUILD_TIME
-        value: ${SENTRY_LOG_LEVEL}
       - key: SENTRY_ENVIRONMENT
         scope: RUN_AND_BUILD_TIME
         value: ${SENTRY_ENVIRONMENT}
+      - key: SENTRY_LOG_LEVEL
+        scope: RUN_AND_BUILD_TIME
+        value: ${SENTRY_LOG_LEVEL}
       - key: SENTRY_TRACES_SAMPLE_RATE
         scope: RUN_AND_BUILD_TIME
         value: ${SENTRY_TRACES_SAMPLE_RATE}
@@ -281,15 +284,18 @@ jobs:
       - key: XERO_CURRENCY_CODE
         scope: RUN_AND_BUILD_TIME
         value: ${XERO_CURRENCY_CODE}
+      - key: DJANGO_LOG_LEVEL
+        scope: RUN_AND_BUILD_TIME
+        value: ${DJANGO_LOG_LEVEL}
       - key: SENTRY_DSN
         scope: RUN_AND_BUILD_TIME
         value: ${SENTRY_DSN}
-      - key: SENTRY_LOG_LEVEL
-        scope: RUN_AND_BUILD_TIME
-        value: ${SENTRY_LOG_LEVEL}
       - key: SENTRY_ENVIRONMENT
         scope: RUN_AND_BUILD_TIME
         value: ${SENTRY_ENVIRONMENT}
+      - key: SENTRY_LOG_LEVEL
+        scope: RUN_AND_BUILD_TIME
+        value: ${SENTRY_LOG_LEVEL}
       - key: SENTRY_TRACES_SAMPLE_RATE
         scope: RUN_AND_BUILD_TIME
         value: ${SENTRY_TRACES_SAMPLE_RATE}
@@ -423,15 +429,18 @@ services:
       - key: XERO_CURRENCY_CODE
         scope: RUN_AND_BUILD_TIME
         value: ${XERO_CURRENCY_CODE}
+      - key: DJANGO_LOG_LEVEL
+        scope: RUN_AND_BUILD_TIME
+        value: ${DJANGO_LOG_LEVEL}
       - key: SENTRY_DSN
         scope: RUN_AND_BUILD_TIME
         value: ${SENTRY_DSN}
-      - key: SENTRY_LOG_LEVEL
-        scope: RUN_AND_BUILD_TIME
-        value: ${SENTRY_LOG_LEVEL}
       - key: SENTRY_ENVIRONMENT
         scope: RUN_AND_BUILD_TIME
         value: ${SENTRY_ENVIRONMENT}
+      - key: SENTRY_LOG_LEVEL
+        scope: RUN_AND_BUILD_TIME
+        value: ${SENTRY_LOG_LEVEL}
       - key: SENTRY_TRACES_SAMPLE_RATE
         scope: RUN_AND_BUILD_TIME
         value: ${SENTRY_TRACES_SAMPLE_RATE}
