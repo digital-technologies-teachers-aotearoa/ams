@@ -110,7 +110,7 @@ ANYMAIL = {
 # more details on how to customize your logging configuration.
 LOGTAIL_SOURCE_TOKEN = env("LOGTAIL_SOURCE_TOKEN")
 LOGTAIL_INGESTING_HOST = env("LOGTAIL_INGESTING_HOST")
-LOG_LEVEL = "DEBUG" if DEBUG else "INFO"  # noqa: F405
+LOG_LEVEL = env("DJANGO_LOG_LEVEL", default="DEBUG" if DEBUG else "INFO")  # noqa: F405
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,

@@ -139,12 +139,12 @@ jobs:
       - key: XERO_CURRENCY_CODE
         scope: RUN_AND_BUILD_TIME
         value: ${XERO_CURRENCY_CODE}
+      - key: DJANGO_LOG_LEVEL
+        scope: RUN_AND_BUILD_TIME
+        value: ${DJANGO_LOG_LEVEL}
       - key: SENTRY_DSN
         scope: RUN_AND_BUILD_TIME
         value: ${SENTRY_DSN}
-      - key: SENTRY_LOG_LEVEL
-        scope: RUN_AND_BUILD_TIME
-        value: ${SENTRY_LOG_LEVEL}
       - key: SENTRY_ENVIRONMENT
         scope: RUN_AND_BUILD_TIME
         value: ${SENTRY_ENVIRONMENT}
@@ -281,12 +281,12 @@ jobs:
       - key: XERO_CURRENCY_CODE
         scope: RUN_AND_BUILD_TIME
         value: ${XERO_CURRENCY_CODE}
+      - key: DJANGO_LOG_LEVEL
+        scope: RUN_AND_BUILD_TIME
+        value: ${DJANGO_LOG_LEVEL}
       - key: SENTRY_DSN
         scope: RUN_AND_BUILD_TIME
         value: ${SENTRY_DSN}
-      - key: SENTRY_LOG_LEVEL
-        scope: RUN_AND_BUILD_TIME
-        value: ${SENTRY_LOG_LEVEL}
       - key: SENTRY_ENVIRONMENT
         scope: RUN_AND_BUILD_TIME
         value: ${SENTRY_ENVIRONMENT}
@@ -423,12 +423,12 @@ services:
       - key: XERO_CURRENCY_CODE
         scope: RUN_AND_BUILD_TIME
         value: ${XERO_CURRENCY_CODE}
+      - key: DJANGO_LOG_LEVEL
+        scope: RUN_AND_BUILD_TIME
+        value: ${DJANGO_LOG_LEVEL}
       - key: SENTRY_DSN
         scope: RUN_AND_BUILD_TIME
         value: ${SENTRY_DSN}
-      - key: SENTRY_LOG_LEVEL
-        scope: RUN_AND_BUILD_TIME
-        value: ${SENTRY_LOG_LEVEL}
       - key: SENTRY_ENVIRONMENT
         scope: RUN_AND_BUILD_TIME
         value: ${SENTRY_ENVIRONMENT}

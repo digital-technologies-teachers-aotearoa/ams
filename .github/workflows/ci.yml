@@ -163,8 +163,8 @@ jobs:
           MAILGUN_API_KEY: ${{ secrets.MAILGUN_API_KEY }}
           MAILGUN_DOMAIN: ${{ secrets.MAILGUN_DOMAIN }}
           MAILGUN_API_URL: ${{ secrets.MAILGUN_API_URL }}
+          DJANGO_LOG_LEVEL: ${{ secrets.DJANGO_LOG_LEVEL }}
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-          SENTRY_LOG_LEVEL: ${{ secrets.SENTRY_LOG_LEVEL }}
           SENTRY_ENVIRONMENT: ${{ secrets.SENTRY_ENVIRONMENT }}
           SENTRY_TRACES_SAMPLE_RATE: ${{ secrets.SENTRY_TRACES_SAMPLE_RATE }}
           LOGTAIL_SOURCE_TOKEN: ${{ secrets.LOGTAIL_SOURCE_TOKEN }}
