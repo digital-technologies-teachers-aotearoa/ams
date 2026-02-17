@@ -286,7 +286,7 @@ def verify_request_signature(request: HttpRequest) -> bool:
         generated_signature,
     )
 
-    is_valid = signature == generated_signature
+    is_valid = hmac.compare_digest(signature or "", generated_signature)
 
     logger.debug(
         "Signature verification result - is_valid=%s, signatures_match=%s",
