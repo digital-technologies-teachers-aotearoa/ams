@@ -15,6 +15,7 @@ from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
+from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 
 from ams.billing.models import Invoice
@@ -297,6 +298,36 @@ def verify_request_signature(request: HttpRequest) -> bool:
     return is_valid
 
 
+def _check_invoice_permission(request: HttpRequest, invoice: Invoice) -> None:
+    # Check if the user owns this invoice (individual membership)
+    user_owns_invoice = (
+        hasattr(request.user, "account") and invoice.account == request.user.account
+    )
+
+    # Check if the invoice belongs to an organisation where the user is an admin
+    user_is_org_admin = False
+    if hasattr(invoice.account, "organisation") and invoice.account.organisation:
+        user_is_org_admin = user_is_organisation_admin(
+            request.user,
+            invoice.account.organisation,
+        )
+
+    # Deny access if user doesn't own the invoice and isn't an org admin
+    if not user_owns_invoice and not user_is_org_admin:
+        raise PermissionDenied
+
+
+@login_required
+def invoice_detail(request: HttpRequest, invoice_number: str) -> HttpResponse:
+    """This view is currently used only by mock billing services.
+
+    Provides useful summary information in local development.
+    """
+    invoice = get_object_or_404(Invoice, invoice_number=invoice_number)
+    _check_invoice_permission(request, invoice)
+    return render(request, "billing/invoice_detail.html", {"invoice": invoice})
+
+
 @login_required
 def invoice_redirect(request: HttpRequest, invoice_number: str) -> HttpResponse:
     """Redirect to the online invoice URL.
@@ -317,23 +348,7 @@ def invoice_redirect(request: HttpRequest, invoice_number: str) -> HttpResponse:
         PermissionDenied: If the user doesn't have permission to view the invoice.
     """
     invoice = get_object_or_404(Invoice, invoice_number=invoice_number)
-
-    # Check if the user owns this invoice (individual membership)
-    user_owns_invoice = (
-        hasattr(request.user, "account") and invoice.account == request.user.account
-    )
-
-    # Check if the invoice belongs to an organisation where the user is an admin
-    user_is_org_admin = False
-    if hasattr(invoice.account, "organisation") and invoice.account.organisation:
-        user_is_org_admin = user_is_organisation_admin(
-            request.user,
-            invoice.account.organisation,
-        )
-
-    # Deny access if user doesn't own the invoice and isn't an org admin
-    if not user_owns_invoice and not user_is_org_admin:
-        raise PermissionDenied
+    _check_invoice_permission(request, invoice)
 
     billing_service: BillingService | None = get_billing_service()
     if not billing_service:

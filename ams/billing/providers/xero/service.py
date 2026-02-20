@@ -9,6 +9,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.http.response import HttpResponse
+from django.urls import reverse
 from xero_python.accounting import AccountingApi
 from xero_python.accounting import Contact
 from xero_python.accounting import Contacts
@@ -640,16 +641,25 @@ class MockXeroBillingService(XeroBillingService):
         """
         return
 
-    def _get_online_invoice_url(self, billing_service_invoice_id: str) -> str:
+    def _get_online_invoice_url(self, billing_service_invoice_id: str) -> str | None:
         """Mock the online invoice URL from Xero.
 
         Args:
             billing_service_invoice_id: The Xero invoice ID.
 
         Returns:
-            The online invoice URL from Xero.
+            The local invoice detail URL, or None if the invoice is not found.
         """
-        return
+        try:
+            invoice = Invoice.objects.get(
+                billing_service_invoice_id=billing_service_invoice_id,
+            )
+        except Invoice.DoesNotExist:
+            return None
+        return reverse(
+            "billing:invoice-detail",
+            kwargs={"invoice_number": invoice.invoice_number},
+        )
 
     def _create_xero_invoice(
         self,

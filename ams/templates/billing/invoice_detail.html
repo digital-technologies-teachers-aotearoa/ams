@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+
+{% block title %}
+  {% trans "Invoice" %} {{ invoice.invoice_number }}
+{% endblock title %}
+
+{% comment %} This template is currently used Mock billing services {% endcomment %}
+{% block content %}
+  <div class="container my-5">
+    <div class="row">
+      <div class="col-12 col-md-8 offset-md-2">
+        <h1>{% trans "Invoice" %} #{{ invoice.invoice_number }}</h1>
+        <table class="table">
+          <tbody>
+            <tr>
+              <th>{% trans "Invoice Number" %}</th>
+              <td>{{ invoice.invoice_number }}</td>
+            </tr>
+            <tr>
+              <th>{% trans "Account" %}</th>
+              <td>{{ invoice.account }}</td>
+            </tr>
+            <tr>
+              <th>{% trans "Issue Date" %}</th>
+              <td>{{ invoice.issue_date|date:"d/m/Y" }}</td>
+            </tr>
+            <tr>
+              <th>{% trans "Due Date" %}</th>
+              <td>{{ invoice.due_date|date:"d/m/Y" }}</td>
+            </tr>
+            <tr>
+              <th>{% trans "Paid Date" %}</th>
+              <td>{{ invoice.paid_date|date:"d/m/Y"|default:"-" }}</td>
+            </tr>
+            <tr>
+              <th>{% trans "Amount" %}</th>
+              <td>{{ invoice.amount }}</td>
+            </tr>
+            <tr>
+              <th>{% trans "Paid" %}</th>
+              <td>{{ invoice.paid }}</td>
+            </tr>
+            <tr>
+              <th>{% trans "Amount Due" %}</th>
+              <td class="fw-bold">{{ invoice.due }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
