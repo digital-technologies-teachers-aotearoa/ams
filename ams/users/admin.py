@@ -12,6 +12,7 @@ from ams.users.forms import UserAdminChangeForm
 from ams.users.forms import UserAdminCreationForm
 from ams.users.models import ProfileField
 from ams.users.models import ProfileFieldGroup
+from ams.users.models import ProfileFieldResponse
 from ams.users.models import User
 from ams.users.widgets import OptionsWidget
 from ams.users.widgets import TranslationWidget
@@ -131,10 +132,19 @@ class ProfileFieldAdmin(admin.ModelAdmin):
         return super().formfield_for_dbfield(db_field, request, **kwargs)
 
 
+class ProfileFieldResponseInline(admin.TabularInline):
+    model = ProfileFieldResponse
+    extra = 0
+    fields = ("profile_field", "value", "updated_datetime")
+    readonly_fields = ("updated_datetime",)
+    autocomplete_fields = ("profile_field",)
+
+
 @admin.register(User)
 class UserAdmin(auth_admin.UserAdmin):
     form = UserAdminChangeForm
     add_form = UserAdminCreationForm
+    inlines = [ProfileFieldResponseInline]
     fieldsets = (
         (None, {"fields": ("email", "password")}),
         (
@@ -225,3 +235,8 @@ class UserAdmin(auth_admin.UserAdmin):
             writer.writerow(row)
 
         return response
+
+    def get_inlines(self, request, obj=None):
+        if obj is None:
+            return []
+        return super().get_inlines(request, obj)

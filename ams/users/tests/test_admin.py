@@ -36,6 +36,10 @@ class TestUserAdmin:
                 "first_name": "New",
                 "last_name": "Admin",
                 "username": "admin1234",
+                "profile_responses-TOTAL_FORMS": "0",
+                "profile_responses-INITIAL_FORMS": "0",
+                "profile_responses-MIN_NUM_FORMS": "0",
+                "profile_responses-MAX_NUM_FORMS": "1000",
             },
         )
         assert response.status_code == HTTPStatus.FOUND
