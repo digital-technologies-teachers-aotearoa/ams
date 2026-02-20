@@ -2,6 +2,7 @@ from datetime import date
 from typing import Any
 
 from django.contrib.auth.models import User
+from django.urls import reverse
 
 from ams.billing.models import Account
 from ams.billing.models import Invoice
@@ -59,4 +60,7 @@ class MockBillingService(BillingService):
         )
 
     def get_invoice_url(self, invoice: Invoice) -> str | None:
-        return
+        return reverse(
+            "billing:invoice-detail",
+            kwargs={"invoice_number": invoice.invoice_number},
+        )
