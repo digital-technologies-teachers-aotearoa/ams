@@ -13,6 +13,7 @@ class AccountAdmin(admin.ModelAdmin):
 
 @admin.register(Invoice)
 class InvoiceAdmin(admin.ModelAdmin):
+    actions = ["mark_update_needed"]
     list_display = (
         "account",
         "invoice_number",
@@ -80,3 +81,7 @@ class InvoiceAdmin(admin.ModelAdmin):
             },
         ),
     )
+
+    @admin.action(description="Mark selected invoices for update")
+    def mark_update_needed(self, request, queryset):
+        queryset.update(update_needed=True)
