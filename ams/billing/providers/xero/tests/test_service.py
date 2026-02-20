@@ -598,7 +598,7 @@ class TestMockXeroBillingService:
 
         assert invoice.account == account_user
         assert invoice.amount == Decimal("100.00")
-        assert invoice.invoice_number == "INV-1234"
+        assert invoice.invoice_number == "INV-1"
 
     def test_mock_service_email_invoice(self, xero_settings, invoice_user):
         """Test that mock service handles email requests."""

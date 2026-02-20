@@ -1,5 +1,6 @@
 import json
 import logging
+import uuid
 from contextlib import suppress
 from typing import TYPE_CHECKING
 from typing import Any
@@ -674,8 +675,8 @@ class MockXeroBillingService(XeroBillingService):
             total += line_item["unit_amount"] * line_item["quantity"]
 
         invoice: AccountingInvoice = AccountingInvoice(
-            invoice_id="e576f965-f2fb-459f-9ea8-035424ae31d7",
-            invoice_number="INV-1234",
+            invoice_id=str(uuid.uuid4()),
+            invoice_number=f"INV-{Invoice.objects.count() + 1}",
             date=str(invoice_details["date"]),
             due_date=str(invoice_details["due_date"]),
             total=total,
