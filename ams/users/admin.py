@@ -4,10 +4,14 @@ from allauth.account.decorators import secure_admin_login
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth import admin as auth_admin
-from django.http import HttpResponse
+from django.db.models import Prefetch
+from django.http import StreamingHttpResponse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from ams.memberships.models import IndividualMembership
+from ams.memberships.models import MembershipStatus
+from ams.organisations.models import OrganisationMember
 from ams.users.forms import UserAdminChangeForm
 from ams.users.forms import UserAdminCreationForm
 from ams.users.models import ProfileField
@@ -191,50 +195,141 @@ class UserAdmin(auth_admin.UserAdmin):
             },
         ),
     )
-    actions = ["export_profile_responses_csv"]
+    actions = ["export_users_csv"]
 
-    @admin.action(description=_("Export profile responses to CSV"))
-    def export_profile_responses_csv(self, request, queryset):
-        """Export profile responses for selected users to CSV."""
-        # Get all active profile fields
+    @admin.action(description=_("Export users to CSV"))
+    def export_users_csv(self, request, queryset):
+        """Export all user data for selected users to CSV."""
         profile_fields = ProfileField.objects.filter(is_active=True).order_by(
             "group__order",
             "order",
         )
 
-        # Create CSV response
-        response = HttpResponse(content_type="text/csv")
-        filename = f"profile_responses_{timezone.now().strftime('%Y%m%d_%H%M%S')}.csv"
-        response["Content-Disposition"] = f'attachment; filename="{filename}"'
+        queryset = queryset.prefetch_related(
+            "profile_responses__profile_field",
+            Prefetch(
+                "individual_memberships",
+                queryset=IndividualMembership.objects.select_related(
+                    "membership_option",
+                ).order_by("-created_datetime"),
+            ),
+            Prefetch(
+                "organisation_members",
+                queryset=OrganisationMember.objects.active()
+                .select_related("organisation")
+                .prefetch_related(
+                    "organisation__organisation_memberships__membership_option",
+                )
+                .order_by("-created_datetime"),
+            ),
+        )
 
-        # Create CSV writer
-        writer = csv.writer(response)
+        headers = [
+            "Email",
+            "First Name",
+            "Last Name",
+            "Username",
+            "Active Member",
+            "Date Joined",
+            "Last Login",
+            "Is Active",
+            "Is Staff",
+            "Is Superuser",
+            "Admin Notes",
+            "Individual Membership Status",
+            "Membership Option",
+            "Membership Start Date",
+            "Membership Expiry Date",
+            "Organisation Name",
+            "Organisation Role",
+            "Organisation Membership Status",
+        ]
+        headers.extend([field.field_key for field in profile_fields])
 
-        # Write header row
-        header = ["Email", "First Name", "Last Name"]
-        header.extend([field.field_key for field in profile_fields])
-        writer.writerow(header)
+        class Echo:
+            def write(self, value):
+                return value
 
-        # Write data rows
-        for user in queryset.select_related().prefetch_related("profile_responses"):
-            # Create dict mapping field_key → value
-            responses_dict = {
-                resp.profile_field.field_key: resp.get_value()
-                for resp in user.profile_responses.all()
-            }
+        def generate_rows():
+            writer = csv.writer(Echo())
+            yield writer.writerow(headers)
 
-            # Build row
-            row = [user.email, user.first_name, user.last_name]
-            for field in profile_fields:
-                value = responses_dict.get(field.field_key, "")
-                # Convert lists to comma-separated strings
-                if isinstance(value, list):
-                    value = ", ".join(str(v) for v in value)
-                row.append(value)
+            for user in queryset:
+                responses_dict = {
+                    resp.profile_field.field_key: resp.get_value()
+                    for resp in user.profile_responses.all()
+                }
 
-            writer.writerow(row)
+                # Individual membership (most recent)
+                ind_memberships = list(user.individual_memberships.all())
+                if ind_memberships:
+                    ind = ind_memberships[0]
+                    ind_status = ind.status()
+                    ind_option = ind.membership_option.name
+                    ind_start = ind.start_date
+                    ind_expiry = ind.expiry_date
+                else:
+                    ind_status = MembershipStatus.NONE
+                    ind_option = ""
+                    ind_start = ""
+                    ind_expiry = ""
 
-        return response
+                # Organisation membership (most recent active org member)
+                org_members = list(user.organisation_members.all())
+                if org_members:
+                    org_member = org_members[0]
+                    org_name = org_member.organisation.name
+                    org_role = org_member.get_role_display()
+                    org_membership = org_member.organisation.get_active_membership()
+                    org_status = (
+                        org_membership.status()
+                        if org_membership
+                        else MembershipStatus.NONE
+                    )
+                else:
+                    org_name = ""
+                    org_role = ""
+                    org_status = ""
+
+                row = [
+                    user.email,
+                    user.first_name,
+                    user.last_name,
+                    user.username,
+                    user.check_has_active_membership_core(),
+                    user.date_joined.strftime("%Y-%m-%d %H:%M:%S"),
+                    (
+                        user.last_login.strftime("%Y-%m-%d %H:%M:%S")
+                        if user.last_login
+                        else ""
+                    ),
+                    user.is_active,
+                    user.is_staff,
+                    user.is_superuser,
+                    user.admin_notes,
+                    ind_status,
+                    ind_option,
+                    ind_start,
+                    ind_expiry,
+                    org_name,
+                    org_role,
+                    org_status,
+                ]
+
+                for field in profile_fields:
+                    value = responses_dict.get(field.field_key, "")
+                    if isinstance(value, list):
+                        value = ", ".join(str(v) for v in value)
+                    row.append(value)
+
+                yield writer.writerow(row)
+
+        filename = f"users_export_{timezone.now().strftime('%Y%m%d_%H%M%S')}.csv"
+        return StreamingHttpResponse(
+            generate_rows(),
+            content_type="text/csv",
+            headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+        )
 
     def get_inlines(self, request, obj=None):
         if obj is None:

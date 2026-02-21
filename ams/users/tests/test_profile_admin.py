@@ -1,10 +1,18 @@
 import csv
+import datetime
 from io import StringIO
 
 import pytest
 from django.contrib.admin.sites import AdminSite
 from django.test import RequestFactory
+from django.utils import timezone
 
+from ams.memberships.models import MembershipStatus
+from ams.memberships.tests.factories import IndividualMembershipFactory
+from ams.memberships.tests.factories import MembershipOptionFactory
+from ams.memberships.tests.factories import OrganisationMembershipFactory
+from ams.organisations.tests.factories import OrganisationFactory
+from ams.organisations.tests.factories import OrganisationMemberFactory
 from ams.users.admin import ProfileFieldAdmin
 from ams.users.admin import ProfileFieldGroupAdmin
 from ams.users.admin import UserAdmin
@@ -157,161 +165,241 @@ class TestProfileFieldAdmin:
         assert "field_key" not in readonly_fields
 
 
+def _parse_streaming_csv(response):
+    """Parse a StreamingHttpResponse containing CSV data into rows."""
+    content = b"".join(response.streaming_content).decode("utf-8")
+    return list(csv.reader(StringIO(content)))
+
+
 @pytest.mark.django_db
-class TestUserAdmin:
-    """Tests for UserAdmin with profile field extensions."""
+class TestExportUsersCsv:
+    """Tests for the export_users_csv admin action."""
 
-    def test_has_export_action(self, admin_site):
-        """Test UserAdmin has export_profile_responses_csv action."""
+    def test_has_export_users_action(self, admin_site):
         admin = UserAdmin(User, admin_site)
-        assert "export_profile_responses_csv" in admin.actions
+        assert "export_users_csv" in admin.actions
 
-    def test_export_profile_responses_csv_basic(
+    def test_streaming_response_content_type(
         self,
         admin_site,
-        profile_field,
         request_factory,
         admin_user,
     ):
-        """Test export_profile_responses_csv creates CSV."""
         admin = UserAdmin(User, admin_site)
-
-        # Create users with responses
-        user1 = UserFactory(
-            email="user1@example.com",
-            first_name="John",
-            last_name="Doe",
-        )
-        user2 = UserFactory(
-            email="user2@example.com",
-            first_name="Jane",
-            last_name="Smith",
-        )
-
-        ProfileFieldResponse.objects.create(
-            user=user1,
-            profile_field=profile_field,
-            value="Response 1",
-        )
-        ProfileFieldResponse.objects.create(
-            user=user2,
-            profile_field=profile_field,
-            value="Response 2",
-        )
-
-        # Create request
         request = request_factory.get("/")
         request.user = admin_user
-
-        # Export
-        queryset = User.objects.filter(pk__in=[user1.pk, user2.pk])
-        response = admin.export_profile_responses_csv(request, queryset)
-
-        # Check response type
+        response = admin.export_users_csv(request, User.objects.none())
         assert response["Content-Type"] == "text/csv"
-        assert "attachment" in response["Content-Disposition"]
 
-        # Parse CSV
-        content = response.content.decode("utf-8")
-        csv_reader = csv.reader(StringIO(content))
-        rows = list(csv_reader)
+    def test_filename_format(
+        self,
+        admin_site,
+        request_factory,
+        admin_user,
+    ):
+        admin = UserAdmin(User, admin_site)
+        request = request_factory.get("/")
+        request.user = admin_user
+        response = admin.export_users_csv(request, User.objects.none())
+        assert "users_export_" in response["Content-Disposition"]
+        assert ".csv" in response["Content-Disposition"]
 
-        # Check header
-        assert rows[0] == ["Email", "First Name", "Last Name", "test_field"]
-
-        # Check data rows
-        expected_rows = 3  # Header + 2 users
-        assert len(rows) == expected_rows
-
-        # Find user1 row
-        user1_row = next(row for row in rows if row[0] == "user1@example.com")
-        assert user1_row[1] == "John"
-        assert user1_row[2] == "Doe"
-        assert user1_row[3] == "Response 1"
-
-        # Find user2 row
-        user2_row = next(row for row in rows if row[0] == "user2@example.com")
-        assert user2_row[1] == "Jane"
-        assert user2_row[2] == "Smith"
-        assert user2_row[3] == "Response 2"
-
-    def test_export_handles_missing_responses(
+    def test_export_basic_with_all_data(
         self,
         admin_site,
         profile_field,
         request_factory,
         admin_user,
     ):
-        """Test export handles users without responses."""
+        """Test export with a user that has profile, membership, and org data."""
         admin = UserAdmin(User, admin_site)
 
-        # Create user without response
-        user = UserFactory(email="user@example.com")
+        user = UserFactory(
+            email="full@example.com",
+            first_name="Full",
+            last_name="User",
+            username="fulluser",
+        )
 
-        # Create request
+        # Profile response
+        ProfileFieldResponse.objects.create(
+            user=user,
+            profile_field=profile_field,
+            value="My Response",
+        )
+
+        # Individual membership (active, approved)
+        option = MembershipOptionFactory(name="Gold Plan")
+        IndividualMembershipFactory(
+            user=user,
+            membership_option=option,
+            approved=True,
+        )
+
+        # Organisation membership
+        org = OrganisationFactory(name="Test Corp")
+        OrganisationMemberFactory(
+            user=user,
+            organisation=org,
+            accepted=True,
+            role="ADMIN",
+        )
+        OrganisationMembershipFactory(
+            organisation=org,
+            approved=True,
+        )
+
         request = request_factory.get("/")
         request.user = admin_user
-
-        # Export
         queryset = User.objects.filter(pk=user.pk)
-        response = admin.export_profile_responses_csv(request, queryset)
+        response = admin.export_users_csv(request, queryset)
+        rows = _parse_streaming_csv(response)
 
-        # Parse CSV
-        content = response.content.decode("utf-8")
-        csv_reader = csv.reader(StringIO(content))
-        rows = list(csv_reader)
+        # Check header has all sections
+        header = rows[0]
+        assert "Email" in header
+        assert "Active Member" in header
+        assert "test_field" in header
+        assert "Individual Membership Status" in header
+        assert "Organisation Name" in header
 
-        # Check data row has empty value for missing response
-        assert rows[1][3] == ""
+        # Check data row
+        data_row = rows[1]
+        email_idx = header.index("Email")
+        assert data_row[email_idx] == "full@example.com"
 
-    def test_export_handles_checkbox_lists(
+        first_name_idx = header.index("First Name")
+        assert data_row[first_name_idx] == "Full"
+
+        active_member_idx = header.index("Active Member")
+        assert data_row[active_member_idx] == "True"
+
+        profile_idx = header.index("test_field")
+        assert data_row[profile_idx] == "My Response"
+
+        status_idx = header.index("Individual Membership Status")
+        assert data_row[status_idx] == MembershipStatus.ACTIVE
+
+        option_idx = header.index("Membership Option")
+        assert data_row[option_idx] == "Gold Plan"
+
+        org_name_idx = header.index("Organisation Name")
+        assert data_row[org_name_idx] == "Test Corp"
+
+        org_role_idx = header.index("Organisation Role")
+        assert data_row[org_role_idx] == "Admin"
+
+    def test_export_user_no_memberships_no_org(
+        self,
+        admin_site,
+        request_factory,
+        admin_user,
+    ):
+        """Test export for user with no memberships or org."""
+        admin = UserAdmin(User, admin_site)
+
+        user = UserFactory(email="bare@example.com")
+
+        request = request_factory.get("/")
+        request.user = admin_user
+        queryset = User.objects.filter(pk=user.pk)
+        response = admin.export_users_csv(request, queryset)
+        rows = _parse_streaming_csv(response)
+
+        header = rows[0]
+        data_row = rows[1]
+
+        status_idx = header.index("Individual Membership Status")
+        assert data_row[status_idx] == MembershipStatus.NONE
+
+        option_idx = header.index("Membership Option")
+        assert data_row[option_idx] == ""
+
+        org_name_idx = header.index("Organisation Name")
+        assert data_row[org_name_idx] == ""
+
+    def test_export_multiple_memberships_picks_most_recent(
+        self,
+        admin_site,
+        request_factory,
+        admin_user,
+    ):
+        """Test that the most recent membership is used when user has multiple."""
+        admin = UserAdmin(User, admin_site)
+
+        user = UserFactory(email="multi@example.com")
+
+        old_option = MembershipOptionFactory(name="Old Plan")
+        new_option = MembershipOptionFactory(name="New Plan")
+
+        # Older membership
+        IndividualMembershipFactory(
+            user=user,
+            membership_option=old_option,
+            approved=True,
+            created_datetime=timezone.now() - timezone.timedelta(days=365),
+        )
+        # Newer membership
+        IndividualMembershipFactory(
+            user=user,
+            membership_option=new_option,
+            approved=True,
+        )
+
+        request = request_factory.get("/")
+        request.user = admin_user
+        queryset = User.objects.filter(pk=user.pk)
+        response = admin.export_users_csv(request, queryset)
+        rows = _parse_streaming_csv(response)
+
+        header = rows[0]
+        data_row = rows[1]
+
+        option_idx = header.index("Membership Option")
+        assert data_row[option_idx] == "New Plan"
+
+    def test_export_checkbox_profile_field(
         self,
         admin_site,
         profile_group,
         request_factory,
         admin_user,
     ):
-        """Test export converts checkbox lists to comma-separated strings."""
+        """Test checkbox profile fields render as comma-separated strings."""
         admin = UserAdmin(User, admin_site)
 
-        # Create checkbox field
         checkbox_field = ProfileField.objects.create(
-            field_key="subjects",
+            field_key="interests",
             field_type=ProfileField.FieldType.CHECKBOX,
-            label_translations={"en": "Subjects"},
+            label_translations={"en": "Interests"},
             options={
                 "choices": [
-                    {"value": "math", "label_translations": {"en": "Math"}},
-                    {"value": "science", "label_translations": {"en": "Science"}},
+                    {"value": "art", "label_translations": {"en": "Art"}},
+                    {"value": "music", "label_translations": {"en": "Music"}},
                 ],
             },
             group=profile_group,
         )
 
-        # Create user with checkbox response
         user = UserFactory()
-        response = ProfileFieldResponse.objects.create(
+        resp = ProfileFieldResponse.objects.create(
             user=user,
             profile_field=checkbox_field,
         )
-        response.set_value(["math", "science"])
-        response.save()
+        resp.set_value(["art", "music"])
+        resp.save()
 
-        # Create request
         request = request_factory.get("/")
         request.user = admin_user
-
-        # Export
         queryset = User.objects.filter(pk=user.pk)
-        response_obj = admin.export_profile_responses_csv(request, queryset)
+        response = admin.export_users_csv(request, queryset)
+        rows = _parse_streaming_csv(response)
 
-        # Parse CSV
-        content = response_obj.content.decode("utf-8")
-        csv_reader = csv.reader(StringIO(content))
-        rows = list(csv_reader)
+        header = rows[0]
+        data_row = rows[1]
 
-        # Check checkbox values are comma-separated
-        assert rows[1][3] == "math, science"
+        interests_idx = header.index("interests")
+        assert data_row[interests_idx] == "art, music"
 
     def test_export_only_includes_active_fields(
         self,
@@ -320,65 +408,265 @@ class TestUserAdmin:
         request_factory,
         admin_user,
     ):
-        """Test export only includes active fields in columns."""
+        """Test export only includes active profile fields in columns."""
         admin = UserAdmin(User, admin_site)
 
-        # Create active field
         ProfileField.objects.create(
-            field_key="active",
+            field_key="active_field",
             field_type=ProfileField.FieldType.TEXT,
             label_translations={"en": "Active"},
             group=profile_group,
             is_active=True,
         )
-
-        # Create inactive field
         ProfileField.objects.create(
-            field_key="inactive",
+            field_key="inactive_field",
             field_type=ProfileField.FieldType.TEXT,
             label_translations={"en": "Inactive"},
             group=profile_group,
             is_active=False,
         )
 
-        # Create user
         user = UserFactory()
 
-        # Create request
         request = request_factory.get("/")
         request.user = admin_user
-
-        # Export
         queryset = User.objects.filter(pk=user.pk)
-        response = admin.export_profile_responses_csv(request, queryset)
+        response = admin.export_users_csv(request, queryset)
+        rows = _parse_streaming_csv(response)
 
-        # Parse CSV
-        content = response.content.decode("utf-8")
-        csv_reader = csv.reader(StringIO(content))
-        rows = list(csv_reader)
+        header = rows[0]
+        assert "active_field" in header
+        assert "inactive_field" not in header
 
-        # Check header only includes active field
-        assert "active" in rows[0]
-        assert "inactive" not in rows[0]
-
-    def test_export_filename_format(
+    def test_export_user_no_profile_responses(
         self,
         admin_site,
         profile_field,
         request_factory,
         admin_user,
     ):
-        """Test export filename has correct format."""
+        """Test export for user with no profile responses shows empty columns."""
         admin = UserAdmin(User, admin_site)
 
-        # Create request
+        user = UserFactory()
+
         request = request_factory.get("/")
         request.user = admin_user
+        queryset = User.objects.filter(pk=user.pk)
+        response = admin.export_users_csv(request, queryset)
+        rows = _parse_streaming_csv(response)
 
-        # Export
-        queryset = User.objects.none()
-        response = admin.export_profile_responses_csv(request, queryset)
+        header = rows[0]
+        data_row = rows[1]
 
-        # Check filename format
-        assert "profile_responses_" in response["Content-Disposition"]
-        assert ".csv" in response["Content-Disposition"]
+        profile_idx = header.index("test_field")
+        assert data_row[profile_idx] == ""
+
+    def test_export_user_with_null_last_login(
+        self,
+        admin_site,
+        request_factory,
+        admin_user,
+    ):
+        """Test export for user who has never logged in shows empty Last Login."""
+        admin = UserAdmin(User, admin_site)
+
+        user = UserFactory(last_login=None)
+
+        request = request_factory.get("/")
+        request.user = admin_user
+        queryset = User.objects.filter(pk=user.pk)
+        response = admin.export_users_csv(request, queryset)
+        rows = _parse_streaming_csv(response)
+
+        header = rows[0]
+        data_row = rows[1]
+
+        last_login_idx = header.index("Last Login")
+        assert data_row[last_login_idx] == ""
+
+    def test_export_individual_membership_expired_status(
+        self,
+        admin_site,
+        request_factory,
+        admin_user,
+    ):
+        """Test export shows EXPIRED for membership with past expiry date."""
+        admin = UserAdmin(User, admin_site)
+
+        user = UserFactory()
+        IndividualMembershipFactory(user=user, approved=True, expired=True)
+
+        request = request_factory.get("/")
+        request.user = admin_user
+        queryset = User.objects.filter(pk=user.pk)
+        response = admin.export_users_csv(request, queryset)
+        rows = _parse_streaming_csv(response)
+
+        header = rows[0]
+        data_row = rows[1]
+
+        status_idx = header.index("Individual Membership Status")
+        assert data_row[status_idx] == MembershipStatus.EXPIRED
+
+    def test_export_individual_membership_cancelled_status(
+        self,
+        admin_site,
+        request_factory,
+        admin_user,
+    ):
+        """Test export shows CANCELLED for membership with cancelled_datetime set."""
+        admin = UserAdmin(User, admin_site)
+
+        user = UserFactory()
+        IndividualMembershipFactory(user=user, approved=True, cancelled=True)
+
+        request = request_factory.get("/")
+        request.user = admin_user
+        queryset = User.objects.filter(pk=user.pk)
+        response = admin.export_users_csv(request, queryset)
+        rows = _parse_streaming_csv(response)
+
+        header = rows[0]
+        data_row = rows[1]
+
+        status_idx = header.index("Individual Membership Status")
+        assert data_row[status_idx] == MembershipStatus.CANCELLED
+
+    def test_export_organisation_with_no_active_membership(
+        self,
+        admin_site,
+        request_factory,
+        admin_user,
+    ):
+        """Test org member whose organisation has no active membership."""
+        admin = UserAdmin(User, admin_site)
+
+        user = UserFactory()
+        org = OrganisationFactory(name="Expired Corp")
+        OrganisationMemberFactory(
+            user=user,
+            organisation=org,
+            accepted=True,
+            role="ADMIN",
+        )
+        # Create an expired org membership so get_active_membership() returns None
+        OrganisationMembershipFactory(
+            organisation=org,
+            approved=True,
+            expired=True,
+        )
+
+        request = request_factory.get("/")
+        request.user = admin_user
+        queryset = User.objects.filter(pk=user.pk)
+        response = admin.export_users_csv(request, queryset)
+        rows = _parse_streaming_csv(response)
+
+        header = rows[0]
+        data_row = rows[1]
+
+        org_name_idx = header.index("Organisation Name")
+        assert data_row[org_name_idx] == "Expired Corp"
+
+        org_role_idx = header.index("Organisation Role")
+        assert data_row[org_role_idx] == "Admin"
+
+        org_status_idx = header.index("Organisation Membership Status")
+        assert data_row[org_status_idx] == MembershipStatus.NONE
+
+    def test_export_csv_special_characters(
+        self,
+        admin_site,
+        profile_group,
+        request_factory,
+        admin_user,
+    ):
+        """Test CSV properly escapes special characters in field values."""
+        admin = UserAdmin(User, admin_site)
+
+        special_field = ProfileField.objects.create(
+            field_key="bio",
+            field_type=ProfileField.FieldType.TEXT,
+            label_translations={"en": "Bio"},
+            group=profile_group,
+            order=1,
+            is_active=True,
+        )
+
+        user = UserFactory(first_name='Jane "the great"', last_name="O'Brien")
+        ProfileFieldResponse.objects.create(
+            user=user,
+            profile_field=special_field,
+            value='Hello, "world"\ntest',
+        )
+
+        request = request_factory.get("/")
+        request.user = admin_user
+        queryset = User.objects.filter(pk=user.pk)
+        response = admin.export_users_csv(request, queryset)
+        rows = _parse_streaming_csv(response)
+
+        header = rows[0]
+        data_row = rows[1]
+
+        first_name_idx = header.index("First Name")
+        assert data_row[first_name_idx] == 'Jane "the great"'
+
+        bio_idx = header.index("bio")
+        assert data_row[bio_idx] == 'Hello, "world"\ntest'
+
+    def test_export_multiple_users(
+        self,
+        admin_site,
+        request_factory,
+        admin_user,
+    ):
+        """Test export with multiple users produces correct rows."""
+        admin = UserAdmin(User, admin_site)
+
+        user1 = UserFactory(email="alice@example.com", first_name="Alice")
+        user2 = UserFactory(email="bob@example.com", first_name="Bob")
+        user3 = UserFactory(email="carol@example.com", first_name="Carol")
+
+        request = request_factory.get("/")
+        request.user = admin_user
+        queryset = User.objects.filter(pk__in=[user1.pk, user2.pk, user3.pk])
+        response = admin.export_users_csv(request, queryset)
+        rows = _parse_streaming_csv(response)
+
+        # 1 header + 3 data rows
+        expected_rows = 4
+        assert len(rows) == expected_rows
+
+        header = rows[0]
+        email_idx = header.index("Email")
+        emails = {rows[i][email_idx] for i in range(1, 4)}
+        assert emails == {"alice@example.com", "bob@example.com", "carol@example.com"}
+
+    def test_export_date_format(
+        self,
+        admin_site,
+        request_factory,
+        admin_user,
+    ):
+        """Test date_joined and last_login use expected format."""
+        admin = UserAdmin(User, admin_site)
+
+        known_date = datetime.datetime(2025, 3, 15, 10, 30, 45, tzinfo=datetime.UTC)
+        user = UserFactory(date_joined=known_date, last_login=known_date)
+
+        request = request_factory.get("/")
+        request.user = admin_user
+        queryset = User.objects.filter(pk=user.pk)
+        response = admin.export_users_csv(request, queryset)
+        rows = _parse_streaming_csv(response)
+
+        header = rows[0]
+        data_row = rows[1]
+
+        date_joined_idx = header.index("Date Joined")
+        assert data_row[date_joined_idx] == "2025-03-15 10:30:45"
+
+        last_login_idx = header.index("Last Login")
+        assert data_row[last_login_idx] == "2025-03-15 10:30:45"
