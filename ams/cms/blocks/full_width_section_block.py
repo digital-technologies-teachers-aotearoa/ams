@@ -15,7 +15,7 @@ from ams.cms.constants import ColourModes
 class FullWidthSectionItem(StructBlock):
     """Individual item within a full-width section.
 
-    E.g., a feature, service, or link.
+    Text color is auto-determined from background_colour luminance.
     """
 
     text = CharBlock(
@@ -43,13 +43,7 @@ class FullWidthSectionItem(StructBlock):
     )
     background_colour = NativeColorBlock(
         default="#333333",
-        help_text="Used if no image is provided",
-    )
-    colour_mode = ChoiceBlock(
-        choices=ColourModes.choices,
-        default=ColourModes.DARK,
-        required=True,
-        help_text="Colour mode to use for the item (determines text colour)",
+        help_text="Used if no image is provided. Text color is auto-determined.",
     )
 
     class Meta:

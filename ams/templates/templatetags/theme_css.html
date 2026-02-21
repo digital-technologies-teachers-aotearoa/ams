@@ -12,154 +12,85 @@
   --bs-body-line-height: {{ theme.body_line_height }};
 
   /* Body */
-  --bs-body-color: {{ theme.body_color_light }};
-  --bs-body-color-rgb: {{ theme.body_color_light|hex_to_rgb }};
-  --bs-body-bg: {{ theme.body_bg_light }};
-  --bs-body-bg-rgb: {{ theme.body_bg_light|hex_to_rgb }};
+  --bs-body-color: {{ theme.body_color }};
+  --bs-body-color-rgb: {{ derived.body_color_rgb }};
+  --bs-body-bg: {{ theme.body_bg }};
+  --bs-body-bg-rgb: {{ derived.body_bg_rgb }};
 
-  /* Secondary */
-  --bs-secondary-color: {{ theme.secondary_color_light }};
-  --bs-secondary-color-rgb: {{ theme.secondary_color_light|hex_to_rgb }};
-  --bs-secondary-bg: {{ theme.secondary_bg_light }};
-  --bs-secondary-bg-rgb: {{ theme.secondary_bg_light|hex_to_rgb }};
+  /* Secondary (auto-derived from body colors) */
+  --bs-secondary-color: {{ derived.secondary_color }};
+  --bs-secondary-color-rgb: {{ derived.secondary_color_rgb }};
+  --bs-secondary-bg: {{ derived.secondary_bg }};
+  --bs-secondary-bg-rgb: {{ derived.secondary_bg_rgb }};
 
-  /* Tertiary */
-  --bs-tertiary-color: {{ theme.tertiary_color_light }};
-  --bs-tertiary-color-rgb: {{ theme.tertiary_color_light|hex_to_rgb }};
-  --bs-tertiary-bg: {{ theme.tertiary_bg_light }};
-  --bs-tertiary-bg-rgb: {{ theme.tertiary_bg_light|hex_to_rgb }};
+  /* Tertiary (auto-derived from body colors) */
+  --bs-tertiary-color: {{ derived.tertiary_color }};
+  --bs-tertiary-color-rgb: {{ derived.tertiary_color_rgb }};
+  --bs-tertiary-bg: {{ derived.tertiary_bg }};
+  --bs-tertiary-bg-rgb: {{ derived.tertiary_bg_rgb }};
 
-  /* Emphasis */
-  --bs-emphasis-color: {{ theme.emphasis_color_light }};
-  --bs-emphasis-color-rgb: {{ theme.emphasis_color_light|hex_to_rgb }};
+  /* Emphasis (auto-derived) */
+  --bs-emphasis-color: {{ derived.emphasis_color }};
+  --bs-emphasis-color-rgb: {{ derived.emphasis_color_rgb }};
 
-  /* Border */
-  --bs-border-color: {{ theme.border_color_light }};
-  --bs-border-color-rgb: {{ theme.border_color_light|hex_to_rgb }};
+  /* Border (auto-derived from body bg) */
+  --bs-border-color: {{ derived.border_color }};
+  --bs-border-color-rgb: {{ derived.border_color_rgb }};
 
-  /* Primary */
+  /* Primary (base from model, variants auto-derived) */
   --bs-primary: {{ theme.primary_color }};
-  --bs-primary-rgb: {{ theme.primary_color|hex_to_rgb }};
-  --bs-primary-bg-subtle: {{ theme.primary_bg_subtle_light }};
-  --bs-primary-border-subtle: {{ theme.primary_border_subtle_light }};
-  --bs-primary-text-emphasis: {{ theme.primary_text_emphasis_light }};
+  --bs-primary-rgb: {{ derived.primary_rgb }};
+  --bs-primary-bg-subtle: {{ derived.primary_bg_subtle }};
+  --bs-primary-border-subtle: {{ derived.primary_border_subtle }};
+  --bs-primary-text-emphasis: {{ derived.primary_text_emphasis }};
 
   /* Success */
   --bs-success: {{ theme.success_color }};
-  --bs-success-rgb: {{ theme.success_color|hex_to_rgb }};
-  --bs-success-bg-subtle: {{ theme.success_bg_subtle_light }};
-  --bs-success-border-subtle: {{ theme.success_border_subtle_light }};
-  --bs-success-text-emphasis: {{ theme.success_text_emphasis_light }};
+  --bs-success-rgb: {{ derived.success_rgb }};
+  --bs-success-bg-subtle: {{ derived.success_bg_subtle }};
+  --bs-success-border-subtle: {{ derived.success_border_subtle }};
+  --bs-success-text-emphasis: {{ derived.success_text_emphasis }};
 
   /* Danger */
   --bs-danger: {{ theme.danger_color }};
-  --bs-danger-rgb: {{ theme.danger_color|hex_to_rgb }};
-  --bs-danger-bg-subtle: {{ theme.danger_bg_subtle_light }};
-  --bs-danger-border-subtle: {{ theme.danger_border_subtle_light }};
-  --bs-danger-text-emphasis: {{ theme.danger_text_emphasis_light }};
+  --bs-danger-rgb: {{ derived.danger_rgb }};
+  --bs-danger-bg-subtle: {{ derived.danger_bg_subtle }};
+  --bs-danger-border-subtle: {{ derived.danger_border_subtle }};
+  --bs-danger-text-emphasis: {{ derived.danger_text_emphasis }};
 
   /* Warning */
   --bs-warning: {{ theme.warning_color }};
-  --bs-warning-rgb: {{ theme.warning_color|hex_to_rgb }};
-  --bs-warning-bg-subtle: {{ theme.warning_bg_subtle_light }};
-  --bs-warning-border-subtle: {{ theme.warning_border_subtle_light }};
-  --bs-warning-text-emphasis: {{ theme.warning_text_emphasis_light }};
+  --bs-warning-rgb: {{ derived.warning_rgb }};
+  --bs-warning-bg-subtle: {{ derived.warning_bg_subtle }};
+  --bs-warning-border-subtle: {{ derived.warning_border_subtle }};
+  --bs-warning-text-emphasis: {{ derived.warning_text_emphasis }};
 
   /* Info */
   --bs-info: {{ theme.info_color }};
-  --bs-info-rgb: {{ theme.info_color|hex_to_rgb }};
-  --bs-info-bg-subtle: {{ theme.info_bg_subtle_light }};
-  --bs-info-border-subtle: {{ theme.info_border_subtle_light }};
-  --bs-info-text-emphasis: {{ theme.info_text_emphasis_light }};
+  --bs-info-rgb: {{ derived.info_rgb }};
+  --bs-info-bg-subtle: {{ derived.info_bg_subtle }};
+  --bs-info-border-subtle: {{ derived.info_border_subtle }};
+  --bs-info-text-emphasis: {{ derived.info_text_emphasis }};
 
-  /* Light */
-  --bs-light: {{ theme.light_color }};
-  --bs-light-rgb: {{ theme.light_color|hex_to_rgb }};
-  --bs-light-bg-subtle: {{ theme.light_bg_subtle_light }};
-  --bs-light-border-subtle: {{ theme.light_border_subtle_light }};
-  --bs-light-text-emphasis: {{ theme.light_text_emphasis_light }};
+  /* Light (auto-derived from body bg) */
+  --bs-light: {{ derived.light }};
+  --bs-light-rgb: {{ derived.light_rgb }};
+  --bs-light-bg-subtle: {{ derived.light_bg_subtle }};
+  --bs-light-border-subtle: {{ derived.light_border_subtle }};
+  --bs-light-text-emphasis: {{ derived.light_text_emphasis }};
 
-  /* Dark */
-  --bs-dark: {{ theme.dark_color }};
-  --bs-dark-rgb: {{ theme.dark_color|hex_to_rgb }};
-  --bs-dark-bg-subtle: {{ theme.dark_bg_subtle_light }};
-  --bs-dark-border-subtle: {{ theme.dark_border_subtle_light }};
-  --bs-dark-text-emphasis: {{ theme.dark_text_emphasis_light }};
-
-  /* Links */
-  --bs-link-color: {{ theme.link_color_light }};
-  --bs-link-color-rgb: {{ theme.link_color_light|hex_to_rgb }};
-  --bs-link-hover-color: {{ theme.link_hover_color_light }};
-  --bs-link-hover-color-rgb: {{ theme.link_hover_color_light|hex_to_rgb }};
-}
-
-[data-bs-theme="dark"] {
-  /* Body */
-  --bs-body-color: {{ theme.body_color_dark }};
-  --bs-body-color-rgb: {{ theme.body_color_dark|hex_to_rgb }};
-  --bs-body-bg: {{ theme.body_bg_dark }};
-  --bs-body-bg-rgb: {{ theme.body_bg_dark|hex_to_rgb }};
-
-  /* Secondary */
-  --bs-secondary-color: {{ theme.secondary_color_dark }};
-  --bs-secondary-color-rgb: {{ theme.secondary_color_dark|hex_to_rgb }};
-  --bs-secondary-bg: {{ theme.secondary_bg_dark }};
-  --bs-secondary-bg-rgb: {{ theme.secondary_bg_dark|hex_to_rgb }};
-
-  /* Tertiary */
-  --bs-tertiary-color: {{ theme.tertiary_color_dark }};
-  --bs-tertiary-color-rgb: {{ theme.tertiary_color_dark|hex_to_rgb }};
-  --bs-tertiary-bg: {{ theme.tertiary_bg_dark }};
-  --bs-tertiary-bg-rgb: {{ theme.tertiary_bg_dark|hex_to_rgb }};
-
-  /* Emphasis */
-  --bs-emphasis-color: {{ theme.emphasis_color_dark }};
-  --bs-emphasis-color-rgb: {{ theme.emphasis_color_dark|hex_to_rgb }};
-
-  /* Border */
-  --bs-border-color: {{ theme.border_color_dark }};
-  --bs-border-color-rgb: {{ theme.border_color_dark|hex_to_rgb }};
-
-  /* Primary */
-  --bs-primary-bg-subtle: {{ theme.primary_bg_subtle_dark }};
-  --bs-primary-border-subtle: {{ theme.primary_border_subtle_dark }};
-  --bs-primary-text-emphasis: {{ theme.primary_text_emphasis_dark }};
-
-  /* Success */
-  --bs-success-bg-subtle: {{ theme.success_bg_subtle_dark }};
-  --bs-success-border-subtle: {{ theme.success_border_subtle_dark }};
-  --bs-success-text-emphasis: {{ theme.success_text_emphasis_dark }};
-
-  /* Danger */
-  --bs-danger-bg-subtle: {{ theme.danger_bg_subtle_dark }};
-  --bs-danger-border-subtle: {{ theme.danger_border_subtle_dark }};
-  --bs-danger-text-emphasis: {{ theme.danger_text_emphasis_dark }};
-
-  /* Warning */
-  --bs-warning-bg-subtle: {{ theme.warning_bg_subtle_dark }};
-  --bs-warning-border-subtle: {{ theme.warning_border_subtle_dark }};
-  --bs-warning-text-emphasis: {{ theme.warning_text_emphasis_dark }};
-
-  /* Info */
-  --bs-info-bg-subtle: {{ theme.info_bg_subtle_dark }};
-  --bs-info-border-subtle: {{ theme.info_border_subtle_dark }};
-  --bs-info-text-emphasis: {{ theme.info_text_emphasis_dark }};
-
-  /* Light */
-  --bs-light-bg-subtle: {{ theme.light_bg_subtle_dark }};
-  --bs-light-border-subtle: {{ theme.light_border_subtle_dark }};
-  --bs-light-text-emphasis: {{ theme.light_text_emphasis_dark }};
-
-  /* Dark */
-  --bs-dark-bg-subtle: {{ theme.dark_bg_subtle_dark }};
-  --bs-dark-border-subtle: {{ theme.dark_border_subtle_dark }};
-  --bs-dark-text-emphasis: {{ theme.dark_text_emphasis_dark }};
+  /* Dark (auto-derived from body color) */
+  --bs-dark: {{ derived.dark }};
+  --bs-dark-rgb: {{ derived.dark_rgb }};
+  --bs-dark-bg-subtle: {{ derived.dark_bg_subtle }};
+  --bs-dark-border-subtle: {{ derived.dark_border_subtle }};
+  --bs-dark-text-emphasis: {{ derived.dark_text_emphasis }};
 
   /* Links */
-  --bs-link-color: {{ theme.link_color_dark }};
-  --bs-link-color-rgb: {{ theme.link_color_dark|hex_to_rgb }};
-  --bs-link-hover-color: {{ theme.link_hover_color_dark }};
-  --bs-link-hover-color-rgb: {{ theme.link_hover_color_dark|hex_to_rgb }};
+  --bs-link-color: {{ theme.link_color }};
+  --bs-link-color-rgb: {{ derived.link_color_rgb }};
+  --bs-link-hover-color: {{ theme.link_hover_color }};
+  --bs-link-hover-color-rgb: {{ derived.link_hover_color_rgb }};
 }
 
 /* Navbar */

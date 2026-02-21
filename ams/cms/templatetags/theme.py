@@ -5,6 +5,7 @@ from django.core.cache import cache
 from django.template.loader import render_to_string
 from wagtail.models import Site
 
+from ams.cms import color_utils
 from ams.cms.models import ThemeSettings
 
 register = template.Library()
@@ -12,22 +13,97 @@ register = template.Library()
 
 @register.filter
 def hex_to_rgb(hex_color):
-    """Convert hex color to RGB string for CSS.
+    """Convert hex color to RGB string for CSS."""
+    return color_utils.hex_to_rgb_string(hex_color)
 
-    Args:
-        hex_color: Hex color string (e.g., "#ffffff" or "#fff")
 
-    Returns:
-        String of "r, g, b" format for CSS rgb values
+@register.filter(name="auto_theme")
+def auto_theme_filter(hex_color):
+    """Returns 'light' or 'dark' based on background luminance."""
+    return color_utils.auto_theme(hex_color)
+
+
+def compute_derived_colors(theme):
+    """Compute all auto-derived color values from the base theme colors.
+
+    Returns a dict of derived CSS variable values including:
+    - Secondary/tertiary colors from body colors
+    - Emphasis and border colors
+    - For each theme color: bg_subtle, border_subtle, text_emphasis, rgb
+    - Light/dark theme color equivalents
     """
-    hex_color = hex_color.lstrip("#")
+    body_color = theme.body_color
+    body_bg = theme.body_bg
 
-    # Handle 3-digit hex codes
-    if len(hex_color) == 3:  # noqa: PLR2004
-        hex_color = "".join([c * 2 for c in hex_color])
+    derived = {}
 
-    rgb = tuple(int(hex_color[i : i + 2], 16) for i in (0, 2, 4))
-    return f"{rgb[0]}, {rgb[1]}, {rgb[2]}"
+    # Body RGB strings
+    derived["body_color_rgb"] = color_utils.hex_to_rgb_string(body_color)
+    derived["body_bg_rgb"] = color_utils.hex_to_rgb_string(body_bg)
+
+    # Secondary: derived from body colors
+    derived["secondary_color"] = color_utils.mix_colors(body_color, body_bg, 0.75)
+    derived["secondary_bg"] = color_utils.mix_colors(body_bg, body_color, 0.90)
+    derived["secondary_color_rgb"] = color_utils.hex_to_rgb_string(
+        derived["secondary_color"],
+    )
+    derived["secondary_bg_rgb"] = color_utils.hex_to_rgb_string(derived["secondary_bg"])
+
+    # Tertiary: derived from body colors
+    derived["tertiary_color"] = color_utils.mix_colors(body_color, body_bg, 0.50)
+    derived["tertiary_bg"] = color_utils.mix_colors(body_bg, body_color, 0.95)
+    derived["tertiary_color_rgb"] = color_utils.hex_to_rgb_string(
+        derived["tertiary_color"],
+    )
+    derived["tertiary_bg_rgb"] = color_utils.hex_to_rgb_string(derived["tertiary_bg"])
+
+    # Emphasis: near-black for light mode
+    derived["emphasis_color"] = "#000000"
+    derived["emphasis_color_rgb"] = "0, 0, 0"
+
+    # Border: derived from body bg
+    derived["border_color"] = color_utils.mix_colors(body_bg, body_color, 0.85)
+    derived["border_color_rgb"] = color_utils.hex_to_rgb_string(derived["border_color"])
+
+    # Theme colors: primary, success, danger, warning, info
+    theme_colors = {
+        "primary": theme.primary_color,
+        "success": theme.success_color,
+        "danger": theme.danger_color,
+        "warning": theme.warning_color,
+        "info": theme.info_color,
+    }
+
+    for name, base in theme_colors.items():
+        variants = color_utils.derive_theme_variants(base)
+        derived[f"{name}_rgb"] = color_utils.hex_to_rgb_string(base)
+        derived[f"{name}_bg_subtle"] = variants["bg_subtle"]
+        derived[f"{name}_border_subtle"] = variants["border_subtle"]
+        derived[f"{name}_text_emphasis"] = variants["text_emphasis"]
+
+    # Light theme color: derived from body_bg
+    derived["light"] = color_utils.mix_colors(body_bg, body_color, 0.97)
+    derived["light_rgb"] = color_utils.hex_to_rgb_string(derived["light"])
+    light_variants = color_utils.derive_theme_variants(derived["light"])
+    derived["light_bg_subtle"] = light_variants["bg_subtle"]
+    derived["light_border_subtle"] = light_variants["border_subtle"]
+    derived["light_text_emphasis"] = light_variants["text_emphasis"]
+
+    # Dark theme color: derived from body_color
+    derived["dark"] = color_utils.mix_colors(body_color, body_bg, 0.97)
+    derived["dark_rgb"] = color_utils.hex_to_rgb_string(derived["dark"])
+    dark_variants = color_utils.derive_theme_variants(derived["dark"])
+    derived["dark_bg_subtle"] = dark_variants["bg_subtle"]
+    derived["dark_border_subtle"] = dark_variants["border_subtle"]
+    derived["dark_text_emphasis"] = dark_variants["text_emphasis"]
+
+    # Link RGB strings
+    derived["link_color_rgb"] = color_utils.hex_to_rgb_string(theme.link_color)
+    derived["link_hover_color_rgb"] = color_utils.hex_to_rgb_string(
+        theme.link_hover_color,
+    )
+
+    return derived
 
 
 @register.simple_tag(takes_context=True)
@@ -84,11 +160,14 @@ def theme_css(context):
     if not theme_settings_obj:
         return ""
 
+    # Compute derived values
+    theme_data = {
+        "theme": theme_settings_obj,
+        "derived": compute_derived_colors(theme_settings_obj),
+    }
+
     # Step 4: Render the CSS
-    html = render_to_string(
-        "templatetags/theme_css.html",
-        {"theme": theme_settings_obj},
-    )
+    html = render_to_string("templatetags/theme_css.html", theme_data)
 
     # Step 5: Update both cache tiers
     css_cache_key = css_cache_key_template.format(

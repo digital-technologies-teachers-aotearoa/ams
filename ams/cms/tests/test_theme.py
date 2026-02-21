@@ -12,6 +12,7 @@ from wagtail.models import Page
 from wagtail.models import Site
 
 from ams.cms.models import ThemeSettings
+from ams.cms.templatetags.theme import compute_derived_colors
 from ams.cms.templatetags.theme import hex_to_rgb
 
 
@@ -66,15 +67,13 @@ class TestThemeSettings:
         theme = ThemeSettings.objects.create(
             site=site,
             primary_color="#ff0000",
-            secondary_color_light="#00ff00",
-            body_bg_light="#ffffff",
-            body_bg_dark="#000000",
+            body_bg="#ffffff",
+            body_color="#000000",
         )
 
         assert theme.primary_color == "#ff0000"
-        assert theme.secondary_color_light == "#00ff00"
-        assert theme.body_bg_light == "#ffffff"
-        assert theme.body_bg_dark == "#000000"
+        assert theme.body_bg == "#ffffff"
+        assert theme.body_color == "#000000"
 
     def test_invalid_color_raises_validation_error(self, site):
         """Test that invalid color values raise ValidationError."""
@@ -139,41 +138,52 @@ class TestThemeCSSGeneration:
         theme = ThemeSettings.objects.create(
             site=site,
             primary_color="#ff0000",
-            body_bg_light="#ffffff",
-            body_bg_dark="#000000",
+            body_bg="#ffffff",
         )
 
-        html = render_to_string("templatetags/theme_css.html", {"theme": theme})
+        derived = compute_derived_colors(theme)
+        html = render_to_string(
+            "templatetags/theme_css.html",
+            {"theme": theme, "derived": derived},
+        )
 
         assert ":root" in html
-        assert '[data-bs-theme="dark"]' in html
         assert "--bs-primary: #ff0000" in html
         assert "--bs-body-bg: #ffffff" in html
         assert "--bs-primary-rgb: 255, 0, 0" in html
         assert "<style>" in html
         assert "</style>" in html
 
-    def test_dark_mode_css_separate(self, site):
-        """Test that dark mode colors are in separate selector."""
+    def test_derived_colors_computed(self, site):
+        """Test that derived colors are computed from base colors."""
         theme = ThemeSettings.objects.create(
             site=site,
-            body_bg_light="#ffffff",
-            body_bg_dark="#000000",
-            body_color_light="#000000",
-            body_color_dark="#ffffff",
+            primary_color="#0d6efd",
+            body_color="#212529",
+            body_bg="#ffffff",
         )
 
-        html = render_to_string("templatetags/theme_css.html", {"theme": theme})
+        derived = compute_derived_colors(theme)
 
-        # Check light mode section
-        light_section = html.split('[data-bs-theme="dark"]')[0]
-        assert "--bs-body-bg: #ffffff" in light_section
-        assert "--bs-body-color: #000000" in light_section
+        # Check that derived values exist
+        assert "primary_rgb" in derived
+        assert "primary_bg_subtle" in derived
+        assert "primary_border_subtle" in derived
+        assert "primary_text_emphasis" in derived
+        assert "secondary_color" in derived
+        assert "tertiary_bg" in derived
+        assert "border_color" in derived
+        assert "emphasis_color" in derived
 
-        # Check dark mode section
-        dark_section = html.split('[data-bs-theme="dark"]')[1]
-        assert "--bs-body-bg: #000000" in dark_section
-        assert "--bs-body-color: #ffffff" in dark_section
+    def test_no_dark_mode_section(self, site):
+        """Test that dark mode CSS section is not present."""
+        theme = ThemeSettings.objects.create(site=site)
+        derived = compute_derived_colors(theme)
+        html = render_to_string(
+            "templatetags/theme_css.html",
+            {"theme": theme, "derived": derived},
+        )
+        assert '[data-bs-theme="dark"]' not in html
 
 
 @pytest.mark.django_db

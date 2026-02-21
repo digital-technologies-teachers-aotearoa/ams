@@ -1,4 +1,4 @@
-{% load wagtailcore_tags wagtailimages_tags %}
+{% load wagtailcore_tags wagtailimages_tags theme %}
 
 {# Full-width section that breaks out of the container #}
 <div class="full-width-section bg-body-tertiary text-body-tertiary"
@@ -19,12 +19,12 @@
           {% if item.link_page or item.link_url %}
             <a href="{% if item.link_page %}{% pageurl item.link_page %}{% else %}{{ item.link_url }}{% endif %}"
                class="full-width-section__item full-width-section__item--{{ self.item_shape|default:'default' }} h-100 bg-body-tertiary text-body-tertiary"
-               data-bs-theme="{{ item.colour_mode }}">
+               data-bs-theme="{{ item.background_colour|auto_theme }}">
               {% include "cms/blocks/partials/full_width_section_item_content.html" %}
             </a>
           {% else %}
             <div class="full-width-section__item full-width-section__item--{{ self.item_shape|default:'default' }} h-100 bg-body-tertiary text-body-tertiary"
-                 data-bs-theme="{{ item.colour_mode }}">
+                 data-bs-theme="{{ item.background_colour|auto_theme }}">
               {% include "cms/blocks/partials/full_width_section_item_content.html" %}
             </div>
           {% endif %}

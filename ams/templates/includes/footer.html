@@ -1,7 +1,7 @@
-{% load i18n menu_tags translate_url icon cache %}
+{% load i18n menu_tags translate_url icon cache theme %}
 
 <footer class="footer mt-auto py-3"
-        data-bs-theme="{{ settings.cms.ThemeSettings.footer_colour_mode }}">
+        data-bs-theme="{{ settings.cms.ThemeSettings.footer_bg_color|auto_theme }}">
   <div class="container">
     <div class="row py-5 my-5">
       <div class="col-12 col-lg-6 mb-3">

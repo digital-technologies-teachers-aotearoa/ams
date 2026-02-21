@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   if (path.startsWith('/cms/settings/cms/themesettings/')) {
     addThemeSettingsImportExport();
+    addWcagContrastBadges();
   }
 });
 
@@ -173,4 +174,99 @@ function importThemeSettings(event) {
   };
 
   reader.readAsText(file);
+}
+
+// ==== WCAG Contrast Badge Helpers ====
+
+function wcagRelativeLuminance(hex) {
+  hex = hex.replace('#', '');
+  const r = parseInt(hex.substring(0, 2), 16) / 255;
+  const g = parseInt(hex.substring(2, 4), 16) / 255;
+  const b = parseInt(hex.substring(4, 6), 16) / 255;
+  const toLinear = (c) =>
+    c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  return 0.2126 * toLinear(r) + 0.7152 * toLinear(g) + 0.0722 * toLinear(b);
+}
+
+function wcagContrastRatio(color1, color2) {
+  const l1 = wcagRelativeLuminance(color1);
+  const l2 = wcagRelativeLuminance(color2);
+  const lighter = Math.max(l1, l2);
+  const darker = Math.min(l1, l2);
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+function wcagRating(ratio) {
+  if (ratio >= 7.0) return 'AAA';
+  if (ratio >= 4.5) return 'AA';
+  return 'Fail';
+}
+
+function createWcagBadge(ratio, rating) {
+  const badge = document.createElement('span');
+  badge.className = 'wcag-badge wcag-badge--' + rating.toLowerCase();
+  badge.textContent = rating + ' ' + ratio.toFixed(1) + ':1';
+  badge.title = 'WCAG contrast ratio against white / dark backgrounds';
+  return badge;
+}
+
+function updateWcagBadge(input) {
+  const color = input.value;
+  if (!color || color.length < 7) return;
+
+  // Remove existing badges for this input
+  const container = input.closest('.w-field__wrapper') || input.parentElement;
+  container.querySelectorAll('.wcag-badge-group').forEach((el) => el.remove());
+
+  const ratioWhite = wcagContrastRatio(color, '#ffffff');
+  const ratingWhite = wcagRating(ratioWhite);
+  const ratioDark = wcagContrastRatio(color, '#212529');
+  const ratingDark = wcagRating(ratioDark);
+
+  const group = document.createElement('span');
+  group.className = 'wcag-badge-group';
+
+  const whiteLabel = document.createElement('span');
+  whiteLabel.className = 'wcag-badge-label';
+  whiteLabel.textContent = 'on white:';
+
+  const darkLabel = document.createElement('span');
+  darkLabel.className = 'wcag-badge-label';
+  darkLabel.textContent = 'on dark:';
+
+  group.appendChild(whiteLabel);
+  group.appendChild(createWcagBadge(ratioWhite, ratingWhite));
+  group.appendChild(darkLabel);
+  group.appendChild(createWcagBadge(ratioDark, ratingDark));
+
+  // Insert after the help text or input wrapper
+  const helpText = container.querySelector('.w-field__help');
+  if (helpText) {
+    helpText.after(group);
+  } else {
+    container.appendChild(group);
+  }
+}
+
+function addWcagContrastBadges() {
+  const colorInputs = document.querySelectorAll('input[type="color"]');
+  colorInputs.forEach((input) => {
+    // Initial badge
+    updateWcagBadge(input);
+
+    // Update on change
+    input.addEventListener('input', () => updateWcagBadge(input));
+    input.addEventListener('change', () => updateWcagBadge(input));
+
+    // Also watch the associated text input (wagtail-color-panel uses a text input)
+    const textInput = input
+      .closest('.w-field__wrapper')
+      ?.querySelector('input[type="text"]');
+    if (textInput) {
+      textInput.addEventListener('input', () => {
+        // Small delay to let the color input sync
+        setTimeout(() => updateWcagBadge(input), 50);
+      });
+    }
+  });
 }
