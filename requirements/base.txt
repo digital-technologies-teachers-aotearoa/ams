@@ -1,29 +1,29 @@
 python-slugify==8.0.4
-Pillow==12.1.0
+Pillow==12.1.1
 argon2-cffi==25.1.0
-whitenoise==6.11.0
-redis==7.1.0
+whitenoise==6.12.0
+redis==7.2.1
 hiredis==3.3.0
 html2text==2025.4.15
 
 # Django
 # ------------------------------------------------------------------------------
 django==5.2.11
-django-environ==0.12.0
+django-environ==0.13.0
 django-model-utils==5.0.0
-django-allauth[mfa]==65.14.0
+django-allauth[mfa]==65.14.3
 django-crispy-forms==2.5
 crispy-bootstrap5==2025.6
 django-redis==6.0.0
 django-relativedelta==2.0.0
 django-tables2==2.8.0
 django-storages[s3]==1.14.6
-django-imagekit==6.0.0
+django-imagekit==6.1.0
 
 # Wagtail
 # ------------------------------------------------------------------------------
 wagtail==7.3
-wagtailmenus==4.0.5
+wagtailmenus==4.0.6
 wagtail-color-panel==1.7.1
 
 # Discourse
