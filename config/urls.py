@@ -33,6 +33,8 @@ urlpatterns = [
     path("cms-documents/", include(wagtaildocs_urls)),
     # Forum
     path("forum/", include("ams.forum.urls", namespace="forum")),
+    # Events
+    path("events/", include("ams.events.urls", namespace="events")),
 ]
 
 urlpatterns += i18n_patterns(

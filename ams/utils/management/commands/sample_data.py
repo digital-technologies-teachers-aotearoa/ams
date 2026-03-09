@@ -36,6 +36,9 @@ class Command(management.base.BaseCommand):
         # Setup CMS pages
         management.call_command("setup_cms")
 
+        # Create sample events
+        management.call_command("create_sample_events")
+
         # Set association settings for each site
         self.stdout.write(LOG_HEADER.format("🏢 Setting association settings"))
         for site in Site.objects.all():

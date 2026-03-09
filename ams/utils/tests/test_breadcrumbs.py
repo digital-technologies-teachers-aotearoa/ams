@@ -9,11 +9,15 @@ from django.urls import reverse
 from wagtail.models import Page
 
 from ams.cms.models import HomePage
+from ams.events.tests.factories import EventFactory
+from ams.events.tests.factories import LocationFactory
 from ams.organisations.tests.factories import OrganisationFactory
 from ams.users.tests.factories import UserFactory
 from ams.utils.breadcrumbs import BREADCRUMB_REGISTRY
 from ams.utils.breadcrumbs import _get_cached_value
+from ams.utils.breadcrumbs import _get_event_name
 from ams.utils.breadcrumbs import _get_kwargs_for_view
+from ams.utils.breadcrumbs import _get_location_name
 from ams.utils.breadcrumbs import _get_organisation_name
 from ams.utils.breadcrumbs import _get_user_dashboard_label
 from ams.utils.breadcrumbs import get_breadcrumbs_for_django_page
@@ -154,6 +158,84 @@ class TestGetUserDashboardLabel:
         result = _get_user_dashboard_label(request, username="nonexistent")
 
         assert result == "User"
+
+
+class TestGetEventName:
+    """Tests for _get_event_name function."""
+
+    def test_returns_event_name_when_exists(self, db):
+        """Test that it returns the event name when it exists."""
+        event = EventFactory(name="Annual Conference")
+        request = RequestFactory().get("/")
+
+        result = _get_event_name(request, pk=event.pk)
+
+        assert result == "Annual Conference"
+
+    def test_returns_default_label_when_event_not_found(self, db):
+        """Test that it returns default label when event doesn't exist."""
+        request = RequestFactory().get("/")
+
+        result = _get_event_name(request, pk=99999)
+
+        assert result == "Event"
+
+    def test_returns_default_label_when_no_pk_provided(self):
+        """Test that it returns default label when no pk is provided."""
+        request = RequestFactory().get("/")
+
+        result = _get_event_name(request)
+
+        assert result == "Event"
+
+    def test_caches_event_name(self, db):
+        """Test that event name is cached."""
+        event = EventFactory(name="Annual Conference")
+        request = RequestFactory().get("/")
+
+        _get_event_name(request, pk=event.pk)
+
+        assert hasattr(request, "breadcrumb_cache")
+        assert "event_name" in request.breadcrumb_cache
+
+
+class TestGetLocationName:
+    """Tests for _get_location_name function."""
+
+    def test_returns_location_name_when_exists(self, db):
+        """Test that it returns the location name when it exists."""
+        location = LocationFactory(name="Convention Centre")
+        request = RequestFactory().get("/")
+
+        result = _get_location_name(request, pk=location.pk)
+
+        assert result == "Convention Centre"
+
+    def test_returns_default_label_when_location_not_found(self, db):
+        """Test that it returns default label when location doesn't exist."""
+        request = RequestFactory().get("/")
+
+        result = _get_location_name(request, pk=99999)
+
+        assert result == "Location"
+
+    def test_returns_default_label_when_no_pk_provided(self):
+        """Test that it returns default label when no pk is provided."""
+        request = RequestFactory().get("/")
+
+        result = _get_location_name(request)
+
+        assert result == "Location"
+
+    def test_caches_location_name(self, db):
+        """Test that location name is cached."""
+        location = LocationFactory(name="Convention Centre")
+        request = RequestFactory().get("/")
+
+        _get_location_name(request, pk=location.pk)
+
+        assert hasattr(request, "breadcrumb_cache")
+        assert "location_name" in request.breadcrumb_cache
 
 
 class TestGetCurrentViewName:
@@ -512,6 +594,89 @@ class TestGetBreadcrumbsForDjangoPage:
         assert result[3]["title"] == "Invite Member"
         assert result[3]["is_active"] is True
 
+    def test_events_home_breadcrumbs(self):
+        """Test breadcrumbs for events home page."""
+        request = RequestFactory().get("/")
+
+        result = get_breadcrumbs_for_django_page(request, "events:home")
+
+        # Should have: Home -> Events
+        expected_results = 2
+        assert len(result) == expected_results
+        assert result[0]["title"] == "Home"
+        assert result[1]["title"] == "Events"
+        assert result[1]["is_active"] is True
+
+    def test_events_upcoming_breadcrumbs(self):
+        """Test breadcrumbs for upcoming events page."""
+        request = RequestFactory().get("/")
+
+        result = get_breadcrumbs_for_django_page(request, "events:upcoming")
+
+        # Should have: Home -> Events -> Upcoming Events
+        expected_results = 3
+        assert len(result) == expected_results
+        assert result[0]["title"] == "Home"
+        assert result[1]["title"] == "Events"
+        assert result[1]["is_active"] is False
+        assert result[2]["title"] == "Upcoming Events"
+        assert result[2]["is_active"] is True
+
+    def test_events_past_breadcrumbs(self):
+        """Test breadcrumbs for past events page."""
+        request = RequestFactory().get("/")
+
+        result = get_breadcrumbs_for_django_page(request, "events:past")
+
+        # Should have: Home -> Events -> Past Events
+        expected_results = 3
+        assert len(result) == expected_results
+        assert result[0]["title"] == "Home"
+        assert result[1]["title"] == "Events"
+        assert result[2]["title"] == "Past Events"
+        assert result[2]["is_active"] is True
+
+    def test_event_detail_breadcrumbs(self, db):
+        """Test breadcrumbs for event detail page."""
+        event = EventFactory(name="Annual Conference")
+        request = RequestFactory().get("/")
+
+        result = get_breadcrumbs_for_django_page(
+            request,
+            "events:event",
+            pk=event.pk,
+            slug=event.slug,
+        )
+
+        # Should have: Home -> Events -> Annual Conference
+        expected_results = 3
+        assert len(result) == expected_results
+        assert result[0]["title"] == "Home"
+        assert result[1]["title"] == "Events"
+        assert result[1]["url"] == reverse("events:home")
+        assert result[2]["title"] == "Annual Conference"
+        assert result[2]["is_active"] is True
+
+    def test_location_detail_breadcrumbs(self, db):
+        """Test breadcrumbs for location detail page."""
+        location = LocationFactory(name="Convention Centre")
+        request = RequestFactory().get("/")
+
+        result = get_breadcrumbs_for_django_page(
+            request,
+            "events:location",
+            pk=location.pk,
+        )
+
+        # Should have: Home -> Events -> Convention Centre
+        expected_results = 3
+        assert len(result) == expected_results
+        assert result[0]["title"] == "Home"
+        assert result[1]["title"] == "Events"
+        assert result[1]["url"] == reverse("events:home")
+        assert result[2]["title"] == "Convention Centre"
+        assert result[2]["is_active"] is True
+
 
 class TestBreadcrumbRegistry:
     """Tests for BREADCRUMB_REGISTRY configuration."""
@@ -527,6 +692,11 @@ class TestBreadcrumbRegistry:
             "organisations:update",
             "account_login",
             "account_signup",
+            "events:home",
+            "events:upcoming",
+            "events:past",
+            "events:event",
+            "events:location",
         ]
 
         for key in expected_keys:
