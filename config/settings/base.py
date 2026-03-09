@@ -118,6 +118,9 @@ THIRD_PARTY_APPS = [
     "storages",
     "imagekit",
     "wagtail_color_panel",
+    "tinymce",
+    "djmoney",
+    "django_filters",
 ]
 
 LOCAL_APPS = [
@@ -129,6 +132,8 @@ LOCAL_APPS = [
     "ams.utils",
     "ams.forum",
     "ams.terms",
+    "ams.entities",
+    "ams.events",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

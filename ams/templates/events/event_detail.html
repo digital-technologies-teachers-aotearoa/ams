@@ -1,0 +1,191 @@
+{% extends "events/base.html" %}
+
+{% load static %}
+
+{% block page_heading %}
+  <div id="event-details" class="my-3">
+    {% if perms.events %}
+      <a href="{% url 'admin:events_event_change' event.id %}"
+         class="btn btn-sm btn-secondary float-end">Edit event</a>
+    {% endif %}
+    {% for organiser in organisers %}
+      {% if organiser.logo %}
+        <img src="{{ organiser.logo.url }}"
+             class="img-inline-lg me-4"
+             alt="{{ organiser.name }}" />
+      {% else %}
+        <span class="h6 me-4">{{ organiser.name }}</span>
+      {% endif %}
+    {% endfor %}
+    {% if event.series.logo %}
+      <img src="{{ event.series.logo.url }}"
+           class="img-inline-lg"
+           alt="{{ event.series.name }}" />
+    {% endif %}
+    <h1 class="display-4 mt-4">{{ event.name }}</h1>
+  </div>
+{% endblock page_heading %}
+
+{% block content_container %}
+  <div class="col-12 col-md-8 order-1 order-md-1">
+    {% if event.registration_link and not event.has_ended %}
+      <a class="btn btn-success d-block btn-lg mb-3 d-md-none"
+         href="{{ event.registration_link }}"
+         role="button">{{ event.get_registration_type_display }}</a>
+    {% endif %}
+    {% if event.accessible_online %}
+      {% include "events/badges/online.html" %}
+    {% endif %}
+    <div class="card mb-3">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-6 col-md-3 mb-2">
+            <small class="text-muted d-block">Starts</small>
+            {{ event.start|date:"g:i a" }}
+            <br />
+            {{ event.start|date:"j F, Y" }}
+          </div>
+          <div class="col-6 col-md-3 mb-2">
+            <small class="text-muted d-block">Ends</small>
+            {{ event.end|date:"g:i a" }}
+            <br />
+            {{ event.end|date:"j F, Y" }}
+          </div>
+          <div class="col-6 col-md-3 mb-2">
+            <small class="text-muted d-block">Cost</small>
+            {% if event.price.amount == 0 %}
+              <span class="text-success fw-semibold">Free</span>
+            {% else %}
+              {{ event.price }}
+            {% endif %}
+          </div>
+          <div class="col-6 col-md-3 mb-2">
+            <small class="text-muted d-block">Location{{ locations|pluralize }}</small>
+            {% for location in locations %}
+              <a href="{{ location.get_absolute_url }}">
+                {% if location.room %}{{ location.room }},{% endif %}
+                {{ location.name }}
+              </a>
+              {% if not forloop.last %}<br />{% endif %}
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+    <h3 id="event-description" class="event-heading">Description</h3>
+    <div class="mb-3">{{ event.description|safe }}</div>
+    {% if event.show_schedule and schedule %}
+      <h3 id="event-schedule" class="event-heading">Schedule</h3>
+      {% include "events/event_schedule.html" %}
+    {% endif %}
+  </div>
+  <div class="col-12 col-md-4 order-2 order-md-2">
+    <div id="sticky-navigation" class="mb-3 position-sticky">
+      <strong>On this page</strong>
+      <nav id="event-navigation" class="nav nav-pills flex-column">
+        <a class="nav-link" href="#event-details">Details</a>
+        <a class="nav-link" href="#event-description">Description</a>
+        {% if event.show_schedule %}
+          <a class="nav-link" href="#event-schedule">Schedule</a>
+          {% if schedule|length > 1 %}
+            {% for day in schedule %}
+              <a class="nav-link ms-4" href="#schedule-day-{{ forloop.counter }}">
+                <small>{{ day.date|date:"l j F, Y" }}</small>
+              </a>
+            {% endfor %}
+          {% endif %}
+        {% endif %}
+      </nav>
+      {% if event.registration_link and not event.has_ended %}
+        <hr />
+        <a class="btn btn-success d-block btn-lg"
+           href="{{ event.registration_link }}"
+           role="button">{{ event.get_registration_type_display }}</a>
+      {% endif %}
+      {% if event.registration_type == event.RegistrationType.INVITE_ONLY %}
+        <hr />
+        <button class="btn btn-secondary d-block btn-lg" role="button" disabled>
+          {{ event.get_registration_type_display }}
+        </button>
+      {% endif %}
+      {% if event.series %}
+        <hr />
+        <div class="text-center">
+          <small>This event is part of the following series</small>
+          {% if event.series.logo %}
+            <img src="{{ event.series.logo.url }}"
+                 class="img-inline"
+                 alt="{{ event.series.name }}" />
+          {% else %}
+            <div class="h6 text-center m-3">{{ event.series.name }}</div>
+          {% endif %}
+        </div>
+      {% endif %}
+      {% if sponsors %}
+        <hr />
+        <div class="text-center">
+          <small>This event is sponsored by</small>
+        </div>
+        <ul class="list-unstyled text-center mb-3">
+          {% for sponsor in sponsors %}
+            <li class="my-2">
+              <a href="{{ sponsor.url }}" target="_blank">
+                {% if sponsor.logo %}
+                  <img src="{{ sponsor.logo.url }}" class="img-y4" alt="{{ sponsor.name }}" />
+                {% else %}
+                  {{ sponsor.name }}
+                {% endif %}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+  </div>
+{% endblock content_container %}
+
+{% block scripts %}
+  <script>
+    var event_markers = [{
+      %
+      for location in locations %
+    } {
+      %
+      if location.latitude and location.longitude %
+    } {
+      coords: {
+        lat: {
+          {
+            location.latitude
+          }
+        },
+        lng: {
+          {
+            location.longitude
+          }
+        }
+      },
+      title: "{{ location.name|escape }}",
+      text: "<br />{{ location.get_full_address|escape|linebreaksbr }}",
+    }, {
+      %
+      endif %
+    } {
+      %
+      endfor %
+    }];
+    var map_zoom = {
+      %
+      if locations.count == 1 %
+    }
+    13 {
+      %
+      else %
+    }
+    5 {
+      %
+      endif %
+    };
+  </script>
+  {% include "events/includes/leaflet_map.html" %}
+{% endblock scripts %}

@@ -10,6 +10,8 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from ams.cms.models import HomePage
+from ams.events.models import Event
+from ams.events.models import Location
 from ams.organisations.models import Organisation
 
 User = get_user_model()
@@ -84,6 +86,27 @@ BREADCRUMB_REGISTRY: dict[str, BreadcrumbConfig] = {
         "parent": "organisations:detail",
         "label": _("Add Seats"),
     },
+    # Event pages
+    "events:home": {
+        "parent": None,
+        "label": _("Events"),
+    },
+    "events:upcoming": {
+        "parent": "events:home",
+        "label": _("Upcoming Events"),
+    },
+    "events:past": {
+        "parent": "events:home",
+        "label": _("Past Events"),
+    },
+    "events:event": {
+        "parent": "events:home",
+        "label_getter": "get_event_name",
+    },
+    "events:location": {
+        "parent": "events:home",
+        "label_getter": "get_location_name",
+    },
     # Auth pages (allauth)
     "account_login": {
         "parent": None,
@@ -156,10 +179,40 @@ def _get_user_dashboard_label(request, **kwargs):
     return _get_cached_value(request, "user_name", get_name)
 
 
+def _get_event_name(request, **kwargs):
+    """Get event name for breadcrumb with caching and error handling."""
+
+    def get_name():
+        try:
+            if pk := kwargs.get("pk"):
+                return Event.objects.get(pk=pk).name
+        except Event.DoesNotExist:
+            pass
+        return _("Event")
+
+    return _get_cached_value(request, "event_name", get_name)
+
+
+def _get_location_name(request, **kwargs):
+    """Get location name for breadcrumb with caching and error handling."""
+
+    def get_name():
+        try:
+            if pk := kwargs.get("pk"):
+                return Location.objects.get(pk=pk).name
+        except Location.DoesNotExist:
+            pass
+        return _("Location")
+
+    return _get_cached_value(request, "location_name", get_name)
+
+
 # Label getter functions
 LABEL_GETTERS = {
     "get_organisation_name": _get_organisation_name,
     "get_user_dashboard_label": _get_user_dashboard_label,
+    "get_event_name": _get_event_name,
+    "get_location_name": _get_location_name,
 }
 
 
@@ -245,7 +298,10 @@ def get_breadcrumbs_for_django_page(request, view_name, **kwargs):
         try:
             url = reverse(current_name, kwargs=view_kwargs)
         except NoReverseMatch:
-            url = None
+            try:
+                url = reverse(current_name)
+            except NoReverseMatch:
+                url = None
 
         breadcrumbs.insert(
             0,

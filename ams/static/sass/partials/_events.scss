@@ -1,0 +1,77 @@
+$events-brand-colour: #0976a9;
+
+// Events navbar
+#events-navbar {
+  background-color: $events-brand-colour;
+  border-radius: 0.375rem;
+}
+
+// Event card
+.event.card {
+  .featured-header {
+    background-color: $events-brand-colour;
+    color: #fff;
+    font-weight: 600;
+  }
+
+  .title-header {
+    background-color: rgba($events-brand-colour, 0.05);
+  }
+
+  .event-card-sponsor {
+    max-height: 2rem;
+  }
+}
+
+// Badge colour for events brand
+.text-bg-events {
+  background-color: $events-brand-colour !important;
+  color: #fff !important;
+}
+
+// Schedule
+.schedule-day {
+  border-bottom: 2px solid $events-brand-colour;
+}
+
+.schedule-time-slot-time {
+  color: $events-brand-colour;
+}
+
+// Event heading
+.event-heading {
+  border-bottom: 2px solid $events-brand-colour;
+  padding-bottom: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+// Map
+#event-map {
+  height: 400px;
+  width: 100%;
+  border-radius: 0.375rem;
+  z-index: 0;
+}
+
+.event-map {
+  height: 400px;
+  width: 100%;
+}
+
+#leaflet-picker-map {
+  height: 400px;
+  margin-top: 10px;
+}
+
+// Inline images
+.img-inline {
+  max-height: 2rem;
+}
+
+.img-inline-lg {
+  max-height: 3rem;
+}
+
+.img-y4 {
+  max-height: 4rem;
+}
