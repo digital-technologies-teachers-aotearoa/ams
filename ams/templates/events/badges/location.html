@@ -1,8 +1,0 @@
-<a class="badge text-bg-events text-decoration-none"
-   href="{% url 'events:upcoming' %}?locations__region={{ location.region_id }}">
-  {{ location.city }}
-  {% if location.region and location.city != location.region.name %}
-    ,
-    {{ location.region }}
-  {% endif %}
-</a>

@@ -1,5 +1,7 @@
 {% extends "events/base.html" %}
 
+{% load icon %}
+
 {% block page_heading %}
   <div class="d-flex justify-content-between align-items-center">
     <h1>Events</h1>
@@ -13,7 +15,9 @@
 
 {% block content_container %}
   <div class="col-12 col-lg-7">
-    <h3>Upcoming Events</h3>
+    <h3>
+      <span class="event-section-icon">{% icon "calendar-event" %}</span> Upcoming Events
+    </h3>
     {% if upcoming_events %}
       {% for event in upcoming_events %}
         {% include 'events/event_card.html' %}
@@ -31,7 +35,9 @@
     {% endif %}
   </div>
   <div class="col-12 col-lg-5">
-    <h3>Event Locations</h3>
+    <h3>
+      <span class="event-section-icon">{% icon "geo-alt-fill" %}</span> Event Locations
+    </h3>
     <div id="event-map"></div>
   </div>
 {% endblock content_container %}

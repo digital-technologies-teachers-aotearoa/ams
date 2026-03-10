@@ -1,71 +1,90 @@
-{% load static humanize %}
+{% load static humanize icon %}
 
-<div class="event card mb-3 w-100">
-  {% if event.featured %}<div class="card-header featured-header align-middle">Featured event</div>{% endif %}
-  <div class="card-header title-header align-middle">
-    <div class="row">
-      <div class="col-12 col-lg-9">
-        {% if event.organisers.all or event.series %}
-          <div class="mb-2">
-            {% if event.series.logo %}
-              <img src="{{ event.series.logo.url }}"
-                   class="img-inline"
-                   alt="{{ event.series.name }}" />
-            {% elif event.series.abbreviation %}
-              <small class="text-muted">Part of {{ event.series.abbreviation }} series</small>
-            {% endif %}
-            {% for organiser in event.organisers.all %}
-              <a href="{% url 'events:upcoming' %}?organisers={{ organiser.pk }}">
-                {% if organiser.logo %}
-                  <img src="{{ organiser.logo.url }}"
-                       class="event-card-sponsor me-3"
-                       alt="{{ organiser.name }}" />
-                {% else %}
-                  <small class="me-4">{{ organiser.name }}</small>
+<div class="event-card card mb-3 w-100{% if event.featured %} event-card--featured{% endif %}">
+  <div class="card-body">
+    <div class="d-flex gap-3 align-items-start">
+      <div class="event-card__date-block">
+        <span class="event-card__date-month">{{ event.start|date:"M" }}</span>
+        <span class="event-card__date-day">{{ event.start|date:"j" }}</span>
+      </div>
+      <div class="min-width-0 flex-grow-1">
+        <div class="event-card__header d-flex flex-wrap align-items-top gap-2">
+          <div class="event-card__header-left">
+            {% if event.organisers.all or event.series %}
+              <div class="event-card__meta mb-1">
+                {% if event.series.logo %}
+                  <img src="{{ event.series.logo.url }}"
+                       class="event-card__logo me-1"
+                       alt="{{ event.series.name }}" />
+                {% elif event.series.abbreviation %}
+                  {{ event.series.abbreviation }} series
                 {% endif %}
-              </a>
-            {% endfor %}
+                {% for organiser in event.organisers.all %}
+                  <a href="{% url 'events:upcoming' %}?organisers={{ organiser.pk }}"
+                     class="text-muted">
+                    {% if organiser.logo %}
+                      <img src="{{ organiser.logo.url }}"
+                           class="event-card__logo me-2"
+                           alt="{{ organiser.name }}" />
+                    {% else %}
+                      {{ organiser.name }}
+                      {% if not forloop.last %},{% endif %}
+                    {% endif %}
+                  </a>
+                {% endfor %}
+              </div>
+            {% endif %}
+            <h4 class="event-card__title mb-2">
+              <a href="{{ event.get_absolute_url }}"
+                 class="stretched-link text-decoration-none text-body">{{ event.name }}</a>
+            </h4>
           </div>
-        {% endif %}
-        <h4 class="mb-0">
-          <a href="{{ event.get_absolute_url }}">{{ event.name }}</a>
-        </h4>
-      </div>
-      <div class="col text-start text-lg-end align-self-center">
-        {% if event.start|date:"j" != event.end|date:"j" %}
-          {% if event.start|date:"F" == event.end|date:"F" %}
-            {{ event.start|date:"j" }}
-          {% else %}
-            {{ event.start|date:"j F" }}
+          <div class="event-card__header-right ms-auto">
+            {% if event.featured %}
+              <span class="event-card__featured-tag badge text-bg-events">{% icon "star-fill" %} Featured</span>
+            {% endif %}
+          </div>
+        </div>
+        <div class="event-card__details d-flex flex-wrap align-items-center gap-3">
+          <span>
+            {% icon "clock" %}
+            {% if event.start|date:"j" != event.end|date:"j" %}
+              {% if event.start|date:"F" == event.end|date:"F" %}
+                {{ event.start|date:"j" }}
+              {% else %}
+                {{ event.start|date:"j F" }}
+              {% endif %}
+              –
+            {% endif %}
+            {{ event.end|date:"j F Y" }}
+            <span class="text-muted">· {{ event.start|naturaltime }}</span>
+          </span>
+          {% if event.locations.all or event.accessible_online %}
+            <span class="text-muted">
+              {% if event.locations.all %}
+                {% icon "geo-alt" %}
+              {% endif %}
+              {% for location in event.locations.all %}
+                {{ location.city }}
+                {% if not forloop.last %},{% endif %}
+              {% endfor %}
+              {% if event.accessible_online %}
+                {% if event.locations.all %}·{% endif %}
+                {% icon "laptop" %} Online
+              {% endif %}
+            </span>
           {% endif %}
-          to
-        {% endif %}
-        {{ event.end|date:" j F Y" }}
-        <br />
-        <small class="text-muted">{{ event.start|naturaltime }}</small>
-      </div>
-    </div>
-  </div>
-  <div class="card-body py-2">
-    <div class="d-flex flex-wrap align-items-center gap-1">
-      <div>
-        {% if event.accessible_online %}
-          {% include "events/badges/online.html" %}
-        {% endif %}
-        {% for location in event.locations.all %}
-          {% include "events/badges/location.html" %}
-        {% endfor %}
-      </div>
-      <div class="ms-auto">
-        {% if event.price.amount == 0 %}
-          <span class="fw-semibold text-success">Free</span>
-        {% else %}
-          <span class="fw-semibold">{{ event.price }}</span>
-        {% endif %}
-        {% if event.registration_type == event.RegistrationType.INVITE_ONLY %}
-          <br />
-          <small class="text-muted">Invite only</small>
-        {% endif %}
+          <span class="ms-auto event-card__price">
+            {% if event.price.amount == 0 %}
+              <span class="text-success">Free</span>
+            {% else %}
+              {{ event.price }}
+            {% endif %}
+            {% if event.registration_type == event.RegistrationType.INVITE_ONLY %}
+              <small class="text-muted">Invite only</small>
+            {% endif %}
+          </span>
+        </div>
       </div>
     </div>
   </div>

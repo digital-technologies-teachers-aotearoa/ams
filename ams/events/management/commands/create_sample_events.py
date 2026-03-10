@@ -1,3 +1,5 @@
+# ruff: noqa: E501
+
 """Module for the custom Django create_sample_events command."""
 
 from datetime import timedelta
@@ -31,10 +33,6 @@ class Command(management.base.BaseCommand):
     def handle(self, *args, **options):
         """Automatically called when the create_sample_events command is given."""
         self.stdout.write(LOG_HEADER.format("📅 Create sample events"))
-
-        if Event.objects.exists():
-            self.stdout.write("✅ Events already exist. Skipping creation.")
-            return
 
         regions = self._create_regions()
         locations = self._create_locations(regions)
@@ -185,11 +183,11 @@ class Command(management.base.BaseCommand):
         session_locations: optional dict mapping session index to list of locations
         """
         for i, (name, start, end) in enumerate(session_defs):
-            session = Session.objects.create(
+            session, _ = Session.objects.update_or_create(
                 name=name,
                 event=event,
                 start=start,
-                end=end,
+                defaults={"end": end},
             )
             if session_locations and i in session_locations:
                 session.locations.set(session_locations[i])
@@ -200,18 +198,20 @@ class Command(management.base.BaseCommand):
         reg_link = "https://example.com/register"
 
         # --- 1. Past large conference (AC series) ---
-        e1 = Event.objects.create(
+        e1, _ = Event.objects.update_or_create(
             name="Conference 2025",
-            description="<p>The 2025 annual conference reviewing the past year.</p>",
-            published=True,
-            show_schedule=True,
-            featured=False,
-            registration_type=Event.RegistrationType.REGISTER,
-            registration_link=reg_link,
-            price=Money(350, "NZD"),
-            series=series["AC"],
+            defaults={
+                "description": "<p>The 2025 annual conference reviewing the past year.</p>",
+                "published": True,
+                "show_schedule": True,
+                "featured": False,
+                "registration_type": Event.RegistrationType.REGISTER,
+                "registration_link": reg_link,
+                "price": Money(350, "NZD"),
+                "series": series["AC"],
+            },
         )
-        e1.locations.set([akl_main, akl_a, akl_b])
+        e1.locations.set([akl_main])
         e1.sponsors.set([entities[0], entities[1]])
         e1.organisers.set([entities[2]])
         base = _dt(-90)
@@ -263,18 +263,20 @@ class Command(management.base.BaseCommand):
         self.stdout.write("✅ Event 1: Conference 2025 (past, multi-day)")
 
         # --- 2. Future large conference (AC series) ---
-        e2 = Event.objects.create(
+        e2, _ = Event.objects.update_or_create(
             name="Conference 2026",
-            description="<p>The upcoming 2026 annual conference.</p>",
-            published=True,
-            show_schedule=True,
-            featured=True,
-            registration_type=Event.RegistrationType.REGISTER,
-            registration_link=reg_link,
-            price=Money(400, "NZD"),
-            series=series["AC"],
+            defaults={
+                "description": "<p>The upcoming 2026 annual conference.</p>",
+                "published": True,
+                "show_schedule": True,
+                "featured": True,
+                "registration_type": Event.RegistrationType.REGISTER,
+                "registration_link": reg_link,
+                "price": Money(400, "NZD"),
+                "series": series["AC"],
+            },
         )
-        e2.locations.set([akl_main, akl_a, akl_b])
+        e2.locations.set([akl_main])
         e2.sponsors.set(entities[:3])
         e2.organisers.set([entities[3]])
         base = _dt(120)
@@ -331,14 +333,16 @@ class Command(management.base.BaseCommand):
         self.stdout.write("✅ Event 2: Conference 2026 (future, multi-day)")
 
         # --- 3-5. Regional workshops (RW series) ---
-        e3 = Event.objects.create(
+        e3, _ = Event.objects.update_or_create(
             name="Wellington Workshop: Project Management",
-            description="<p>A hands-on workshop covering modern project management techniques.</p>",  # noqa: E501
-            published=True,
-            registration_type=Event.RegistrationType.REGISTER,
-            registration_link=reg_link,
-            price=Money(120, "NZD"),
-            series=series["RW"],
+            defaults={
+                "description": "<p>A hands-on workshop covering modern project management techniques.</p>",
+                "published": True,
+                "registration_type": Event.RegistrationType.REGISTER,
+                "registration_link": reg_link,
+                "price": Money(120, "NZD"),
+                "series": series["RW"],
+            },
         )
         e3.locations.set([te_papa])
         base = _dt(30)
@@ -370,14 +374,16 @@ class Command(management.base.BaseCommand):
         )
         self.stdout.write("✅ Event 3: Wellington Workshop (future)")
 
-        e4 = Event.objects.create(
+        e4, _ = Event.objects.update_or_create(
             name="Canterbury Workshop: Data Governance",
-            description="<p>Understanding data governance frameworks and best practices.</p>",  # noqa: E501
-            published=True,
-            registration_type=Event.RegistrationType.REGISTER,
-            registration_link=reg_link,
-            price=Money(100, "NZD"),
-            series=series["RW"],
+            defaults={
+                "description": "<p>Understanding data governance frameworks and best practices.</p>",
+                "published": True,
+                "registration_type": Event.RegistrationType.REGISTER,
+                "registration_link": reg_link,
+                "price": Money(100, "NZD"),
+                "series": series["RW"],
+            },
         )
         e4.locations.set([chch])
         base = _dt(60)
@@ -399,14 +405,16 @@ class Command(management.base.BaseCommand):
         )
         self.stdout.write("✅ Event 4: Canterbury Workshop (future)")
 
-        e5 = Event.objects.create(
+        e5, _ = Event.objects.update_or_create(
             name="Otago Workshop: Communication Skills",
-            description="<p>Improve your professional communication and presentation skills.</p>",  # noqa: E501
-            published=True,
-            registration_type=Event.RegistrationType.REGISTER,
-            registration_link=reg_link,
-            price=Money(80, "NZD"),
-            series=series["RW"],
+            defaults={
+                "description": "<p>Improve your professional communication and presentation skills.</p>",
+                "published": True,
+                "registration_type": Event.RegistrationType.REGISTER,
+                "registration_link": reg_link,
+                "price": Money(80, "NZD"),
+                "series": series["RW"],
+            },
         )
         e5.locations.set([dunedin])
         base = _dt(-45)
@@ -433,15 +441,17 @@ class Command(management.base.BaseCommand):
         self.stdout.write("✅ Event 5: Otago Workshop (past)")
 
         # --- 6-8. Webinars (WS series) ---
-        e6 = Event.objects.create(
+        e6, _ = Event.objects.update_or_create(
             name="Webinar: Intro to Sustainability Reporting",
-            description="<p>Learn the basics of ESG and sustainability reporting.</p>",
-            published=True,
-            accessible_online=True,
-            registration_type=Event.RegistrationType.REGISTER,
-            registration_link=reg_link,
-            price=Money(0, "NZD"),
-            series=series["WS"],
+            defaults={
+                "description": "<p>Learn the basics of ESG and sustainability reporting.</p>",
+                "published": True,
+                "accessible_online": True,
+                "registration_type": Event.RegistrationType.REGISTER,
+                "registration_link": reg_link,
+                "price": Money(0, "NZD"),
+                "series": series["WS"],
+            },
         )
         self._add_sessions(
             e6,
@@ -451,15 +461,17 @@ class Command(management.base.BaseCommand):
         )
         self.stdout.write("✅ Event 6: Webinar (future, free)")
 
-        e7 = Event.objects.create(
+        e7, _ = Event.objects.update_or_create(
             name="Webinar: Cybersecurity Essentials",
-            description="<p>Key cybersecurity practices every professional should know.</p>",  # noqa: E501
-            published=True,
-            accessible_online=True,
-            registration_type=Event.RegistrationType.REGISTER,
-            registration_link=reg_link,
-            price=Money(25, "NZD"),
-            series=series["WS"],
+            defaults={
+                "description": "<p>Key cybersecurity practices every professional should know.</p>",
+                "published": True,
+                "accessible_online": True,
+                "registration_type": Event.RegistrationType.REGISTER,
+                "registration_link": reg_link,
+                "price": Money(25, "NZD"),
+                "series": series["WS"],
+            },
         )
         self._add_sessions(
             e7,
@@ -469,15 +481,17 @@ class Command(management.base.BaseCommand):
         )
         self.stdout.write("✅ Event 7: Webinar (future)")
 
-        e8 = Event.objects.create(
+        e8, _ = Event.objects.update_or_create(
             name="Webinar: Remote Work Best Practices",
-            description="<p>Tips and tools for effective remote and hybrid work.</p>",
-            published=True,
-            accessible_online=True,
-            registration_type=Event.RegistrationType.REGISTER,
-            registration_link=reg_link,
-            price=Money(0, "NZD"),
-            series=series["WS"],
+            defaults={
+                "description": "<p>Tips and tools for effective remote and hybrid work.</p>",
+                "published": True,
+                "accessible_online": True,
+                "registration_type": Event.RegistrationType.REGISTER,
+                "registration_link": reg_link,
+                "price": Money(0, "NZD"),
+                "series": series["WS"],
+            },
         )
         self._add_sessions(
             e8,
@@ -488,13 +502,15 @@ class Command(management.base.BaseCommand):
         self.stdout.write("✅ Event 8: Webinar (past, free)")
 
         # --- 9-11. Networking/social events ---
-        e9 = Event.objects.create(
+        e9, _ = Event.objects.update_or_create(
             name="Auckland Networking Evening",
-            description="<p>An informal evening of networking with industry professionals.</p>",  # noqa: E501
-            published=True,
-            registration_type=Event.RegistrationType.REGISTER,
-            registration_link=reg_link,
-            price=Money(15, "NZD"),
+            defaults={
+                "description": "<p>An informal evening of networking with industry professionals.</p>",
+                "published": True,
+                "registration_type": Event.RegistrationType.REGISTER,
+                "registration_link": reg_link,
+                "price": Money(15, "NZD"),
+            },
         )
         e9.locations.set([akl_main])
         self._add_sessions(
@@ -505,12 +521,14 @@ class Command(management.base.BaseCommand):
         )
         self.stdout.write("✅ Event 9: Networking Evening (past)")
 
-        e10 = Event.objects.create(
+        e10, _ = Event.objects.update_or_create(
             name="Wellington End-of-Year Social",
-            description="<p>Celebrate the end of the year with colleagues and friends.</p>",  # noqa: E501
-            published=True,
-            registration_type=Event.RegistrationType.INVITE_ONLY,
-            price=Money(0, "NZD"),
+            defaults={
+                "description": "<p>Celebrate the end of the year with colleagues and friends.</p>",
+                "published": True,
+                "registration_type": Event.RegistrationType.INVITE_ONLY,
+                "price": Money(0, "NZD"),
+            },
         )
         e10.locations.set([te_papa])
         self._add_sessions(
@@ -521,13 +539,15 @@ class Command(management.base.BaseCommand):
         )
         self.stdout.write("✅ Event 10: End-of-Year Social (future, invite only)")
 
-        e11 = Event.objects.create(
+        e11, _ = Event.objects.update_or_create(
             name="Christchurch Industry Mixer",
-            description="<p>Connect with professionals from across Canterbury.</p>",
-            published=True,
-            registration_type=Event.RegistrationType.REGISTER,
-            registration_link=reg_link,
-            price=Money(10, "NZD"),
+            defaults={
+                "description": "<p>Connect with professionals from across Canterbury.</p>",
+                "published": True,
+                "registration_type": Event.RegistrationType.REGISTER,
+                "registration_link": reg_link,
+                "price": Money(10, "NZD"),
+            },
         )
         e11.locations.set([chch])
         self.stdout.write("✅ Event 11: Industry Mixer (future, no sessions)")
@@ -535,13 +555,15 @@ class Command(management.base.BaseCommand):
         Event.objects.filter(pk=e11.pk).update(start=_dt(90, 17), end=_dt(90, 20))
 
         # --- 12-14. Training days ---
-        e12 = Event.objects.create(
+        e12, _ = Event.objects.update_or_create(
             name="Advanced Excel Training",
-            description="<p>Master advanced Excel techniques for data analysis.</p>",
-            published=True,
-            registration_type=Event.RegistrationType.REGISTER,
-            registration_link=reg_link,
-            price=Money(200, "NZD"),
+            defaults={
+                "description": "<p>Master advanced Excel techniques for data analysis.</p>",
+                "published": True,
+                "registration_type": Event.RegistrationType.REGISTER,
+                "registration_link": reg_link,
+                "price": Money(200, "NZD"),
+            },
         )
         e12.locations.set([akl_a])
         base = _dt(-120)
@@ -578,13 +600,15 @@ class Command(management.base.BaseCommand):
         )
         self.stdout.write("✅ Event 12: Excel Training (past)")
 
-        e13 = Event.objects.create(
+        e13, _ = Event.objects.update_or_create(
             name="Leadership Development Day",
-            description="<p>Develop your leadership capabilities through interactive exercises.</p>",  # noqa: E501
-            published=True,
-            registration_type=Event.RegistrationType.REGISTER,
-            registration_link=reg_link,
-            price=Money(250, "NZD"),
+            defaults={
+                "description": "<p>Develop your leadership capabilities through interactive exercises.</p>",
+                "published": True,
+                "registration_type": Event.RegistrationType.REGISTER,
+                "registration_link": reg_link,
+                "price": Money(250, "NZD"),
+            },
         )
         e13.locations.set([te_papa])
         base = _dt(40)
@@ -616,13 +640,15 @@ class Command(management.base.BaseCommand):
         )
         self.stdout.write("✅ Event 13: Leadership Development (future)")
 
-        e14 = Event.objects.create(
+        e14, _ = Event.objects.update_or_create(
             name="Financial Literacy for Managers",
-            description="<p>Understand financial statements and budgeting essentials.</p>",  # noqa: E501
-            published=True,
-            registration_type=Event.RegistrationType.REGISTER,
-            registration_link=reg_link,
-            price=Money(180, "NZD"),
+            defaults={
+                "description": "<p>Understand financial statements and budgeting essentials.</p>",
+                "published": True,
+                "registration_type": Event.RegistrationType.REGISTER,
+                "registration_link": reg_link,
+                "price": Money(180, "NZD"),
+            },
         )
         e14.locations.set([chch])
         base = _dt(100)
@@ -650,47 +676,55 @@ class Command(management.base.BaseCommand):
         self.stdout.write("✅ Event 14: Financial Literacy (future)")
 
         # --- 15-17. External events ---
-        e15 = Event.objects.create(
+        e15, _ = Event.objects.update_or_create(
             name="NZ Tech Summit 2026",
-            description="<p>New Zealand's premier technology summit.</p>",
-            published=True,
-            registration_type=Event.RegistrationType.EXTERNAL,
-            registration_link="https://nztechsummit.example.com",
-            price=Money(500, "NZD"),
+            defaults={
+                "description": "<p>New Zealand's premier technology summit.</p>",
+                "published": True,
+                "registration_type": Event.RegistrationType.EXTERNAL,
+                "registration_link": "https://nztechsummit.example.com",
+                "price": Money(500, "NZD"),
+            },
         )
         Event.objects.filter(pk=e15.pk).update(start=_dt(150, 9), end=_dt(152, 17))
         self.stdout.write("✅ Event 15: NZ Tech Summit (future, external)")
 
-        e16 = Event.objects.create(
+        e16, _ = Event.objects.update_or_create(
             name="Australasian HR Conference",
-            description="<p>Cross-Tasman HR professionals conference.</p>",
-            published=True,
-            registration_type=Event.RegistrationType.EXTERNAL,
-            registration_link="https://australasianhr.example.com",
-            price=Money(450, "NZD"),
+            defaults={
+                "description": "<p>Cross-Tasman HR professionals conference.</p>",
+                "published": True,
+                "registration_type": Event.RegistrationType.EXTERNAL,
+                "registration_link": "https://australasianhr.example.com",
+                "price": Money(450, "NZD"),
+            },
         )
         Event.objects.filter(pk=e16.pk).update(start=_dt(80, 9), end=_dt(81, 17))
         self.stdout.write("✅ Event 16: Australasian HR Conference (future, external)")
 
-        e17 = Event.objects.create(
+        e17, _ = Event.objects.update_or_create(
             name="Pacific Innovation Forum",
-            description="<p>Regional innovation and entrepreneurship forum.</p>",
-            published=True,
-            registration_type=Event.RegistrationType.EXTERNAL,
-            registration_link="https://pacificinnovation.example.com",
-            price=Money(300, "NZD"),
+            defaults={
+                "description": "<p>Regional innovation and entrepreneurship forum.</p>",
+                "published": True,
+                "registration_type": Event.RegistrationType.EXTERNAL,
+                "registration_link": "https://pacificinnovation.example.com",
+                "price": Money(300, "NZD"),
+            },
         )
         Event.objects.filter(pk=e17.pk).update(start=_dt(170, 9), end=_dt(170, 17))
         self.stdout.write("✅ Event 17: Pacific Innovation Forum (future, external)")
 
         # --- 18-20. Application-based events ---
-        e18 = Event.objects.create(
+        e18, _ = Event.objects.update_or_create(
             name="Emerging Leaders Programme",
-            description="<p>A selective programme for emerging leaders in the sector.</p>",  # noqa: E501
-            published=True,
-            registration_type=Event.RegistrationType.APPLY,
-            registration_link=reg_link,
-            price=Money(150, "NZD"),
+            defaults={
+                "description": "<p>A selective programme for emerging leaders in the sector.</p>",
+                "published": True,
+                "registration_type": Event.RegistrationType.APPLY,
+                "registration_link": reg_link,
+                "price": Money(150, "NZD"),
+            },
         )
         e18.locations.set([te_papa])
         base = _dt(-20)
@@ -713,13 +747,15 @@ class Command(management.base.BaseCommand):
         )
         self.stdout.write("✅ Event 18: Emerging Leaders (past, apply)")
 
-        e19 = Event.objects.create(
+        e19, _ = Event.objects.update_or_create(
             name="Research Symposium 2026",
-            description="<p>Present and discuss current research in our sector.</p>",
-            published=True,
-            registration_type=Event.RegistrationType.APPLY,
-            registration_link=reg_link,
-            price=Money(100, "NZD"),
+            defaults={
+                "description": "<p>Present and discuss current research in our sector.</p>",
+                "published": True,
+                "registration_type": Event.RegistrationType.APPLY,
+                "registration_link": reg_link,
+                "price": Money(100, "NZD"),
+            },
         )
         e19.locations.set([chch])
         base = _dt(55)
@@ -746,13 +782,15 @@ class Command(management.base.BaseCommand):
         )
         self.stdout.write("✅ Event 19: Research Symposium (future, apply)")
 
-        e20 = Event.objects.create(
+        e20, _ = Event.objects.update_or_create(
             name="Innovation Bootcamp",
-            description="<p>An intensive two-day bootcamp for innovators and entrepreneurs.</p>",  # noqa: E501
-            published=True,
-            registration_type=Event.RegistrationType.APPLY,
-            registration_link=reg_link,
-            price=Money(175, "NZD"),
+            defaults={
+                "description": "<p>An intensive two-day bootcamp for innovators and entrepreneurs.</p>",
+                "published": True,
+                "registration_type": Event.RegistrationType.APPLY,
+                "registration_link": reg_link,
+                "price": Money(175, "NZD"),
+            },
         )
         e20.locations.set([akl_a])
         base = _dt(110)
@@ -780,13 +818,15 @@ class Command(management.base.BaseCommand):
         self.stdout.write("✅ Event 20: Innovation Bootcamp (future, apply)")
 
         # --- 21-23. Community meetups ---
-        e21 = Event.objects.create(
+        e21, _ = Event.objects.update_or_create(
             name="Auckland Community Meetup",
-            description="<p>Monthly community gathering for members in Auckland.</p>",
-            published=True,
-            registration_type=Event.RegistrationType.REGISTER,
-            registration_link=reg_link,
-            price=Money(0, "NZD"),
+            defaults={
+                "description": "<p>Monthly community gathering for members in Auckland.</p>",
+                "published": True,
+                "registration_type": Event.RegistrationType.REGISTER,
+                "registration_link": reg_link,
+                "price": Money(0, "NZD"),
+            },
         )
         e21.locations.set([akl_main])
         base = _dt(-15)
@@ -812,13 +852,15 @@ class Command(management.base.BaseCommand):
         )
         self.stdout.write("✅ Event 21: Auckland Meetup (past, free)")
 
-        e22 = Event.objects.create(
+        e22, _ = Event.objects.update_or_create(
             name="Wellington Community Meetup",
-            description="<p>Monthly community gathering for members in Wellington.</p>",
-            published=True,
-            registration_type=Event.RegistrationType.REGISTER,
-            registration_link=reg_link,
-            price=Money(0, "NZD"),
+            defaults={
+                "description": "<p>Monthly community gathering for members in Wellington.</p>",
+                "published": True,
+                "registration_type": Event.RegistrationType.REGISTER,
+                "registration_link": reg_link,
+                "price": Money(0, "NZD"),
+            },
         )
         e22.locations.set([te_papa])
         base = _dt(20)
@@ -839,13 +881,15 @@ class Command(management.base.BaseCommand):
         )
         self.stdout.write("✅ Event 22: Wellington Meetup (future, free)")
 
-        e23 = Event.objects.create(
+        e23, _ = Event.objects.update_or_create(
             name="Tauranga Community Meetup",
-            description="<p>Community gathering for Bay of Plenty members.</p>",
-            published=True,
-            registration_type=Event.RegistrationType.REGISTER,
-            registration_link=reg_link,
-            price=Money(0, "NZD"),
+            defaults={
+                "description": "<p>Community gathering for Bay of Plenty members.</p>",
+                "published": True,
+                "registration_type": Event.RegistrationType.REGISTER,
+                "registration_link": reg_link,
+                "price": Money(0, "NZD"),
+            },
         )
         e23.locations.set([tauranga])
         base = _dt(50)
@@ -867,15 +911,17 @@ class Command(management.base.BaseCommand):
         self.stdout.write("✅ Event 23: Tauranga Meetup (future, free)")
 
         # --- 24. Multi-day retreat ---
-        e24 = Event.objects.create(
+        e24, _ = Event.objects.update_or_create(
             name="Annual Leadership Retreat",
-            description="<p>A four-day retreat for senior leaders in a stunning lakeside setting.</p>",  # noqa: E501
-            published=True,
-            show_schedule=True,
-            featured=True,
-            registration_type=Event.RegistrationType.REGISTER,
-            registration_link=reg_link,
-            price=Money(500, "NZD"),
+            defaults={
+                "description": "<p>A four-day retreat for senior leaders in a stunning lakeside setting.</p>",
+                "published": True,
+                "show_schedule": True,
+                "featured": True,
+                "registration_type": Event.RegistrationType.REGISTER,
+                "registration_link": reg_link,
+                "price": Money(500, "NZD"),
+            },
         )
         e24.locations.set([wanaka])
         e24.sponsors.set([entities[3], entities[4]])
@@ -914,13 +960,15 @@ class Command(management.base.BaseCommand):
         self.stdout.write("✅ Event 24: Leadership Retreat (future, multi-day)")
 
         # --- 25. Cancelled/unpublished event ---
-        e25 = Event.objects.create(
+        e25, _ = Event.objects.update_or_create(
             name="Draft Workshop: TBD",
-            description="<p>This event is still being planned.</p>",
-            published=False,
-            registration_type=Event.RegistrationType.REGISTER,
-            registration_link=reg_link,
-            price=Money(0, "NZD"),
+            defaults={
+                "description": "<p>This event is still being planned.</p>",
+                "published": False,
+                "registration_type": Event.RegistrationType.REGISTER,
+                "registration_link": reg_link,
+                "price": Money(0, "NZD"),
+            },
         )
         Event.objects.filter(pk=e25.pk).update(start=_dt(180, 9), end=_dt(180, 17))
         self.stdout.write("✅ Event 25: Draft Workshop (unpublished)")

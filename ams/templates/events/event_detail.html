@@ -1,6 +1,6 @@
 {% extends "events/base.html" %}
 
-{% load static %}
+{% load static icon %}
 
 {% block page_heading %}
   <div id="event-details" class="my-3">
@@ -33,84 +33,111 @@
          href="{{ event.registration_link }}"
          role="button">{{ event.get_registration_type_display }}</a>
     {% endif %}
-    {% if event.accessible_online %}
-      {% include "events/badges/online.html" %}
-    {% endif %}
-    <div class="card mb-3">
-      <div class="card-body">
-        <div class="row">
-          <div class="col-6 col-md-3 mb-2">
-            <small class="text-muted d-block">Starts</small>
-            {{ event.start|date:"g:i a" }}
-            <br />
-            {{ event.start|date:"j F, Y" }}
-          </div>
-          <div class="col-6 col-md-3 mb-2">
-            <small class="text-muted d-block">Ends</small>
-            {{ event.end|date:"g:i a" }}
-            <br />
-            {{ event.end|date:"j F, Y" }}
-          </div>
-          <div class="col-6 col-md-3 mb-2">
-            <small class="text-muted d-block">Cost</small>
-            {% if event.price.amount == 0 %}
-              <span class="text-success fw-semibold">Free</span>
-            {% else %}
-              {{ event.price }}
-            {% endif %}
-          </div>
-          <div class="col-6 col-md-3 mb-2">
-            <small class="text-muted d-block">Location{{ locations|pluralize }}</small>
-            {% for location in locations %}
-              <a href="{{ location.get_absolute_url }}">
-                {% if location.room %}{{ location.room }},{% endif %}
-                {{ location.name }}
-              </a>
-              {% if not forloop.last %}<br />{% endif %}
-            {% endfor %}
+    <div class="event-hero__details mb-3">
+      <div class="row g-3">
+        <div class="col-6 col-md-3">
+          <div class="event-hero__detail-item">
+            <span class="event-hero__icon">{% icon "calendar-event" %}</span>
+            <div>
+              <small class="text-muted d-block">Starts</small>
+              {{ event.start|date:"g:i a" }}
+              <br />
+              {{ event.start|date:"j F, Y" }}
+            </div>
           </div>
         </div>
+        <div class="col-6 col-md-3">
+          <div class="event-hero__detail-item">
+            <span class="event-hero__icon">{% icon "clock" %}</span>
+            <div>
+              <small class="text-muted d-block">Ends</small>
+              {{ event.end|date:"g:i a" }}
+              <br />
+              {{ event.end|date:"j F, Y" }}
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="event-hero__detail-item">
+            <span class="event-hero__icon">{% icon "tag-fill" %}</span>
+            <div>
+              <small class="text-muted d-block">Cost</small>
+              {% if event.price.amount == 0 %}
+                <span class="text-success fw-semibold">Free</span>
+              {% else %}
+                {{ event.price }}
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% if locations %}
+          <div class="col-6 col-md-3">
+            <div class="event-hero__detail-item">
+              <span class="event-hero__icon">{% icon "geo-alt-fill" %}</span>
+              <div>
+                <small class="text-muted d-block">Location{{ locations|pluralize }}</small>
+                {% for location in locations %}
+                  <a href="{{ location.get_absolute_url }}">
+                    {% if location.room %}{{ location.room }},{% endif %}
+                    {{ location.name }}
+                  </a>
+                  <a href="{% url 'events:upcoming' %}?locations__region={{ location.region_id }}"
+                     class="text-muted ms-1"
+                     title="Browse events in this region">{% icon "funnel" %}</a>
+                  {% if not forloop.last %}<br />{% endif %}
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        {% endif %}
+        {% if event.accessible_online %}
+          <div class="col-6 col-md-3">
+            <div class="event-hero__detail-item">
+              <span class="event-hero__icon">{% icon "laptop" %}</span>
+              <div>
+                <small class="text-muted d-block">Online</small>
+                <a href="{% url 'events:upcoming' %}?accessible_online=1">Accessible online</a>
+              </div>
+            </div>
+          </div>
+        {% endif %}
       </div>
     </div>
-    <h3 id="event-description" class="event-heading">Description</h3>
+    <h3 id="event-description" class="event-section-heading">Description</h3>
     <div class="mb-3">{{ event.description|safe }}</div>
     {% if event.show_schedule and schedule %}
-      <h3 id="event-schedule" class="event-heading">Schedule</h3>
+      <h3 id="event-schedule" class="event-section-heading">Schedule</h3>
       {% include "events/event_schedule.html" %}
     {% endif %}
   </div>
   <div class="col-12 col-md-4 order-2 order-md-2">
-    <div id="sticky-navigation" class="mb-3 position-sticky">
-      <strong>On this page</strong>
-      <nav id="event-navigation" class="nav nav-pills flex-column">
-        <a class="nav-link" href="#event-details">Details</a>
-        <a class="nav-link" href="#event-description">Description</a>
+    <div id="sticky-navigation" class="position-sticky mb-3">
+      <div class="event-sidebar-nav mb-3">
+        <div class="event-sidebar-nav__heading">On this page</div>
+        <a class="event-sidebar-nav__link" href="#event-details">Details</a>
+        <a class="event-sidebar-nav__link" href="#event-description">Description</a>
         {% if event.show_schedule %}
-          <a class="nav-link" href="#event-schedule">Schedule</a>
+          <a class="event-sidebar-nav__link" href="#event-schedule">Schedule</a>
           {% if schedule|length > 1 %}
             {% for day in schedule %}
-              <a class="nav-link ms-4" href="#schedule-day-{{ forloop.counter }}">
-                <small>{{ day.date|date:"l j F, Y" }}</small>
-              </a>
+              <a class="event-sidebar-nav__link event-sidebar-nav__link--indent"
+                 href="#schedule-day-{{ forloop.counter }}">{{ day.date|date:"l j F, Y" }}</a>
             {% endfor %}
           {% endif %}
         {% endif %}
-      </nav>
+      </div>
       {% if event.registration_link and not event.has_ended %}
-        <hr />
-        <a class="btn btn-success d-block btn-lg"
+        <a class="btn btn-success d-block btn-lg mb-3"
            href="{{ event.registration_link }}"
            role="button">{{ event.get_registration_type_display }}</a>
       {% endif %}
       {% if event.registration_type == event.RegistrationType.INVITE_ONLY %}
-        <hr />
-        <button class="btn btn-secondary d-block btn-lg" role="button" disabled>
+        <button class="btn btn-secondary d-block btn-lg mb-3" role="button" disabled>
           {{ event.get_registration_type_display }}
         </button>
       {% endif %}
       {% if event.series %}
-        <hr />
-        <div class="text-center">
+        <div class="text-center mb-3">
           <small>This event is part of the following series</small>
           {% if event.series.logo %}
             <img src="{{ event.series.logo.url }}"
@@ -122,8 +149,7 @@
         </div>
       {% endif %}
       {% if sponsors %}
-        <hr />
-        <div class="text-center">
+        <div class="text-center mb-2">
           <small>This event is sponsored by</small>
         </div>
         <ul class="list-unstyled text-center mb-3">
