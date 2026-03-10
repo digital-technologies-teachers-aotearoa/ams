@@ -76,10 +76,49 @@ class EventUpcomingListFilter(admin.SimpleListFilter):
             }
 
 
+@admin.action(description="Duplicate selected events")
+def duplicate_events(modeladmin, request, queryset):
+    count = 0
+    for event in queryset:
+        # Store M2M relations and sessions before duplicating
+        locations = list(event.locations.all())
+        sponsors = list(event.sponsors.all())
+        organisers = list(event.organisers.all())
+        sessions = list(event.sessions.all())
+
+        # Duplicate event
+        event.pk = None
+        event.id = None
+        event.slug = None
+        event.published = False
+        event.name = f"{event.name} (Duplicate)"
+        event.save()
+
+        # Copy M2M relations
+        event.locations.set(locations)
+        event.sponsors.set(sponsors)
+        event.organisers.set(organisers)
+
+        # Duplicate sessions
+        for session in sessions:
+            session_locations = list(session.locations.all())
+            session.pk = None
+            session.id = None
+            session.event = event
+            session.save()
+            session.locations.set(session_locations)
+
+        event.update_datetimes()
+        count += 1
+
+    modeladmin.message_user(request, f"Successfully duplicated {count} event(s).")
+
+
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
     model = Event
     inlines = [SessionInline]
+    actions = [duplicate_events]
     fieldsets = (
         (
             None,
