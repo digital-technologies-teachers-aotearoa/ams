@@ -120,6 +120,54 @@ function vendorScripts() {
     .pipe(dest(paths.js, { sourcemaps: '.' }));
 }
 
+// Leaflet vendor JS bundle (separate from main vendors)
+function leafletVendorScripts() {
+  mkdirSync(paths.js, { recursive: true });
+
+  return src(
+    [
+      'node_modules/leaflet/dist/leaflet.js',
+      'node_modules/leaflet.markercluster/dist/leaflet.markercluster.js',
+    ],
+    { sourcemaps: true }
+  )
+    .pipe(concat('leaflet_vendors.js'))
+    .pipe(dest(paths.js))
+    .pipe(plumber())
+    .pipe(uglify())
+    .pipe(rename({ suffix: '.min' }))
+    .pipe(dest(paths.js, { sourcemaps: '.' }));
+}
+
+// Leaflet CSS bundle
+function leafletStyles() {
+  mkdirSync(paths.css, { recursive: true });
+
+  const minifyCss = [cssnano({ preset: 'default' })];
+
+  return src([
+    'node_modules/leaflet/dist/leaflet.css',
+    'node_modules/leaflet.markercluster/dist/MarkerCluster.css',
+    'node_modules/leaflet.markercluster/dist/MarkerCluster.Default.css',
+  ])
+    .pipe(plumber())
+    .pipe(concat('leaflet.css'))
+    .pipe(dest(paths.css))
+    .pipe(rename({ suffix: '.min' }))
+    .pipe(postcss(minifyCss))
+    .pipe(dest(paths.css));
+}
+
+// Copy Leaflet marker images (CSS references ./images/)
+function copyLeafletImages() {
+  const imagesDir = `${paths.css}/images`;
+  mkdirSync(imagesDir, { recursive: true });
+
+  return src('node_modules/leaflet/dist/images/*', { encoding: false }).pipe(
+    dest(imagesDir)
+  );
+}
+
 // Image compression
 async function imgCompression() {
   const imagemin = (await import('gulp-imagemin')).default;
@@ -212,6 +260,9 @@ const build = parallel(
   styles,
   scripts,
   vendorScripts,
+  leafletVendorScripts,
+  leafletStyles,
+  copyLeafletImages,
   imgCompression,
   copyIcons,
   mjml

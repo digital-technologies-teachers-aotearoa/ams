@@ -17,7 +17,7 @@ class TestHomeView:
         location = LocationFactory()
         EventFactory(locations=[location])
         response = client.get("/events/")
-        assert "map_locations_json" in response.context
+        assert "map_locations" in response.context
 
 
 @pytest.mark.django_db

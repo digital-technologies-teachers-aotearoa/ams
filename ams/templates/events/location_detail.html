@@ -27,35 +27,12 @@
     {% endif %}
   </div>
   <div class="col-12 col-md-6">
-    <div id="event-map"></div>
+    <div id="event-map" data-leaflet-map></div>
   </div>
 {% endblock content_container %}
 
 {% block scripts %}
-  <script>
-    var event_markers = [{
-      %
-      if location.latitude and location.longitude %
-    } {
-      coords: {
-        lat: {
-          {
-            location.latitude
-          }
-        },
-        lng: {
-          {
-            location.longitude
-          }
-        }
-      },
-      title: "{{ location.name|escape }}",
-      text: "<br />{{ location.get_full_address|escape|linebreaksbr }}",
-    }, {
-      %
-      endif %
-    }];
-    var map_zoom = 18;
-  </script>
+  {{ event_markers|json_script:"event-markers-data" }}
+  {{ map_zoom|json_script:"map-zoom-data" }}
   {% include "events/includes/leaflet_map.html" %}
 {% endblock scripts %}

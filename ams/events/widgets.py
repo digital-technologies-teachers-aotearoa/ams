@@ -9,20 +9,8 @@ class LeafletPickerWidget(MultiWidget):
 
     def __init__(self, attrs=None):
         widgets = [
-            NumberInput(
-                attrs={
-                    "step": "0.000001",
-                    "placeholder": "Latitude",
-                    "id": "id_latitude",
-                },
-            ),
-            NumberInput(
-                attrs={
-                    "step": "0.000001",
-                    "placeholder": "Longitude",
-                    "id": "id_longitude",
-                },
-            ),
+            NumberInput(attrs={"step": "0.000001", "placeholder": "Latitude"}),
+            NumberInput(attrs={"step": "0.000001", "placeholder": "Longitude"}),
         ]
         super().__init__(widgets, attrs)
 
@@ -32,7 +20,5 @@ class LeafletPickerWidget(MultiWidget):
         return [None, None]
 
     class Media:
-        css = {
-            "all": ("https://unpkg.com/leaflet@1.9.4/dist/leaflet.css",),
-        }
-        js = ("https://unpkg.com/leaflet@1.9.4/dist/leaflet.js",)
+        css = {"all": ("css/leaflet.min.css",)}
+        js = ("js/leaflet_vendors.min.js",)
