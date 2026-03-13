@@ -275,6 +275,7 @@ ams/media/
 ams/static/css/
 ams/templates/icons/*.svg
 vendors.js
+leaflet_vendors.js
 *.min.js
 *.min.js.map
 .env

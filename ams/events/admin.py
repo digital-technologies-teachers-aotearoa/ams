@@ -1,5 +1,6 @@
 import logging
 
+from django import forms
 from django.contrib import admin
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
@@ -9,8 +10,57 @@ from ams.events.models import Location
 from ams.events.models import Region
 from ams.events.models import Series
 from ams.events.models import Session
+from ams.events.widgets import LeafletPickerWidget
 
 logger = logging.getLogger(__name__)
+
+
+class CoordinatesField(forms.MultiValueField):
+    widget = LeafletPickerWidget
+
+    def __init__(self, *args, **kwargs):
+        fields = (
+            forms.DecimalField(max_digits=9, decimal_places=6, required=False),
+            forms.DecimalField(max_digits=9, decimal_places=6, required=False),
+        )
+        super().__init__(fields=fields, require_all_fields=False, *args, **kwargs)  # noqa: B026
+
+    def compress(self, data_list):
+        return data_list or [None, None]
+
+
+class LocationAdminForm(forms.ModelForm):
+    coordinates = CoordinatesField(required=False, label="Coordinates")
+
+    class Meta:
+        model = Location
+        fields = [
+            "name",
+            "room",
+            "street_address",
+            "suburb",
+            "city",
+            "region",
+            "description",
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.pk:
+            self.fields["coordinates"].initial = [
+                self.instance.latitude,
+                self.instance.longitude,
+            ]
+
+    def save(self, commit=True):  # noqa: FBT002
+        instance = super().save(commit=False)
+        coords = self.cleaned_data.get("coordinates") or [None, None]
+        instance.latitude = coords[0]
+        instance.longitude = coords[1]
+        if commit:
+            instance.save()
+            self.save_m2m()
+        return instance
 
 
 @admin.register(Region)
@@ -21,19 +71,11 @@ class RegionAdmin(admin.ModelAdmin):
 
 @admin.register(Location)
 class LocationAdmin(admin.ModelAdmin):
+    form = LocationAdminForm
     list_display = ("name", "room", "street_address", "suburb", "city", "region")
     list_filter = ("region",)
     search_fields = ("name", "room", "street_address", "suburb", "city")
     autocomplete_fields = ("region",)
-
-    class Media:
-        css = {
-            "all": ("https://unpkg.com/leaflet@1.9.4/dist/leaflet.css",),
-        }
-        js = ("https://unpkg.com/leaflet@1.9.4/dist/leaflet.js",)
-
-    class LeafletMedia:
-        """Inline JS for coordinate picking is provided via the change_form template."""
 
 
 class SessionInline(admin.StackedInline):

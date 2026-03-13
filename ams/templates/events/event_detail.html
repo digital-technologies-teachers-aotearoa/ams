@@ -27,12 +27,65 @@
 {% endblock page_heading %}
 
 {% block content_container %}
-  <div class="col-12 col-md-8 order-1 order-md-1">
-    {% if event.registration_link and not event.has_ended %}
-      <a class="btn btn-success d-block btn-lg mb-3 d-md-none"
-         href="{{ event.registration_link }}"
-         role="button">{{ event.get_registration_type_display }}</a>
-    {% endif %}
+  <div class="col-12 col-lg-4">
+    <div id="sticky-navigation" class="position-sticky mb-3">
+      <div class="event-sidebar-nav mb-3">
+        <div class="event-sidebar-nav__heading">On this page</div>
+        <a class="event-sidebar-nav__link" href="#event-details">Details</a>
+        <a class="event-sidebar-nav__link" href="#event-description">Description</a>
+        {% if event.show_schedule %}
+          <a class="event-sidebar-nav__link" href="#event-schedule">Schedule</a>
+          {% if schedule|length > 1 %}
+            {% for day in schedule %}
+              <a class="event-sidebar-nav__link event-sidebar-nav__link--indent"
+                 href="#schedule-day-{{ forloop.counter }}">{{ day.date|date:"l j F, Y" }}</a>
+            {% endfor %}
+          {% endif %}
+        {% endif %}
+      </div>
+      {% if event.registration_link and not event.has_ended %}
+        <a class="btn btn-success d-block btn-lg mb-3"
+           href="{{ event.registration_link }}"
+           role="button">{{ event.get_registration_type_display }}</a>
+      {% endif %}
+      {% if event.registration_type == event.RegistrationType.INVITE_ONLY %}
+        <button class="btn btn-secondary d-block btn-lg mb-3" role="button" disabled>
+          {{ event.get_registration_type_display }}
+        </button>
+      {% endif %}
+      {% if event.series %}
+        <div class="text-center mb-3">
+          <small>This event is part of the following series</small>
+          {% if event.series.logo %}
+            <img src="{{ event.series.logo.url }}"
+                 class="img-inline"
+                 alt="{{ event.series.name }}" />
+          {% else %}
+            <div class="h6 text-center m-3">{{ event.series.name }}</div>
+          {% endif %}
+        </div>
+      {% endif %}
+      {% if sponsors %}
+        <div class="text-center mb-2">
+          <small>This event is sponsored by</small>
+        </div>
+        <ul class="list-unstyled text-center mb-3">
+          {% for sponsor in sponsors %}
+            <li class="my-2">
+              <a href="{{ sponsor.url }}" target="_blank">
+                {% if sponsor.logo %}
+                  <img src="{{ sponsor.logo.url }}" class="img-y4" alt="{{ sponsor.name }}" />
+                {% else %}
+                  {{ sponsor.name }}
+                {% endif %}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+  </div>
+  <div class="col-12 col-lg-8 order-lg-first">
     <div class="event-hero__details mb-3">
       <div class="row g-3">
         <div class="col-6 col-md-3">
@@ -110,108 +163,15 @@
       {% include "events/event_schedule.html" %}
     {% endif %}
   </div>
-  <div class="col-12 col-md-4 order-2 order-md-2">
-    <div id="sticky-navigation" class="position-sticky mb-3">
-      <div class="event-sidebar-nav mb-3">
-        <div class="event-sidebar-nav__heading">On this page</div>
-        <a class="event-sidebar-nav__link" href="#event-details">Details</a>
-        <a class="event-sidebar-nav__link" href="#event-description">Description</a>
-        {% if event.show_schedule %}
-          <a class="event-sidebar-nav__link" href="#event-schedule">Schedule</a>
-          {% if schedule|length > 1 %}
-            {% for day in schedule %}
-              <a class="event-sidebar-nav__link event-sidebar-nav__link--indent"
-                 href="#schedule-day-{{ forloop.counter }}">{{ day.date|date:"l j F, Y" }}</a>
-            {% endfor %}
-          {% endif %}
-        {% endif %}
-      </div>
-      {% if event.registration_link and not event.has_ended %}
-        <a class="btn btn-success d-block btn-lg mb-3"
-           href="{{ event.registration_link }}"
-           role="button">{{ event.get_registration_type_display }}</a>
-      {% endif %}
-      {% if event.registration_type == event.RegistrationType.INVITE_ONLY %}
-        <button class="btn btn-secondary d-block btn-lg mb-3" role="button" disabled>
-          {{ event.get_registration_type_display }}
-        </button>
-      {% endif %}
-      {% if event.series %}
-        <div class="text-center mb-3">
-          <small>This event is part of the following series</small>
-          {% if event.series.logo %}
-            <img src="{{ event.series.logo.url }}"
-                 class="img-inline"
-                 alt="{{ event.series.name }}" />
-          {% else %}
-            <div class="h6 text-center m-3">{{ event.series.name }}</div>
-          {% endif %}
-        </div>
-      {% endif %}
-      {% if sponsors %}
-        <div class="text-center mb-2">
-          <small>This event is sponsored by</small>
-        </div>
-        <ul class="list-unstyled text-center mb-3">
-          {% for sponsor in sponsors %}
-            <li class="my-2">
-              <a href="{{ sponsor.url }}" target="_blank">
-                {% if sponsor.logo %}
-                  <img src="{{ sponsor.logo.url }}" class="img-y4" alt="{{ sponsor.name }}" />
-                {% else %}
-                  {{ sponsor.name }}
-                {% endif %}
-              </a>
-            </li>
-          {% endfor %}
-        </ul>
-      {% endif %}
+  {% if locations %}
+    <div class="col-12">
+      <div id="event-map" data-leaflet-map></div>
     </div>
-  </div>
+  {% endif %}
 {% endblock content_container %}
 
 {% block scripts %}
-  <script>
-    var event_markers = [{
-      %
-      for location in locations %
-    } {
-      %
-      if location.latitude and location.longitude %
-    } {
-      coords: {
-        lat: {
-          {
-            location.latitude
-          }
-        },
-        lng: {
-          {
-            location.longitude
-          }
-        }
-      },
-      title: "{{ location.name|escape }}",
-      text: "<br />{{ location.get_full_address|escape|linebreaksbr }}",
-    }, {
-      %
-      endif %
-    } {
-      %
-      endfor %
-    }];
-    var map_zoom = {
-      %
-      if locations.count == 1 %
-    }
-    13 {
-      %
-      else %
-    }
-    5 {
-      %
-      endif %
-    };
-  </script>
+  {{ event_markers|json_script:"event-markers-data" }}
+  {{ map_zoom|json_script:"map-zoom-data" }}
   {% include "events/includes/leaflet_map.html" %}
 {% endblock scripts %}

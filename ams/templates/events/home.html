@@ -38,17 +38,11 @@
     <h3>
       <span class="event-section-icon">{% icon "geo-alt-fill" %}</span> Event Locations
     </h3>
-    <div id="event-map"></div>
+    <div id="event-map" data-leaflet-map></div>
   </div>
 {% endblock content_container %}
 
 {% block scripts %}
-  <script>
-    var event_markers = {
-      {
-        map_locations_json | safe
-      }
-    };
-  </script>
+  {{ map_locations|json_script:"event-markers-data" }}
   {% include "events/includes/leaflet_map.html" %}
 {% endblock scripts %}

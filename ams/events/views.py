@@ -1,5 +1,3 @@
-import json
-
 from django.utils.timezone import now
 from django.views import generic
 from django_filters.views import FilterView
@@ -48,7 +46,7 @@ class HomeView(generic.TemplateView):
                         "name": event.name,
                     },
                 )
-        context["map_locations_json"] = json.dumps(list(raw_map_locations.values()))
+        context["map_locations"] = list(raw_map_locations.values())
         context["upcoming_events"] = future_events[:3]
         return context
 
@@ -89,7 +87,21 @@ class EventDetailView(RedirectToCosmeticURLMixin, generic.DetailView):
         context["schedule"] = organise_schedule_data(
             self.object.sessions.all().prefetch_related("locations"),
         )
-        context["locations"] = self.object.locations.all()
+        locations = self.object.locations.all()
+        context["locations"] = locations
+        context["event_markers"] = [
+            {
+                "coords": {
+                    "lat": float(loc.latitude),
+                    "lng": float(loc.longitude),
+                },
+                "title": loc.name,
+                "text": "<br />" + loc.get_full_address().replace("\n", "<br />"),
+            }
+            for loc in locations
+            if loc.latitude and loc.longitude
+        ]
+        context["map_zoom"] = 13 if locations.count() == 1 else 5
         return context
 
 
@@ -109,4 +121,19 @@ class LocationDetailView(RedirectToCosmeticURLMixin, generic.DetailView):
             .prefetch_related("organisers", "locations", "sponsors")
             .select_related("series")[:5]
         )
+        loc = self.object
+        if loc.latitude and loc.longitude:
+            context["event_markers"] = [
+                {
+                    "coords": {
+                        "lat": float(loc.latitude),
+                        "lng": float(loc.longitude),
+                    },
+                    "title": loc.name,
+                    "text": "<br />" + loc.get_full_address().replace("\n", "<br />"),
+                },
+            ]
+        else:
+            context["event_markers"] = []
+        context["map_zoom"] = 18
         return context

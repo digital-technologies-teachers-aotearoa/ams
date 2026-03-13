@@ -1,52 +1,5 @@
-<link rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<link rel="stylesheet"
-      href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
-<link rel="stylesheet"
-      href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
-<div id="{{ map_id|default:'event-map' }}" class="event-map"></div>
-<script>
-  (function() {
-    var mapId = '{{ map_id|default:"event-map" }}';
-    var markers = typeof event_markers !== 'undefined' ? event_markers : [];
-    var mapZoom = typeof map_zoom !== 'undefined' ? map_zoom : 5;
+{% load static %}
 
-    var map = L.map(mapId).setView([-41.2865, 174.7762], mapZoom);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      maxZoom: 19
-    }).addTo(map);
-
-    if (markers.length === 0) return;
-
-    var markerCluster = L.markerClusterGroup();
-    var bounds = L.latLngBounds();
-
-    markers.forEach(function(m) {
-      var latlng = L.latLng(m.coords.lat, m.coords.lng);
-      var popupContent = '<strong>' + m.title + '</strong>';
-      if (m.events) {
-        m.events.forEach(function(evt) {
-          popupContent += '<p class="mb-0"><a href="' + evt.url + '">' + evt.date + ' - ' + evt.name + '</a></p>';
-        });
-      } else if (m.text) {
-        popupContent += m.text;
-      }
-      var marker = L.marker(latlng).bindPopup(popupContent);
-      markerCluster.addLayer(marker);
-      bounds.extend(latlng);
-    });
-
-    map.addLayer(markerCluster);
-
-    if (markers.length === 1) {
-      map.setView(bounds.getCenter(), mapZoom);
-    } else {
-      map.fitBounds(bounds, {
-        padding: [30, 30]
-      });
-    }
-  })();
-</script>
+<link rel="stylesheet" href="{% static 'css/leaflet.min.css' %}" />
+<script src="{% static 'js/leaflet_vendors.min.js' %}"></script>
+<script src="{% static 'js/leaflet_map.min.js' %}"></script>
