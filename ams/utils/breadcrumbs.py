@@ -1,5 +1,6 @@
 """Breadcrumb functionality for Django pages."""
 
+import logging
 from typing import TypedDict
 
 from django.contrib.auth import get_user_model
@@ -13,6 +14,8 @@ from ams.cms.models import HomePage
 from ams.events.models import Event
 from ams.events.models import Location
 from ams.organisations.models import Organisation
+
+logger = logging.getLogger(__name__)
 
 User = get_user_model()
 
@@ -158,7 +161,11 @@ def _get_organisation_name(request, **kwargs):
             if org_uuid := kwargs.get("uuid"):
                 return Organisation.objects.get(uuid=org_uuid).name
         except Organisation.DoesNotExist:
-            pass
+            # Organisation not found; fall back to generic label.
+            logger.debug(
+                "Organisation with uuid=%s not found for breadcrumb label.",
+                kwargs.get("uuid"),
+            )
         return _("Organisation")
 
     return _get_cached_value(request, "org_name", get_name)
@@ -173,7 +180,11 @@ def _get_user_dashboard_label(request, **kwargs):
                 user = User.objects.get(username=username)
                 return user.get_full_name()
         except User.DoesNotExist:
-            pass
+            # User not found; fall back to generic label.
+            logger.debug(
+                "User with username=%s not found for breadcrumb label.",
+                kwargs.get("username"),
+            )
         return _("User")
 
     return _get_cached_value(request, "user_name", get_name)
@@ -187,7 +198,11 @@ def _get_event_name(request, **kwargs):
             if pk := kwargs.get("pk"):
                 return Event.objects.get(pk=pk).name
         except Event.DoesNotExist:
-            pass
+            # Event not found; fall back to generic label.
+            logger.debug(
+                "Event with pk=%s not found for breadcrumb label.",
+                kwargs.get("pk"),
+            )
         return _("Event")
 
     return _get_cached_value(request, "event_name", get_name)
@@ -201,7 +216,11 @@ def _get_location_name(request, **kwargs):
             if pk := kwargs.get("pk"):
                 return Location.objects.get(pk=pk).name
         except Location.DoesNotExist:
-            pass
+            # Location not found; fall back to generic label.
+            logger.debug(
+                "Location with pk=%s not found for breadcrumb label.",
+                kwargs.get("pk"),
+            )
         return _("Location")
 
     return _get_cached_value(request, "location_name", get_name)
