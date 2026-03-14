@@ -1,5 +1,7 @@
 """Views for terms acceptance."""
 
+from urllib.parse import urlparse
+
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -10,6 +12,18 @@ from ams.terms.forms import TermAcceptanceForm
 from ams.terms.helpers import get_latest_term_versions
 from ams.terms.helpers import get_pending_term_versions_for_user
 from ams.terms.models import TermAcceptance
+
+
+def _is_safe_redirect_url(url):
+    """Return True if the URL is a safe relative path for redirection."""
+    parsed = urlparse(url)
+    return (
+        bool(url)
+        and url.startswith("/")
+        and not parsed.scheme
+        and not parsed.netloc
+        and "\\" not in url
+    )
 
 
 def get_client_ip(request):
@@ -49,7 +63,7 @@ def accept_terms_view(request):
     # If no pending terms, redirect to 'next' or home
     if not pending_versions:
         next_url = request.GET.get("next") or request.POST.get("next")
-        if next_url:
+        if next_url and _is_safe_redirect_url(next_url):
             return HttpResponseRedirect(next_url)
         return HttpResponseRedirect(reverse("root_redirect"))
 

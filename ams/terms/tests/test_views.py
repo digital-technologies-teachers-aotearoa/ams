@@ -11,6 +11,7 @@ from django.utils import timezone
 from ams.terms.models import TermAcceptance
 from ams.terms.tests.factories import TermFactory
 from ams.terms.tests.factories import TermVersionFactory
+from ams.terms.views import _is_safe_redirect_url
 from ams.users.tests.factories import UserFactory
 
 pytestmark = pytest.mark.django_db
@@ -262,6 +263,108 @@ class TestAcceptTermsView:
         assert "1 of 3" in str(response.content) or "Reviewing 1 of 3" in str(
             response.content,
         )
+
+
+class TestIsSafeRedirectUrl:
+    """Tests for _is_safe_redirect_url."""
+
+    @pytest.mark.parametrize(
+        "url",
+        [
+            "/home/",
+            "/accounts/login/",
+            "/path/to/page?query=1",
+            "/path/to/page#fragment",
+            "/",
+        ],
+    )
+    def test_allows_safe_relative_paths(self, url):
+        assert _is_safe_redirect_url(url) is True
+
+    @pytest.mark.parametrize(
+        "url",
+        [
+            "https://evil.com",
+            "http://evil.com",
+            "ftp://evil.com/path",
+        ],
+    )
+    def test_rejects_absolute_urls_with_scheme(self, url):
+        assert _is_safe_redirect_url(url) is False
+
+    @pytest.mark.parametrize(
+        "url",
+        [
+            "//evil.com",
+            "//evil.com/path",
+        ],
+    )
+    def test_rejects_protocol_relative_urls(self, url):
+        assert _is_safe_redirect_url(url) is False
+
+    @pytest.mark.parametrize(
+        "url",
+        [
+            "/\\evil.com",
+            "/path\\to\\evil",
+        ],
+    )
+    def test_rejects_urls_with_backslashes(self, url):
+        assert _is_safe_redirect_url(url) is False
+
+    def test_rejects_empty_string(self):
+        assert _is_safe_redirect_url("") is False
+
+    @pytest.mark.parametrize(
+        "url",
+        [
+            "javascript:alert(1)",
+            "data:text/html,<h1>evil</h1>",
+            "relative/path",
+        ],
+    )
+    def test_rejects_non_path_urls(self, url):
+        assert _is_safe_redirect_url(url) is False
+
+
+class TestAcceptTermsViewRedirectSafety:
+    """Tests for URL redirect safety in accept_terms_view."""
+
+    def test_rejects_external_redirect(self, client: Client):
+        """Test that external URLs in 'next' are ignored."""
+        user = UserFactory()
+        client.force_login(user)
+
+        response = client.get(
+            f"{reverse('terms:accept')}?next=https://evil.com",
+        )
+
+        assert response.status_code == HTTPStatus.FOUND
+        assert response.url == reverse("root_redirect")
+
+    def test_rejects_protocol_relative_redirect(self, client: Client):
+        """Test that protocol-relative URLs in 'next' are ignored."""
+        user = UserFactory()
+        client.force_login(user)
+
+        response = client.get(
+            f"{reverse('terms:accept')}?next=//evil.com",
+        )
+
+        assert response.status_code == HTTPStatus.FOUND
+        assert response.url == reverse("root_redirect")
+
+    def test_rejects_backslash_redirect(self, client: Client):
+        """Test that backslash-based URLs in 'next' are ignored."""
+        user = UserFactory()
+        client.force_login(user)
+
+        response = client.get(
+            f"{reverse('terms:accept')}?next=/\\evil.com",
+        )
+
+        assert response.status_code == HTTPStatus.FOUND
+        assert response.url == reverse("root_redirect")
 
 
 class TestTermsListView:
