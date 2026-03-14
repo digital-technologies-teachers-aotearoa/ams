@@ -256,43 +256,38 @@ def verify_request_signature(request: HttpRequest) -> bool:
         True if the signature is valid, False otherwise.
     """
     signature = request.headers.get("x-xero-signature")
+    raw_body = request.body
+    body_hash = hashlib.sha256(raw_body).hexdigest() if raw_body else "empty"
+    webhook_key = settings.XERO_WEBHOOK_KEY.strip() if settings.XERO_WEBHOOK_KEY else ""
 
-    logger.debug(
-        "Signature verification - received_signature=%s, body_length=%d, "
-        "webhook_key_configured=%s",
+    logger.info(
+        "Signature verification - received_signature=%s, header_present=%s, "
+        "body_length=%d, body_sha256=%s, body_first_50=%r, "
+        "key_length=%d, key_first_4=%s",
         signature,
-        len(request.body) if request.body else 0,
-        bool(settings.XERO_WEBHOOK_KEY),
+        signature is not None,
+        len(raw_body) if raw_body else 0,
+        body_hash,
+        raw_body[:50] if raw_body else b"",
+        len(webhook_key),
+        webhook_key[:4] if len(webhook_key) >= 4 else "***",  # noqa: PLR2004
     )
-
-    if settings.XERO_WEBHOOK_KEY:
-        logger.debug(
-            "Webhook key info - length=%d, first_4_chars=%s",
-            len(settings.XERO_WEBHOOK_KEY),
-            settings.XERO_WEBHOOK_KEY[:4]
-            if len(settings.XERO_WEBHOOK_KEY) >= 4  # noqa: PLR2004
-            else "***",
-        )
 
     generated_signature = base64.b64encode(
         hmac.new(
-            bytes(settings.XERO_WEBHOOK_KEY, "utf8"),
-            request.body,
+            webhook_key.encode("utf-8"),
+            raw_body,
             hashlib.sha256,
         ).digest(),
     ).decode("utf-8")
 
-    logger.debug(
-        "Signature verification - generated_signature=%s",
-        generated_signature,
-    )
-
     is_valid = hmac.compare_digest(signature or "", generated_signature)
 
-    logger.debug(
-        "Signature verification result - is_valid=%s, signatures_match=%s",
+    logger.info(
+        "Signature verification result - is_valid=%s, received=%s, computed=%s",
         is_valid,
-        "YES" if is_valid else "NO",
+        signature or "",
+        generated_signature,
     )
 
     return is_valid
@@ -378,20 +373,46 @@ def xero_webhooks(request: HttpRequest) -> HttpResponse:
     webhook_id = str(uuid.uuid4())
     start_time = time.perf_counter()
 
-    payload_size = len(request.body) if request.body else 0
+    raw_body = request.body
+    payload_size = len(raw_body) if raw_body else 0
     logger.info(
-        "Webhook received [%s] - method=%s, size=%d bytes, ip=%s",
+        "Webhook received [%s] - method=%s, size=%d bytes, ip=%s, "
+        "content_type=%s, content_length=%s",
         webhook_id,
         request.method,
         payload_size,
         request.META.get("REMOTE_ADDR", "unknown"),
+        request.content_type,
+        request.headers.get("content-length", "missing"),
     )
 
-    logger.debug(
-        "Webhook headers [%s] - content_type=%s, user_agent=%s",
+    cf_headers = {
+        k: request.headers.get(k, "missing")
+        for k in [
+            "CF-Connecting-IP",
+            "CF-Ray",
+            "CF-Worker",
+            "X-Forwarded-For",
+            "CF-IPCountry",
+        ]
+    }
+    logger.info(
+        "Webhook Cloudflare headers [%s] - %s",
         webhook_id,
-        request.content_type,
-        request.headers.get("user-agent", "unknown"),
+        json.dumps(cf_headers),
+    )
+
+    all_headers = dict(request.headers.items())
+    logger.info(
+        "Webhook all headers [%s] - %s",
+        webhook_id,
+        json.dumps(all_headers),
+    )
+
+    logger.info(
+        "Webhook raw body [%s] - first_200=%r",
+        webhook_id,
+        raw_body[:200] if raw_body else b"",
     )
 
     if request.method != "POST":
