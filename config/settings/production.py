@@ -56,6 +56,8 @@ SECURE_CONTENT_TYPE_NOSNIFF = env.bool(
     "DJANGO_SECURE_CONTENT_TYPE_NOSNIFF",
     default=True,
 )
+# https://docs.djangoproject.com/en/dev/ref/settings/#secure-referrer-policy
+SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
 
 # CACHES
 # ------------------------------------------------------------------------------
