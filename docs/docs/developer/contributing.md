@@ -123,6 +123,9 @@ For optional features like billing integrations, you can create a `django-privat
 
 The `django-private.ini` file supports the following optional settings:
 
+- **Feature Flags:**
+    - `AMS_EVENTS_ENABLED` - Enable the events module (default: `False`). See [Feature Flags](feature-flags.md) for details.
+
 - **Billing Service Configuration:**
     - `AMS_BILLING_SERVICE_CLASS` - The billing service provider class (e.g., `"ams.billing.providers.xero.XeroBillingService"`)
 

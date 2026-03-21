@@ -25,11 +25,13 @@ nav:
   - Website administrator guide:
       - admin/index.md
       - admin/cms.md
+      - admin/events.md
       - admin/forum.md
       - admin/xero-billing.md
       - admin/theme-customization.md
   - Developer documentation:
       - developer/contributing.md
+      - developer/feature-flags.md
       - developer/billing.md
       - developer/management-commands-catalog.md
       - developer/forum.md
