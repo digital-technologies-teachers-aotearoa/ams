@@ -81,9 +81,26 @@ Active members gain forum access, while lapsed memberships result in automatic a
 
 <!-- [Screenshot: Discourse forum SSO login flow] -->
 
+### 📅 Events
+
+AMS includes an optional events module for publishing and managing association events.
+When enabled, members can browse upcoming and past events, view event details with session schedules, and find event locations on an interactive map.
+Administrators manage events through the Django admin interface with support for series, locations, regions, and event duplication.
+
+**Key Features:**
+
+- Event listings with upcoming and past event views
+- Event detail pages with session schedules
+- Location management with map integration
+- Event series for grouping related events
+- Registration link support
+- Featured events highlighting
+
+<!-- [Screenshot: Events listing page with upcoming events] -->
+
 ### 🎨 Customization and Branding
 
-AMS provides extensive customization options without requiring code modifications.
+AMS provides extensive customization options without requiring code modifications, including enabling or disabling parts of the website such as the events module.
 Upload your association's logo, configure brand colors, and customize the visual theme to match your organization's identity.
 The Bootstrap based design ensures responsive, modern styling across all devices.
 

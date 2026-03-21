@@ -62,7 +62,7 @@ class TestLocation:
     def test_get_absolute_url(self):
         location = LocationFactory()
         url = location.get_absolute_url()
-        assert f"/events/location/{location.pk}/" == url
+        assert f"/en/events/location/{location.pk}/" == url
 
 
 @pytest.mark.django_db
@@ -81,7 +81,7 @@ class TestEvent:
     def test_get_absolute_url(self):
         event = EventFactory(name="Test Event")
         url = event.get_absolute_url()
-        assert f"/events/event/{event.pk}/" in url
+        assert f"/en/events/event/{event.pk}/" in url
 
     def test_get_short_name_with_series(self):
         series = SeriesFactory(abbreviation="WS")

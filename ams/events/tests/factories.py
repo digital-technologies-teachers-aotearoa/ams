@@ -49,6 +49,7 @@ class EventFactory(factory.django.DjangoModelFactory[Event]):
 
     class Meta:
         model = Event
+        skip_postgeneration_save = True
 
     @factory.post_generation
     def locations(self, create, extracted, **kwargs):

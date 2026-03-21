@@ -66,3 +66,7 @@ XERO_ACCOUNT_CODE = "200"
 XERO_AMOUNT_TYPE = "INCLUSIVE"
 XERO_CURRENCY_CODE = "NZD"
 XERO_EMAIL_INVOICES = True
+
+# Events
+# ------------------------------------------------------------------------------
+EVENTS_ENABLED = True

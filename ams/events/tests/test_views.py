@@ -6,24 +6,24 @@ from django.utils import timezone
 from ams.events.tests.factories import EventFactory
 from ams.events.tests.factories import LocationFactory
 
+pytestmark = pytest.mark.django_db
 
-@pytest.mark.django_db
+
 class TestHomeView:
     def test_get(self, client):
-        response = client.get("/events/")
+        response = client.get("/en/events/")
         assert response.status_code == HTTPStatus.OK
 
     def test_map_locations_in_context(self, client):
         location = LocationFactory()
         EventFactory(locations=[location])
-        response = client.get("/events/")
+        response = client.get("/en/events/")
         assert "map_locations" in response.context
 
 
-@pytest.mark.django_db
 class TestEventUpcomingView:
     def test_get(self, client):
-        response = client.get("/events/upcoming/")
+        response = client.get("/en/events/upcoming/")
         assert response.status_code == HTTPStatus.OK
 
     def test_shows_future_events(self, client):
@@ -37,20 +37,18 @@ class TestEventUpcomingView:
             start=timezone.now() - timezone.timedelta(days=2),
             end=timezone.now() - timezone.timedelta(days=1),
         )
-        response = client.get("/events/upcoming/")
+        response = client.get("/en/events/upcoming/")
         qs = response.context["filter"].qs
         assert future_event in qs
         assert past_event not in qs
 
 
-@pytest.mark.django_db
 class TestEventPastView:
     def test_get(self, client):
-        response = client.get("/events/past/")
+        response = client.get("/en/events/past/")
         assert response.status_code == HTTPStatus.OK
 
 
-@pytest.mark.django_db
 class TestEventDetailView:
     def test_get_with_slug(self, client):
         event = EventFactory(published=True)
@@ -59,7 +57,7 @@ class TestEventDetailView:
 
     def test_redirect_without_slug(self, client):
         event = EventFactory(published=True)
-        response = client.get(f"/events/event/{event.pk}/")
+        response = client.get(f"/en/events/event/{event.pk}/")
         assert response.status_code == HTTPStatus.MOVED_PERMANENTLY
         assert event.get_absolute_url() in response.url
 
@@ -69,9 +67,8 @@ class TestEventDetailView:
         assert response.status_code == HTTPStatus.NOT_FOUND
 
 
-@pytest.mark.django_db
 class TestLocationDetailView:
     def test_get(self, client):
         location = LocationFactory()
-        response = client.get(f"/events/location/{location.pk}/")
+        response = client.get(f"/en/events/location/{location.pk}/")
         assert response.status_code == HTTPStatus.OK

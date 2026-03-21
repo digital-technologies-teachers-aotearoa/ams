@@ -1,6 +1,7 @@
 import logging
 
 from django import forms
+from django.conf import settings
 from django.contrib import admin
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
@@ -13,6 +14,30 @@ from ams.events.models import Session
 from ams.events.widgets import LeafletPickerWidget
 
 logger = logging.getLogger(__name__)
+
+
+class EventsFeatureFlagMixin:
+    """Hides events admin when EVENTS_ENABLED is False."""
+
+    def has_module_permission(self, request):
+        if not settings.EVENTS_ENABLED:
+            return False
+        return super().has_module_permission(request)
+
+    def has_add_permission(self, request):
+        if not settings.EVENTS_ENABLED:
+            return False
+        return super().has_add_permission(request)
+
+    def has_change_permission(self, request, obj=None):
+        if not settings.EVENTS_ENABLED:
+            return False
+        return super().has_change_permission(request, obj)
+
+    def has_view_permission(self, request, obj=None):
+        if not settings.EVENTS_ENABLED:
+            return False
+        return super().has_view_permission(request, obj)
 
 
 class CoordinatesField(forms.MultiValueField):
@@ -64,13 +89,13 @@ class LocationAdminForm(forms.ModelForm):
 
 
 @admin.register(Region)
-class RegionAdmin(admin.ModelAdmin):
+class RegionAdmin(EventsFeatureFlagMixin, admin.ModelAdmin):
     list_display = ("name", "order")
     search_fields = ("name",)
 
 
 @admin.register(Location)
-class LocationAdmin(admin.ModelAdmin):
+class LocationAdmin(EventsFeatureFlagMixin, admin.ModelAdmin):
     form = LocationAdminForm
     list_display = ("name", "room", "street_address", "suburb", "city", "region")
     list_filter = ("region",)
@@ -157,7 +182,7 @@ def duplicate_events(modeladmin, request, queryset):
 
 
 @admin.register(Event)
-class EventAdmin(admin.ModelAdmin):
+class EventAdmin(EventsFeatureFlagMixin, admin.ModelAdmin):
     model = Event
     inlines = [SessionInline]
     actions = [duplicate_events]
@@ -223,6 +248,6 @@ class EventAdmin(admin.ModelAdmin):
 
 
 @admin.register(Series)
-class SeriesAdmin(admin.ModelAdmin):
+class SeriesAdmin(EventsFeatureFlagMixin, admin.ModelAdmin):
     list_display = ("name", "abbreviation")
     search_fields = ("name",)
