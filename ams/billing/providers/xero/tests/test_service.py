@@ -8,6 +8,7 @@ from unittest.mock import patch
 import pytest
 from xero_python.accounting import Invoice as XeroInvoiceModel
 from xero_python.exceptions import AccountingBadRequestException
+from xero_python.exceptions import HTTPStatusException
 
 from ams.billing.providers.xero.models import XeroContact
 from ams.billing.providers.xero.service import MockXeroBillingService
@@ -705,3 +706,144 @@ class TestXeroBillingServiceInvoiceUrl:
             xero_settings.XERO_TENANT_ID,
             "invoice-id-789",
         )
+
+
+class TestVoidXeroInvoice:
+    """Tests for voiding Xero invoices."""
+
+    @patch("ams.billing.providers.xero.service.AccountingApi")
+    def test_void_xero_invoice_calls_api(
+        self,
+        mock_accounting_api_class,
+        xero_service,
+        xero_settings,
+    ):
+        """Test that _void_xero_invoice calls Xero's update_invoice API."""
+        mock_api = Mock()
+        mock_accounting_api_class.return_value = mock_api
+
+        xero_service._void_xero_invoice("invoice-id-123")  # noqa: SLF001
+
+        mock_api.update_invoice.assert_called_once()
+        call_args = mock_api.update_invoice.call_args
+        assert call_args[0][0] == xero_settings.XERO_TENANT_ID
+        assert call_args[0][1] == "invoice-id-123"
+
+        # Verify the invoice status is set to VOIDED
+        invoices_arg = call_args[0][2]
+        assert invoices_arg.invoices[0].status == "VOIDED"
+        assert invoices_arg.invoices[0].invoice_id == "invoice-id-123"
+
+
+class TestCreateInvoiceCompensation:
+    """Tests for invoice creation compensation logic."""
+
+    @patch("ams.billing.providers.xero.service.AccountingApi")
+    def test_create_invoice_voids_xero_invoice_on_db_failure(  # noqa: PLR0913
+        self,
+        mock_accounting_api_class,
+        xero_service,
+        account_user,
+        xero_contact_model,
+        xero_invoice_response,
+        xero_settings,
+    ):
+        """Test that Xero invoice is voided when DB save fails."""
+        mock_api = Mock()
+        mock_api.create_invoices.return_value = xero_invoice_response
+        mock_accounting_api_class.return_value = mock_api
+
+        with (
+            patch.object(xero_service, "_get_authentication_token"),
+            patch(
+                "ams.billing.providers.xero.service.Invoice.objects.create",
+                side_effect=Exception("DB error"),
+            ),
+            patch.object(xero_service, "_void_xero_invoice") as mock_void,
+            pytest.raises(Exception, match="DB error"),
+        ):
+            xero_service.create_invoice(
+                account=account_user,
+                date=date(2024, 1, 15),
+                due_date=date(2024, 2, 15),
+                line_items=[
+                    {
+                        "description": "Test",
+                        "quantity": 1,
+                        "unit_amount": Decimal("100.00"),
+                    },
+                ],
+                reference="Test",
+            )
+
+        mock_void.assert_called_once_with("test-invoice-id-123")
+
+    @patch("ams.billing.providers.xero.service.AccountingApi")
+    def test_create_invoice_logs_when_void_also_fails(  # noqa: PLR0913
+        self,
+        mock_accounting_api_class,
+        xero_service,
+        account_user,
+        xero_contact_model,
+        xero_invoice_response,
+        xero_settings,
+    ):
+        """Test that failure to void is logged but original exception re-raised."""
+        mock_api = Mock()
+        mock_api.create_invoices.return_value = xero_invoice_response
+        mock_accounting_api_class.return_value = mock_api
+
+        with (
+            patch.object(xero_service, "_get_authentication_token"),
+            patch(
+                "ams.billing.providers.xero.service.Invoice.objects.create",
+                side_effect=Exception("DB error"),
+            ),
+            patch.object(
+                xero_service,
+                "_void_xero_invoice",
+                side_effect=Exception("Void failed"),
+            ),
+            pytest.raises(Exception, match="DB error"),
+        ):
+            xero_service.create_invoice(
+                account=account_user,
+                date=date(2024, 1, 15),
+                due_date=date(2024, 2, 15),
+                line_items=[
+                    {
+                        "description": "Test",
+                        "quantity": 1,
+                        "unit_amount": Decimal("100.00"),
+                    },
+                ],
+                reference="Test",
+            )
+
+    @patch("ams.billing.providers.xero.service.AccountingApi")
+    def test_create_xero_invoice_not_retried_on_transient_error(
+        self,
+        mock_api_class,
+        xero_service,
+        xero_settings,
+    ):
+        """Test that _create_xero_invoice does NOT retry on transient errors."""
+        mock_resp = Mock()
+        mock_resp.status = 500
+        mock_resp.reason = "Internal Server Error"
+        mock_resp.text = "Server Error"
+
+        mock_api = Mock()
+        mock_api.create_invoices.side_effect = HTTPStatusException(
+            http_resp=mock_resp,
+        )
+        mock_api_class.return_value = mock_api
+
+        with pytest.raises(HTTPStatusException):
+            xero_service._create_xero_invoice(  # noqa: SLF001
+                "contact-id",
+                {"type": "ACCREC", "status": "AUTHORISED"},
+                [{"description": "Test", "unit_amount": 100, "quantity": 1}],
+            )
+
+        mock_api.create_invoices.assert_called_once()

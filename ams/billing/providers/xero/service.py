@@ -198,7 +198,6 @@ class XeroBillingService(BillingService):
         return None
 
     @handle_rate_limit()
-    @retry_transient_errors()
     def _create_xero_invoice(
         self,
         contact_id: str,
@@ -233,6 +232,26 @@ class XeroBillingService(BillingService):
 
         response_invoice: AccountingInvoice = api_response.invoices[0]
         return response_invoice
+
+    @handle_rate_limit()
+    @retry_transient_errors()
+    def _void_xero_invoice(self, invoice_id: str) -> None:
+        """Void an invoice in Xero. Used for compensation when DB save fails.
+
+        Args:
+            invoice_id: The Xero invoice ID to void.
+        """
+        api_instance = AccountingApi(self.api_client)
+        invoice = AccountingInvoice(
+            invoice_id=invoice_id,
+            status="VOIDED",
+        )
+        invoices = Invoices(invoices=[invoice])
+        api_instance.update_invoice(
+            settings.XERO_TENANT_ID,
+            invoice_id,
+            invoices,
+        )
 
     @handle_rate_limit()
     @retry_transient_errors()
@@ -507,16 +526,32 @@ class XeroBillingService(BillingService):
             line_items,
         )
 
-        invoice: Invoice = Invoice.objects.create(
-            account=account,
-            billing_service_invoice_id=accounting_invoice.invoice_id,
-            invoice_number=accounting_invoice.invoice_number,
-            issue_date=accounting_invoice.date,
-            due_date=accounting_invoice.due_date,
-            amount=accounting_invoice.total,
-            due=accounting_invoice.amount_due,
-            paid=accounting_invoice.amount_paid,
-        )
+        try:
+            invoice: Invoice = Invoice.objects.create(
+                account=account,
+                billing_service_invoice_id=accounting_invoice.invoice_id,
+                invoice_number=accounting_invoice.invoice_number,
+                issue_date=accounting_invoice.date,
+                due_date=accounting_invoice.due_date,
+                amount=accounting_invoice.total,
+                due=accounting_invoice.amount_due,
+                paid=accounting_invoice.amount_paid,
+            )
+        except Exception:
+            logger.exception(
+                "Failed to save invoice %s to DB. Voiding Xero invoice %s.",
+                accounting_invoice.invoice_number,
+                accounting_invoice.invoice_id,
+            )
+            try:
+                self._void_xero_invoice(accounting_invoice.invoice_id)
+            except Exception:
+                logger.exception(
+                    "CRITICAL: Failed to void orphaned Xero invoice %s. "
+                    "Manual cleanup required.",
+                    accounting_invoice.invoice_id,
+                )
+            raise
 
         return invoice
 
@@ -694,3 +729,7 @@ class MockXeroBillingService(XeroBillingService):
             amount_paid=0,
         )
         return invoice
+
+    def _void_xero_invoice(self, invoice_id: str) -> None:
+        """Mock voiding an invoice (no-op)."""
+        return
