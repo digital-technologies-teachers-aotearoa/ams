@@ -1,5 +1,8 @@
+from functools import partial
+
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -39,7 +42,9 @@ class CreateIndividualMembershipView(LoginRequiredMixin, FormView):
 
     def form_valid(self, form):  # type: ignore[override]
         membership = form.save(user=self.request.user)
-        send_staff_individual_membership_notification(membership)
+        transaction.on_commit(
+            partial(send_staff_individual_membership_notification, membership),
+        )
 
         # Show different message based on approval status
         if membership.approved_datetime:
@@ -155,7 +160,9 @@ class CreateOrganisationMembershipView(
         membership = form.save()
 
         # Send staff notification
-        send_staff_organisation_membership_notification(membership)
+        transaction.on_commit(
+            partial(send_staff_organisation_membership_notification, membership),
+        )
 
         # Add success message based on approval status
         if membership.approved_datetime:
@@ -295,12 +302,15 @@ class AddOrganisationSeatsView(
         prorata_cost = form.calculate_prorata_cost(seats_added)
 
         # Send staff notification
-        send_staff_organisation_seats_added_notification(
-            organisation=self.organisation,
-            membership=membership,
-            seats_added=seats_added,
-            prorata_cost=prorata_cost,
-            invoice=invoice,
+        transaction.on_commit(
+            partial(
+                send_staff_organisation_seats_added_notification,
+                organisation=self.organisation,
+                membership=membership,
+                seats_added=seats_added,
+                prorata_cost=prorata_cost,
+                invoice=invoice,
+            ),
         )
 
         # Add success message

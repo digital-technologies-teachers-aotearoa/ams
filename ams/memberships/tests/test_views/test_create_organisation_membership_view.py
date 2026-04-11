@@ -1,4 +1,5 @@
 from http import HTTPStatus
+from unittest.mock import patch
 
 import pytest
 from django.test import override_settings
@@ -243,8 +244,10 @@ class TestCreateOrganisationMembershipView:
         membership = OrganisationMembership.objects.get(organisation=org)
         assert not membership.invoices.exists()
 
+    @patch("ams.memberships.views.transaction.on_commit", side_effect=lambda fn: fn())
     def test_add_membership_sends_staff_notification(
         self,
+        mock_on_commit,
         user: User,
         client,
         mailoutbox,

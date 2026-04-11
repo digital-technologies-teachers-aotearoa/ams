@@ -189,12 +189,14 @@ class TestAddOrganisationSeatsView:
         assert response.status_code == HTTPStatus.FOUND
         assert mock_billing_service.create_membership_invoice.called
 
+    @patch("ams.memberships.views.transaction.on_commit", side_effect=lambda fn: fn())
     @patch("ams.memberships.forms.MembershipBillingService")
     @patch("ams.memberships.views.send_staff_organisation_seats_added_notification")
     def test_post_valid_sends_notification(
         self,
         mock_send_notification,
         mock_billing_service_class,
+        mock_on_commit,
         user: User,
         client,
     ):
