@@ -7,6 +7,7 @@ from wagtail.blocks import RichTextBlock
 from wagtail.images.blocks import ImageBlock
 from wagtail.images.models import Image
 from wagtail.images.tests.utils import get_test_image_file
+from wagtail.models import Collection
 
 from ams.cms.blocks.image_grid_block import GridItemBlock
 from ams.cms.blocks.image_grid_block import ImageGridBlock
@@ -15,9 +16,11 @@ from ams.cms.blocks.image_grid_block import ImageGridBlock
 @pytest.fixture
 def test_image(db):
     """Create a test image for grid items."""
+
     return Image.objects.create(
         title="Test Image",
         file=get_test_image_file(),
+        collection=Collection.get_first_root_node(),
     )
 
 

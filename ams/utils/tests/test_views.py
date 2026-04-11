@@ -32,6 +32,8 @@ def setup_multilingual_sites(django_db_setup, django_db_blocker):
 
         # Get root page
         root = Page.get_first_root_node()
+        if not root:
+            root = Page.add_root(title="Root", slug="root")
 
         # Create English site (default)
         en_home = HomePage(title="Home", slug="home-en")

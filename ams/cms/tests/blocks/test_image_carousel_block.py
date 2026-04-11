@@ -5,6 +5,7 @@ from wagtail.blocks import ChoiceBlock
 from wagtail.blocks import ListBlock
 from wagtail.images.models import Image
 from wagtail.images.tests.utils import get_test_image_file
+from wagtail.models import Collection
 
 from ams.cms.blocks.image_carousel_block import CarouselSlideBlock
 from ams.cms.blocks.image_carousel_block import ImageCarouselBlock
@@ -18,9 +19,11 @@ MAX_INTERVAL = 30000
 @pytest.fixture
 def test_image(db):
     """Create a test image for carousel slides."""
+
     return Image.objects.create(
         title="Test Image",
         file=get_test_image_file(),
+        collection=Collection.get_first_root_node(),
     )
 
 

@@ -21,21 +21,22 @@ def languages_settings(settings):
 
 
 @pytest.fixture
-def sites(db):
+def sites(wagtail_site):
     # Ensure a clean slate: exactly one default site overall
     Site.objects.all().delete()
+    root_page = wagtail_site.root_page
     # English site is also the default site
     en_default_site = Site.objects.create(
         hostname="en",
         port=80,
-        root_page_id=1,  # dummy; tests do not traverse pages
+        root_page=root_page,
         is_default_site=True,
         site_name="English",
     )
     mi_site = Site.objects.create(
         hostname="mi",
         port=80,
-        root_page_id=1,
+        root_page=root_page,
         is_default_site=False,
         site_name="Te Reo Māori",
     )
@@ -161,7 +162,7 @@ def test_middleware_handles_multiple_sites_with_same_language(sites, db):
     another_en_site = Site.objects.create(
         hostname="en-alt",
         port=80,
-        root_page_id=1,
+        root_page=sites["en"].root_page,
         is_default_site=False,
         site_name="English Alternative",
     )

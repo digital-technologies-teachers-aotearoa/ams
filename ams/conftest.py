@@ -3,6 +3,10 @@ from pathlib import Path
 import pytest
 from django.contrib.auth import get_user_model
 from django.utils.crypto import get_random_string
+from wagtail.models import Collection
+from wagtail.models import Locale
+from wagtail.models import Page
+from wagtail.models import Site
 
 from ams.billing.tests.factories import AccountFactory
 from ams.billing.tests.factories import InvoiceFactory
@@ -18,6 +22,25 @@ from ams.users.tests.factories import UserFactory
 def pytest_configure():
     # Ensure the staticfiles directory exists
     Path("staticfiles/").mkdir(parents=True, exist_ok=True)
+
+
+@pytest.fixture(autouse=True)
+def wagtail_site(db):
+    """Ensure a Wagtail Site, Collection, and Locale exist for template rendering."""
+    Locale.objects.get_or_create(language_code="en")
+    if not Collection.get_first_root_node():
+        Collection.add_root(name="Root")
+    root_page = Page.objects.filter(depth=1).first()
+    if not root_page:
+        root_page = Page.add_root(title="Root", slug="root")
+    site, _ = Site.objects.get_or_create(
+        is_default_site=True,
+        defaults={
+            "hostname": "localhost",
+            "root_page": root_page,
+        },
+    )
+    return site
 
 
 @pytest.fixture(autouse=True)
