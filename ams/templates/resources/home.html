@@ -1,5 +1,6 @@
 {% extends "resources/base.html" %}
 
+{% load crispy_forms_tags %}
 {% load icon %}
 
 {% block page_heading %}
@@ -11,6 +12,7 @@
     {% endif %}
   </div>
   <p class="lead">Browse and download resources.</p>
+  {% crispy form %}
 {% endblock page_heading %}
 
 {% block content_container %}

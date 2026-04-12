@@ -1,7 +1,11 @@
+from django.contrib.postgres.search import SearchQuery
+from django.contrib.postgres.search import SearchRank
+from django.db.models import F
 from django.http import Http404
 from django.http import HttpResponseRedirect
 from django.views import generic
 
+from ams.resources.forms import ResourceSearchForm
 from ams.resources.models import Resource
 from ams.resources.models import ResourceComponent
 from ams.utils.mixins import RedirectToCosmeticURLMixin
@@ -12,6 +16,7 @@ class ResourceHomeView(generic.TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["form"] = ResourceSearchForm()
         context["resources"] = Resource.objects.filter(published=True).prefetch_related(
             "components",
             "author_users",
@@ -57,3 +62,24 @@ class ResourceComponentDownloadView(generic.View):
         if not component.component_file:
             raise Http404
         return HttpResponseRedirect(component.component_file.url)
+
+
+class ResourceSearchView(generic.TemplateView):
+    template_name = "resources/search.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        q = self.request.GET.get("q", "").strip()
+        context["q"] = q
+        context["form"] = ResourceSearchForm(initial={"q": q})
+        if q:
+            query = SearchQuery(q, search_type="websearch")
+            context["results"] = (
+                Resource.objects.filter(published=True, search_vector=query)
+                .annotate(rank=SearchRank(F("search_vector"), query))
+                .order_by("-rank")
+                .prefetch_related("components", "author_users", "author_entities")
+            )
+        else:
+            context["results"] = Resource.objects.none()
+        return context

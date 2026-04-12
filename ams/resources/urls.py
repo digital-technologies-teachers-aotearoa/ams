@@ -10,6 +10,11 @@ urlpatterns = [
         name="home",
     ),
     path(
+        "search/",
+        views.ResourceSearchView.as_view(),
+        name="search",
+    ),
+    path(
         "resource/<int:pk>/",
         views.ResourceDetailView.as_view(),
     ),

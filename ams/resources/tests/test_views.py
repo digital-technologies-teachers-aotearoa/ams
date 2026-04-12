@@ -4,8 +4,10 @@ from unittest.mock import patch
 
 import pytest
 
+from ams.entities.tests.factories import EntityFactory
 from ams.resources.tests.factories import ResourceComponentFactory
 from ams.resources.tests.factories import ResourceFactory
+from ams.users.tests.factories import UserFactory
 
 pytestmark = pytest.mark.django_db
 
@@ -141,3 +143,100 @@ class TestResourceComponentDownloadView:
 
         assert response.status_code == HTTPStatus.FOUND
         assert response.url == presigned_url
+
+
+class TestResourceSearchView:
+    def test_get_without_query_returns_200(self, client):
+        response = client.get("/en/resources/search/")
+        assert response.status_code == HTTPStatus.OK
+
+    def test_get_without_query_returns_empty_results(self, client):
+        ResourceFactory(published=True)
+        response = client.get("/en/resources/search/")
+        assert list(response.context["results"]) == []
+
+    def test_q_in_context(self, client):
+        response = client.get("/en/resources/search/?q=python")
+        assert response.context["q"] == "python"
+
+    def test_finds_resource_by_name(self, client):
+        resource = ResourceFactory(name="Python tutorial", published=True)
+        response = client.get("/en/resources/search/?q=python")
+        assert resource in list(response.context["results"])
+
+    def test_finds_resource_by_description(self, client):
+        resource = ResourceFactory(
+            name="Unrelated title",
+            description="This covers Django web framework concepts.",
+            published=True,
+        )
+        response = client.get("/en/resources/search/?q=django")
+        assert resource in list(response.context["results"])
+
+    def test_excludes_unpublished_resources(self, client):
+        ResourceFactory(name="Hidden resource", published=False)
+        response = client.get("/en/resources/search/?q=hidden")
+        assert list(response.context["results"]) == []
+
+    def test_name_match_ranks_higher_than_description_match(self, client):
+        name_match = ResourceFactory(
+            name="Python guide",
+            description="A general resource.",
+            published=True,
+        )
+        desc_match = ResourceFactory(
+            name="General guide",
+            description="Covers Python programming.",
+            published=True,
+        )
+        response = client.get("/en/resources/search/?q=python")
+        results = list(response.context["results"])
+        assert results.index(name_match) < results.index(desc_match)
+
+    def test_websearch_quoted_phrase(self, client):
+        resource = ResourceFactory(
+            name="Machine learning fundamentals",
+            published=True,
+        )
+        other = ResourceFactory(name="Learning machines separately", published=True)
+        response = client.get('/en/resources/search/?q="machine learning"')
+        results = list(response.context["results"])
+        assert resource in results
+        assert other not in results
+
+    def test_websearch_excluded_term(self, client):
+        included = ResourceFactory(name="Python tutorial", published=True)
+        excluded = ResourceFactory(name="Python Django tutorial", published=True)
+        response = client.get("/en/resources/search/?q=python -django")
+        results = list(response.context["results"])
+        assert included in results
+        assert excluded not in results
+
+    def test_finds_resource_by_component_name(self, client):
+        resource = ResourceFactory(name="Unrelated title", published=True)
+        ResourceComponentFactory(
+            resource=resource,
+            name="Kubernetes deployment guide",
+            component_url="https://example.com/",
+        )
+        response = client.get("/en/resources/search/?q=kubernetes")
+        assert resource in list(response.context["results"])
+
+    def test_finds_resource_by_author_user_name(self, client):
+        resource = ResourceFactory(name="Unrelated title", published=True)
+        user = UserFactory(first_name="Hildegard", last_name="Peplau")
+        resource.author_users.add(user)
+        response = client.get("/en/resources/search/?q=hildegard")
+        assert resource in list(response.context["results"])
+
+    def test_finds_resource_by_author_entity_name(self, client):
+        resource = ResourceFactory(name="Unrelated title", published=True)
+        entity = EntityFactory(name="Oceanic Research Institute")
+        resource.author_entities.add(entity)
+        response = client.get("/en/resources/search/?q=oceanic")
+        assert resource in list(response.context["results"])
+
+    def test_empty_query_returns_no_results(self, client):
+        ResourceFactory.create_batch(3, published=True)
+        response = client.get("/en/resources/search/?q=")
+        assert list(response.context["results"]) == []
