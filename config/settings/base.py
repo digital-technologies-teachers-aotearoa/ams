@@ -134,6 +134,7 @@ LOCAL_APPS = [
     "ams.terms",
     "ams.entities",
     "ams.events",
+    "ams.resources",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -468,3 +469,4 @@ REQUIRE_FREE_MEMBERSHIP_APPROVAL = env.bool(
     default=False,
 )
 EVENTS_ENABLED = env.bool("AMS_EVENTS_ENABLED", default=False)
+RESOURCES_ENABLED = env.bool("AMS_RESOURCES_ENABLED", default=False)
