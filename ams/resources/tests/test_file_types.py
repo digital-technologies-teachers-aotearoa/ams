@@ -110,6 +110,18 @@ class TestDetectFileType:
     def test_wpd_extension(self):
         assert detect_file_type(_make_file("document.wpd")) == TYPE_DOCUMENT
 
+    def test_wks_extension(self):
+        assert detect_file_type(_make_file("document.wks")) == TYPE_DOCUMENT
+
+    def test_wps_extension(self):
+        assert detect_file_type(_make_file("document.wps")) == TYPE_DOCUMENT
+
+    def test_markdown_long_extension(self):
+        assert detect_file_type(_make_file("readme.markdown")) == TYPE_DOCUMENT
+
+    def test_extension_matching_is_case_insensitive(self):
+        assert detect_file_type(_make_file("REPORT.PDF")) == TYPE_PDF
+
     def test_xls_extension(self):
         assert detect_file_type(_make_file("data.xls")) == TYPE_SPREADSHEET
 

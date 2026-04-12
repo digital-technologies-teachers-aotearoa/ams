@@ -1,0 +1,33 @@
+{% extends "resources/base.html" %}
+
+{% load icon %}
+
+{% block page_heading %}
+  <div class="d-flex justify-content-between align-items-center">
+    <h1>Resources</h1>
+    {% if perms.resources %}
+      <a href="{% url 'admin:app_list' 'resources' %}"
+         class="btn btn-sm btn-secondary">Open resources admin</a>
+    {% endif %}
+  </div>
+  <p class="lead">Browse and download resources.</p>
+{% endblock page_heading %}
+
+{% block content_container %}
+  <div class="col-12">
+    <div class="d-flex gap-4 mb-4 text-muted">
+      <span>{% icon "file-earmark-text" %} {{ resource_count }} resource{{ resource_count|pluralize }}</span>
+      <span>{% icon "paperclip" %} {{ component_count }} component{{ component_count|pluralize }}</span>
+    </div>
+    {% if resources %}
+      {% for resource in resources %}
+        {% include "resources/resource_card.html" %}
+      {% endfor %}
+    {% else %}
+      <div class="text-center py-5">
+        <p class="fs-5 text-muted mb-1">No resources available yet</p>
+        <p class="text-muted">Check back later for new resources</p>
+      </div>
+    {% endif %}
+  </div>
+{% endblock content_container %}
