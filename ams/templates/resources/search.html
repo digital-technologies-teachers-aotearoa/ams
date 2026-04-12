@@ -1,0 +1,34 @@
+{% extends "resources/base.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block page_heading %}
+  <h1>Search resources</h1>
+  {% crispy form %}
+{% endblock page_heading %}
+
+{% block content_container %}
+  <div class="col-12">
+    {% if q %}
+      {% if results %}
+        <p class="text-muted small mb-3">
+          Results for <strong>{{ q }}</strong>
+        </p>
+        {% for resource in results %}
+          {% include "resources/resource_card.html" %}
+        {% endfor %}
+      {% else %}
+        <div class="text-center py-5">
+          <p class="fs-5 text-muted mb-1">
+            No results found for <strong>{{ q }}</strong>
+          </p>
+          <p class="text-muted">Try different keywords or check your spelling.</p>
+        </div>
+      {% endif %}
+    {% else %}
+      <div class="text-center py-5">
+        <p class="text-muted">Enter a search term above to find resources.</p>
+      </div>
+    {% endif %}
+  </div>
+{% endblock content_container %}
