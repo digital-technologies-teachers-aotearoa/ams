@@ -41,6 +41,12 @@ if settings.EVENTS_ENABLED:
         path("events/", include("ams.events.urls", namespace="events")),
     )
 
+# Resources (optional module)
+if settings.RESOURCES_ENABLED:
+    urlpatterns += i18n_patterns(
+        path("resources/", include("ams.resources.urls", namespace="resources")),
+    )
+
 urlpatterns += i18n_patterns(
     # User management
     path(
