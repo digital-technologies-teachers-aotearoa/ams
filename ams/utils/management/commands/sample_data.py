@@ -39,6 +39,9 @@ class Command(management.base.BaseCommand):
         # Create sample events
         management.call_command("create_sample_events")
 
+        # Create sample resources
+        management.call_command("create_sample_resources")
+
         # Set association settings for each site
         self.stdout.write(LOG_HEADER.format("🏢 Setting association settings"))
         for site in Site.objects.all():

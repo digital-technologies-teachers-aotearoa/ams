@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+  {% block page_heading %}
+  {% endblock page_heading %}
+
+  <div class="row">
+    {% block content_container %}
+      <div class="col-12">
+        {% block resource_content %}
+        {% endblock resource_content %}
+
+      </div>
+    {% endblock content_container %}
+
+  </div>
+  {% block scripts %}
+  {% endblock scripts %}
+{% endblock content %}

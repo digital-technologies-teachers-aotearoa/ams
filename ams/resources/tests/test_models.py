@@ -22,12 +22,36 @@ class TestResourceModel:
         resource = ResourceFactory(name="Some Useful Resource")
         assert resource.slug == "some-useful-resource"
 
-    @pytest.mark.skip(reason="Not implemented yet")
     def test_get_absolute_url_contains_pk_and_slug(self):
         resource = ResourceFactory(name="Example Title")
         url = resource.get_absolute_url()
         assert str(resource.pk) in url
         assert "example-title" in url
+
+    def test_default_ordering_is_datetime_updated_descending(self):
+        older = ResourceFactory()
+        newer = ResourceFactory()
+        # Touch newer so its datetime_updated is later
+        newer.save()
+        qs = list(type(older).objects.all())
+        assert qs[0] == newer
+        assert qs[1] == older
+
+
+class TestResourceComponentModel:
+    def test_str_returns_name(self):
+        component = ResourceComponentFactory.build(name="My Component")
+        assert str(component) == "My Component"
+
+    def test_save_with_no_data_sets_type_other(self):
+        resource = ResourceFactory()
+        component = ResourceComponent(name="c", resource=resource)
+        # Bypass clean() to test save() directly
+        component.component_url = ""
+        component.component_file = None
+        component.component_resource = None
+        component.save()
+        assert component.component_type == file_types.TYPE_OTHER
 
 
 class TestResourceComponentClean:
@@ -161,6 +185,12 @@ class TestResourceComponentHelpers:
         component.component_url = ""
         assert component.filename() == "doc.pdf"
 
+    def test_filename_returns_basename_when_stored_under_subpath(self):
+        component = ResourceComponentFactory.build()
+        component.component_file = SimpleUploadedFile("resources/42/doc.pdf", b"data")
+        component.component_url = ""
+        assert component.filename() == "doc.pdf"
+
     def test_filename_returns_none_without_file(self):
         component = ResourceComponentFactory.build()
         assert component.filename() is None
@@ -168,3 +198,15 @@ class TestResourceComponentHelpers:
     def test_icon_name_returns_icon_for_component_type(self):
         component = ResourceComponent(component_type=file_types.TYPE_PDF)
         assert component.icon_name() == "file-earmark-pdf"
+
+    def test_icon_name_for_video(self):
+        component = ResourceComponent(component_type=file_types.TYPE_VIDEO)
+        assert component.icon_name() == "file-earmark-play"
+
+    def test_icon_name_for_website(self):
+        component = ResourceComponent(component_type=file_types.TYPE_WEBSITE)
+        assert component.icon_name() == "globe2"
+
+    def test_icon_name_for_resource(self):
+        component = ResourceComponent(component_type=file_types.TYPE_RESOURCE)
+        assert component.icon_name() == "folder-symlink"
