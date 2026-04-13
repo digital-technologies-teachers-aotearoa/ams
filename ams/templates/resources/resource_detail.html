@@ -17,12 +17,12 @@
     <div class="mb-4">{{ resource.description|safe }}</div>
     {% with components=resource.components.all %}
       {% if components %}
-        <h3 class="mb-3">Components</h3>
+        <h3 class="resource-section-heading">Components</h3>
         <div class="list-group mb-4">
           {% for component in components %}
             <div class="list-group-item">
               <div class="d-flex align-items-center gap-2">
-                <span class="text-muted">{% icon component.icon_name %}</span>
+                <span class="text-muted resource-component-icon">{% icon component.icon_name %}</span>
                 <div class="flex-grow-1 min-width-0">
                   <div class="fw-semibold">{{ component.name }}</div>
                   <small class="text-muted">{{ component.get_component_type_display }}</small>
@@ -46,14 +46,12 @@
       {% endif %}
     {% endwith %}
     {% if components_of %}
-      <h3 class="mb-3">Also a component of</h3>
-      <ul class="list-unstyled">
-        {% for comp in components_of %}
-          <li>
-            <a href="{{ comp.resource.get_absolute_url }}">{{ comp.resource.name }}</a>
-          </li>
-        {% endfor %}
-      </ul>
+      <h3 class="resource-section-heading">Also a component of</h3>
+      {% for comp in components_of %}
+        {% with resource=comp.resource %}
+          {% include "resources/resource_card.html" %}
+        {% endwith %}
+      {% endfor %}
     {% endif %}
   </div>
   <div class="col-12 col-lg-4">

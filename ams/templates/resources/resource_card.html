@@ -1,14 +1,14 @@
 {% load icon %}
 
-<div class="card mb-3 w-100">
+<div class="resource-card card mb-3 w-100">
   <div class="card-body">
     <div class="d-flex justify-content-between align-items-start gap-2">
       <div class="min-width-0 flex-grow-1">
-        <h4 class="card-title mb-1">
+        <h4 class="card-title resource-card__title mb-1">
           <a href="{{ resource.get_absolute_url }}"
              class="stretched-link text-decoration-none text-body">{{ resource.name }}</a>
         </h4>
-        <div class="text-muted small mb-2">
+        <div class="resource-card__meta mb-2">
           {% with authors=resource.author_entities.all %}
             {% if authors %}
               {% for entity in authors %}
@@ -26,7 +26,7 @@
             {% endif %}
           {% endwith %}
         </div>
-        <div class="d-flex align-items-center gap-3 text-muted small">
+        <div class="resource-card__details d-flex align-items-center gap-3">
           <span>{% icon "calendar-event" %} {{ resource.datetime_added|date:"j F Y" }}</span>
           {% with count=resource.components.count %}
             {% if count %}<span class="badge text-bg-secondary">{{ count }} component{{ count|pluralize }}</span>{% endif %}

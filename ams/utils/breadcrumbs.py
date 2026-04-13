@@ -14,6 +14,7 @@ from ams.cms.models import HomePage
 from ams.events.models import Event
 from ams.events.models import Location
 from ams.organisations.models import Organisation
+from ams.resources.models import Resource
 
 logger = logging.getLogger(__name__)
 
@@ -109,6 +110,19 @@ BREADCRUMB_REGISTRY: dict[str, BreadcrumbConfig] = {
     "events:location": {
         "parent": "events:home",
         "label_getter": "get_location_name",
+    },
+    # Resource pages
+    "resources:home": {
+        "parent": None,
+        "label": _("Resources"),
+    },
+    "resources:resource": {
+        "parent": "resources:home",
+        "label_getter": "get_resource_name",
+    },
+    "resources:search": {
+        "parent": "resources:home",
+        "label": _("Search"),
     },
     # Auth pages (allauth)
     "account_login": {
@@ -226,12 +240,30 @@ def _get_location_name(request, **kwargs):
     return _get_cached_value(request, "location_name", get_name)
 
 
+def _get_resource_name(request, **kwargs):
+    """Get resource name for breadcrumb with caching and error handling."""
+
+    def get_name():
+        try:
+            if pk := kwargs.get("pk"):
+                return Resource.objects.get(pk=pk).name
+        except Resource.DoesNotExist:
+            logger.debug(
+                "Resource with pk=%s not found for breadcrumb label.",
+                kwargs.get("pk"),
+            )
+        return _("Resource")
+
+    return _get_cached_value(request, "resource_name", get_name)
+
+
 # Label getter functions
 LABEL_GETTERS = {
     "get_organisation_name": _get_organisation_name,
     "get_user_dashboard_label": _get_user_dashboard_label,
     "get_event_name": _get_event_name,
     "get_location_name": _get_location_name,
+    "get_resource_name": _get_resource_name,
 }
 
 

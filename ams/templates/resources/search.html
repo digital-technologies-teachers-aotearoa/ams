@@ -1,9 +1,15 @@
 {% extends "resources/base.html" %}
 
-{% load crispy_forms_tags %}
+{% load crispy_forms_tags icon %}
 
 {% block page_heading %}
-  <h1>Search resources</h1>
+  <div class="d-flex justify-content-between align-items-center">
+    <h1>Search resources</h1>
+    {% if perms.resources %}
+      <a href="{% url 'admin:app_list' 'resources' %}"
+         class="btn btn-sm btn-secondary">Open resources admin</a>
+    {% endif %}
+  </div>
   {% crispy form %}
 {% endblock page_heading %}
 
