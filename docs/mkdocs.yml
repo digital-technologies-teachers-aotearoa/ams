@@ -26,12 +26,14 @@ nav:
       - admin/index.md
       - admin/cms.md
       - admin/events.md
+      - admin/resources.md
       - admin/forum.md
       - admin/xero-billing.md
       - admin/theme-customization.md
   - Developer documentation:
       - developer/contributing.md
       - developer/feature-flags.md
+      - developer/resources.md
       - developer/billing.md
       - developer/management-commands-catalog.md
       - developer/forum.md

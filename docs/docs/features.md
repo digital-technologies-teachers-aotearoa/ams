@@ -98,6 +98,23 @@ Administrators manage events through the Django admin interface with support for
 
 <!-- [Screenshot: Events listing page with upcoming events] -->
 
+### 📚 Resources
+
+AMS includes an optional resources module for publishing downloadable materials on the website.
+When enabled, members can browse and search resources, view detail pages, and download files.
+Administrators manage resources through the Django admin interface, with support for private file uploads, rich descriptions, and a flexible two-level taxonomy.
+
+**Key Features:**
+
+- Resource listing with latest published resources
+- Detail pages with downloadable components (files, links, or references to other resources)
+- Private file storage — files are served via authenticated URLs, never public hotlinks
+- Postgres full-text search with keyword ranking and websearch operator support
+- Admin-managed taxonomy with categories and tags for faceted filtering
+- Multiple component types auto-detected: PDF, document, spreadsheet, slideshow, video, audio, and more
+
+<!-- [Screenshot: Resources listing page with search and tag filters] -->
+
 ### 🎨 Customization and Branding
 
 AMS provides extensive customization options without requiring code modifications, including enabling or disabling parts of the website such as the events module.

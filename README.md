@@ -62,6 +62,22 @@ AMS consolidates essential association management functions into a single platfo
 
 <!-- [Screenshot: Forum integration with SSO login] -->
 
+### Events (Optional module)
+
+- **Event Listings:** Browse upcoming and past events with detail pages, session schedules, and location maps
+- **Event Management:** Manage events, series, locations, and regions via the Django admin
+- **Series and Regions:** Group related events into series and organise locations by region
+
+<!-- [Screenshot: Events listing page with upcoming events] -->
+
+### Resources (Optional module)
+
+- **Resource Library:** Browse, search, and download resources with full-text search and tag-based filtering
+- **Private File Storage:** Files are served via authenticated URLs — never publicly hotlinkable
+- **Taxonomy:** Admin-managed categories and tags for faceted filtering across the resource library
+
+<!-- [Screenshot: Resources listing page with search and tag filters] -->
+
 ### Customization and Branding
 
 - **Theme Customization:** Customize colors, logos, and branding to match your association's identity
