@@ -9,7 +9,9 @@ from django.core import management
 from ams.entities.models import Entity
 from ams.resources import file_types
 from ams.resources.models import Resource
+from ams.resources.models import ResourceCategory
 from ams.resources.models import ResourceComponent
+from ams.resources.models import ResourceTag
 from ams.utils.management.commands._constants import LOG_HEADER
 
 GOOGLE_DOC = "https://docs.google.com/document/d/118YeEQNp9G9_xjxBw3tq5FotOSmnWfJuxi8Mi6V3E0g/edit"
@@ -35,6 +37,8 @@ class Command(management.base.BaseCommand):
         entities = self._get_entities()
         resources = self._create_resources(users, entities)
         self._create_all_components(resources)
+        taxonomy = self._create_taxonomy()
+        self._apply_tags(resources, taxonomy)
         self.stdout.write("✅ Sample resources created.")
 
     def _get_users(self):
@@ -1025,3 +1029,130 @@ class Command(management.base.BaseCommand):
 
         count = ResourceComponent.objects.filter(resource__in=r.values()).count()
         self.stdout.write(f"✅ Created/updated {count} resource components.")
+
+    def _create_taxonomy(self):
+        """Create sample categories and tags. Returns a flat dict of tag_name → tag."""
+        taxonomy_data = [
+            {
+                "name": "Topic",
+                "order": 1,
+                "tags": [
+                    {"name": "Governance", "order": 1},
+                    {"name": "Training & Development", "order": 2},
+                    {"name": "Events", "order": 3},
+                    {"name": "Communications", "order": 4},
+                    {"name": "Finance", "order": 5},
+                    {"name": "Research", "order": 6},
+                    {"name": "Technology", "order": 7},
+                    {"name": "Community", "order": 8},
+                    {"name": "Environment", "order": 9},
+                ],
+            },
+            {
+                "name": "Audience",
+                "order": 2,
+                "tags": [
+                    {"name": "All Members", "order": 1},
+                    {"name": "Board & Leadership", "order": 2},
+                    {"name": "Volunteers", "order": 3},
+                    {"name": "Staff", "order": 4},
+                    {"name": "Regional Chapters", "order": 5},
+                ],
+            },
+        ]
+
+        tags = {}
+        for cat_data in taxonomy_data:
+            category, _ = ResourceCategory.objects.update_or_create(
+                name=cat_data["name"],
+                defaults={"order": cat_data["order"]},
+            )
+            for tag_data in cat_data["tags"]:
+                tag, _ = ResourceTag.objects.update_or_create(
+                    category=category,
+                    name=tag_data["name"],
+                    defaults={"order": tag_data["order"]},
+                )
+                tags[tag_data["name"]] = tag
+
+        self.stdout.write(f"✅ Created/updated {len(tags)} resource tags.")
+        return tags
+
+    def _apply_tags(self, resources, tags):  # noqa: PLR0915
+        r = resources
+        t = tags
+
+        def tag(resource_name, *tag_names):
+            resource = r.get(resource_name)
+            if resource:
+                resource.tags.set([t[n] for n in tag_names if n in t])
+
+        tag("Introduction to Data Analysis", "Training & Development", "All Members")
+        tag("Conference Highlights Reel", "Events", "All Members")
+        tag("Annual Report 2024", "Finance", "All Members")
+        tag("Member Survey Results", "Research", "All Members")
+        tag("Conference Slides 2024", "Events", "All Members")
+        tag("Organisation Chart", "Governance", "Staff")
+        tag("Member Portal Guide", "Technology", "All Members")
+        tag("Shared Files Repository", "Technology", "Staff")
+        tag("Policy Document PDF", "Governance", "All Members")
+        tag("Board Meeting Recording", "Governance", "Board & Leadership")
+
+        tag("Workshop Materials Pack", "Training & Development", "All Members")
+        tag("Governance Framework", "Governance", "Board & Leadership")
+        tag("Technology Roadmap", "Technology", "Board & Leadership", "Staff")
+        tag("Research Summary", "Research", "All Members")
+        tag("Media Kit", "Communications", "Staff")
+        tag("Training Video Series - Module 1", "Training & Development", "All Members")
+        tag("Financial Overview", "Finance", "Board & Leadership", "Staff")
+        tag("Event Archive 2023", "Events", "All Members")
+        tag(
+            "Podcast Episode - Leadership",
+            "Training & Development",
+            "Board & Leadership",
+        )
+        tag("Innovation Report", "Research", "Technology", "Board & Leadership")
+
+        tag("New Member Onboarding Kit", "Training & Development", "All Members")
+        tag("Annual Conference Pack 2024", "Events", "All Members")
+        tag("Strategic Plan 2025-2030", "Governance", "Board & Leadership")
+        tag("Diversity & Inclusion Resources", "Training & Development", "All Members")
+        tag("Regional Chapter Toolkit", "Governance", "Regional Chapters")
+        tag("Webinar Recordings Playlist", "Training & Development", "All Members")
+        tag("Member Benefits Overview", "All Members")
+        tag("Compliance Checklist", "Governance", "Staff")
+        tag("Community Engagement Guide", "Community", "All Members")
+        tag("Sponsorship Prospectus", "Events", "Board & Leadership")
+
+        tag("Complete Event Handbook", "Events", "Staff", "Volunteers")
+        tag("Software Tools Resource Hub", "Technology", "Staff")
+        tag(
+            "Leadership Development Program",
+            "Training & Development",
+            "Board & Leadership",
+        )
+        tag("Member Research Library", "Research", "All Members")
+        tag("Digital Archive 2022", "Events", "All Members")
+        tag("Communications Templates", "Communications", "Staff")
+        tag("Environmental Policy Resources", "Environment", "All Members")
+        tag("Professional Development Hub", "Training & Development", "All Members")
+        tag("Historical Records Collection", "Governance", "Board & Leadership")
+        tag("Volunteer Training Materials", "Training & Development", "Volunteers")
+
+        tag("Master Knowledge Base", "Governance", "Research", "Staff")
+        tag("Executive Resource Pack", "Governance", "Board & Leadership")
+        tag("Comprehensive Training Suite", "Training & Development", "All Members")
+        tag("Complete Governance Library", "Governance", "Board & Leadership")
+        tag("Multimedia Learning Centre", "Training & Development", "All Members")
+        tag("Research & Analytics Portal", "Research", "Board & Leadership", "Staff")
+        tag("Events Resource Centre", "Events", "Staff")
+        tag(
+            "Innovation & Technology Hub",
+            "Technology",
+            "Research",
+            "Board & Leadership",
+        )
+        tag("Community Resources Portal", "Community", "All Members")
+        tag("Full Library Index", "Governance", "Research", "Staff")
+
+        self.stdout.write("✅ Applied tags to resources.")

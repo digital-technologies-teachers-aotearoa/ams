@@ -5,12 +5,64 @@ from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 
 from ams.resources import file_types
+from ams.resources.models import ResourceCategory
 from ams.resources.models import ResourceComponent
+from ams.resources.models import ResourceTag
+from ams.resources.tests.factories import ResourceCategoryFactory
 from ams.resources.tests.factories import ResourceComponentFactory
 from ams.resources.tests.factories import ResourceFactory
+from ams.resources.tests.factories import ResourceTagFactory
 from config.storage_backends import PrivateMediaStorage
 
 pytestmark = pytest.mark.django_db
+
+
+class TestResourceCategoryModel:
+    def test_str_returns_name(self):
+        category = ResourceCategoryFactory(name="Year Level")
+        assert str(category) == "Year Level"
+
+    def test_ordering_by_order_then_name(self):
+        b = ResourceCategoryFactory(name="B Category", order=2)
+        a = ResourceCategoryFactory(name="A Category", order=1)
+        c = ResourceCategoryFactory(name="C Category", order=1)
+        qs = list(ResourceCategory.objects.all())
+        assert qs.index(a) < qs.index(b)
+        assert qs.index(c) < qs.index(b)
+
+
+class TestResourceTagModel:
+    def test_str_returns_name(self):
+        tag = ResourceTagFactory(name="Level 1")
+        assert str(tag) == "Level 1"
+
+    def test_same_slug_allowed_in_different_categories(self):
+        cat_a = ResourceCategoryFactory(name="Category A")
+        cat_b = ResourceCategoryFactory(name="Category B")
+        tag_a = ResourceTagFactory(name="duplicate", category=cat_a)
+        tag_b = ResourceTagFactory(name="duplicate", category=cat_b)
+        assert tag_a.slug == tag_b.slug
+
+    def test_ordering_by_order_then_name(self):
+        category = ResourceCategoryFactory()
+        b = ResourceTagFactory(name="B Tag", order=2, category=category)
+        a = ResourceTagFactory(name="A Tag", order=1, category=category)
+        qs = list(ResourceTag.objects.filter(category=category))
+        assert qs.index(a) < qs.index(b)
+
+
+class TestResourceTagsM2M:
+    def test_resource_can_have_tags(self):
+        resource = ResourceFactory()
+        tag = ResourceTagFactory()
+        resource.tags.add(tag)
+        assert tag in resource.tags.all()
+
+    def test_tag_resources_reverse_relation(self):
+        resource = ResourceFactory()
+        tag = ResourceTagFactory()
+        resource.tags.add(tag)
+        assert resource in tag.resources.all()
 
 
 class TestResourceModel:

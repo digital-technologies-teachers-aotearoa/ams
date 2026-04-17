@@ -15,6 +15,39 @@ from ams.resources.utils import resource_upload_path
 from config.storage_backends import PrivateMediaStorage
 
 
+class ResourceCategory(models.Model):
+    name = models.CharField(max_length=200)
+    slug = AutoSlugField(populate_from="name")
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["order", "name"]
+        verbose_name_plural = "resource categories"
+
+    def __str__(self):
+        return self.name
+
+
+class ResourceTag(models.Model):
+    category = models.ForeignKey(
+        ResourceCategory,
+        on_delete=models.CASCADE,
+        related_name="tags",
+    )
+    name = models.CharField(max_length=200)
+    slug = AutoSlugField(populate_from="name")
+    abbreviation = models.CharField(max_length=20, blank=True)
+    css_class = models.CharField(max_length=30, blank=True)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["order", "name"]
+        unique_together = [("category", "slug")]
+
+    def __str__(self):
+        return self.name
+
+
 class Resource(models.Model):
     name = models.CharField(max_length=200)
     slug = AutoSlugField(populate_from="name", always_update=True, null=True)
@@ -32,6 +65,11 @@ class Resource(models.Model):
     )
     author_entities = models.ManyToManyField(
         "entities.Entity",
+        related_name="resources",
+        blank=True,
+    )
+    tags = models.ManyToManyField(
+        ResourceTag,
         related_name="resources",
         blank=True,
     )

@@ -5,8 +5,10 @@ from unittest.mock import patch
 import pytest
 
 from ams.entities.tests.factories import EntityFactory
+from ams.resources.tests.factories import ResourceCategoryFactory
 from ams.resources.tests.factories import ResourceComponentFactory
 from ams.resources.tests.factories import ResourceFactory
+from ams.resources.tests.factories import ResourceTagFactory
 from ams.users.tests.factories import UserFactory
 
 pytestmark = pytest.mark.django_db
@@ -240,3 +242,166 @@ class TestResourceSearchView:
         ResourceFactory.create_batch(3, published=True)
         response = client.get("/en/resources/search/?q=")
         assert list(response.context["results"]) == []
+
+    def test_whitespace_only_query_treated_as_empty(self, client):
+        ResourceFactory(name="Python tutorial", published=True)
+        response = client.get("/en/resources/search/?q=++++")
+        assert list(response.context["results"]) == []
+        assert response.context["q"] == ""
+
+    def test_no_match_query_returns_empty_results(self, client):
+        ResourceFactory(name="Python tutorial", published=True)
+        response = client.get("/en/resources/search/?q=xyznonexistentterm")
+        assert list(response.context["results"]) == []
+
+    def test_resource_matching_both_search_vector_and_tag_name_appears_once(
+        self,
+        client,
+    ):
+        category = ResourceCategoryFactory()
+        tag = ResourceTagFactory(category=category, name="Kubernetes")
+        resource = ResourceFactory(name="Kubernetes tutorial", published=True)
+        resource.tags.add(tag)
+        response = client.get("/en/resources/search/?q=kubernetes")
+        results = list(response.context["results"])
+        assert results.count(resource) == 1
+
+    def test_form_initial_q_matches_query(self, client):
+        response = client.get("/en/resources/search/?q=python")
+        assert response.context["form"].initial["q"] == "python"
+
+    def test_selected_tag_slugs_empty_when_no_tags(self, client):
+        response = client.get("/en/resources/search/?q=python")
+        assert response.context["selected_tag_slugs"] == set()
+
+
+class TestResourceSearchTagFiltering:
+    def test_single_tag_filters_results(self, client):
+        category = ResourceCategoryFactory()
+        tag = ResourceTagFactory(category=category, name="Year 9")
+        other_tag = ResourceTagFactory(category=category, name="Year 10")
+        tagged = ResourceFactory(published=True)
+        tagged.tags.add(tag)
+        other = ResourceFactory(published=True)
+        other.tags.add(other_tag)
+        response = client.get(f"/en/resources/search/?tag={tag.slug}")
+        results = list(response.context["results"])
+        assert tagged in results
+        assert other not in results
+
+    def test_or_within_category(self, client):
+        category = ResourceCategoryFactory()
+        tag_a = ResourceTagFactory(category=category, name="Year 9")
+        tag_b = ResourceTagFactory(category=category, name="Year 10")
+        r_a = ResourceFactory(published=True)
+        r_a.tags.add(tag_a)
+        r_b = ResourceFactory(published=True)
+        r_b.tags.add(tag_b)
+        response = client.get(
+            f"/en/resources/search/?tag={tag_a.slug}&tag={tag_b.slug}",
+        )
+        results = list(response.context["results"])
+        assert r_a in results
+        assert r_b in results
+
+    def test_and_across_categories(self, client):
+        c1 = ResourceCategoryFactory()
+        c2 = ResourceCategoryFactory()
+        tag_c1 = ResourceTagFactory(category=c1, name="Year 9")
+        tag_c2 = ResourceTagFactory(category=c2, name="English")
+        both = ResourceFactory(published=True)
+        both.tags.add(tag_c1, tag_c2)
+        only_c1 = ResourceFactory(published=True)
+        only_c1.tags.add(tag_c1)
+        response = client.get(
+            f"/en/resources/search/?tag={tag_c1.slug}&tag={tag_c2.slug}",
+        )
+        results = list(response.context["results"])
+        assert both in results
+        assert only_c1 not in results
+
+    def test_unpublished_excluded_when_tag_matches(self, client):
+        category = ResourceCategoryFactory()
+        tag = ResourceTagFactory(category=category)
+        hidden = ResourceFactory(published=False)
+        hidden.tags.add(tag)
+        response = client.get(f"/en/resources/search/?tag={tag.slug}")
+        assert list(response.context["results"]) == []
+
+    def test_combined_query_and_tag_filter(self, client):
+        category = ResourceCategoryFactory()
+        tag = ResourceTagFactory(category=category)
+        match = ResourceFactory(name="Python tutorial", published=True)
+        match.tags.add(tag)
+        query_only = ResourceFactory(name="Python advanced", published=True)
+        tag_only = ResourceFactory(name="Unrelated", published=True)
+        tag_only.tags.add(tag)
+        response = client.get(
+            f"/en/resources/search/?q=python&tag={tag.slug}",
+        )
+        results = list(response.context["results"])
+        assert match in results
+        assert query_only not in results
+        assert tag_only not in results
+
+    def test_full_text_search_finds_resource_by_tag_name(self, client):
+        category = ResourceCategoryFactory(name="Subject")
+        tag = ResourceTagFactory(category=category, name="Xyzzy")
+        resource = ResourceFactory(name="Unrelated title", published=True)
+        resource.tags.add(tag)
+        response = client.get("/en/resources/search/?q=xyzzy")
+        assert resource in list(response.context["results"])
+
+    def test_categories_in_form(self, client):
+        category = ResourceCategoryFactory(name="Year Level")
+        ResourceTagFactory(category=category, name="Year 9")
+        response = client.get("/en/resources/search/")
+        categories = list(response.context["form"].categories)
+        assert category in categories
+
+    def test_selected_tag_slugs_populated_in_context(self, client):
+        category = ResourceCategoryFactory()
+        tag = ResourceTagFactory(category=category)
+        response = client.get(f"/en/resources/search/?tag={tag.slug}")
+        assert tag.slug in response.context["selected_tag_slugs"]
+
+    def test_nonexistent_tag_slug_returns_empty_results(self, client):
+        ResourceFactory(published=True)
+        response = client.get("/en/resources/search/?tag=does-not-exist")
+        assert response.status_code == HTTPStatus.OK
+        assert list(response.context["results"]) == []
+
+    def test_resource_with_multiple_matching_tags_in_category_appears_once(
+        self,
+        client,
+    ):
+        category = ResourceCategoryFactory()
+        tag_a = ResourceTagFactory(category=category, name="Year 9")
+        tag_b = ResourceTagFactory(category=category, name="Year 10")
+        resource = ResourceFactory(published=True)
+        resource.tags.add(tag_a, tag_b)
+        response = client.get(
+            f"/en/resources/search/?tag={tag_a.slug}&tag={tag_b.slug}",
+        )
+        results = list(response.context["results"])
+        assert results.count(resource) == 1
+
+    def test_three_category_and_combination(self, client):
+        c1, c2, c3 = (
+            ResourceCategoryFactory(),
+            ResourceCategoryFactory(),
+            ResourceCategoryFactory(),
+        )
+        tag1 = ResourceTagFactory(category=c1, name="Year 9")
+        tag2 = ResourceTagFactory(category=c2, name="English")
+        tag3 = ResourceTagFactory(category=c3, name="Beginner")
+        all_three = ResourceFactory(published=True)
+        all_three.tags.add(tag1, tag2, tag3)
+        missing_one = ResourceFactory(published=True)
+        missing_one.tags.add(tag1, tag2)
+        response = client.get(
+            f"/en/resources/search/?tag={tag1.slug}&tag={tag2.slug}&tag={tag3.slug}",
+        )
+        results = list(response.context["results"])
+        assert all_three in results
+        assert missing_one not in results

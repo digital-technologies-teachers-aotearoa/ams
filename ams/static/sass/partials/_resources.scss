@@ -72,3 +72,20 @@ $resources-brand-colour: #0976a9;
   width: 2rem;
   height: 2rem;
 }
+
+// ---------------------------------------------------------------------------
+// Tag facet checkboxes — badge toggles to primary when checked
+// ---------------------------------------------------------------------------
+.resource-tag-check {
+  label {
+    cursor: pointer;
+    user-select: none;
+  }
+
+  input[type='checkbox']:checked ~ label .badge,
+  input[type='checkbox']:checked + label .badge {
+    background-color: var(--bs-primary) !important;
+    color: #fff !important;
+    border-color: transparent !important;
+  }
+}
