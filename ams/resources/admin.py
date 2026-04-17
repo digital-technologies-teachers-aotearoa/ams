@@ -4,7 +4,9 @@ from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
 from ams.resources.models import Resource
+from ams.resources.models import ResourceCategory
 from ams.resources.models import ResourceComponent
+from ams.resources.models import ResourceTag
 
 
 class ResourcesFeatureFlagMixin:
@@ -75,7 +77,7 @@ class ResourceAdmin(ResourcesFeatureFlagMixin, admin.ModelAdmin):
     list_display = ("name", "datetime_added", "datetime_updated", "published")
     list_filter = ("published",)
     search_fields = ("name",)
-    filter_horizontal = ("author_entities", "author_users")
+    filter_horizontal = ("author_entities", "author_users", "tags")
     fieldsets = (
         (None, {"fields": ("name", "description")}),
         (
@@ -87,5 +89,26 @@ class ResourceAdmin(ResourcesFeatureFlagMixin, admin.ModelAdmin):
                 "fields": ("author_entities", "author_users"),
             },
         ),
+        ("Tags", {"fields": ("tags",)}),
         ("Visibility", {"fields": ("published",)}),
     )
+
+
+class ResourceTagInline(admin.TabularInline):
+    model = ResourceTag
+    extra = 1
+    fields = ("name", "abbreviation", "css_class", "order")
+
+
+@admin.register(ResourceCategory)
+class ResourceCategoryAdmin(ResourcesFeatureFlagMixin, admin.ModelAdmin):
+    list_display = ("name", "order")
+    search_fields = ("name",)
+    inlines = [ResourceTagInline]
+
+
+@admin.register(ResourceTag)
+class ResourceTagAdmin(ResourcesFeatureFlagMixin, admin.ModelAdmin):
+    list_display = ("name", "category", "abbreviation", "order")
+    list_filter = ("category",)
+    search_fields = ("name",)

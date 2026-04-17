@@ -14,6 +14,7 @@
 
 {% block content_container %}
   <div class="col-12 col-lg-8 order-lg-first">
+    {% include "resources/_resource_tags.html" with tags=resource.tags.all wrapper_class=" mb-3" only %}
     <div class="mb-4">{{ resource.description|safe }}</div>
     {% with components=resource.components.all %}
       {% if components %}
@@ -58,22 +59,7 @@
     <div class="card mb-3">
       <div class="card-body">
         <h5 class="card-title">Authors</h5>
-        {% with entities=resource.author_entities.all %}
-          {% if entities %}
-            <p class="text-muted small mb-1">Organisations</p>
-            <ul class="list-unstyled mb-3">
-              {% for entity in entities %}<li>{{ entity.name }}</li>{% endfor %}
-            </ul>
-          {% endif %}
-        {% endwith %}
-        {% with users=resource.author_users.all %}
-          {% if users %}
-            <p class="text-muted small mb-1">People</p>
-            <ul class="list-unstyled mb-0">
-              {% for user in users %}<li>{{ user.get_full_name|default:user.email }}</li>{% endfor %}
-            </ul>
-          {% endif %}
-        {% endwith %}
+        {% include "resources/_resource_authors.html" %}
       </div>
     </div>
     <div class="text-muted small">

@@ -1,0 +1,7 @@
+{% if tags %}
+  <div class="d-flex flex-wrap gap-1{{ wrapper_class|default:'' }}">
+    {% for tag in tags %}
+      {% include "resources/_tag_badge.html" %}
+    {% endfor %}
+  </div>
+{% endif %}

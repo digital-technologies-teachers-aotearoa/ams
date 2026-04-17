@@ -1,7 +1,26 @@
 import factory
 
 from ams.resources.models import Resource
+from ams.resources.models import ResourceCategory
 from ams.resources.models import ResourceComponent
+from ams.resources.models import ResourceTag
+
+
+class ResourceCategoryFactory(factory.django.DjangoModelFactory[ResourceCategory]):
+    name = factory.Faker("word")
+    order = factory.Sequence(lambda n: n)
+
+    class Meta:
+        model = ResourceCategory
+
+
+class ResourceTagFactory(factory.django.DjangoModelFactory[ResourceTag]):
+    category = factory.SubFactory(ResourceCategoryFactory)
+    name = factory.Faker("word")
+    order = factory.Sequence(lambda n: n)
+
+    class Meta:
+        model = ResourceTag
 
 
 class ResourceFactory(factory.django.DjangoModelFactory[Resource]):

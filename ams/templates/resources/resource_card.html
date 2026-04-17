@@ -28,10 +28,11 @@
         </div>
         <div class="resource-card__details d-flex align-items-center gap-3">
           <span>{% icon "calendar-event" %} {{ resource.datetime_added|date:"j F Y" }}</span>
-          {% with count=resource.components.count %}
+          {% with count=resource.components.all|length %}
             {% if count %}<span class="badge text-bg-secondary">{{ count }} component{{ count|pluralize }}</span>{% endif %}
           {% endwith %}
         </div>
+        {% include "resources/_resource_tags.html" with tags=resource.tags.all wrapper_class=" resource-card__tags mt-2" only %}
       </div>
     </div>
   </div>
