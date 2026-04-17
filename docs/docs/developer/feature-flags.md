@@ -25,6 +25,26 @@ When disabled (the default):
 - `ams/events/admin.py` — `EventsFeatureFlagMixin` gates all admin permissions
 - `ams/events/validators.py` — `patch_menu_item_clean()` validates menu item URLs (applied in `apps.py` `ready()`)
 
+### `AMS_RESOURCES_ENABLED`
+
+| | |
+| --- | --- |
+| **Setting** | `RESOURCES_ENABLED` |
+| **Env var** | `AMS_RESOURCES_ENABLED` |
+| **Default** | `False` |
+| **Purpose** | Enable or disable the resources module |
+
+When disabled (the default):
+
+- Resource URL patterns are not registered — requests to `/resources/` return 404
+- Resources admin sections are hidden — no add, change, or view permissions
+- Menu items with `/resources/` URLs are rejected during validation
+
+**Implementation pattern:** The env var is read in `config/settings/base.py` as a boolean setting. This setting is then checked in:
+
+- `config/urls.py` — conditionally includes the resources URL patterns
+- `ams/resources/admin.py` — `ResourcesFeatureFlagMixin` gates all admin permissions
+
 ## Future Considerations
 
 The current env-var approach is well-suited for flags that are set once per deployment and rarely change. If requirements evolve, consider these alternatives:
