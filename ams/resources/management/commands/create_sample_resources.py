@@ -5,6 +5,7 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core import management
+from django.core.files.base import ContentFile
 
 from ams.entities.models import Entity
 from ams.resources import file_types
@@ -23,6 +24,17 @@ GOOGLE_DRIVE_FILE = (
 )
 YOUTUBE = "https://www.youtube.com/watch?v=v5yeq5u2RMI"
 VIMEO = "https://vimeo.com/58336187"
+
+PLACEHOLDER_PDF = (
+    b"%PDF-1.0\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj "
+    b"2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj "
+    b"3 0 obj<</Type/Page/MediaBox[0 0 3 3]>>endobj\n"
+    b"xref\n0 4\n0000000000 65535 f\n0000000009 00000 n\n"
+    b"0000000058 00000 n\n0000000115 00000 n\n"
+    b"trailer<</Size 4/Root 1 0 R>>\nstartxref\n190\n%%EOF"
+)
+PLACEHOLDER_DOCX = b"Placeholder document content."
+PLACEHOLDER_CSV = b"name,value\nRow 1,100\nRow 2,200\n"
 
 
 class Command(management.base.BaseCommand):
@@ -76,6 +88,7 @@ class Command(management.base.BaseCommand):
                 "name": "Introduction to Data Analysis",
                 "description": "<p>A beginner-friendly video introduction to data analysis techniques used in association management.</p>",
                 "published": True,
+                "visibility": Resource.Visibility.PUBLIC,
                 "author_users": [u1],
                 "author_entities": [],
             },
@@ -83,6 +96,7 @@ class Command(management.base.BaseCommand):
                 "name": "Conference Highlights Reel",
                 "description": "<p>Video highlights from the annual conference showcasing key moments and speaker presentations.</p>",
                 "published": True,
+                "visibility": Resource.Visibility.PUBLIC,
                 "author_users": [],
                 "author_entities": [sc],
             },
@@ -90,6 +104,7 @@ class Command(management.base.BaseCommand):
                 "name": "Annual Report 2024",
                 "description": "<p>The association's comprehensive annual report covering financial performance, membership growth, and key initiatives for 2024.</p>",
                 "published": True,
+                "visibility": Resource.Visibility.DOWNLOAD_MEMBERSHIP_REQUIRED,
                 "author_users": [],
                 "author_entities": [tc],
             },
@@ -97,6 +112,7 @@ class Command(management.base.BaseCommand):
                 "name": "Member Survey Results",
                 "description": "<p>Compiled results from the annual member satisfaction survey with trend analysis and recommendations.</p>",
                 "published": True,
+                "visibility": Resource.Visibility.DOWNLOAD_MEMBERSHIP_REQUIRED,
                 "author_users": [u1],
                 "author_entities": [tc],
             },
@@ -104,6 +120,7 @@ class Command(management.base.BaseCommand):
                 "name": "Conference Slides 2024",
                 "description": "<p>Presentation slides from the 2024 annual conference plenary sessions.</p>",
                 "published": True,
+                "visibility": Resource.Visibility.PUBLIC,
                 "author_users": [u2],
                 "author_entities": [pi],
             },
@@ -111,6 +128,7 @@ class Command(management.base.BaseCommand):
                 "name": "Organisation Chart",
                 "description": "<p>Current organisational structure diagram showing reporting lines and committee relationships.</p>",
                 "published": False,
+                "visibility": Resource.Visibility.MEMBERS_ONLY,
                 "author_users": [],
                 "author_entities": [kf],
             },
@@ -118,6 +136,7 @@ class Command(management.base.BaseCommand):
                 "name": "Member Portal Guide",
                 "description": "<p>Step-by-step guide to using the online member portal, covering profile management and resource access.</p>",
                 "published": True,
+                "visibility": Resource.Visibility.DOWNLOAD_ACCOUNT_REQUIRED,
                 "author_users": [u1, u2],
                 "author_entities": [],
             },
@@ -125,6 +144,7 @@ class Command(management.base.BaseCommand):
                 "name": "Shared Files Repository",
                 "description": "<p>Central repository of shared files including templates, forms, and reference documents.</p>",
                 "published": True,
+                "visibility": Resource.Visibility.PUBLIC,
                 "author_users": [],
                 "author_entities": [gs],
             },
@@ -132,6 +152,7 @@ class Command(management.base.BaseCommand):
                 "name": "Policy Document PDF",
                 "description": "<p>Official association policy document covering member conduct, governance, and operational procedures.</p>",
                 "published": True,
+                "visibility": Resource.Visibility.DOWNLOAD_ACCOUNT_REQUIRED,
                 "author_users": [u1],
                 "author_entities": [],
             },
@@ -139,6 +160,7 @@ class Command(management.base.BaseCommand):
                 "name": "Board Meeting Recording",
                 "description": "<p>Audio recording of the most recent board meeting, available to members for review.</p>",
                 "published": True,
+                "visibility": Resource.Visibility.MEMBERS_ONLY,
                 "author_users": [],
                 "author_entities": [tc, kf],
             },
@@ -147,6 +169,7 @@ class Command(management.base.BaseCommand):
                 "name": "Workshop Materials Pack",
                 "description": "<p>Complete materials package for the professional development workshop series, including video and supporting documentation.</p>",
                 "published": True,
+                "visibility": Resource.Visibility.PUBLIC,
                 "author_users": [u1, u2, u3],
                 "author_entities": [],
             },
@@ -154,6 +177,7 @@ class Command(management.base.BaseCommand):
                 "name": "Governance Framework",
                 "description": "<p>Comprehensive governance framework documents covering board responsibilities, policies, and procedural guidelines.</p>",
                 "published": True,
+                "visibility": Resource.Visibility.DOWNLOAD_MEMBERSHIP_REQUIRED,
                 "author_users": [],
                 "author_entities": [kf],
             },
@@ -161,6 +185,7 @@ class Command(management.base.BaseCommand):
                 "name": "Technology Roadmap",
                 "description": "<p>Strategic technology roadmap outlining planned digital initiatives and infrastructure improvements for the next three years.</p>",
                 "published": True,
+                "visibility": Resource.Visibility.PUBLIC,
                 "author_users": [],
                 "author_entities": [tc, kf, pi],
             },
@@ -168,6 +193,7 @@ class Command(management.base.BaseCommand):
                 "name": "Research Summary",
                 "description": "<p>Summary of recent industry research findings relevant to association members, with links to full reports.</p>",
                 "published": True,
+                "visibility": Resource.Visibility.PUBLIC,
                 "author_users": [u2],
                 "author_entities": [],
             },
@@ -175,6 +201,7 @@ class Command(management.base.BaseCommand):
                 "name": "Media Kit",
                 "description": "<p>Press and media kit containing brand assets, logos, and official imagery for use in publications.</p>",
                 "published": True,
+                "visibility": Resource.Visibility.PUBLIC,
                 "author_users": [],
                 "author_entities": [sc],
             },
@@ -182,6 +209,7 @@ class Command(management.base.BaseCommand):
                 "name": "Training Video Series - Module 1",
                 "description": "<p>First module of the member training video series covering foundational concepts and onboarding essentials.</p>",
                 "published": True,
+                "visibility": Resource.Visibility.DOWNLOAD_ACCOUNT_REQUIRED,
                 "author_users": [u1],
                 "author_entities": [tc],
             },
@@ -189,6 +217,7 @@ class Command(management.base.BaseCommand):
                 "name": "Financial Overview",
                 "description": "<p>Financial overview including budget summaries, expenditure tracking, and quarterly financial reports.</p>",
                 "published": True,
+                "visibility": Resource.Visibility.MEMBERS_ONLY,
                 "author_users": [],
                 "author_entities": [tc],
             },
@@ -196,6 +225,7 @@ class Command(management.base.BaseCommand):
                 "name": "Event Archive 2023",
                 "description": "<p>Complete archive of 2023 events including recordings, materials, and downloadable assets.</p>",
                 "published": True,
+                "visibility": Resource.Visibility.PUBLIC,
                 "author_users": [u3],
                 "author_entities": [],
             },
@@ -203,6 +233,7 @@ class Command(management.base.BaseCommand):
                 "name": "Podcast Episode - Leadership",
                 "description": "<p>Audio podcast exploring leadership challenges in association management, featuring interviews with industry experts.</p>",
                 "published": False,
+                "visibility": Resource.Visibility.PUBLIC,
                 "author_users": [],
                 "author_entities": [sc],
             },
@@ -210,6 +241,7 @@ class Command(management.base.BaseCommand):
                 "name": "Innovation Report",
                 "description": "<p>Draft report examining innovation trends in the sector with case studies and strategic recommendations.</p>",
                 "published": False,
+                "visibility": Resource.Visibility.DOWNLOAD_MEMBERSHIP_REQUIRED,
                 "author_users": [u1],
                 "author_entities": [],
             },
@@ -218,6 +250,7 @@ class Command(management.base.BaseCommand):
                 "name": "New Member Onboarding Kit",
                 "description": "<p>Complete onboarding resource pack for new members including welcome video, handbook, and portal access guide.</p>",
                 "published": True,
+                "visibility": Resource.Visibility.PUBLIC,
                 "author_users": [u1],
                 "author_entities": [tc, kf],
             },
@@ -225,6 +258,7 @@ class Command(management.base.BaseCommand):
                 "name": "Annual Conference Pack 2024",
                 "description": "<p>Full resource pack from the 2024 annual conference including slide decks, session schedule, and proceedings document.</p>",
                 "published": True,
+                "visibility": Resource.Visibility.DOWNLOAD_MEMBERSHIP_REQUIRED,
                 "author_users": [],
                 "author_entities": [tc, kf],
             },
@@ -232,6 +266,7 @@ class Command(management.base.BaseCommand):
                 "name": "Strategic Plan 2025-2030",
                 "description": "<p>Five-year strategic plan setting out the association's vision, goals, and key performance indicators through 2030.</p>",
                 "published": True,
+                "visibility": Resource.Visibility.DOWNLOAD_MEMBERSHIP_REQUIRED,
                 "author_users": [],
                 "author_entities": [kf],
             },
@@ -239,6 +274,7 @@ class Command(management.base.BaseCommand):
                 "name": "Diversity & Inclusion Resources",
                 "description": "<p>Curated resources supporting diversity and inclusion initiatives, including training video, policy guide, and external links.</p>",
                 "published": True,
+                "visibility": Resource.Visibility.PUBLIC,
                 "author_users": [u1, u2],
                 "author_entities": [tc],
             },
@@ -246,6 +282,7 @@ class Command(management.base.BaseCommand):
                 "name": "Regional Chapter Toolkit",
                 "description": "<p>Operational toolkit for regional chapter coordinators covering administration, event planning, and reporting templates.</p>",
                 "published": False,
+                "visibility": Resource.Visibility.MEMBERS_ONLY,
                 "author_users": [],
                 "author_entities": [pi],
             },
@@ -253,6 +290,7 @@ class Command(management.base.BaseCommand):
                 "name": "Webinar Recordings Playlist",
                 "description": "<p>Curated playlist of recorded webinars from the past year covering a range of professional development topics.</p>",
                 "published": True,
+                "visibility": Resource.Visibility.PUBLIC,
                 "author_users": [],
                 "author_entities": [sc],
             },
@@ -260,6 +298,7 @@ class Command(management.base.BaseCommand):
                 "name": "Member Benefits Overview",
                 "description": "<p>Overview of all membership benefits, including links to partner discounts, training resources, and networking opportunities.</p>",
                 "published": False,
+                "visibility": Resource.Visibility.MEMBERS_ONLY,
                 "author_users": [u2],
                 "author_entities": [pi],
             },
@@ -267,6 +306,7 @@ class Command(management.base.BaseCommand):
                 "name": "Compliance Checklist",
                 "description": "<p>Regulatory compliance checklist for member organisations, with reference spreadsheet and guidance notes.</p>",
                 "published": True,
+                "visibility": Resource.Visibility.DOWNLOAD_ACCOUNT_REQUIRED,
                 "author_users": [],
                 "author_entities": [tc],
             },
@@ -274,6 +314,7 @@ class Command(management.base.BaseCommand):
                 "name": "Community Engagement Guide",
                 "description": "<p>Guide to effective community engagement strategies, featuring case studies, a tutorial video, and external resources.</p>",
                 "published": False,
+                "visibility": Resource.Visibility.PUBLIC,
                 "author_users": [u1, u2],
                 "author_entities": [],
             },
@@ -281,6 +322,7 @@ class Command(management.base.BaseCommand):
                 "name": "Sponsorship Prospectus",
                 "description": "<p>Sponsorship prospectus for the upcoming annual conference, including partnership packages and promotional materials.</p>",
                 "published": False,
+                "visibility": Resource.Visibility.MEMBERS_ONLY,
                 "author_users": [],
                 "author_entities": [sc],
             },
@@ -289,6 +331,7 @@ class Command(management.base.BaseCommand):
                 "name": "Complete Event Handbook",
                 "description": "<p>End-to-end handbook for organising association events, covering planning, logistics, budgeting, and post-event review.</p>",
                 "published": True,
+                "visibility": Resource.Visibility.PUBLIC,
                 "author_users": [u1],
                 "author_entities": [tc],
             },
@@ -296,6 +339,7 @@ class Command(management.base.BaseCommand):
                 "name": "Software Tools Resource Hub",
                 "description": "<p>Curated collection of software tools and platforms recommended for association management, with tutorials and documentation.</p>",
                 "published": True,
+                "visibility": Resource.Visibility.PUBLIC,
                 "author_users": [],
                 "author_entities": [tc, kf, pi],
             },
@@ -303,6 +347,7 @@ class Command(management.base.BaseCommand):
                 "name": "Leadership Development Program",
                 "description": "<p>Structured leadership development program materials including video training, presentation decks, reference guides, and assessment tools.</p>",
                 "published": True,
+                "visibility": Resource.Visibility.DOWNLOAD_MEMBERSHIP_REQUIRED,
                 "author_users": [],
                 "author_entities": [kf],
             },
@@ -310,6 +355,7 @@ class Command(management.base.BaseCommand):
                 "name": "Member Research Library",
                 "description": "<p>Curated research library for members, aggregating reports, data sets, and external resources on key industry topics.</p>",
                 "published": True,
+                "visibility": Resource.Visibility.DOWNLOAD_MEMBERSHIP_REQUIRED,
                 "author_users": [u1, u2, u3],
                 "author_entities": [],
             },
@@ -317,6 +363,7 @@ class Command(management.base.BaseCommand):
                 "name": "Digital Archive 2022",
                 "description": "<p>Complete digital archive of 2022 association activities, including website snapshots, downloadable archives, and video recordings.</p>",
                 "published": True,
+                "visibility": Resource.Visibility.PUBLIC,
                 "author_users": [],
                 "author_entities": [gs],
             },
@@ -324,6 +371,7 @@ class Command(management.base.BaseCommand):
                 "name": "Communications Templates",
                 "description": "<p>Professional communications templates for member newsletters, social media, presentations, and internal reporting.</p>",
                 "published": True,
+                "visibility": Resource.Visibility.DOWNLOAD_ACCOUNT_REQUIRED,
                 "author_users": [],
                 "author_entities": [sc],
             },
@@ -331,6 +379,7 @@ class Command(management.base.BaseCommand):
                 "name": "Environmental Policy Resources",
                 "description": "<p>Resources supporting the association's environmental sustainability commitments, including policy documents, training, and guidance.</p>",
                 "published": True,
+                "visibility": Resource.Visibility.PUBLIC,
                 "author_users": [u2],
                 "author_entities": [gs],
             },
@@ -338,6 +387,7 @@ class Command(management.base.BaseCommand):
                 "name": "Professional Development Hub",
                 "description": "<p>Central hub for professional development resources including video courses, presentation materials, and external learning platforms.</p>",
                 "published": False,
+                "visibility": Resource.Visibility.PUBLIC,
                 "author_users": [u3],
                 "author_entities": [],
             },
@@ -345,6 +395,7 @@ class Command(management.base.BaseCommand):
                 "name": "Historical Records Collection",
                 "description": "<p>Archived collection of historical association records, publications, and documents spanning the organisation's history.</p>",
                 "published": False,
+                "visibility": Resource.Visibility.MEMBERS_ONLY,
                 "author_users": [],
                 "author_entities": [kf],
             },
@@ -352,6 +403,7 @@ class Command(management.base.BaseCommand):
                 "name": "Volunteer Training Materials",
                 "description": "<p>Comprehensive training materials for association volunteers covering roles, responsibilities, and practical guidance.</p>",
                 "published": True,
+                "visibility": Resource.Visibility.DOWNLOAD_ACCOUNT_REQUIRED,
                 "author_users": [u1, u2],
                 "author_entities": [tc],
             },
@@ -360,6 +412,7 @@ class Command(management.base.BaseCommand):
                 "name": "Master Knowledge Base",
                 "description": "<p>Central knowledge base aggregating key association documents, data, videos, and linked resources into a single reference point.</p>",
                 "published": True,
+                "visibility": Resource.Visibility.DOWNLOAD_MEMBERSHIP_REQUIRED,
                 "author_users": [u1],
                 "author_entities": [tc, kf],
             },
@@ -367,6 +420,7 @@ class Command(management.base.BaseCommand):
                 "name": "Executive Resource Pack",
                 "description": "<p>Curated resource pack for board executives and senior leaders, covering strategy, governance, and key reference documents.</p>",
                 "published": True,
+                "visibility": Resource.Visibility.MEMBERS_ONLY,
                 "author_users": [],
                 "author_entities": [tc, kf],
             },
@@ -374,6 +428,7 @@ class Command(management.base.BaseCommand):
                 "name": "Comprehensive Training Suite",
                 "description": "<p>Full training suite combining video content, presentations, and structured learning pathways for member professional development.</p>",
                 "published": True,
+                "visibility": Resource.Visibility.PUBLIC,
                 "author_users": [u1, u2, u3],
                 "author_entities": [],
             },
@@ -381,6 +436,7 @@ class Command(management.base.BaseCommand):
                 "name": "Complete Governance Library",
                 "description": "<p>Complete library of governance documents, policies, frameworks, and supporting data for board and committee members.</p>",
                 "published": True,
+                "visibility": Resource.Visibility.MEMBERS_ONLY,
                 "author_users": [],
                 "author_entities": [kf],
             },
@@ -388,6 +444,7 @@ class Command(management.base.BaseCommand):
                 "name": "Multimedia Learning Centre",
                 "description": "<p>Multimedia learning centre bringing together video, audio, and interactive resources for member continuing education.</p>",
                 "published": True,
+                "visibility": Resource.Visibility.PUBLIC,
                 "author_users": [u2],
                 "author_entities": [pi],
             },
@@ -395,6 +452,7 @@ class Command(management.base.BaseCommand):
                 "name": "Research & Analytics Portal",
                 "description": "<p>Comprehensive portal for association research and analytics, including data sets, reports, and reference documentation.</p>",
                 "published": True,
+                "visibility": Resource.Visibility.DOWNLOAD_MEMBERSHIP_REQUIRED,
                 "author_users": [u1],
                 "author_entities": [tc],
             },
@@ -402,6 +460,7 @@ class Command(management.base.BaseCommand):
                 "name": "Events Resource Centre",
                 "description": "<p>Full resource centre for event management, combining presentation templates, video guides, web resources, and downloadable assets.</p>",
                 "published": True,
+                "visibility": Resource.Visibility.PUBLIC,
                 "author_users": [],
                 "author_entities": [sc],
             },
@@ -409,6 +468,7 @@ class Command(management.base.BaseCommand):
                 "name": "Innovation & Technology Hub",
                 "description": "<p>Hub for innovation and technology resources, bringing together web tools, tutorials, documentation, and strategic references.</p>",
                 "published": False,
+                "visibility": Resource.Visibility.PUBLIC,
                 "author_users": [],
                 "author_entities": [tc, kf, pi],
             },
@@ -416,6 +476,7 @@ class Command(management.base.BaseCommand):
                 "name": "Community Resources Portal",
                 "description": "<p>Open community portal aggregating web guides, documentation, tutorial videos, and reference materials for broader community use.</p>",
                 "published": False,
+                "visibility": Resource.Visibility.PUBLIC,
                 "author_users": [],
                 "author_entities": [],
             },
@@ -423,6 +484,7 @@ class Command(management.base.BaseCommand):
                 "name": "Full Library Index",
                 "description": "<p>Master index of all association resources, combining data exports, reference documents, video content, and downloadable archives.</p>",
                 "published": True,
+                "visibility": Resource.Visibility.MEMBERS_ONLY,
                 "author_users": [u1, u2],
                 "author_entities": [tc],
             },
@@ -435,6 +497,7 @@ class Command(management.base.BaseCommand):
                 defaults={
                     "description": item["description"],
                     "published": item["published"],
+                    "visibility": item["visibility"],
                 },
             )
             resource.author_users.set([u for u in item["author_users"] if u])
@@ -467,6 +530,14 @@ class Command(management.base.BaseCommand):
             ResourceComponent.objects.filter(pk=component.pk).update(
                 component_type=override_type,
             )
+
+    def _add_file_component(self, resource, name, filename, content):
+        component, created = ResourceComponent.objects.get_or_create(
+            resource=resource,
+            name=name,
+        )
+        if created or not component.component_file:
+            component.component_file.save(filename, ContentFile(content), save=True)
 
     def _create_all_components(self, resources):  # noqa: PLR0915
         r = resources
@@ -1025,6 +1096,25 @@ class Command(management.base.BaseCommand):
             "Full Library Index",
             "Reference: Digital Archive 2022",
             linked_resource=r["Digital Archive 2022"],
+        )
+
+        self._add_file_component(
+            r["Annual Report 2024"],
+            "Download: Annual Report PDF",
+            "annual-report-2024.pdf",
+            PLACEHOLDER_PDF,
+        )
+        self._add_file_component(
+            r["Governance Framework"],
+            "Download: Governance Policy Document",
+            "governance-policy.docx",
+            PLACEHOLDER_DOCX,
+        )
+        self._add_file_component(
+            r["Member Survey Results"],
+            "Download: Survey Raw Data",
+            "survey-results-2024.csv",
+            PLACEHOLDER_CSV,
         )
 
         count = ResourceComponent.objects.filter(resource__in=r.values()).count()

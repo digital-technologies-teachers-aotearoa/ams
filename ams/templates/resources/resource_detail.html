@@ -4,7 +4,9 @@
 
 {% block page_heading %}
   <div class="d-flex justify-content-between align-items-center">
-    <h1>{{ resource.name }}</h1>
+    <div class="d-flex align-items-center gap-2">
+      <h1>{{ resource.name }}</h1>
+    </div>
     {% if perms.resources %}
       <a href="{% url 'admin:resources_resource_change' resource.pk %}"
          class="btn btn-sm btn-secondary">Edit resource</a>
@@ -14,7 +16,7 @@
 
 {% block content_container %}
   <div class="col-12 col-lg-8 order-lg-first">
-    {% include "resources/_resource_tags.html" with tags=resource.tags.all wrapper_class=" mb-3" only %}
+    {% include "resources/_resource_tags.html" with tags=resource.tags.all resource=resource wrapper_class=" mb-3" only %}
     <div class="mb-4">{{ resource.description|safe }}</div>
     {% with components=resource.components.all %}
       {% if components %}
@@ -29,8 +31,18 @@
                   <small class="text-muted">{{ component.get_component_type_display }}</small>
                 </div>
                 {% if component.component_file %}
-                  <a href="{% url 'resources:component_download' component.pk %}"
-                     class="btn btn-sm btn-outline-primary">{% icon "download" %} Download</a>
+                  {% if can_download %}
+                    <a href="{% url 'resources:component_download' component.pk %}"
+                       class="btn btn-sm btn-outline-primary">{% icon "download" %} Download</a>
+                  {% else %}
+                    <span class="badge {{ resource.visibility_badge_css_class }}"
+                          tabindex="0"
+                          data-bs-toggle="tooltip"
+                          data-bs-placement="top"
+                          title="{{ resource.visibility_badge_tooltip }}">
+                      {% icon "lock" %} {{ resource.visibility_badge_label }}
+                    </span>
+                  {% endif %}
                 {% elif component.component_url %}
                   <a href="{{ component.component_url }}"
                      class="btn btn-sm btn-outline-secondary"

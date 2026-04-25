@@ -74,7 +74,13 @@ class ResourceComponentInline(admin.StackedInline):
 class ResourceAdmin(ResourcesFeatureFlagMixin, admin.ModelAdmin):
     form = ResourceForm
     inlines = [ResourceComponentInline]
-    list_display = ("name", "datetime_added", "datetime_updated", "published")
+    list_display = (
+        "name",
+        "datetime_added",
+        "datetime_updated",
+        "published",
+        "visibility",
+    )
     list_filter = ("published",)
     search_fields = ("name",)
     filter_horizontal = ("author_entities", "author_users", "tags")
@@ -90,7 +96,12 @@ class ResourceAdmin(ResourcesFeatureFlagMixin, admin.ModelAdmin):
             },
         ),
         ("Tags", {"fields": ("tags",)}),
-        ("Visibility", {"fields": ("published",)}),
+        (
+            "Visibility",
+            {
+                "fields": ("published", "visibility"),
+            },
+        ),
     )
 
 

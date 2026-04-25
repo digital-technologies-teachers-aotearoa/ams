@@ -1,5 +1,16 @@
-{% if tags %}
+{% load icon %}
+
+{% if tags or resource and resource.visibility != 0 %}
   <div class="d-flex flex-wrap gap-1{{ wrapper_class|default:'' }}">
+    {% if resource and resource.visibility != 0 %}
+      <span class="badge {{ resource.visibility_badge_css_class }}"
+            tabindex="0"
+            data-bs-toggle="tooltip"
+            data-bs-placement="top"
+            title="{{ resource.visibility_badge_tooltip }}">
+        {% icon "lock" %} {{ resource.visibility_badge_label }}
+      </span>
+    {% endif %}
     {% for tag in tags %}
       {% include "resources/_tag_badge.html" %}
     {% endfor %}
