@@ -1127,26 +1127,26 @@ class Command(management.base.BaseCommand):
                 "name": "Topic",
                 "order": 1,
                 "tags": [
-                    {"name": "Governance", "order": 1},
-                    {"name": "Training & Development", "order": 2},
-                    {"name": "Events", "order": 3},
-                    {"name": "Communications", "order": 4},
-                    {"name": "Finance", "order": 5},
-                    {"name": "Research", "order": 6},
-                    {"name": "Technology", "order": 7},
-                    {"name": "Community", "order": 8},
-                    {"name": "Environment", "order": 9},
+                    {"name": "Governance", "order": 1, "color": "#1e3a5f"},
+                    {"name": "Training & Development", "order": 2, "color": "#2e7d32"},
+                    {"name": "Events", "order": 3, "color": "#6a1b9a"},
+                    {"name": "Communications", "order": 4, "color": "#00695c"},
+                    {"name": "Finance", "order": 5, "color": "#1b5e20"},
+                    {"name": "Research", "order": 6, "color": "#e65100"},
+                    {"name": "Technology", "order": 7, "color": "#0d47a1"},
+                    {"name": "Community", "order": 8, "color": "#f57f17"},
+                    {"name": "Environment", "order": 9, "color": "#33691e"},
                 ],
             },
             {
                 "name": "Audience",
                 "order": 2,
                 "tags": [
-                    {"name": "All Members", "order": 1},
-                    {"name": "Board & Leadership", "order": 2},
-                    {"name": "Volunteers", "order": 3},
-                    {"name": "Staff", "order": 4},
-                    {"name": "Regional Chapters", "order": 5},
+                    {"name": "All Members", "order": 1, "color": "#1565c0"},
+                    {"name": "Board & Leadership", "order": 2, "color": "#b71c1c"},
+                    {"name": "Volunteers", "order": 3, "color": "#e65100"},
+                    {"name": "Staff", "order": 4, "color": "#4a148c"},
+                    {"name": "Regional Chapters", "order": 5, "color": "#006064"},
                 ],
             },
         ]
@@ -1161,7 +1161,7 @@ class Command(management.base.BaseCommand):
                 tag, _ = ResourceTag.objects.update_or_create(
                     category=category,
                     name=tag_data["name"],
-                    defaults={"order": tag_data["order"]},
+                    defaults={"order": tag_data["order"], "color": tag_data["color"]},
                 )
                 tags[tag_data["name"]] = tag
 

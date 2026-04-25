@@ -1,7 +1,7 @@
 {% for category in form.categories %}
   <div class="mb-3">
     <p class="text-uppercase small fw-semibold text-muted mb-1">{{ category.name }}</p>
-    <div class="d-flex flex-wrap gap-1">
+    <div class="d-flex flex-wrap column-gap-2 row-gap-1">
       {% for tag in category.tags.all %}
         <div class="resource-tag-check">
           <input class="visually-hidden"
@@ -11,7 +11,7 @@
                  id="tag_{{ tag.slug }}"
                  autocomplete="off"
                  {% if tag.slug in selected_tag_slugs %}checked{% endif %} />
-          <label for="tag_{{ tag.slug }}">{% include "resources/_tag_badge.html" %}</label>
+          <label for="tag_{{ tag.slug }}">{% include "resources/_tag_badge.html" with no_link=True %}</label>
         </div>
       {% endfor %}
     </div>

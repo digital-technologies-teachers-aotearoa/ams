@@ -82,11 +82,14 @@ $resources-brand-colour: #0976a9;
 
   input[type='checkbox']:checked ~ label .badge,
   input[type='checkbox']:checked + label .badge {
-    background-color: var(--bs-primary) !important;
-    color: #fff !important;
-    border-color: transparent !important;
+    outline: 2px solid var(--bs-primary);
+    outline-offset: 1px;
   }
 }
+
+// ---------------------------------------------------------------------------
+// Badges
+// ---------------------------------------------------------------------------
 
 .badge {
   display: inline-flex;
@@ -100,18 +103,15 @@ $resources-brand-colour: #0976a9;
 
 .resource-visibility-account-required {
   background-color: #fff3cd;
-  border: 1px solid mix(black, #fff3cd, 9%);
   color: #664d03;
 }
 
 .resource-visibility-membership-download {
   background-color: #ffc107;
-  border: 1px solid mix(black, #ffc107, 9%);
   color: #000;
 }
 
 .resource-visibility-membership-only {
   background-color: #fd7e14;
-  border: 1px solid mix(black, #fd7e14, 9%);
   color: #fff;
 }

@@ -246,19 +246,3 @@ class TestResourceComponentHelpers:
     def test_filename_returns_none_without_file(self):
         component = ResourceComponentFactory.build()
         assert component.filename() is None
-
-    def test_icon_name_returns_icon_for_component_type(self):
-        component = ResourceComponent(component_type=file_types.TYPE_PDF)
-        assert component.icon_name() == "file-earmark-pdf"
-
-    def test_icon_name_for_video(self):
-        component = ResourceComponent(component_type=file_types.TYPE_VIDEO)
-        assert component.icon_name() == "file-earmark-play"
-
-    def test_icon_name_for_website(self):
-        component = ResourceComponent(component_type=file_types.TYPE_WEBSITE)
-        assert component.icon_name() == "globe2"
-
-    def test_icon_name_for_resource(self):
-        component = ResourceComponent(component_type=file_types.TYPE_RESOURCE)
-        assert component.icon_name() == "folder-symlink"

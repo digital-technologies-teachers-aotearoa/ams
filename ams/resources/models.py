@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from autoslug import AutoSlugField
+from colorfield.fields import ColorField
 from django.conf import settings
 from django.contrib.postgres.indexes import GinIndex
 from django.contrib.postgres.search import SearchVectorField
@@ -12,6 +13,7 @@ from tinymce.models import HTMLField
 
 from ams.resources import file_types
 from ams.resources.utils import resource_upload_path
+from ams.utils.colours import contrast_colour
 from config.storage_backends import PrivateMediaStorage
 
 
@@ -37,7 +39,7 @@ class ResourceTag(models.Model):
     name = models.CharField(max_length=200)
     slug = AutoSlugField(populate_from="name")
     abbreviation = models.CharField(max_length=20, blank=True)
-    css_class = models.CharField(max_length=30, blank=True)
+    color = ColorField(blank=True, default="")
     order = models.PositiveIntegerField(default=0)
 
     class Meta:
@@ -46,6 +48,10 @@ class ResourceTag(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def text_color(self) -> str:
+        return contrast_colour(self.color)
 
 
 class Resource(models.Model):

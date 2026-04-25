@@ -119,6 +119,7 @@ THIRD_PARTY_APPS = [
     "storages",
     "imagekit",
     "wagtail_color_panel",
+    "colorfield",
     "tinymce",
     "djmoney",
     "django_filters",
