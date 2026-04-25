@@ -37,5 +37,14 @@ class ResourceComponentFactory(factory.django.DjangoModelFactory[ResourceCompone
     resource = factory.SubFactory(ResourceFactory)
     component_url = "https://example.com/"
 
+    class Params:
+        with_file = factory.Trait(
+            component_url="",
+            component_file=factory.django.FileField(
+                filename="test.pdf",
+                data=b"content",
+            ),
+        )
+
     class Meta:
         model = ResourceComponent

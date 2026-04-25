@@ -2,8 +2,8 @@ from collections import defaultdict
 
 from django.contrib.postgres.search import SearchQuery
 from django.contrib.postgres.search import SearchRank
+from django.core.exceptions import PermissionDenied
 from django.db.models import F
-from django.db.models import Q
 from django.http import Http404
 from django.http import HttpResponseRedirect
 from django.views import generic
@@ -13,6 +13,22 @@ from ams.resources.models import Resource
 from ams.resources.models import ResourceComponent
 from ams.resources.models import ResourceTag
 from ams.utils.mixins import RedirectToCosmeticURLMixin
+from ams.utils.permissions import user_has_active_membership
+
+
+def _user_can_view(user, resource):
+    if resource.visibility == Resource.Visibility.MEMBERS_ONLY:
+        return user_has_active_membership(user)
+    return True
+
+
+def _user_can_download(user, resource):
+    if resource.visibility == Resource.Visibility.PUBLIC:
+        return True
+    if resource.visibility == Resource.Visibility.DOWNLOAD_ACCOUNT_REQUIRED:
+        return user.is_authenticated
+    return user_has_active_membership(user)
+
 
 _RESOURCE_LIST_PREFETCHES = ("components", "author_users", "author_entities", "tags")
 
@@ -23,12 +39,13 @@ class ResourceHomeView(generic.TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["form"] = ResourceSearchForm(inline=True)
-        context["resources"] = Resource.objects.filter(published=True).prefetch_related(
-            *_RESOURCE_LIST_PREFETCHES,
-        )[:10]
-        context["resource_count"] = Resource.objects.filter(published=True).count()
+        qs = Resource.objects.filter(published=True)
+        if not user_has_active_membership(self.request.user):
+            qs = qs.exclude(visibility=Resource.Visibility.MEMBERS_ONLY)
+        context["resources"] = qs.prefetch_related(*_RESOURCE_LIST_PREFETCHES)[:10]
+        context["resource_count"] = qs.count()
         context["component_count"] = ResourceComponent.objects.filter(
-            resource__published=True,
+            resource__in=qs,
         ).count()
         return context
 
@@ -44,11 +61,18 @@ class ResourceDetailView(RedirectToCosmeticURLMixin, generic.DetailView):
             "components__component_resource",
         )
 
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        if not _user_can_view(self.request.user, obj):
+            raise PermissionDenied
+        return obj
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["components_of"] = self.object.component_of.filter(
             resource__published=True,
         ).select_related("resource")
+        context["can_download"] = _user_can_download(self.request.user, self.object)
         return context
 
 
@@ -64,6 +88,8 @@ class ResourceComponentDownloadView(generic.View):
             raise Http404
         if not component.component_file:
             raise Http404
+        if not _user_can_download(request.user, component.resource):
+            raise PermissionDenied
         return HttpResponseRedirect(component.component_file.url)
 
 
@@ -84,17 +110,16 @@ class ResourceSearchView(generic.TemplateView):
             return context
 
         qs = Resource.objects.filter(published=True)
+        if not user_has_active_membership(self.request.user):
+            qs = qs.exclude(visibility=Resource.Visibility.MEMBERS_ONLY)
 
         if q:
             query = SearchQuery(q, search_type="websearch")
             qs = (
-                qs.filter(Q(search_vector=query) | Q(tags__name__icontains=q))
+                qs.filter(search_vector=query)
                 .annotate(rank=SearchRank(F("search_vector"), query))
                 .order_by("-rank")
-                .distinct()
             )
-        else:
-            qs = qs.distinct()
 
         if tag_slugs:
             selected_tags = ResourceTag.objects.filter(

@@ -16,6 +16,7 @@ def _form_data(resource):
         "name": resource.name,
         "description": resource.description,
         "published": resource.published,
+        "visibility": resource.visibility,
     }
 
 

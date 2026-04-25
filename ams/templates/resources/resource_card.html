@@ -32,7 +32,7 @@
             {% if count %}<span class="badge text-bg-secondary">{{ count }} component{{ count|pluralize }}</span>{% endif %}
           {% endwith %}
         </div>
-        {% include "resources/_resource_tags.html" with tags=resource.tags.all wrapper_class=" resource-card__tags mt-2" only %}
+        {% include "resources/_resource_tags.html" with tags=resource.tags.all resource=resource wrapper_class=" resource-card__tags mt-2" only %}
       </div>
     </div>
   </div>
