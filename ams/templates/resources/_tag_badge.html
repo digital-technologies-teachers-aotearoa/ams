@@ -1,1 +1,7 @@
-<span class="badge {% if tag.css_class %}{{ tag.css_class }}{% else %}text-bg-light border{% endif %}">{{ tag.abbreviation|default:tag.name }}</span>
+{% if not no_link %}
+  <a href="{% url 'resources:search' %}?tag={{ tag.slug }}"
+     class="text-decoration-none">
+  {% endif %}
+  <span class="badge {% if not tag.color %}text-bg-light border{% endif %}"
+        {% if tag.color %}style="background-color: {{ tag.color }}; color: {{ tag.text_color }};"{% endif %}>{{ tag.abbreviation|default:tag.name }}</span>
+  {% if not no_link %}</a>{% endif %}

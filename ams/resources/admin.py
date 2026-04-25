@@ -108,7 +108,7 @@ class ResourceAdmin(ResourcesFeatureFlagMixin, admin.ModelAdmin):
 class ResourceTagInline(admin.TabularInline):
     model = ResourceTag
     extra = 1
-    fields = ("name", "abbreviation", "css_class", "order")
+    fields = ("name", "abbreviation", "color", "order")
 
 
 @admin.register(ResourceCategory)
