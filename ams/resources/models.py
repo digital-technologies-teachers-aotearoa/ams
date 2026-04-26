@@ -1,4 +1,5 @@
 from pathlib import Path
+from uuid import uuid4
 
 from autoslug import AutoSlugField
 from colorfield.fields import ColorField
@@ -196,6 +197,7 @@ class ResourceComponent(models.Model):
     )
     datetime_added = models.DateTimeField(auto_now_add=True)
     datetime_updated = models.DateTimeField(auto_now=True)
+    uuid = models.UUIDField(default=uuid4, editable=False)
 
     def __str__(self):
         return self.name
