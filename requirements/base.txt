@@ -28,7 +28,7 @@ django-money==3.6.0
 # Wagtail
 # ------------------------------------------------------------------------------
 wagtail==7.3.1
-wagtailmenus==4.0.6
+wagtailmenus==4.0.7
 wagtail-color-panel==1.8.1
 
 # Discourse
