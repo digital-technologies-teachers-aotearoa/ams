@@ -17,7 +17,7 @@ django-crispy-forms==2.6
 crispy-bootstrap5==2026.3
 django-redis==6.0.0
 django-relativedelta==2.0.0
-django-tables2==2.8.0
+django-tables2==3.0.0
 django-storages[s3]==1.14.6
 django-imagekit==6.1.0
 django-tinymce==5.0.0
