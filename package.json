@@ -26,7 +26,7 @@
     "gulp-uglify-es": "^3.0.0",
     "jest": "^30.3.0",
     "jest-environment-jsdom": "^30.3.0",
-    "mjml": "^4.15.3",
+    "mjml": "^5.1.0",
     "node-sass-tilde-importer": "^1.0.2",
     "pixrem": "^5.0.0",
     "postcss": "^8.5.9",
