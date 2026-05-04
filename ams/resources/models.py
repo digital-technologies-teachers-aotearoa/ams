@@ -187,6 +187,7 @@ class ResourceComponent(models.Model):
         blank=True,
         upload_to=resource_upload_path,
         storage=PrivateMediaStorage(),
+        max_length=500,
     )
     component_resource = models.ForeignKey(
         Resource,
