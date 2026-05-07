@@ -10,7 +10,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.24.0",
-    "@babel/preset-env": "^7.29.3",
+    "@babel/preset-env": "^7.29.5",
     "autoprefixer": "^10.5.0",
     "babel-jest": "^30.3.0",
     "browser-sync": "^3.0.2",
@@ -29,7 +29,7 @@
     "mjml": "^4.15.3",
     "node-sass-tilde-importer": "^1.0.2",
     "pixrem": "^5.0.0",
-    "postcss": "^8.5.9",
+    "postcss": "^8.5.14",
     "sass": "1.99.0"
   },
   "engines": {
