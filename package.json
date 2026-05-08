@@ -15,7 +15,7 @@
     "babel-jest": "^30.4.0",
     "browser-sync": "^3.0.2",
     "gulp-concat": "^2.6.1",
-    "cssnano": "^7.1.7",
+    "cssnano": "^8.0.0",
     "gulp": "^5.0.0",
     "gulp-imagemin": "^9.1.0",
     "gulp-mjml": "^4.0.2",
