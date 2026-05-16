@@ -22,10 +22,10 @@ def _user_can_view(user, resource):
     return True
 
 
-def _user_can_download(user, resource):
+def _user_can_access(user, resource):
     if resource.visibility == Resource.Visibility.PUBLIC:
         return True
-    if resource.visibility == Resource.Visibility.DOWNLOAD_ACCOUNT_REQUIRED:
+    if resource.visibility == Resource.Visibility.ACCESS_ACCOUNT_REQUIRED:
         return user.is_authenticated
     return user_has_active_membership(user)
 
@@ -72,7 +72,7 @@ class ResourceDetailView(RedirectToCosmeticURLMixin, generic.DetailView):
         context["components_of"] = self.object.component_of.filter(
             resource__published=True,
         ).select_related("resource")
-        context["can_download"] = _user_can_download(self.request.user, self.object)
+        context["can_access"] = _user_can_access(self.request.user, self.object)
         return context
 
 
@@ -88,7 +88,7 @@ class ResourceComponentDownloadView(generic.View):
             raise Http404
         if not component.component_file:
             raise Http404
-        if not _user_can_download(request.user, component.resource):
+        if not _user_can_access(request.user, component.resource):
             raise PermissionDenied
         return HttpResponseRedirect(component.component_file.url)
 
