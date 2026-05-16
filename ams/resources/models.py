@@ -57,18 +57,17 @@ class ResourceTag(models.Model):
 
 class Resource(models.Model):
     class Visibility(models.IntegerChoices):
-        PUBLIC = 0, "Public - visible and downloadable by everyone"
-        DOWNLOAD_ACCOUNT_REQUIRED = (
+        PUBLIC = 0, "Public - visible and accessable by everyone"
+        ACCESS_ACCOUNT_REQUIRED = (
             1,
-            "Account required to download - anyone can view, "
-            "logged-in users can download",
+            "Account required to access - anyone can view, logged-in users can access",
         )
-        DOWNLOAD_MEMBERSHIP_REQUIRED = (
+        ACCESS_MEMBERSHIP_REQUIRED = (
             2,
-            "Membership required to download - anyone can view, "
-            "only members can download files",
+            "Membership required to access - anyone can view, "
+            "only members can access files",
         )
-        MEMBERS_ONLY = 3, "Members only - only members can view or download"
+        MEMBERS_ONLY = 3, "Members only - only members can view or access"
 
     name = models.CharField(max_length=200)
     slug = AutoSlugField(populate_from="name", always_update=True, null=True)
@@ -78,13 +77,13 @@ class Resource(models.Model):
         choices=Visibility.choices,
         default=Visibility.PUBLIC,
         help_text=(
-            "Controls who can view and download this resource. "
+            "Controls who can view and access this resource. "
             "Public: no restrictions. "
-            "Account required to download: anyone can browse, "
-            "logged-in users can download. "
-            "Membership required to download: anyone can browse, "
-            "members can download files. "
-            "Members only: only members can view or download."
+            "Account required to access: anyone can browse, "
+            "logged-in users can access. "
+            "Membership required to access: anyone can browse, "
+            "members can access files. "
+            "Members only: only members can view or access."
         ),
     )
     datetime_added = models.DateTimeField(auto_now_add=True)
@@ -126,31 +125,31 @@ class Resource(models.Model):
     @property
     def visibility_badge_label(self):
         return {
-            self.Visibility.DOWNLOAD_ACCOUNT_REQUIRED: "Login required",
-            self.Visibility.DOWNLOAD_MEMBERSHIP_REQUIRED: "Members download",
-            self.Visibility.MEMBERS_ONLY: "Members only",
+            self.Visibility.ACCESS_ACCOUNT_REQUIRED: "Login required",
+            self.Visibility.ACCESS_MEMBERSHIP_REQUIRED: "Membership required",
+            self.Visibility.MEMBERS_ONLY: "Membership required to view",
         }.get(self.visibility, "")
 
     @property
     def visibility_badge_tooltip(self):
         return {
-            self.Visibility.DOWNLOAD_ACCOUNT_REQUIRED: (
-                "Anyone can view, login required to download"
+            self.Visibility.ACCESS_ACCOUNT_REQUIRED: (
+                "Anyone can view, login required to access"
             ),
-            self.Visibility.DOWNLOAD_MEMBERSHIP_REQUIRED: (
-                "Anyone can view, membership required to download"
+            self.Visibility.ACCESS_MEMBERSHIP_REQUIRED: (
+                "Anyone can view, membership required to access"
             ),
-            self.Visibility.MEMBERS_ONLY: "Only members can view or download",
+            self.Visibility.MEMBERS_ONLY: "Only members can view or access",
         }.get(self.visibility, "")
 
     @property
     def visibility_badge_css_class(self):
         return {
-            self.Visibility.DOWNLOAD_ACCOUNT_REQUIRED: (
+            self.Visibility.ACCESS_ACCOUNT_REQUIRED: (
                 "resource-visibility-account-required"
             ),
-            self.Visibility.DOWNLOAD_MEMBERSHIP_REQUIRED: (
-                "resource-visibility-membership-download"
+            self.Visibility.ACCESS_MEMBERSHIP_REQUIRED: (
+                "resource-visibility-membership-access"
             ),
             self.Visibility.MEMBERS_ONLY: "resource-visibility-membership-only",
         }.get(self.visibility, "")

@@ -30,19 +30,17 @@
                   <div class="fw-semibold">{{ component.name }}</div>
                   <small class="text-muted">{{ component.get_component_type_display }}</small>
                 </div>
-                {% if component.component_file %}
-                  {% if can_download %}
-                    <a href="{% url 'resources:component_download' component.pk %}"
-                       class="btn btn-sm btn-outline-primary">{% icon "download" %} Download</a>
-                  {% else %}
-                    <span class="badge {{ resource.visibility_badge_css_class }}"
-                          tabindex="0"
-                          data-bs-toggle="tooltip"
-                          data-bs-placement="top"
-                          title="{{ resource.visibility_badge_tooltip }}">
-                      {% icon "lock" %} {{ resource.visibility_badge_label }}
-                    </span>
-                  {% endif %}
+                {% if not can_access %}
+                  <span class="badge {{ resource.visibility_badge_css_class }}"
+                        tabindex="0"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        title="{{ resource.visibility_badge_tooltip }}">
+                    {% icon "lock" %} {{ resource.visibility_badge_label }}
+                  </span>
+                {% elif component.component_file %}
+                  <a href="{% url 'resources:component_download' component.pk %}"
+                     class="btn btn-sm btn-outline-primary">{% icon "download" %} Download</a>
                 {% elif component.component_url %}
                   <a href="{{ component.component_url }}"
                      class="btn btn-sm btn-outline-secondary"

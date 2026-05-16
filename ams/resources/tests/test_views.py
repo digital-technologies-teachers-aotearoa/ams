@@ -412,14 +412,14 @@ class TestResourceVisibilityDownload:
         response = client.get(f"/en/resources/component/{component.pk}/download/")
         assert response.status_code == HTTPStatus.FOUND
 
-    def test_download_account_required_denied_to_anonymous(self, client, file_storage):
+    def test_access_account_required_denied_to_anonymous(self, client, file_storage):
         component = self._make_file_component(
-            Resource.Visibility.DOWNLOAD_ACCOUNT_REQUIRED,
+            Resource.Visibility.ACCESS_ACCOUNT_REQUIRED,
         )
         response = client.get(f"/en/resources/component/{component.pk}/download/")
         assert response.status_code == HTTPStatus.FORBIDDEN
 
-    def test_download_account_required_allowed_to_authenticated(
+    def test_access_account_required_allowed_to_authenticated(
         self,
         client,
         file_storage,
@@ -427,12 +427,12 @@ class TestResourceVisibilityDownload:
         user = UserFactory()
         client.force_login(user)
         component = self._make_file_component(
-            Resource.Visibility.DOWNLOAD_ACCOUNT_REQUIRED,
+            Resource.Visibility.ACCESS_ACCOUNT_REQUIRED,
         )
         response = client.get(f"/en/resources/component/{component.pk}/download/")
         assert response.status_code == HTTPStatus.FOUND
 
-    def test_download_membership_required_denied_to_non_member(
+    def test_access_membership_required_denied_to_non_member(
         self,
         client,
         file_storage,
@@ -440,17 +440,17 @@ class TestResourceVisibilityDownload:
         user = UserFactory()
         client.force_login(user)
         component = self._make_file_component(
-            Resource.Visibility.DOWNLOAD_MEMBERSHIP_REQUIRED,
+            Resource.Visibility.ACCESS_MEMBERSHIP_REQUIRED,
         )
         with patch(_MEMBERSHIP_PATCH, return_value=False):
             response = client.get(f"/en/resources/component/{component.pk}/download/")
         assert response.status_code == HTTPStatus.FORBIDDEN
 
-    def test_download_membership_required_allowed_to_member(self, client, file_storage):
+    def test_access_membership_required_allowed_to_member(self, client, file_storage):
         user = UserFactory()
         client.force_login(user)
         component = self._make_file_component(
-            Resource.Visibility.DOWNLOAD_MEMBERSHIP_REQUIRED,
+            Resource.Visibility.ACCESS_MEMBERSHIP_REQUIRED,
         )
         with patch(_MEMBERSHIP_PATCH, return_value=True):
             response = client.get(f"/en/resources/component/{component.pk}/download/")
@@ -505,44 +505,44 @@ class TestResourceVisibilityDetail:
             response = client.get(resource.get_absolute_url())
         assert response.status_code == HTTPStatus.OK
 
-    def test_download_account_required_detail_accessible_to_anonymous(self, client):
+    def test_access_account_required_detail_accessible_to_anonymous(self, client):
         resource = ResourceFactory(
             published=True,
-            visibility=Resource.Visibility.DOWNLOAD_ACCOUNT_REQUIRED,
+            visibility=Resource.Visibility.ACCESS_ACCOUNT_REQUIRED,
         )
         response = client.get(resource.get_absolute_url())
         assert response.status_code == HTTPStatus.OK
 
-    def test_download_membership_required_detail_accessible_to_anonymous(self, client):
+    def test_access_membership_required_detail_accessible_to_anonymous(self, client):
         resource = ResourceFactory(
             published=True,
-            visibility=Resource.Visibility.DOWNLOAD_MEMBERSHIP_REQUIRED,
+            visibility=Resource.Visibility.ACCESS_MEMBERSHIP_REQUIRED,
         )
         response = client.get(resource.get_absolute_url())
         assert response.status_code == HTTPStatus.OK
 
-    def test_can_download_context_false_for_non_member_on_membership_required(
+    def test_can_access_context_false_for_non_member_on_membership_required(
         self,
         client,
     ):
         resource = ResourceFactory(
             published=True,
-            visibility=Resource.Visibility.DOWNLOAD_MEMBERSHIP_REQUIRED,
+            visibility=Resource.Visibility.ACCESS_MEMBERSHIP_REQUIRED,
         )
         with patch(_MEMBERSHIP_PATCH, return_value=False):
             response = client.get(resource.get_absolute_url())
-        assert response.context["can_download"] is False
+        assert response.context["can_access"] is False
 
-    def test_can_download_context_true_for_member_on_membership_required(self, client):
+    def test_can_access_context_true_for_member_on_membership_required(self, client):
         user = UserFactory()
         client.force_login(user)
         resource = ResourceFactory(
             published=True,
-            visibility=Resource.Visibility.DOWNLOAD_MEMBERSHIP_REQUIRED,
+            visibility=Resource.Visibility.ACCESS_MEMBERSHIP_REQUIRED,
         )
         with patch(_MEMBERSHIP_PATCH, return_value=True):
             response = client.get(resource.get_absolute_url())
-        assert response.context["can_download"] is True
+        assert response.context["can_access"] is True
 
 
 class TestResourceVisibilityListing:
@@ -572,11 +572,11 @@ class TestResourceVisibilityListing:
     def test_home_shows_download_restricted_resources_to_anonymous(self, client):
         r1 = ResourceFactory(
             published=True,
-            visibility=Resource.Visibility.DOWNLOAD_ACCOUNT_REQUIRED,
+            visibility=Resource.Visibility.ACCESS_ACCOUNT_REQUIRED,
         )
         r2 = ResourceFactory(
             published=True,
-            visibility=Resource.Visibility.DOWNLOAD_MEMBERSHIP_REQUIRED,
+            visibility=Resource.Visibility.ACCESS_MEMBERSHIP_REQUIRED,
         )
         response = client.get("/en/resources/")
         resources = list(response.context["resources"])
@@ -607,12 +607,12 @@ class TestResourceVisibilityListing:
         r1 = ResourceFactory(
             name="Account resource",
             published=True,
-            visibility=Resource.Visibility.DOWNLOAD_ACCOUNT_REQUIRED,
+            visibility=Resource.Visibility.ACCESS_ACCOUNT_REQUIRED,
         )
         r2 = ResourceFactory(
             name="Membership resource",
             published=True,
-            visibility=Resource.Visibility.DOWNLOAD_MEMBERSHIP_REQUIRED,
+            visibility=Resource.Visibility.ACCESS_MEMBERSHIP_REQUIRED,
         )
         response = client.get("/en/resources/search/?q=resource")
         results = list(response.context["results"])
