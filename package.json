@@ -29,7 +29,7 @@
     "mjml": "^4.15.3",
     "node-sass-tilde-importer": "^1.0.2",
     "pixrem": "^5.0.0",
-    "postcss": "^8.5.14",
+    "postcss": "^8.5.15",
     "sass": "1.99.0"
   },
   "engines": {
