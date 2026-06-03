@@ -1,4 +1,4 @@
-FROM docker.io/node:26.1-bookworm-slim
+FROM docker.io/node:26.3-bookworm-slim
 
 # Allow conditional user setting (default to node, can override with --build-arg RUN_USER=root)
 ARG RUN_USER=node
