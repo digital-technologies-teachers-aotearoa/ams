@@ -45,6 +45,35 @@ When disabled (the default):
 - `config/urls.py` — conditionally includes the resources URL patterns
 - `ams/resources/admin.py` — `ResourcesFeatureFlagMixin` gates all admin permissions
 
+### `AMS_ENABLED_LANGUAGES`
+
+| | |
+|---|---|
+| **Setting** | `LANGUAGES` |
+| **Env var** | `AMS_ENABLED_LANGUAGES` |
+| **Default** | `en` |
+| **Purpose** | Control which languages are exposed to users, independently of which languages the codebase has scaffolding for |
+
+Comma-separated list of language codes (e.g. `AMS_ENABLED_LANGUAGES=en,mi`).
+Only codes present in `AVAILABLE_LANGUAGES` (`config/settings/base.py`) take
+effect. `en` should always be included — nothing enforces this, and omitting
+it leaves `LANGUAGE_CODE` pointing at a language not in `LANGUAGES`.
+
+When a language isn't enabled (the default, for any language beyond `en`):
+
+- It's absent from `LANGUAGES`, `WAGTAIL_CONTENT_LANGUAGES`, the language
+  switcher, and `i18n_patterns()` URL routing
+- `setup_cms` (which runs on every deploy via `deploy_steps`) does not create
+  a Wagtail Locale/Site/HomePage for it, so no placeholder content goes live
+
+**Implementation pattern:** The env var is read in `config/settings/base.py`
+as a list and used to filter `AVAILABLE_LANGUAGES` into `LANGUAGES`.
+Everything else (`WAGTAIL_CONTENT_LANGUAGES`, `PathBasedSiteMiddleware`,
+the `translate_url` templatetag, the language switcher template, `setup_cms`)
+already reads `settings.LANGUAGES` dynamically, so no other code needs to
+change to support a new language. As with other settings-based flags, this
+requires an app restart to take effect.
+
 ## Future Considerations
 
 The current env-var approach is well-suited for flags that are set once per deployment and rarely change. If requirements evolve, consider these alternatives:
