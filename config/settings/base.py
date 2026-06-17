@@ -29,10 +29,11 @@ TIME_ZONE = "Pacific/Auckland"
 # https://docs.djangoproject.com/en/dev/ref/settings/#language-code
 LANGUAGE_CODE = "en"
 # https://docs.djangoproject.com/en/dev/ref/settings/#languages
-LANGUAGES = [
+# All languages the codebase has translation scaffolding for. Which of these
+# are actually exposed to users is controlled by AMS_ENABLED_LANGUAGES below.
+AVAILABLE_LANGUAGES = [
     ("en", _("English")),
-    # Disabled until full Te Reo Māori support
-    # ("mi", _("Te Reo Māori")),  # noqa: ERA001
+    ("mi", _("Te Reo Māori")),
 ]
 EXTRA_LANG_INFO = {
     "mi": {
@@ -43,6 +44,12 @@ EXTRA_LANG_INFO = {
     },
 }
 django.conf.locale.LANG_INFO.update(EXTRA_LANG_INFO)
+
+# See docs/docs/developer/feature-flags.md. "en" should always be included.
+AMS_ENABLED_LANGUAGES = env.list("AMS_ENABLED_LANGUAGES", default=["en"])
+LANGUAGES = [
+    (code, name) for code, name in AVAILABLE_LANGUAGES if code in AMS_ENABLED_LANGUAGES
+]
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#site-id
 SITE_ID = 1
