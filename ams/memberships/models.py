@@ -116,7 +116,7 @@ class MembershipOption(Model):
     )
     voting_rights = BooleanField(
         default=True,
-        help_text="Allow to vote in association matters.",
+        help_text=_("Allow to vote in association matters."),
     )
     archived = BooleanField(
         default=False,
@@ -231,7 +231,7 @@ class BaseMembership(Model):
         # Enforce expiry_date is after start_date
         if self.expiry_date and self.start_date and self.expiry_date <= self.start_date:
             raise ValidationError(
-                {"expiry_date": "Expiry date must be after start date."},
+                {"expiry_date": _("Expiry date must be after start date.")},
             )
         super().clean()
 

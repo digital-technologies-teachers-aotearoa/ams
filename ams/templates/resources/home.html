@@ -1,27 +1,26 @@
 {% extends "resources/base.html" %}
 
-{% load crispy_forms_tags %}
-{% load icon %}
+{% load i18n crispy_forms_tags icon %}
 
 {% block page_heading %}
   <div class="d-flex justify-content-between align-items-center">
     <h1>
-      <span class="resource-section-icon">{% icon "file-earmark-text" %}</span> Resources
+      <span class="resource-section-icon">{% icon "file-earmark-text" %}</span> {% trans "Resources" %}
     </h1>
     {% if perms.resources %}
       <a href="{% url 'admin:app_list' 'resources' %}"
-         class="btn btn-sm btn-secondary">Open resources admin</a>
+         class="btn btn-sm btn-secondary">{% trans "Open resources admin" %}</a>
     {% endif %}
   </div>
-  <p class="lead">Browse and download resources.</p>
+  <p class="lead">{% trans "Browse and download resources." %}</p>
   {% crispy form %}
 {% endblock page_heading %}
 
 {% block content_container %}
   <div class="col-12">
     <div class="d-flex gap-4 mb-4 text-muted">
-      <span>{% icon "file-earmark-text" %} {{ resource_count }} resource{{ resource_count|pluralize }}</span>
-      <span>{% icon "paperclip" %} {{ component_count }} component{{ component_count|pluralize }}</span>
+      <span>{% icon "file-earmark-text" %} {% blocktrans count count=resource_count %}{{ count }} resource{% plural %}{{ count }} resources{% endblocktrans %}</span>
+      <span>{% icon "paperclip" %} {% blocktrans count count=component_count %}{{ count }} component{% plural %}{{ count }} components{% endblocktrans %}</span>
     </div>
     {% if resources %}
       {% for resource in resources %}
@@ -29,8 +28,8 @@
       {% endfor %}
     {% else %}
       <div class="text-center py-5">
-        <p class="fs-5 text-muted mb-1">No resources available yet</p>
-        <p class="text-muted">Check back later for new resources</p>
+        <p class="fs-5 text-muted mb-1">{% trans "No resources available yet" %}</p>
+        <p class="text-muted">{% trans "Check back later for new resources" %}</p>
       </div>
     {% endif %}
   </div>

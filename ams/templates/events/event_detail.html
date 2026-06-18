@@ -1,12 +1,12 @@
 {% extends "events/base.html" %}
 
-{% load static icon %}
+{% load i18n static icon %}
 
 {% block page_heading %}
   <div id="event-details" class="my-3">
     {% if perms.events %}
       <a href="{% url 'admin:events_event_change' event.id %}"
-         class="btn btn-sm btn-secondary float-end">Edit event</a>
+         class="btn btn-sm btn-secondary float-end">{% trans "Edit event" %}</a>
     {% endif %}
     {% for organiser in organisers %}
       {% if organiser.logo %}
@@ -30,11 +30,11 @@
   <div class="col-12 col-lg-4">
     <div id="sticky-navigation" class="position-sticky mb-3">
       <div class="event-sidebar-nav mb-3">
-        <div class="event-sidebar-nav__heading">On this page</div>
-        <a class="event-sidebar-nav__link" href="#event-details">Details</a>
-        <a class="event-sidebar-nav__link" href="#event-description">Description</a>
+        <div class="event-sidebar-nav__heading">{% trans "On this page" %}</div>
+        <a class="event-sidebar-nav__link" href="#event-details">{% trans "Details" %}</a>
+        <a class="event-sidebar-nav__link" href="#event-description">{% trans "Description" %}</a>
         {% if event.show_schedule %}
-          <a class="event-sidebar-nav__link" href="#event-schedule">Schedule</a>
+          <a class="event-sidebar-nav__link" href="#event-schedule">{% trans "Schedule" %}</a>
           {% if schedule|length > 1 %}
             {% for day in schedule %}
               <a class="event-sidebar-nav__link event-sidebar-nav__link--indent"
@@ -55,7 +55,7 @@
       {% endif %}
       {% if event.series %}
         <div class="text-center mb-3">
-          <small>This event is part of the following series</small>
+          <small>{% trans "Event series" %}</small>
           {% if event.series.logo %}
             <img src="{{ event.series.logo.url }}"
                  class="img-inline"
@@ -67,7 +67,7 @@
       {% endif %}
       {% if sponsors %}
         <div class="text-center mb-2">
-          <small>This event is sponsored by</small>
+          <small>{% trans "Event sponsors" %}</small>
         </div>
         <ul class="list-unstyled text-center mb-3">
           {% for sponsor in sponsors %}
@@ -92,7 +92,7 @@
           <div class="event-hero__detail-item">
             <span class="event-hero__icon">{% icon "calendar-event" %}</span>
             <div>
-              <small class="text-muted d-block">Starts</small>
+              <small class="text-muted d-block">{% trans "Starts" %}</small>
               {{ event.start|date:"g:i a" }}
               <br />
               {{ event.start|date:"j F, Y" }}
@@ -103,7 +103,7 @@
           <div class="event-hero__detail-item">
             <span class="event-hero__icon">{% icon "clock" %}</span>
             <div>
-              <small class="text-muted d-block">Ends</small>
+              <small class="text-muted d-block">{% trans "Ends" %}</small>
               {{ event.end|date:"g:i a" }}
               <br />
               {{ event.end|date:"j F, Y" }}
@@ -114,9 +114,9 @@
           <div class="event-hero__detail-item">
             <span class="event-hero__icon">{% icon "tag-fill" %}</span>
             <div>
-              <small class="text-muted d-block">Cost</small>
+              <small class="text-muted d-block">{% trans "Cost" %}</small>
               {% if event.price.amount == 0 %}
-                <span class="text-success fw-semibold">Free</span>
+                <span class="text-success fw-semibold">{% trans "Free" %}</span>
               {% else %}
                 {{ event.price }}
               {% endif %}
@@ -128,7 +128,11 @@
             <div class="event-hero__detail-item">
               <span class="event-hero__icon">{% icon "geo-alt-fill" %}</span>
               <div>
-                <small class="text-muted d-block">Location{{ locations|pluralize }}</small>
+                <small class="text-muted d-block">
+                  {% with n=locations|length %}
+                    {% blocktrans context "event detail location label" count n=n %}Location{% plural %}Locations{% endblocktrans %}
+                  {% endwith %}
+                </small>
                 {% for location in locations %}
                   <a href="{{ location.get_absolute_url }}">
                     {% if location.room %}{{ location.room }},{% endif %}
@@ -148,18 +152,18 @@
             <div class="event-hero__detail-item">
               <span class="event-hero__icon">{% icon "laptop" %}</span>
               <div>
-                <small class="text-muted d-block">Online</small>
-                <a href="{% url 'events:upcoming' %}?accessible_online=1">Accessible online</a>
+                <small class="text-muted d-block">{% trans "Online" %}</small>
+                <a href="{% url 'events:upcoming' %}?accessible_online=1">{% trans "Accessible online" %}</a>
               </div>
             </div>
           </div>
         {% endif %}
       </div>
     </div>
-    <h3 id="event-description" class="event-section-heading">Description</h3>
+    <h3 id="event-description" class="event-section-heading">{% trans "Description" %}</h3>
     <div class="mb-3">{{ event.description|safe }}</div>
     {% if event.show_schedule and schedule %}
-      <h3 id="event-schedule" class="event-section-heading">Schedule</h3>
+      <h3 id="event-schedule" class="event-section-heading">{% trans "Schedule" %}</h3>
       {% include "events/event_schedule.html" %}
     {% endif %}
   </div>

@@ -62,23 +62,23 @@ class UserSignupForm(SignupForm):
     """
 
     first_name = CharField(
-        label="First name",
+        label=_("First name"),
         max_length=150,
         widget=TextInput(
             attrs={"placeholder": _("First name"), "autocomplete": "first_name"},
         ),
     )
     last_name = CharField(
-        label="Last name",
+        label=_("Last name"),
         max_length=150,
         widget=TextInput(
             attrs={"placeholder": _("Last name"), "autocomplete": "last_name"},
         ),
     )
     username = CharField(
-        label="Username",
+        label=_("Username"),
         max_length=150,
-        help_text="This is used in the community forum.",
+        help_text=_("This is used in the community forum."),
         widget=TextInput(
             attrs={"placeholder": _("Username"), "autocomplete": "username"},
         ),

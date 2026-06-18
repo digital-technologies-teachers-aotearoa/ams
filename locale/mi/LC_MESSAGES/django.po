@@ -1,4 +1,4 @@
-# Translations for the Association Management Software project
+# Translations for the Association Management Software project (Te Reo Māori)
 # Copyright (C) 2025 DTTA
 # DTTA <admin@dtta.org.nz>, 2025.
 #
@@ -8,10 +8,11 @@ msgstr ""
 "Project-Id-Version: 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-06-18 13:57+1200\n"
-"Language: en\n"
+"Language: mi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "Billing"
 msgstr ""

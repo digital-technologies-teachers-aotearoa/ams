@@ -57,17 +57,22 @@ class ResourceTag(models.Model):
 
 class Resource(models.Model):
     class Visibility(models.IntegerChoices):
-        PUBLIC = 0, "Public - visible and accessable by everyone"
+        PUBLIC = 0, _("Public - visible and accessable by everyone")
         ACCESS_ACCOUNT_REQUIRED = (
             1,
-            "Account required to access - anyone can view, logged-in users can access",
+            _(
+                "Account required to access - anyone can view, "
+                "logged-in users can access",
+            ),
         )
         ACCESS_MEMBERSHIP_REQUIRED = (
             2,
-            "Membership required to access - anyone can view, "
-            "only members can access files",
+            _(
+                "Membership required to access - anyone can view, "
+                "only members can access files",
+            ),
         )
-        MEMBERS_ONLY = 3, "Members only - only members can view or access"
+        MEMBERS_ONLY = 3, _("Members only - only members can view or access")
 
     name = models.CharField(max_length=200)
     slug = AutoSlugField(populate_from="name", always_update=True, null=True)
@@ -76,14 +81,14 @@ class Resource(models.Model):
     visibility = models.PositiveSmallIntegerField(
         choices=Visibility.choices,
         default=Visibility.PUBLIC,
-        help_text=(
+        help_text=_(
             "Controls who can view and access this resource. "
             "Public: no restrictions. "
             "Account required to access: anyone can browse, "
             "logged-in users can access. "
             "Membership required to access: anyone can browse, "
             "members can access files. "
-            "Members only: only members can view or access."
+            "Members only: only members can view or access.",
         ),
     )
     datetime_added = models.DateTimeField(auto_now_add=True)

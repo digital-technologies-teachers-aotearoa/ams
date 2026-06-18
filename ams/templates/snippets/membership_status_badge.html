@@ -1,13 +1,13 @@
-{% load icon %}
+{% load i18n icon %}
 
 {% if status == "ACTIVE" %}
-  <span class="text-success">{% icon "check-circle-fill" %} Active</span>
+  <span class="text-success">{% icon "check-circle-fill" %} {% trans "Active" %}</span>
 {% elif status == "PENDING" %}
-  <span class="text-primary">{% icon "hourglass-split" %} Pending</span>
+  <span class="text-primary">{% icon "hourglass-split" %} {% trans "Pending" %}</span>
 {% elif status == "EXPIRED" %}
-  <span class="text-secondary">{% icon "slash-circle" %} Expired</span>
+  <span class="text-secondary">{% icon "slash-circle" %} {% trans "Expired" %}</span>
 {% elif status == "CANCELLED" %}
-  <span class="text-danger">{% icon "calendar-x" %} Cancelled</span>
+  <span class="text-danger">{% icon "calendar-x" %} {% trans "Cancelled" %}</span>
 {% else %}
-  <span class="text-secondary">None</span>
+  <span class="text-secondary">{% trans "None" %}</span>
 {% endif %}

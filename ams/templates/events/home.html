@@ -1,42 +1,42 @@
 {% extends "events/base.html" %}
 
-{% load icon %}
+{% load i18n icon %}
 
 {% block page_heading %}
   <div class="d-flex justify-content-between align-items-center">
-    <h1>Events</h1>
+    <h1>{% trans "Events" %}</h1>
     {% if perms.events %}
       <a href="{% url 'admin:app_list' 'events' %}"
-         class="btn btn-sm btn-secondary">Open event hub admin</a>
+         class="btn btn-sm btn-secondary">{% trans "Open event hub admin" %}</a>
     {% endif %}
   </div>
-  <p class="lead">Find and register for professional development events throughout New Zealand.</p>
+  <p class="lead">{% trans "Find and register for professional development events throughout New Zealand." %}</p>
 {% endblock page_heading %}
 
 {% block content_container %}
   <div class="col-12 col-lg-7">
     <h3>
-      <span class="event-section-icon">{% icon "calendar-event" %}</span> Upcoming Events
+      <span class="event-section-icon">{% icon "calendar-event" %}</span> {% trans "Upcoming Events" %}
     </h3>
     {% if upcoming_events %}
       {% for event in upcoming_events %}
         {% include 'events/event_card.html' %}
       {% endfor %}
       <div class="d-flex gap-2">
-        <a href="{% url 'events:upcoming' %}" class="btn btn-primary">View all upcoming events</a>
-        <a href="{% url 'events:past' %}" class="btn btn-outline-secondary">Past events</a>
+        <a href="{% url 'events:upcoming' %}" class="btn btn-primary">{% trans "View all upcoming events" %}</a>
+        <a href="{% url 'events:past' %}" class="btn btn-outline-secondary">{% trans "Past events" %}</a>
       </div>
     {% else %}
       <div class="text-center py-5">
-        <p class="fs-5 text-muted mb-1">No upcoming events at the moment</p>
-        <p class="text-muted">Check back later for new events.</p>
-        <a href="{% url 'events:past' %}" class="btn btn-outline-secondary">Browse past events</a>
+        <p class="fs-5 text-muted mb-1">{% trans "No upcoming events at the moment" %}</p>
+        <p class="text-muted">{% trans "Check back later for new events." %}</p>
+        <a href="{% url 'events:past' %}" class="btn btn-outline-secondary">{% trans "Browse past events" %}</a>
       </div>
     {% endif %}
   </div>
   <div class="col-12 col-lg-5">
     <h3>
-      <span class="event-section-icon">{% icon "geo-alt-fill" %}</span> Event Locations
+      <span class="event-section-icon">{% icon "geo-alt-fill" %}</span> {% trans "Event Locations" %}
     </h3>
     <div id="event-map" data-leaflet-map></div>
   </div>

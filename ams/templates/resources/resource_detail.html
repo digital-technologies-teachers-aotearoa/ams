@@ -1,6 +1,6 @@
 {% extends "resources/base.html" %}
 
-{% load icon %}
+{% load i18n icon %}
 
 {% block page_heading %}
   <div class="d-flex justify-content-between align-items-center">
@@ -9,7 +9,7 @@
     </div>
     {% if perms.resources %}
       <a href="{% url 'admin:resources_resource_change' resource.pk %}"
-         class="btn btn-sm btn-secondary">Edit resource</a>
+         class="btn btn-sm btn-secondary">{% trans "Edit resource" %}</a>
     {% endif %}
   </div>
 {% endblock page_heading %}
@@ -20,7 +20,7 @@
     <div class="mb-4">{{ resource.description|safe }}</div>
     {% with components=resource.components.all %}
       {% if components %}
-        <h3 class="resource-section-heading">Components</h3>
+        <h3 class="resource-section-heading">{% trans "Components" %}</h3>
         <div class="list-group mb-4">
           {% for component in components %}
             <div class="list-group-item">
@@ -40,15 +40,15 @@
                   </span>
                 {% elif component.component_file %}
                   <a href="{% url 'resources:component_download' component.pk %}"
-                     class="btn btn-sm btn-outline-primary">{% icon "download" %} Download</a>
+                     class="btn btn-sm btn-outline-primary">{% icon "download" %} {% trans "Download" %}</a>
                 {% elif component.component_url %}
                   <a href="{{ component.component_url }}"
                      class="btn btn-sm btn-outline-secondary"
                      target="_blank"
-                     rel="noopener noreferrer">{% icon "box-arrow-up-right" %} Open</a>
+                     rel="noopener noreferrer">{% icon "box-arrow-up-right" %} {% trans "Open" %}</a>
                 {% elif component.component_resource %}
                   <a href="{{ component.component_resource.get_absolute_url }}"
-                     class="btn btn-sm btn-outline-secondary">{% icon "folder-symlink" %} View resource</a>
+                     class="btn btn-sm btn-outline-secondary">{% icon "folder-symlink" %} {% trans "View resource" %}</a>
                 {% endif %}
               </div>
             </div>
@@ -57,7 +57,7 @@
       {% endif %}
     {% endwith %}
     {% if components_of %}
-      <h3 class="resource-section-heading">Also a component of</h3>
+      <h3 class="resource-section-heading">{% trans "Also a component of" %}</h3>
       {% for comp in components_of %}
         {% with resource=comp.resource %}
           {% include "resources/resource_card.html" %}
@@ -68,13 +68,17 @@
   <div class="col-12 col-lg-4">
     <div class="card mb-3">
       <div class="card-body">
-        <h5 class="card-title">Authors</h5>
+        <h5 class="card-title">{% trans "Authors" %}</h5>
         {% include "resources/_resource_authors.html" %}
       </div>
     </div>
     <div class="text-muted small">
-      <div>Added {{ resource.datetime_added|date:"j F Y" }}</div>
-      <div>Updated {{ resource.datetime_updated|date:"j F Y" }}</div>
+      <div>
+        {% blocktrans with date=resource.datetime_added|date:"j F Y" %}Added {{ date }}{% endblocktrans %}
+      </div>
+      <div>
+        {% blocktrans with date=resource.datetime_updated|date:"j F Y" %}Updated {{ date }}{% endblocktrans %}
+      </div>
     </div>
   </div>
 {% endblock content_container %}
