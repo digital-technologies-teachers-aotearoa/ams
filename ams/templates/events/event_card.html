@@ -1,4 +1,4 @@
-{% load static humanize icon %}
+{% load i18n static humanize icon %}
 
 <div class="event-card card mb-3 w-100{% if event.featured %} event-card--featured{% endif %}">
   <div class="card-body">
@@ -41,7 +41,7 @@
           </div>
           <div class="event-card__header-right ms-auto">
             {% if event.featured %}
-              <span class="event-card__featured-tag badge text-bg-events">{% icon "star-fill" %} Featured</span>
+              <span class="event-card__featured-tag badge text-bg-events">{% icon "star-fill" %} {% trans "Featured" %}</span>
             {% endif %}
           </div>
         </div>
@@ -70,18 +70,18 @@
               {% endfor %}
               {% if event.accessible_online %}
                 {% if event.locations.all %}·{% endif %}
-                {% icon "laptop" %} Online
+                {% icon "laptop" %} {% trans "Online" %}
               {% endif %}
             </span>
           {% endif %}
           <span class="ms-auto event-card__price">
             {% if event.price.amount == 0 %}
-              <span class="text-success">Free</span>
+              <span class="text-success">{% trans "Free" %}</span>
             {% else %}
               {{ event.price }}
             {% endif %}
             {% if event.registration_type == event.RegistrationType.INVITE_ONLY %}
-              <small class="text-muted">Invite only</small>
+              <small class="text-muted">{% trans "Invite only" %}</small>
             {% endif %}
           </span>
         </div>

@@ -78,7 +78,7 @@ def check_document_permissions(document, request):
     # Else show error and redirect to login
     messages.error(
         request,
-        "You must have an active membership to view this file",
+        _("You must have an active membership to view this file"),
     )
     return redirect("account_login")
 

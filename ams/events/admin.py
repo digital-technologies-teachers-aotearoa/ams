@@ -55,7 +55,7 @@ class CoordinatesField(forms.MultiValueField):
 
 
 class LocationAdminForm(forms.ModelForm):
-    coordinates = CoordinatesField(required=False, label="Coordinates")
+    coordinates = CoordinatesField(required=False, label=_("Coordinates"))
 
     class Meta:
         model = Location
@@ -178,7 +178,10 @@ def duplicate_events(modeladmin, request, queryset):
         event.update_datetimes()
         count += 1
 
-    modeladmin.message_user(request, f"Successfully duplicated {count} event(s).")
+    modeladmin.message_user(
+        request,
+        _("Successfully duplicated %(count)d event(s).") % {"count": count},
+    )
 
 
 @admin.register(Event)

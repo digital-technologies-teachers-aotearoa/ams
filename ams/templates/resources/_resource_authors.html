@@ -1,6 +1,8 @@
+{% load i18n %}
+
 {% with entities=resource.author_entities.all %}
   {% if entities %}
-    <p class="text-muted small mb-1">Organisations</p>
+    <p class="text-muted small mb-1">{% trans "Organisations" %}</p>
     <ul class="list-unstyled mb-3">
       {% for entity in entities %}<li>{{ entity.name }}</li>{% endfor %}
     </ul>
@@ -8,7 +10,7 @@
 {% endwith %}
 {% with users=resource.author_users.all %}
   {% if users %}
-    <p class="text-muted small mb-1">People</p>
+    <p class="text-muted small mb-1">{% trans "People" %}</p>
     <ul class="list-unstyled mb-0">
       {% for user in users %}<li>{{ user.get_full_name|default:user.email }}</li>{% endfor %}
     </ul>

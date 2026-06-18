@@ -1,5 +1,6 @@
 import django_filters
 from django.utils.timezone import now
+from django.utils.translation import gettext_lazy as _
 
 from ams.entities.models import Entity
 from ams.events.models import Event
@@ -9,20 +10,20 @@ from ams.events.models import Region
 class BaseEventFilter(django_filters.FilterSet):
     locations__region = django_filters.ModelChoiceFilter(
         queryset=Region.objects.all(),
-        label="Region",
-        empty_label="Show all",
+        label=_("Region"),
+        empty_label=_("Show all"),
     )
     accessible_online = django_filters.ChoiceFilter(
         choices=(
-            ("1", "Yes"),
-            ("0", "No"),
+            ("1", _("Yes")),
+            ("0", _("No")),
         ),
-        empty_label="Show all",
+        empty_label=_("Show all"),
     )
     organisers = django_filters.ModelChoiceFilter(
         queryset=Entity.objects.all(),
-        label="Organiser",
-        empty_label="Show all",
+        label=_("Organiser"),
+        empty_label=_("Show all"),
     )
 
     class Meta:

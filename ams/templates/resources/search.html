@@ -1,13 +1,13 @@
 {% extends "resources/base.html" %}
 
-{% load crispy_forms_tags icon %}
+{% load i18n crispy_forms_tags icon %}
 
 {% block page_heading %}
   <div class="d-flex justify-content-between align-items-center">
-    <h1>Search resources</h1>
+    <h1>{% trans "Search resources" %}</h1>
     {% if perms.resources %}
       <a href="{% url 'admin:app_list' 'resources' %}"
-         class="btn btn-sm btn-secondary">Open resources admin</a>
+         class="btn btn-sm btn-secondary">{% trans "Open resources admin" %}</a>
     {% endif %}
   </div>
 {% endblock page_heading %}
@@ -23,9 +23,9 @@
           {% if results %}
             <p class="text-muted small mb-3">
               {% if q %}
-                Results for <strong>{{ q }}</strong>
+                {% blocktrans with q=q %}Results for <strong>{{ q }}</strong>{% endblocktrans %}
               {% else %}
-                Filtered results
+                {% trans "Filtered results" %}
               {% endif %}
             </p>
             {% for resource in results %}
@@ -34,15 +34,18 @@
           {% else %}
             <div class="text-center py-5">
               <p class="fs-5 text-muted mb-1">
-                No results found
-                {% if q %}for <strong>{{ q }}</strong>{% endif %}
+                {% if q %}
+                  {% blocktrans with q=q %}No results found for <strong>{{ q }}</strong>{% endblocktrans %}
+                {% else %}
+                  {% trans "No results found" %}
+                {% endif %}
               </p>
-              <p class="text-muted">Try different keywords or filters.</p>
+              <p class="text-muted">{% trans "Try different keywords or filters." %}</p>
             </div>
           {% endif %}
         {% else %}
           <div class="text-center py-5">
-            <p class="text-muted">Enter a search term or select filters to find resources.</p>
+            <p class="text-muted">{% trans "Enter a search term or select filters to find resources." %}</p>
           </div>
         {% endif %}
       </div>

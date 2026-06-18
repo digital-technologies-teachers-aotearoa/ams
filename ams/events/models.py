@@ -14,7 +14,7 @@ class Region(models.Model):
     name = models.CharField(max_length=200)
     order = models.PositiveIntegerField(
         default=0,
-        help_text="Custom sort order. When 0 (unset), falls back to alphabetical sort.",
+        help_text=_("Custom sort order. When 0, falls back to alphabetical sort."),
     )
 
     class Meta:
@@ -28,25 +28,25 @@ class Location(models.Model):
     room = models.CharField(
         max_length=200,
         blank=True,
-        help_text="Name of room or space, for example: Room 134",
+        help_text=_("Name of room or space, for example: Room 134"),
     )
     name = models.CharField(
         max_length=200,
-        help_text="Name of location, for example: Middleton Grange School",
+        help_text=_("Name of location, for example: Middleton Grange School"),
     )
     street_address = models.CharField(
         max_length=200,
         blank=True,
-        help_text="Street address location, for example: 12 High Street",
+        help_text=_("Street address location, for example: 12 High Street"),
     )
     suburb = models.CharField(
         max_length=200,
         blank=True,
-        help_text="Suburb, for example: Riccarton",
+        help_text=_("Suburb, for example: Riccarton"),
     )
     city = models.CharField(
         max_length=200,
-        help_text="Town or city, for example: Christchurch",
+        help_text=_("Town or city, for example: Christchurch"),
     )
     region = models.ForeignKey(
         Region,
@@ -99,7 +99,7 @@ class Series(models.Model):
     logo = models.ImageField(
         blank=True,
         upload_to="events/series/",
-        help_text="Logo will be displayed instead of name if provided.",
+        help_text=_("Logo will be displayed instead of name if provided."),
     )
 
     class Meta:
@@ -131,7 +131,7 @@ class Event(models.Model):
     end = models.DateTimeField(blank=True, null=True)
     accessible_online = models.BooleanField(
         default=False,
-        help_text="Select if this event can be attended online",
+        help_text=_("Select if this event can be attended online"),
     )
     price = MoneyField(
         max_digits=10,

@@ -1,9 +1,9 @@
 {% extends "events/base.html" %}
 
-{% load crispy_forms_tags %}
+{% load i18n crispy_forms_tags %}
 
 {% block page_heading %}
-  <h1>Past events</h1>
+  <h1>{% trans "Past events" %}</h1>
 {% endblock page_heading %}
 
 {% block event_content %}
@@ -11,16 +11,20 @@
     <div class="card-body">{% crispy filter.form filter_formatter %}</div>
   </div>
   {% if filter.qs %}
-    <p class="text-muted small mb-2">Showing {{ filter.qs.count }} event{{ filter.qs.count|pluralize }}</p>
+    {% with count=filter.qs.count %}
+      <p class="text-muted small mb-2">
+        {% blocktrans count count=count %}Showing {{ count }} event{% plural %}Showing {{ count }} events{% endblocktrans %}
+      </p>
+    {% endwith %}
     {% for event in filter.qs %}
       {% include 'events/event_card.html' %}
     {% endfor %}
   {% else %}
     <div class="text-center py-5">
-      <p class="fs-5 text-muted mb-1">No past events found</p>
-      <p class="text-muted">Try adjusting your filters or check back later.</p>
+      <p class="fs-5 text-muted mb-1">{% trans "No past events found" %}</p>
+      <p class="text-muted">{% trans "Try adjusting your filters or check back later." %}</p>
       <a href="{% url 'events:past' %}"
-         class="btn btn-sm btn-outline-secondary">Clear filters</a>
+         class="btn btn-sm btn-outline-secondary">{% trans "Clear filters" %}</a>
     </div>
   {% endif %}
 {% endblock event_content %}

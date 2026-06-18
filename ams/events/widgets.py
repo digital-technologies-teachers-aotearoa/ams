@@ -1,5 +1,6 @@
 from django.forms import MultiWidget
 from django.forms import NumberInput
+from django.utils.translation import gettext_lazy as _
 
 
 class LeafletPickerWidget(MultiWidget):
@@ -9,8 +10,8 @@ class LeafletPickerWidget(MultiWidget):
 
     def __init__(self, attrs=None):
         widgets = [
-            NumberInput(attrs={"step": "0.000001", "placeholder": "Latitude"}),
-            NumberInput(attrs={"step": "0.000001", "placeholder": "Longitude"}),
+            NumberInput(attrs={"step": "0.000001", "placeholder": _("Latitude")}),
+            NumberInput(attrs={"step": "0.000001", "placeholder": _("Longitude")}),
         ]
         super().__init__(widgets, attrs)
 

@@ -1,16 +1,18 @@
 {% extends "base.html" %}
 
+{% load i18n %}
+
 {% block title %}
-  Bad Request
+  {% trans "Bad Request" %}
 {% endblock title %}
 
 {% block content %}
-  <h1>Bad Request (400)</h1>
+  <h1>{% trans "Bad Request (400)" %}</h1>
   <p>
     {% if exception %}
       {{ exception }}
     {% else %}
-      The request could not be understood by the server.
+      {% trans "The request could not be understood by the server." %}
     {% endif %}
   </p>
 {% endblock content %}

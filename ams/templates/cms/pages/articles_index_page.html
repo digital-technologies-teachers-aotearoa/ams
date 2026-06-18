@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load wagtailcore_tags %}
+{% load i18n wagtailcore_tags %}
 
 {% block content %}
   <div class="col-12 content-gap-spacing d-flex flex-column gap-3">
@@ -14,13 +14,13 @@
       </div>
       {# Pagination controls #}
       {% if articles.has_other_pages %}
-        <nav aria-label="Articles pagination" class="mt-5">
+        <nav aria-label="{% trans 'Articles pagination' %}" class="mt-5">
           <ul class="pagination justify-content-center">
             {% if articles.has_previous %}
               <li class="page-item">
                 <a class="page-link"
                    href="?page={{ articles.previous_page_number }}"
-                   aria-label="Previous">
+                   aria-label="{% trans 'Previous' %}">
                   <span aria-hidden="true">«</span>
                 </a>
               </li>
@@ -44,7 +44,7 @@
               <li class="page-item">
                 <a class="page-link"
                    href="?page={{ articles.next_page_number }}"
-                   aria-label="Next">
+                   aria-label="{% trans 'Next' %}">
                   <span aria-hidden="true">»</span>
                 </a>
               </li>
@@ -57,7 +57,7 @@
         </nav>
       {% endif %}
     {% else %}
-      <p class="text-muted">No articles have been published yet.</p>
+      <p class="text-muted">{% trans "No articles have been published yet." %}</p>
     {% endif %}
   </div>
 {% endblock content %}

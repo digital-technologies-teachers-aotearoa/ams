@@ -1,3 +1,5 @@
+{% load i18n %}
+
 {% for day in schedule %}
   <div class="mb-2">
     <div id="schedule-day-{{ forloop.counter }}"></div>
@@ -13,7 +15,7 @@
           <h5 class="schedule-time-slot-time">
             {{ time_slot.start|time:"g:i a" }}
             <br class="d-none d-md-inline" />
-            <small class="text-muted">until {{ time_slot.end|time:"g:i a" }}</small>
+            <small class="text-muted">{% blocktrans with end=time_slot.end|time:"g:i a" %}until {{ end }}{% endblocktrans %}</small>
           </h5>
         </div>
         <div class="col-12 col-md-9 schedule-time-slot-sessions border-start border-2 border-opacity-25">
@@ -24,7 +26,9 @@
               <div class="mb-1 session-description">{{ session.description|safe }}</div>
               {% if session.locations.all %}
                 <small class="text-muted">
-                  Location{{ session.locations.all|pluralize }}:
+                  {% with n=session.locations.all|length %}
+                    {% blocktrans context "session location label" count n=n %}Location:{% plural %}Locations:{% endblocktrans %}
+                  {% endwith %}
                   {% for location in session.locations.all %}
                     <a href="{{ location.get_absolute_url }}">
                       {% if location.room %}

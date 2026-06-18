@@ -1,4 +1,4 @@
-{% load icon %}
+{% load i18n icon %}
 
 <div class="resource-card card mb-3 w-100">
   <div class="card-body">
@@ -29,7 +29,9 @@
         <div class="resource-card__details d-flex align-items-center gap-3">
           <span>{% icon "calendar-event" %} {{ resource.datetime_added|date:"j F Y" }}</span>
           {% with count=resource.components.all|length %}
-            {% if count %}<span class="badge text-bg-secondary">{{ count }} component{{ count|pluralize }}</span>{% endif %}
+            {% if count %}
+              <span class="badge text-bg-secondary">{% blocktrans count count=count %}{{ count }} component{% plural %}{{ count }} components{% endblocktrans %}</span>
+            {% endif %}
           {% endwith %}
         </div>
         {% include "resources/_resource_tags.html" with tags=resource.tags.all resource=resource wrapper_class=" resource-card__tags mt-2" only %}
