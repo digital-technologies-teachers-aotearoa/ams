@@ -36,7 +36,7 @@ class ContentStreamBlocks(StreamBlock):
     image_carousel_block = ImageCarouselBlock()
     horizontal_rule_block = HorizontalRuleBlock()
     embed_block = EmbedBlock(
-        help_text="Insert a URL to embed. For example, https://www.youtube.com/watch?v=V-6m0jW0X9E",
+        help_text="Insert a URL to embed. For example, https://www.youtube.com/watch?v=ScMzIvxBSi4",
         icon="media",
     )
 
