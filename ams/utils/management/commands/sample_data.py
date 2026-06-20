@@ -35,6 +35,7 @@ class Command(management.base.BaseCommand):
 
         # Setup CMS pages
         management.call_command("setup_cms")
+        management.call_command("create_sample_cms_content")
 
         # Create sample events
         management.call_command("create_sample_events")
