@@ -17,8 +17,10 @@ def _setup_cms():
     call_command("setup_cms", stdout=StringIO(), stderr=StringIO())
 
 
-def test_setup_cms_creates_only_enabled_languages(wagtail_site):
+def test_setup_cms_creates_only_enabled_languages(wagtail_site, settings):
     """Languages absent from settings.LANGUAGES never get Wagtail content."""
+    settings.LANGUAGES = [("en", "English")]
+    settings.WAGTAIL_CONTENT_LANGUAGES = [("en", "English")]
     _setup_cms()
 
     assert not Locale.objects.filter(language_code="mi").exists()
@@ -29,6 +31,7 @@ def test_setup_cms_creates_only_enabled_languages(wagtail_site):
 def test_setup_cms_creates_site_per_enabled_language(wagtail_site, settings):
     """Each language in settings.LANGUAGES gets its own Locale/HomePage/Site."""
     settings.LANGUAGES = [("en", "English"), ("mi", "Te Reo Māori")]
+    settings.WAGTAIL_CONTENT_LANGUAGES = [("en", "English"), ("mi", "Te Reo Māori")]
 
     _setup_cms()
 
@@ -47,10 +50,12 @@ def test_setup_cms_creates_site_per_enabled_language(wagtail_site, settings):
 def test_setup_cms_removes_site_when_language_disabled(wagtail_site, settings):
     """Disabling a language removes its live Site, but keeps Locale/HomePage."""
     settings.LANGUAGES = [("en", "English"), ("mi", "Te Reo Māori")]
+    settings.WAGTAIL_CONTENT_LANGUAGES = [("en", "English"), ("mi", "Te Reo Māori")]
     _setup_cms()
     mi_locale = Locale.objects.get(language_code="mi")
 
     settings.LANGUAGES = [("en", "English")]
+    settings.WAGTAIL_CONTENT_LANGUAGES = [("en", "English")]
     _setup_cms()
 
     assert not Site.objects.filter(sitesettings__language="mi").exists()
