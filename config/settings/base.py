@@ -279,6 +279,7 @@ TEMPLATES = [
             "libraries": {
                 "icon": "config.templatetags.icon",
                 "translate_url": "config.templatetags.translate_url",
+                "localise_url": "config.templatetags.localise_url",
                 "theme": "ams.cms.templatetags.theme",
                 "breadcrumbs": "ams.utils.templatetags.breadcrumbs",
                 "utils": "ams.utils.templatetags.utils",

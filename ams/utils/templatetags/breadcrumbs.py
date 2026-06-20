@@ -42,7 +42,7 @@ def breadcrumbs(context):
         # Add home
         breadcrumb_list.append(
             {
-                "url": "/",
+                "url": f"/{request.LANGUAGE_CODE}/",
                 "title": _("Home"),
                 "is_active": False,
             },
