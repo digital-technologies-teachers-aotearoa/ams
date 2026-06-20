@@ -1,18 +1,18 @@
-{% load static utils %}
+{% load i18n static utils %}
 
 <div class="translation-widget" data-widget-name="{{ widget.name }}">
   <table>
     <thead>
       <tr>
-        <th>Language</th>
-        <th>Translation</th>
+        <th>{% trans "Language" %}</th>
+        <th>{% trans "Translation" %}</th>
       </tr>
     </thead>
     <tbody>
       {% for lang_code, lang_name in widget.languages %}
         <tr data-lang="{{ lang_code }}">
           <td>
-            <strong>{{ lang_name }} label</strong>
+            <strong>{{ lang_name }}</strong>
           </td>
           <td>
             <input type="text"

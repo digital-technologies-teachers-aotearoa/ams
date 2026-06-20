@@ -17,7 +17,7 @@
                        class="event-card__logo me-1"
                        alt="{{ event.series.name }}" />
                 {% elif event.series.abbreviation %}
-                  {{ event.series.abbreviation }} series
+                  {% blocktrans with abbr=event.series.abbreviation %}{{ abbr }} series{% endblocktrans %}
                 {% endif %}
                 {% for organiser in event.organisers.all %}
                   <a href="{% url 'events:upcoming' %}?organisers={{ organiser.pk }}"

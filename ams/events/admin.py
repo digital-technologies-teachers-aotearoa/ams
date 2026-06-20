@@ -204,15 +204,15 @@ class EventAdmin(EventsFeatureFlagMixin, admin.ModelAdmin):
             },
         ),
         (
-            "Location",
+            _("Location"),
             {
                 "fields": ("accessible_online", "locations"),
             },
         ),
         (
-            "Registration",
+            _("Registration"),
             {
-                "description": "Currently only registration via URL is available.",
+                "description": _("Currently only registration via URL is available."),
                 "fields": (
                     "registration_link",
                     "registration_type",
@@ -220,7 +220,7 @@ class EventAdmin(EventsFeatureFlagMixin, admin.ModelAdmin):
             },
         ),
         (
-            "Visibility",
+            _("Visibility"),
             {
                 "fields": (
                     "published",

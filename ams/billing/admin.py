@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils.translation import gettext_lazy as _
 
 from .models import Account
 from .models import Invoice
@@ -46,18 +47,20 @@ class InvoiceAdmin(admin.ModelAdmin):
     )
     fieldsets = (
         (
-            "Billing Integration",
+            _("Billing Integration"),
             {
                 "fields": (
                     "update_needed",
                     "billing_service_invoice_id",
                 ),
-                "description": "Enabling 'Update needed' will force the invoice "
-                "to update in the next update cycle.",
+                "description": _(
+                    "Enabling 'Update needed' will force the invoice "
+                    "to update in the next update cycle.",
+                ),
             },
         ),
         (
-            "Invoice",
+            _("Invoice"),
             {
                 "fields": (
                     "invoice_number",
@@ -71,7 +74,7 @@ class InvoiceAdmin(admin.ModelAdmin):
             },
         ),
         (
-            "Related models",
+            _("Related models"),
             {
                 "fields": (
                     "account",
@@ -82,6 +85,6 @@ class InvoiceAdmin(admin.ModelAdmin):
         ),
     )
 
-    @admin.action(description="Mark selected invoices for update")
+    @admin.action(description=_("Mark selected invoices for update"))
     def mark_update_needed(self, request, queryset):
         queryset.update(update_needed=True)

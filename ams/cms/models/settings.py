@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 from wagtail.admin.panels import FieldPanel
 from wagtail.admin.panels import MultiFieldPanel
 from wagtail.contrib.settings.models import BaseSiteSetting
@@ -11,7 +12,7 @@ from wagtail.fields import RichTextField
 class SiteSettings(BaseSiteSetting):
     language = models.CharField(
         max_length=10,
-        verbose_name="Language",
+        verbose_name=_("Language"),
         blank=True,
         choices=settings.LANGUAGES,
     )
@@ -25,12 +26,12 @@ class SiteSettings(BaseSiteSetting):
 class AssociationSettings(BaseSiteSetting):
     association_short_name = models.CharField(
         max_length=255,
-        verbose_name="Association short name",
+        verbose_name=_("Association short name"),
         blank=True,
     )
     association_long_name = models.CharField(
         max_length=255,
-        verbose_name="Association long name",
+        verbose_name=_("Association long name"),
         blank=True,
     )
     association_logo = models.ForeignKey(
@@ -39,7 +40,7 @@ class AssociationSettings(BaseSiteSetting):
         blank=True,
         on_delete=models.SET_NULL,
         related_name="+",
-        verbose_name="Association logo",
+        verbose_name=_("Association logo"),
     )
     association_favicon = models.ForeignKey(
         "wagtailimages.Image",
@@ -47,27 +48,31 @@ class AssociationSettings(BaseSiteSetting):
         blank=True,
         on_delete=models.SET_NULL,
         related_name="+",
-        verbose_name="Association favicon",
+        verbose_name=_("Association favicon"),
     )
     use_logo_in_navbar = models.BooleanField(
         default=False,
-        verbose_name="Use logo in navbar",
-        help_text="If not set, the association short name will be used in the navbar.",
+        verbose_name=_("Use logo in navbar"),
+        help_text=_(
+            "If not set, the association short name will be used in the navbar.",
+        ),
     )
     use_logo_in_footer = models.BooleanField(
         default=False,
-        verbose_name="Use logo in footer",
-        help_text="If not set, the association short name will be used in the footer.",
+        verbose_name=_("Use logo in footer"),
+        help_text=_(
+            "If not set, the association short name will be used in the footer.",
+        ),
     )
     linkedin_url = models.URLField(
-        verbose_name="LinkedIn URL",
+        verbose_name=_("LinkedIn URL"),
         blank=True,
-        help_text="If set, a link will appear in the footer.",
+        help_text=_("If set, a link will appear in the footer."),
     )
     facebook_url = models.URLField(
-        verbose_name="Facebook URL",
+        verbose_name=_("Facebook URL"),
         blank=True,
-        help_text="If set, a link will appear in the footer.",
+        help_text=_("If set, a link will appear in the footer."),
     )
     footer_text = RichTextField(
         blank=True,
@@ -80,7 +85,7 @@ class AssociationSettings(BaseSiteSetting):
             "align-right",
             "align-justify",
         ],
-        help_text="Optional footer text (e.g., copyright info, disclaimers).",
+        help_text=_("Optional footer text (e.g., copyright info, disclaimers)."),
     )
 
     panels = [
@@ -89,7 +94,7 @@ class AssociationSettings(BaseSiteSetting):
                 FieldPanel("association_short_name"),
                 FieldPanel("association_long_name"),
             ],
-            "Name",
+            _("Name"),
         ),
         MultiFieldPanel(
             [
@@ -98,19 +103,19 @@ class AssociationSettings(BaseSiteSetting):
                 FieldPanel("use_logo_in_footer"),
                 FieldPanel("association_favicon"),
             ],
-            "Images",
+            _("Images"),
         ),
         MultiFieldPanel(
             [
                 FieldPanel("linkedin_url"),
                 FieldPanel("facebook_url"),
             ],
-            "Social networks",
+            _("Social networks"),
         ),
         MultiFieldPanel(
             [
                 FieldPanel("footer_text"),
             ],
-            "Footer",
+            _("Footer"),
         ),
     ]

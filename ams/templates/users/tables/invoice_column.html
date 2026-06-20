@@ -1,7 +1,7 @@
-{% load icon %}
+{% load i18n icon %}
 
 {% if not record.invoices.exists %}
-  <span class="text-secondary">Not required</span>
+  <span class="text-secondary">{% trans "Not required" %}</span>
 {% else %}
   {% for invoice in record.invoices.all %}
     {% if invoice.paid_date %}
@@ -9,18 +9,18 @@
         <a href="{% url 'billing:invoice-redirect' invoice.invoice_number %}"
            target="_blank"
            rel="noopener noreferrer"
-           class="text-success d-block">Paid<span class="ps-1">{% icon "box-arrow-up-right" %}</span></a>
+           class="text-success d-block">{% trans "Paid" %}<span class="ps-1">{% icon "box-arrow-up-right" %}</span></a>
       {% else %}
-        <span class="text-success d-block">Paid</span>
+        <span class="text-success d-block">{% trans "Paid" %}</span>
       {% endif %}
     {% else %}
       {% if invoice.billing_service_invoice_id %}
         <a href="{% url 'billing:invoice-redirect' invoice.invoice_number %}"
            target="_blank"
            rel="noopener noreferrer"
-           class="text-warning d-block">Awaiting payment<span class="ps-1">{% icon "box-arrow-up-right" %}</span></a>
+           class="text-warning d-block">{% trans "Awaiting payment" %}<span class="ps-1">{% icon "box-arrow-up-right" %}</span></a>
       {% else %}
-        <span class="text-warning d-block">Awaiting payment</span>
+        <span class="text-warning d-block">{% trans "Awaiting payment" %}</span>
       {% endif %}
     {% endif %}
   {% endfor %}

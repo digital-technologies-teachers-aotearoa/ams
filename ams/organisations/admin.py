@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils.translation import gettext_lazy as _
 
 from ams.organisations.models import Organisation
 from ams.organisations.models import OrganisationMember
@@ -18,7 +19,7 @@ class OrganisationAdmin(admin.ModelAdmin):
             },
         ),
         (
-            "Contact",
+            _("Contact"),
             {
                 "fields": (
                     "contact_name",
@@ -28,7 +29,7 @@ class OrganisationAdmin(admin.ModelAdmin):
             },
         ),
         (
-            "Physical address",
+            _("Physical address"),
             {
                 "fields": (
                     "street_address",
@@ -38,7 +39,7 @@ class OrganisationAdmin(admin.ModelAdmin):
             },
         ),
         (
-            "Postal address",
+            _("Postal address"),
             {
                 "fields": (
                     "postal_address",
@@ -50,11 +51,11 @@ class OrganisationAdmin(admin.ModelAdmin):
         ),
     )
 
-    @admin.action(description="Activate selected organisations")
+    @admin.action(description=_("Activate selected organisations"))
     def activate_organisations(self, request, queryset):
         queryset.update(is_active=True)
 
-    @admin.action(description="Deactivate selected organisations")
+    @admin.action(description=_("Deactivate selected organisations"))
     def deactivate_organisations(self, request, queryset):
         # Use save() to trigger auto-cancellation logic
         for org in queryset:

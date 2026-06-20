@@ -1,4 +1,4 @@
-{% load wagtailcore_tags wagtailimages_tags %}
+{% load i18n wagtailcore_tags wagtailimages_tags %}
 
 <div class="card h-100 w-100">
   {% if article.cover_image %}
@@ -10,10 +10,12 @@
     <h5 class="card-title">{{ article.title }}</h5>
     <p class="card-text text-muted small">
       {{ article.publication_date|date:"F j, Y" }}
-      {% if article.author %}· by {{ article.author }}{% endif %}
+      {% if article.author %}
+        · {% blocktrans with author=article.author %}by {{ author }}{% endblocktrans %}
+      {% endif %}
     </p>
     <p class="card-text">{{ article.summary }}</p>
     <a href="{% pageurl article %}"
-       class="btn btn-sm btn-outline-primary stretched-link mt-auto align-self-start">Read more</a>
+       class="btn btn-sm btn-outline-primary stretched-link mt-auto align-self-start">{% trans "Read more" %}</a>
   </div>
 </div>

@@ -58,7 +58,7 @@ class ResourceComponentInline(admin.StackedInline):
     fieldsets = (
         (None, {"fields": ("name",)}),
         (
-            "Item",
+            _("Item"),
             {
                 "fields": ("component_url", "component_file", "component_resource"),
                 "description": _(
@@ -87,7 +87,7 @@ class ResourceAdmin(ResourcesFeatureFlagMixin, admin.ModelAdmin):
     fieldsets = (
         (None, {"fields": ("name", "description")}),
         (
-            "Ownership",
+            _("Ownership"),
             {
                 "description": _(
                     "Resources can be owned by both users and entities.",
@@ -95,9 +95,9 @@ class ResourceAdmin(ResourcesFeatureFlagMixin, admin.ModelAdmin):
                 "fields": ("author_entities", "author_users"),
             },
         ),
-        ("Tags", {"fields": ("tags",)}),
+        (_("Tags"), {"fields": ("tags",)}),
         (
-            "Visibility",
+            _("Visibility"),
             {
                 "fields": ("published", "visibility"),
             },

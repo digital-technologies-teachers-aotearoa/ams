@@ -1,19 +1,21 @@
+{% load i18n %}
+
 <section>
-  <h2>Remember</h2>
+  <h2>{% trans "Remember" %}</h2>
   <ul>
-    <li>All images uploaded are public. Private content should be uploaded as documents.</li>
-    <li>All documents uploaded are private to users with an active membership.</li>
+    <li>{% trans "All images uploaded are public. Private content should be uploaded as documents." %}</li>
+    <li>{% trans "All documents uploaded are private to users with an active membership." %}</li>
   </ul>
-  <h2>Helpful links</h2>
+  <h2>{% trans "Helpful links" %}</h2>
   <ul>
     <li>
-      <a href="https://guide.wagtail.org/en-latest/">Wagtail user guide</a>
+      <a href="https://guide.wagtail.org/en-latest/">{% trans "Wagtail user guide" %}</a>
     </li>
     <li>
-      <a href="{{ DOCUMENTATION_URL }}">AMS CMS documentation</a>
+      <a href="{{ DOCUMENTATION_URL }}">{% trans "AMS CMS documentation" %}</a>
     </li>
     <li>
-      <a href="https://github.com/digital-technologies-teachers-aotearoa/ams/issues/new?template=feature_request.md">Feature request</a>
+      <a href="https://github.com/digital-technologies-teachers-aotearoa/ams/issues/new?template=feature_request.md">{% trans "Feature request" %}</a>
     </li>
   </ul>
 </section>
