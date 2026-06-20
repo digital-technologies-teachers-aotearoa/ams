@@ -1,10 +1,10 @@
-{% load menu_tags %}
+{% load menu_tags localise_url %}
 
 {% for item in menu_items %}
   {% if item.has_children_in_menu %}
     <li class="nav-item dropdown">
       <a class="nav-link text-body-emphasis dropdown-toggle submenu"
-         href="{{ item.href }}"
+         href="{{ item.href|localise_url:request.LANGUAGE_CODE }}"
          id="menu-item-{{ forloop.counter }}"
          role="button"
          data-bs-toggle="dropdown"
@@ -17,7 +17,7 @@
   {% else %}
     <li class="nav-item">
       <a class="nav-link text-body-emphasis {% if item.active_class %}active{% endif %}"
-         href="{{ item.href }}"
+         href="{{ item.href|localise_url:request.LANGUAGE_CODE }}"
          {% if item.active_class %}aria-current="page"{% endif %}>{{ item.text }}</a>
     </li>
   {% endif %}

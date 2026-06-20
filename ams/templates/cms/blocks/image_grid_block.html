@@ -1,4 +1,4 @@
-{% load wagtailcore_tags wagtailimages_tags %}
+{% load wagtailcore_tags wagtailimages_tags localise_url %}
 
 <div class="image-grid row row-cols-2 row-cols-lg-{{ self.columns }} g-4 {% if self.image_alignment == 'center' %}justify-content-center{% endif %} {% if self.image_vertical_alignment == 'center' %}align-items-center{% endif %}">
   {% for item in self.items %}
@@ -26,7 +26,7 @@
           </div>
           {% comment %} (item.title and item.link_page) or (item.title and item.link_url) {% endcomment %}
           {% if item.title and item.link_page or item.title and item.link_url %}
-            <a href="{% if item.link_page %}{% pageurl item.link_page %}{% else %}{{ item.link_url }}{% endif %}"
+            <a href="{% if item.link_page %}{% pageurl item.link_page %}{% else %}{{ item.link_url|localise_url }}{% endif %}"
                class="stretched-link">
               <h4 class="image-grid__item__title h5 mb-2 {% if self.text_alignment == 'center' %} text-center {% else %} text-start {% endif %}">
                 {{ item.title }}
@@ -39,7 +39,7 @@
               </h4>
             {% endif %}
             {% if item.link_page or item.link_url %}
-              <a href="{% if item.link_page %}{% pageurl item.link_page %}{% else %}{{ item.link_url }}{% endif %}"
+              <a href="{% if item.link_page %}{% pageurl item.link_page %}{% else %}{{ item.link_url|localise_url }}{% endif %}"
                  class="stretched-link"></a>
             {% endif %}
           {% endif %}
