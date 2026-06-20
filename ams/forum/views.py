@@ -5,6 +5,7 @@ from django.http import HttpResponseRedirect
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 from pydiscourse.sso import sso_redirect_url
 from pydiscourse.sso import sso_validate
 
@@ -26,7 +27,7 @@ def forum_sso_login_callback(request: HttpRequest) -> HttpResponse:
     if not user_has_active_membership(request.user):
         messages.error(
             request,
-            "You must have an active membership to view this feature",
+            _("You must have an active membership to view this feature"),
         )
         return HttpResponseRedirect(
             reverse("users:detail", kwargs={"username": request.user.username}),

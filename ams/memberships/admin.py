@@ -38,7 +38,7 @@ class MembershipOptionAdmin(admin.ModelAdmin):
                 },
             ),
             (
-                "Properties",
+                _("Properties"),
                 {
                     "fields": (
                         "type",
@@ -48,17 +48,19 @@ class MembershipOptionAdmin(admin.ModelAdmin):
                         "max_charged_seats",
                         "voting_rights",
                     ),
-                    "description": "Note: These values are read only after creation.",
+                    "description": _(
+                        "Note: These values are read only after creation.",
+                    ),
                 },
             ),
             (
-                "Billing",
+                _("Billing"),
                 {
                     "fields": ("invoice_due_days", "invoice_reference"),
                 },
             ),
             (
-                "Visibility",
+                _("Visibility"),
                 {
                     "fields": (
                         "order",

@@ -1,7 +1,7 @@
-{% load icon %}
+{% load i18n icon %}
 
 {% if active_membership %}
-  <span class="text-success">{% icon "check-circle-fill" %} Active</span>
+  <span class="text-success">{% icon "check-circle-fill" %} {% trans "Active" %}</span>
 {% else %}
-  <span class="text-secondary">None</span>
+  <span class="text-secondary">{% trans "None" %}</span>
 {% endif %}
