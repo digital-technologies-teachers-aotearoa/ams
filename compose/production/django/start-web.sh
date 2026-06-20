@@ -15,6 +15,7 @@ exec /usr/local/bin/gunicorn config.wsgi \
   --threads 1 \
   --timeout 30 \
   --chdir=/app \
+  --no-control-socket \
   --access-logfile - \
   --error-logfile - \
   --log-level info \
