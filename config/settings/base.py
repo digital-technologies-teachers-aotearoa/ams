@@ -388,6 +388,8 @@ ACCOUNT_FORMS = {"signup": "ams.users.forms.UserSignupForm"}
 SOCIALACCOUNT_ADAPTER = "ams.users.adapters.SocialAccountAdapter"
 # https://docs.allauth.org/en/latest/socialaccount/configuration.html
 SOCIALACCOUNT_FORMS = {"signup": "ams.users.forms.UserSocialSignupForm"}
+MFA_ADAPTER = "ams.users.adapters.MFAAdapter"
+MFA_TOTP_ISSUER = env("MFA_TOTP_ISSUER", default="")
 
 
 # Wagtail

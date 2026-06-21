@@ -3,10 +3,14 @@ from __future__ import annotations
 import typing
 
 from allauth.account.adapter import DefaultAccountAdapter
+from allauth.core import context as allauth_context
+from allauth.mfa import app_settings as mfa_app_settings
+from allauth.mfa.adapter import DefaultMFAAdapter
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from django.conf import settings
 from django.template.loader import render_to_string
 
+from ams.cms.models.settings import AssociationSettings
 from ams.utils.email import send_templated_email
 
 if typing.TYPE_CHECKING:
@@ -110,3 +114,16 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
                 if last_name := data.get("last_name"):
                     user.name += f" {last_name}"
         return user
+
+
+class MFAAdapter(DefaultMFAAdapter):
+    def get_totp_issuer(self) -> str:
+        request = allauth_context.request
+        if request is not None:
+            assoc = AssociationSettings.for_request(request)
+            if assoc and assoc.association_short_name:
+                return assoc.association_short_name
+        issuer = mfa_app_settings.TOTP_ISSUER
+        if issuer:
+            return issuer
+        return self._get_site_name()
