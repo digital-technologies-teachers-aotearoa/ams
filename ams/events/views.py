@@ -1,3 +1,4 @@
+from django.utils.formats import date_format
 from django.utils.timezone import now
 from django.views import generic
 from django_filters.views import FilterView
@@ -40,7 +41,7 @@ class HomeView(generic.TemplateView):
                 raw_map_locations[key]["events"].append(
                     {
                         "url": event.get_absolute_url(),
-                        "date": event.start.strftime("%-d %b %Y")
+                        "date": date_format(event.start, "j M Y")
                         if event.start
                         else "",
                         "name": event.name,
