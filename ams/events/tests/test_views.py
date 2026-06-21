@@ -1,10 +1,13 @@
+import datetime
 from http import HTTPStatus
 
 import pytest
 from django.utils import timezone
+from django.utils import translation
 
 from ams.events.tests.factories import EventFactory
 from ams.events.tests.factories import LocationFactory
+from ams.events.views import HomeView
 
 pytestmark = pytest.mark.django_db
 
@@ -19,6 +22,35 @@ class TestHomeView:
         EventFactory(locations=[location])
         response = client.get("/en/events/")
         assert "map_locations" in response.context
+
+    def test_map_location_date_format(self, client):
+        location = LocationFactory()
+        start = datetime.datetime(2026, 7, 15, 0, 0, 0, tzinfo=datetime.UTC)
+        EventFactory(
+            locations=[location],
+            start=start,
+            end=start + datetime.timedelta(days=1),
+        )
+        response = client.get("/en/events/")
+        event_date = response.context["map_locations"][0]["events"][0]["date"]
+        assert event_date == "15 Jul 2026"
+
+    @pytest.mark.skip(reason="Te Reo Māori translation required")
+    def test_map_location_date_uses_active_language(self, rf):
+        location = LocationFactory()
+        start = datetime.datetime(2026, 7, 15, 0, 0, 0, tzinfo=datetime.UTC)
+        EventFactory(
+            locations=[location],
+            start=start,
+            end=start + datetime.timedelta(days=1),
+        )
+        request = rf.get("/en/events/")
+        view = HomeView()
+        view.setup(request)
+        with translation.override("mi"):
+            context = view.get_context_data()
+        event_date = context["map_locations"][0]["events"][0]["date"]
+        assert event_date == "15 Jul 2026"
 
 
 class TestEventUpcomingView:

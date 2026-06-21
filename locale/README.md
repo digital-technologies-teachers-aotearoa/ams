@@ -30,3 +30,7 @@ The production image runs `compilemessages` automatically at build time, so as l
 1. Update the [`LANGUAGES` setting](https://docs.djangoproject.com/en/stable/ref/settings/#std-setting-LANGUAGES) to your project's base settings.
 2. Create the locale folder for the language next to this file, e.g. `fr_FR` for French. Make sure the case is correct.
 3. Run `makemessages` (as instructed above) to generate the PO files for the new language.
+
+## Month and weekday name translations
+
+Django's `|date:` template filter renders month and weekday names (format chars `F`, `M`, `l`, `D`) using strings from `django.utils.dates`, which is Django's own source and is not scanned by `makemessages`. To ensure these strings appear in every language catalog, `ams/utils/i18n_date_hints.py` re-declares the same `pgettext_lazy` calls so `makemessages` picks them up automatically.

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-20 14:30+1200\n"
+"POT-Creation-Date: 2026-06-21 20:44+1200\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -40,7 +40,7 @@ msgstr ""
 msgid "Mark selected invoices for update"
 msgstr ""
 
-#: ams/billing/apps.py:8 ams/memberships/admin.py:55
+#: ams/billing/apps.py:8 ams/memberships/admin.py:57
 msgid "Billing"
 msgstr ""
 
@@ -92,47 +92,47 @@ msgstr ""
 msgid "Use logo in navbar"
 msgstr ""
 
-#: ams/cms/models/settings.py:56
+#: ams/cms/models/settings.py:57
 msgid "If not set, the association short name will be used in the navbar."
 msgstr ""
 
-#: ams/cms/models/settings.py:60
+#: ams/cms/models/settings.py:62
 msgid "Use logo in footer"
 msgstr ""
 
-#: ams/cms/models/settings.py:61
+#: ams/cms/models/settings.py:64
 msgid "If not set, the association short name will be used in the footer."
 msgstr ""
 
-#: ams/cms/models/settings.py:64
+#: ams/cms/models/settings.py:68
 msgid "LinkedIn URL"
 msgstr ""
 
-#: ams/cms/models/settings.py:66 ams/cms/models/settings.py:71
+#: ams/cms/models/settings.py:70 ams/cms/models/settings.py:75
 msgid "If set, a link will appear in the footer."
 msgstr ""
 
-#: ams/cms/models/settings.py:69
+#: ams/cms/models/settings.py:73
 msgid "Facebook URL"
 msgstr ""
 
-#: ams/cms/models/settings.py:84
+#: ams/cms/models/settings.py:88
 msgid "Optional footer text (e.g., copyright info, disclaimers)."
 msgstr ""
 
-#: ams/cms/models/settings.py:93 ams/memberships/forms.py:96
+#: ams/cms/models/settings.py:97 ams/memberships/forms.py:96
 msgid "Name"
 msgstr ""
 
-#: ams/cms/models/settings.py:102
+#: ams/cms/models/settings.py:106
 msgid "Images"
 msgstr ""
 
-#: ams/cms/models/settings.py:109
+#: ams/cms/models/settings.py:113
 msgid "Social networks"
 msgstr ""
 
-#: ams/cms/models/settings.py:115
+#: ams/cms/models/settings.py:119
 msgid "Footer"
 msgstr ""
 
@@ -182,7 +182,7 @@ msgstr ""
 msgid "Currently only registration via URL is available."
 msgstr ""
 
-#: ams/events/admin.py:223 ams/memberships/admin.py:61
+#: ams/events/admin.py:223 ams/memberships/admin.py:63
 #: ams/resources/admin.py:100
 msgid "Visibility"
 msgstr ""
@@ -283,21 +283,21 @@ msgstr ""
 msgid "Properties"
 msgstr ""
 
-#: ams/memberships/admin.py:51
+#: ams/memberships/admin.py:52
 msgid "Note: These values are read only after creation."
 msgstr ""
 
-#: ams/memberships/admin.py:108
+#: ams/memberships/admin.py:110
 msgid ""
 "Could not delete the following membership options because they have existing "
 "memberships. Archive them instead: {}"
 msgstr ""
 
-#: ams/memberships/admin.py:116
+#: ams/memberships/admin.py:118
 msgid "Successfully deleted {} membership option(s)."
 msgstr ""
 
-#: ams/memberships/admin.py:144 ams/terms/admin.py:116
+#: ams/memberships/admin.py:146 ams/terms/admin.py:116
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr ""
@@ -1468,12 +1468,12 @@ msgstr ""
 msgid "No articles have been published yet."
 msgstr ""
 
-#: ams/templates/cms/partials/article_card.html:13
+#: ams/templates/cms/partials/article_card.html:14
 #, python-format
 msgid "by %(author)s"
 msgstr ""
 
-#: ams/templates/cms/partials/article_card.html:17
+#: ams/templates/cms/partials/article_card.html:19
 msgid "Read more"
 msgstr ""
 
@@ -3029,15 +3029,15 @@ msgstr ""
 msgid "Personal info"
 msgstr ""
 
-#: ams/users/admin.py:165
+#: ams/users/admin.py:166
 msgid "Permissions"
 msgstr ""
 
-#: ams/users/admin.py:177
+#: ams/users/admin.py:178
 msgid "Important dates"
 msgstr ""
 
-#: ams/users/admin.py:200
+#: ams/users/admin.py:201
 msgid "Export users to CSV"
 msgstr ""
 
@@ -3045,44 +3045,52 @@ msgstr ""
 msgid "Users"
 msgstr ""
 
-#: ams/users/forms.py:53 ams/users/tests/test_forms.py:52
+#: ams/users/forms.py:54 ams/users/tests/test_forms.py:52
 msgid "This email has already been taken."
 msgstr ""
 
-#: ams/users/forms.py:65 ams/users/forms.py:68
+#: ams/users/forms.py:66 ams/users/forms.py:69
 msgid "First name"
 msgstr ""
 
-#: ams/users/forms.py:72 ams/users/forms.py:75
+#: ams/users/forms.py:73 ams/users/forms.py:76
 msgid "Last name"
 msgstr ""
 
-#: ams/users/forms.py:79 ams/users/forms.py:83
+#: ams/users/forms.py:80 ams/users/forms.py:84
 msgid "Username"
 msgstr ""
 
-#: ams/users/forms.py:81
+#: ams/users/forms.py:82
 msgid "This is used in the community forum."
 msgstr ""
 
-#: ams/users/forms.py:119
+#: ams/users/forms.py:88
+msgid "Preferred language"
+msgstr ""
+
+#: ams/users/forms.py:106 ams/users/forms.py:157
+msgid "No preference"
+msgstr ""
+
+#: ams/users/forms.py:135
 msgid "Profile picture"
 msgstr ""
 
-#: ams/users/forms.py:122
+#: ams/users/forms.py:138
 msgid ""
 "Upload a profile picture (JPEG, PNG, GIF, or WEBP). Maximum file size: 5MB."
 msgstr ""
 
-#: ams/users/forms.py:303
+#: ams/users/forms.py:324
 msgid "Personal Information"
 msgstr ""
 
-#: ams/users/forms.py:334
+#: ams/users/forms.py:356
 msgid "Update Profile"
 msgstr ""
 
-#: ams/users/forms.py:364
+#: ams/users/forms.py:386
 #, python-format
 msgid "File size must be no more than 5MB. Your file is %(size).1fMB."
 msgstr ""
@@ -3091,275 +3099,279 @@ msgstr ""
 msgid "You do not have permission to view this user profile."
 msgstr ""
 
-#: ams/users/models.py:40
+#: ams/users/models.py:41
 msgid ""
 "Username must only include numbers, letters (including macrons), dashes, "
 "dots, and underscores."
 msgstr ""
 
-#: ams/users/models.py:73
+#: ams/users/models.py:74
 msgid "email address"
 msgstr ""
 
-#: ams/users/models.py:75
+#: ams/users/models.py:76
 msgid "username"
 msgstr ""
 
-#: ams/users/models.py:79
+#: ams/users/models.py:80
 msgid ""
 "This is used in the community forum. Username must only include numbers, "
 "letters (including macrons), dashes, dots, and underscores."
 msgstr ""
 
-#: ams/users/models.py:84
+#: ams/users/models.py:85
 msgid "A user with that username already exists."
 msgstr ""
 
-#: ams/users/models.py:87
+#: ams/users/models.py:88
 msgid "first name"
 msgstr ""
 
-#: ams/users/models.py:88
+#: ams/users/models.py:89
 msgid "last name"
 msgstr ""
 
-#: ams/users/models.py:90
+#: ams/users/models.py:91
 msgid "profile picture"
 msgstr ""
 
-#: ams/users/models.py:102
+#: ams/users/models.py:103
 msgid "admin notes"
 msgstr ""
 
-#: ams/users/models.py:104
+#: ams/users/models.py:105
 msgid "Internal notes for administrators only."
 msgstr ""
 
-#: ams/users/models.py:163
+#: ams/users/models.py:108
+msgid "preferred language"
+msgstr ""
+
+#: ams/users/models.py:171
 msgid "name translations"
 msgstr ""
 
-#: ams/users/models.py:165
+#: ams/users/models.py:173
 msgid "Enter translations as JSON: {\"en\": \"Name\", \"mi\": \"Ingoa\"}"
 msgstr ""
 
-#: ams/users/models.py:168
+#: ams/users/models.py:176
 msgid "description translations"
 msgstr ""
 
-#: ams/users/models.py:172
+#: ams/users/models.py:180
 msgid ""
 "Enter translations as JSON: {\"en\": \"Description\", \"mi\": "
 "\"Whakamārama\"}"
 msgstr ""
 
-#: ams/users/models.py:175 ams/users/models.py:295
+#: ams/users/models.py:183 ams/users/models.py:303
 msgid "order"
 msgstr ""
 
-#: ams/users/models.py:175
+#: ams/users/models.py:183
 msgid "Display order"
 msgstr ""
 
-#: ams/users/models.py:177 ams/users/models.py:300
+#: ams/users/models.py:185 ams/users/models.py:308
 msgid "is active"
 msgstr ""
 
-#: ams/users/models.py:179
+#: ams/users/models.py:187
 msgid "Show/hide group"
 msgstr ""
 
-#: ams/users/models.py:184
+#: ams/users/models.py:192
 msgid "profile field group"
 msgstr ""
 
-#: ams/users/models.py:185
+#: ams/users/models.py:193
 msgid "profile field groups"
 msgstr ""
 
-#: ams/users/models.py:226
+#: ams/users/models.py:234
 msgid "Text"
 msgstr ""
 
-#: ams/users/models.py:227
+#: ams/users/models.py:235
 msgid "Textarea"
 msgstr ""
 
-#: ams/users/models.py:228
+#: ams/users/models.py:236
 msgid "Checkbox"
 msgstr ""
 
-#: ams/users/models.py:229
+#: ams/users/models.py:237
 msgid "Radio"
 msgstr ""
 
-#: ams/users/models.py:230
+#: ams/users/models.py:238
 msgid "Date"
 msgstr ""
 
-#: ams/users/models.py:231
+#: ams/users/models.py:239
 msgid "Month"
 msgstr ""
 
-#: ams/users/models.py:232
+#: ams/users/models.py:240
 msgid "Number"
 msgstr ""
 
-#: ams/users/models.py:233
+#: ams/users/models.py:241
 msgid "Select"
 msgstr ""
 
-#: ams/users/models.py:236
+#: ams/users/models.py:244
 msgid "field key"
 msgstr ""
 
-#: ams/users/models.py:239
+#: ams/users/models.py:247
 msgid "Unique identifier (lowercase_underscore format)"
 msgstr ""
 
-#: ams/users/models.py:242
+#: ams/users/models.py:250
 msgid "field type"
 msgstr ""
 
-#: ams/users/models.py:245
+#: ams/users/models.py:253
 msgid "Type of form field"
 msgstr ""
 
-#: ams/users/models.py:248
+#: ams/users/models.py:256
 msgid "label translations"
 msgstr ""
 
-#: ams/users/models.py:250
+#: ams/users/models.py:258
 msgid "Enter translations as JSON: {\"en\": \"Label\", \"mi\": \"Tapanga\"}"
 msgstr ""
 
-#: ams/users/models.py:253
+#: ams/users/models.py:261
 msgid "help text translations"
 msgstr ""
 
-#: ams/users/models.py:256
+#: ams/users/models.py:264
 msgid "Enter translations as JSON: {\"en\": \"Help text\", \"mi\": \"Āwhina\"}"
 msgstr ""
 
-#: ams/users/models.py:259
+#: ams/users/models.py:267
 msgid "options"
 msgstr ""
 
-#: ams/users/models.py:263
+#: ams/users/models.py:271
 msgid ""
 "For select/radio/checkbox: {\"choices\": [{\"value\": \"val1\", "
 "\"label_translations\": {\"en\": \"Label 1\", \"mi\": \"...\"}}]}"
 msgstr ""
 
-#: ams/users/models.py:268
+#: ams/users/models.py:276
 msgid "min value"
 msgstr ""
 
-#: ams/users/models.py:271
+#: ams/users/models.py:279
 msgid "Minimum value for number fields"
 msgstr ""
 
-#: ams/users/models.py:274
+#: ams/users/models.py:282
 msgid "max value"
 msgstr ""
 
-#: ams/users/models.py:277
+#: ams/users/models.py:285
 msgid "Maximum value for number fields"
 msgstr ""
 
-#: ams/users/models.py:280
+#: ams/users/models.py:288
 msgid "is read only"
 msgstr ""
 
-#: ams/users/models.py:282
+#: ams/users/models.py:290
 msgid "Only admins can set value"
 msgstr ""
 
-#: ams/users/models.py:285
+#: ams/users/models.py:293
 msgid "is required for membership"
 msgstr ""
 
-#: ams/users/models.py:287
+#: ams/users/models.py:295
 msgid "Required before membership purchase"
 msgstr ""
 
-#: ams/users/models.py:290
+#: ams/users/models.py:298
 msgid "recommended to complete"
 msgstr ""
 
-#: ams/users/models.py:292
+#: ams/users/models.py:300
 msgid "Include this field in profile completion percentage"
 msgstr ""
 
-#: ams/users/models.py:297
+#: ams/users/models.py:305
 msgid "Display order within group"
 msgstr ""
 
-#: ams/users/models.py:302
+#: ams/users/models.py:310
 msgid "Show/hide field"
 msgstr ""
 
-#: ams/users/models.py:308
+#: ams/users/models.py:316
 msgid "group"
 msgstr ""
 
-#: ams/users/models.py:314 ams/users/models.py:445
+#: ams/users/models.py:322 ams/users/models.py:453
 msgid "profile field"
 msgstr ""
 
-#: ams/users/models.py:315
+#: ams/users/models.py:323
 msgid "profile fields"
 msgstr ""
 
-#: ams/users/models.py:381
+#: ams/users/models.py:389
 msgid ""
 "Field key must start with a lowercase letter and contain only lowercase "
 "letters, numbers, and underscores."
 msgstr ""
 
-#: ams/users/models.py:390
+#: ams/users/models.py:398
 msgid "Label translations cannot be empty."
 msgstr ""
 
-#: ams/users/models.py:403
+#: ams/users/models.py:411
 msgid ""
 "Options must have a 'choices' list with label_translations for select/radio/"
 "checkbox types."
 msgstr ""
 
-#: ams/users/models.py:413
+#: ams/users/models.py:421
 msgid "Each choice must have label_translations."
 msgstr ""
 
-#: ams/users/models.py:423
+#: ams/users/models.py:431
 msgid "Minimum value must be less than maximum value."
 msgstr ""
 
-#: ams/users/models.py:439
+#: ams/users/models.py:447
 msgid "user"
 msgstr ""
 
-#: ams/users/models.py:447
+#: ams/users/models.py:455
 msgid "value"
 msgstr ""
 
-#: ams/users/models.py:447
+#: ams/users/models.py:455
 msgid "Response value"
 msgstr ""
 
-#: ams/users/models.py:449
+#: ams/users/models.py:457
 msgid "updated datetime"
 msgstr ""
 
-#: ams/users/models.py:451
+#: ams/users/models.py:459
 msgid "When response was last updated"
 msgstr ""
 
-#: ams/users/models.py:460
+#: ams/users/models.py:468
 msgid "profile field response"
 msgstr ""
 
-#: ams/users/models.py:461
+#: ams/users/models.py:469
 msgid "profile field responses"
 msgstr ""
 
@@ -3411,6 +3423,278 @@ msgstr ""
 
 #: ams/utils/crispy_forms.py:99
 msgid "Required for membership"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:20
+msgid "January"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:20
+msgid "February"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:20
+msgid "March"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:20
+msgid "April"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:21
+msgid "May"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:21
+msgid "June"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:21
+msgid "July"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:21
+msgid "August"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:22
+msgid "September"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:22
+msgid "October"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:22
+msgid "November"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:22
+msgid "December"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:26
+msgid "jan"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:26
+msgid "feb"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:26
+msgid "mar"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:26
+msgid "apr"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:27
+msgid "may"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:27
+msgid "jun"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:27
+msgid "jul"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:27
+msgid "aug"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:28
+msgid "sep"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:28
+msgid "oct"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:28
+msgid "nov"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:28
+msgid "dec"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:32
+msgctxt "abbrev. month"
+msgid "Jan."
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:33
+msgctxt "abbrev. month"
+msgid "Feb."
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:34
+msgctxt "abbrev. month"
+msgid "March"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:35
+msgctxt "abbrev. month"
+msgid "April"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:36
+msgctxt "abbrev. month"
+msgid "May"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:37
+msgctxt "abbrev. month"
+msgid "June"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:38
+msgctxt "abbrev. month"
+msgid "July"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:39
+msgctxt "abbrev. month"
+msgid "Aug."
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:40
+msgctxt "abbrev. month"
+msgid "Sept."
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:41
+msgctxt "abbrev. month"
+msgid "Oct."
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:42
+msgctxt "abbrev. month"
+msgid "Nov."
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:43
+msgctxt "abbrev. month"
+msgid "Dec."
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:47
+msgctxt "alt. month"
+msgid "January"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:48
+msgctxt "alt. month"
+msgid "February"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:49
+msgctxt "alt. month"
+msgid "March"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:50
+msgctxt "alt. month"
+msgid "April"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:51
+msgctxt "alt. month"
+msgid "May"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:52
+msgctxt "alt. month"
+msgid "June"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:53
+msgctxt "alt. month"
+msgid "July"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:54
+msgctxt "alt. month"
+msgid "August"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:55
+msgctxt "alt. month"
+msgid "September"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:56
+msgctxt "alt. month"
+msgid "October"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:57
+msgctxt "alt. month"
+msgid "November"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:58
+msgctxt "alt. month"
+msgid "December"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:62
+msgid "Monday"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:62
+msgid "Tuesday"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:62
+msgid "Wednesday"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:62
+msgid "Thursday"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:63
+msgid "Friday"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:63
+msgid "Saturday"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:63
+msgid "Sunday"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:67
+msgid "Mon"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:67
+msgid "Tue"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:67
+msgid "Wed"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:67
+msgid "Thu"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:67
+msgid "Fri"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:67
+msgid "Sat"
+msgstr ""
+
+#: ams/utils/i18n_date_hints.py:67
+msgid "Sun"
 msgstr ""
 
 #: config/settings/base.py:35
