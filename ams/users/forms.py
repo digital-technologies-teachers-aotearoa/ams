@@ -5,6 +5,7 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Fieldset
 from crispy_forms.layout import Layout
 from crispy_forms.layout import Submit
+from django.conf import settings
 from django.contrib.auth import forms as admin_forms
 from django.core.exceptions import ValidationError
 from django.db import transaction
@@ -83,6 +84,11 @@ class UserSignupForm(SignupForm):
             attrs={"placeholder": _("Username"), "autocomplete": "username"},
         ),
     )
+    language = ChoiceField(
+        label=_("Preferred language"),
+        choices=[],  # populated in __init__
+        required=False,
+    )
 
     field_order = [
         "email",
@@ -91,13 +97,23 @@ class UserSignupForm(SignupForm):
         "first_name",
         "last_name",
         "username",
+        "language",
     ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["language"].choices = [
+            ("", _("No preference")),
+            *list(settings.LANGUAGES),
+        ]
 
     def save(self, request):
         user = super().save(request)
         user.first_name = self.cleaned_data.get("first_name")
         user.last_name = self.cleaned_data.get("last_name")
         user.username = self.cleaned_data.get("username")
+        user.language = self.cleaned_data.get("language", "")
+        user.save()
         return user
 
 
@@ -126,7 +142,7 @@ class UserUpdateForm(ModelForm):
 
     class Meta:
         model = User
-        fields = ["first_name", "last_name", "username", "profile_picture"]
+        fields = ["first_name", "last_name", "username", "profile_picture", "language"]
         widgets = {
             "first_name": TextInput(attrs={"autocomplete": "given-name"}),
             "last_name": TextInput(attrs={"autocomplete": "family-name"}),
@@ -136,6 +152,11 @@ class UserUpdateForm(ModelForm):
     def __init__(self, *args, **kwargs):
         """Initialize form and add dynamic profile fields."""
         super().__init__(*args, **kwargs)
+
+        self.fields["language"].choices = [
+            ("", _("No preference")),
+            *list(settings.LANGUAGES),
+        ]
 
         language_code = get_language()
         self._profile_fields = []
@@ -305,6 +326,7 @@ class UserUpdateForm(ModelForm):
                 "last_name",
                 "username",
                 "profile_picture",
+                "language",
             ),
         ]
 
