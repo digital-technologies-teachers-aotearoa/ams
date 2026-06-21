@@ -6,6 +6,7 @@ from allauth.account.adapter import DefaultAccountAdapter
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from django.conf import settings
 from django.template.loader import render_to_string
+from django.utils import translation
 
 from ams.utils.email import send_templated_email
 
@@ -44,8 +45,16 @@ class AccountAdapter(DefaultAccountAdapter):
             extra_tags,
         )
 
+    def get_login_redirect_url(self, request):
+        # Activate stored language so reverse() returns the correct prefix
+        if request.user.is_authenticated and request.user.language:
+            translation.activate(request.user.language)
+        return super().get_login_redirect_url(request)
+
     def send_mail(self, template_prefix, email, context):
         """Override to send HTML emails using MJML templates."""
+        user = context.get("user")
+        language = getattr(user, "language", None) or settings.LANGUAGE_CODE
 
         # Map allauth template prefixes to MJML template names
         template_map = {
@@ -63,23 +72,24 @@ class AccountAdapter(DefaultAccountAdapter):
             ),
         }
 
-        template_name = template_map.get(template_prefix)
+        with translation.override(language):
+            template_name = template_map.get(template_prefix)
 
-        if template_name:
-            # Render subject using allauth's template
-            subject = render_to_string(f"{template_prefix}_subject.txt", context)
-            subject = "".join(subject.splitlines())
+            if template_name:
+                # Render subject using allauth's template
+                subject = render_to_string(f"{template_prefix}_subject.txt", context)
+                subject = "".join(subject.splitlines())
 
-            # Send using MJML pipeline
-            send_templated_email(
-                subject=subject,
-                template_name=template_name,
-                context=context,
-                recipient_list=[email],
-            )
-        else:
-            # Fallback to default allauth behavior
-            super().send_mail(template_prefix, email, context)
+                # Send using MJML pipeline
+                send_templated_email(
+                    subject=subject,
+                    template_name=template_name,
+                    context=context,
+                    recipient_list=[email],
+                )
+            else:
+                # Fallback to default allauth behavior
+                super().send_mail(template_prefix, email, context)
 
 
 class SocialAccountAdapter(DefaultSocialAccountAdapter):

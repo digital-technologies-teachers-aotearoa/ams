@@ -4,6 +4,7 @@ import time
 import uuid as uuid_lib
 from typing import ClassVar
 
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.core.files.storage import storages
@@ -102,6 +103,13 @@ class User(AbstractUser):
         _("admin notes"),
         blank=True,
         help_text=_("Internal notes for administrators only."),
+    )
+    language = CharField(
+        _("preferred language"),
+        max_length=10,
+        choices=settings.AVAILABLE_LANGUAGES,
+        blank=True,
+        default="",
     )
 
     USERNAME_FIELD = "email"

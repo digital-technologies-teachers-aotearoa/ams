@@ -17,7 +17,15 @@ from ams.utils.views import server_error
 
 def redirect_to_user_language(request):
     """Redirect to the user's preferred language, falling back to 'en'."""
-    language = get_language() or "en"
+    if request.user.is_authenticated and request.user.language:
+        languages = [code for code, _ in settings.LANGUAGES]
+        language = (
+            request.user.language
+            if request.user.language in languages
+            else (get_language() or settings.LANGUAGE_CODE)
+        )
+    else:
+        language = get_language() or settings.LANGUAGE_CODE
     return HttpResponseRedirect(f"/{language}/")
 
 
