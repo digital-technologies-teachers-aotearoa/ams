@@ -5,12 +5,29 @@ from io import StringIO
 import pytest
 from django.core.management import call_command
 from wagtail.models import Locale
+from wagtail.models import Page
 from wagtail.models import Site
 
 from ams.cms.models import HomePage
 from ams.cms.models import SiteSettings
 
 pytestmark = pytest.mark.django_db
+
+
+@pytest.fixture(autouse=True)
+def clean_cms_state(wagtail_site, db):
+    """Delete stale CMS objects left by previous test runs.
+
+    setup_cms calls modify_site_hostname_constraint which runs DDL (ALTER TABLE).
+    In psycopg3 this breaks savepoint rollback, so Locale/Site/Page rows can
+    persist across --reuse-db runs. This fixture deletes them at the start of
+    each test so every test begins with a consistent empty slate.
+
+    Depends on wagtail_site so it runs after the base en Locale/Site are set up.
+    """
+    Page.objects.filter(depth__gte=2).delete()
+    Locale.objects.exclude(language_code="en").delete()
+    Site.objects.exclude(id=wagtail_site.id).delete()
 
 
 def _setup_cms():
