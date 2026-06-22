@@ -157,6 +157,7 @@ class Command(BaseCommand):
 
         try:
             with connection.cursor() as cursor:
+                cursor.execute("SET CONSTRAINTS ALL IMMEDIATE")
                 cursor.execute(
                     f"ALTER TABLE wagtailcore_site DROP CONSTRAINT {constraint_name};",
                 )

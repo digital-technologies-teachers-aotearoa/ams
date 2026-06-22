@@ -20,7 +20,7 @@ from config.storage_backends import PrivateMediaStorage
 
 class ResourceCategory(models.Model):
     name = models.CharField(max_length=200)
-    slug = AutoSlugField(populate_from="name")
+    slug = AutoSlugField(populate_from="_slug_source")
     order = models.PositiveIntegerField(default=0)
 
     class Meta:
@@ -30,6 +30,9 @@ class ResourceCategory(models.Model):
     def __str__(self):
         return self.name
 
+    def _slug_source(self):
+        return self.name_en or self.name
+
 
 class ResourceTag(models.Model):
     category = models.ForeignKey(
@@ -38,7 +41,7 @@ class ResourceTag(models.Model):
         related_name="tags",
     )
     name = models.CharField(max_length=200)
-    slug = AutoSlugField(populate_from="name")
+    slug = AutoSlugField(populate_from="_slug_source")
     abbreviation = models.CharField(max_length=20, blank=True)
     color = ColorField(blank=True, default="")
     order = models.PositiveIntegerField(default=0)
@@ -49,6 +52,9 @@ class ResourceTag(models.Model):
 
     def __str__(self):
         return self.name
+
+    def _slug_source(self):
+        return self.name_en or self.name
 
     @property
     def text_color(self) -> str:
@@ -75,7 +81,7 @@ class Resource(models.Model):
         MEMBERS_ONLY = 3, _("Members only - only members can view or access")
 
     name = models.CharField(max_length=200)
-    slug = AutoSlugField(populate_from="name", always_update=True, null=True)
+    slug = AutoSlugField(populate_from="_slug_source", always_update=True, null=True)
     description = HTMLField()
     published = models.BooleanField(default=False)
     visibility = models.PositiveSmallIntegerField(
@@ -126,6 +132,9 @@ class Resource(models.Model):
             "resources:resource",
             kwargs={"pk": self.pk, "slug": self.slug},
         )
+
+    def _slug_source(self):
+        return self.name_en or self.name
 
     @property
     def visibility_badge_label(self):

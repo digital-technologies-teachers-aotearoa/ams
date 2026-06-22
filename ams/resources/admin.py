@@ -2,6 +2,9 @@ from django import forms
 from django.conf import settings
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
+from modeltranslation.admin import TabbedTranslationAdmin
+from modeltranslation.admin import TranslationStackedInline
+from modeltranslation.admin import TranslationTabularInline
 
 from ams.resources.models import Resource
 from ams.resources.models import ResourceCategory
@@ -51,7 +54,7 @@ class ResourceForm(forms.ModelForm):
         return cleaned_data
 
 
-class ResourceComponentInline(admin.StackedInline):
+class ResourceComponentInline(TranslationStackedInline):
     model = ResourceComponent
     fk_name = "resource"
     extra = 1
@@ -71,7 +74,7 @@ class ResourceComponentInline(admin.StackedInline):
 
 
 @admin.register(Resource)
-class ResourceAdmin(ResourcesFeatureFlagMixin, admin.ModelAdmin):
+class ResourceAdmin(ResourcesFeatureFlagMixin, TabbedTranslationAdmin):
     form = ResourceForm
     inlines = [ResourceComponentInline]
     list_display = (
@@ -105,21 +108,21 @@ class ResourceAdmin(ResourcesFeatureFlagMixin, admin.ModelAdmin):
     )
 
 
-class ResourceTagInline(admin.TabularInline):
+class ResourceTagInline(TranslationTabularInline):
     model = ResourceTag
     extra = 1
     fields = ("name", "abbreviation", "color", "order")
 
 
 @admin.register(ResourceCategory)
-class ResourceCategoryAdmin(ResourcesFeatureFlagMixin, admin.ModelAdmin):
+class ResourceCategoryAdmin(ResourcesFeatureFlagMixin, TabbedTranslationAdmin):
     list_display = ("name", "order")
     search_fields = ("name",)
     inlines = [ResourceTagInline]
 
 
 @admin.register(ResourceTag)
-class ResourceTagAdmin(ResourcesFeatureFlagMixin, admin.ModelAdmin):
+class ResourceTagAdmin(ResourcesFeatureFlagMixin, TabbedTranslationAdmin):
     list_display = ("name", "category", "abbreviation", "order")
     list_filter = ("category",)
     search_fields = ("name",)

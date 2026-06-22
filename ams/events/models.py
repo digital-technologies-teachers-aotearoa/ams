@@ -118,7 +118,7 @@ class Event(models.Model):
 
     name = models.CharField(max_length=200)
     description = HTMLField()
-    slug = AutoSlugField(populate_from="get_short_name", always_update=False, null=True)
+    slug = AutoSlugField(populate_from="_slug_source", always_update=False, null=True)
     published = models.BooleanField(default=False)
     show_schedule = models.BooleanField(default=False)
     featured = models.BooleanField(default=False)
@@ -181,6 +181,13 @@ class Event(models.Model):
                 start=first_session.start,
                 end=last_session.end,
             )
+
+    def _slug_source(self):
+        name = self.name_en or self.name
+        if self.series:
+            abbreviation = self.series.abbreviation_en or self.series.abbreviation
+            return f"{abbreviation}: {name}"
+        return name
 
     def get_short_name(self):
         if self.series:

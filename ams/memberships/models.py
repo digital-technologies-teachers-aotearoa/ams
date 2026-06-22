@@ -128,7 +128,7 @@ class MembershipOption(Model):
     )
 
     class Meta:
-        unique_together = (("name", "type"),)
+        unique_together = (("name_en", "type"),)
         ordering = ["order", "cost"]
 
     def __str__(self):

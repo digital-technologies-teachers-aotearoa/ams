@@ -5,13 +5,21 @@ from django.contrib import messages
 from django.db.models.deletion import ProtectedError
 from django.http import HttpResponseRedirect
 from django.utils.translation import gettext_lazy as _
+from modeltranslation.admin import TabbedTranslationAdmin
 
+from ams.terms.models import Term
 from ams.terms.models import TermAcceptance
 from ams.terms.models import TermVersion
 
 
+@admin.register(Term)
+class TermAdmin(TabbedTranslationAdmin):
+    list_display = ["name", "key", "created_at"]
+    search_fields = ["name", "key"]
+
+
 @admin.register(TermVersion)
-class TermVersionAdmin(admin.ModelAdmin):
+class TermVersionAdmin(TabbedTranslationAdmin):
     """Django admin interface for managing Term Versions."""
 
     list_display = [

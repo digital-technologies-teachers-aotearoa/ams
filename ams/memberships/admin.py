@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from modeltranslation.admin import TabbedTranslationAdmin
 
 from ams.memberships.forms import MembershipOptionForm
 from ams.memberships.models import IndividualMembership
@@ -12,7 +13,7 @@ from ams.memberships.models import OrganisationMembership
 
 
 @admin.register(MembershipOption)
-class MembershipOptionAdmin(admin.ModelAdmin):
+class MembershipOptionAdmin(TabbedTranslationAdmin):
     form = MembershipOptionForm
     list_display = (
         "order",
@@ -30,7 +31,7 @@ class MembershipOptionAdmin(admin.ModelAdmin):
     list_filter = ("type", "archived")
 
     def get_fieldsets(self, request, obj=None):
-        return (
+        fieldsets = (
             (
                 None,
                 {
@@ -69,6 +70,7 @@ class MembershipOptionAdmin(admin.ModelAdmin):
                 },
             ),
         )
+        return self._patch_fieldsets(fieldsets)
 
     def get_readonly_fields(self, request, obj=None):
         """Fields are read only on updates only."""

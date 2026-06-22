@@ -5,6 +5,8 @@ from django.conf import settings
 from django.contrib import admin
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
+from modeltranslation.admin import TabbedTranslationAdmin
+from modeltranslation.admin import TranslationStackedInline
 
 from ams.events.models import Event
 from ams.events.models import Location
@@ -89,13 +91,13 @@ class LocationAdminForm(forms.ModelForm):
 
 
 @admin.register(Region)
-class RegionAdmin(EventsFeatureFlagMixin, admin.ModelAdmin):
+class RegionAdmin(EventsFeatureFlagMixin, TabbedTranslationAdmin):
     list_display = ("name", "order")
     search_fields = ("name",)
 
 
 @admin.register(Location)
-class LocationAdmin(EventsFeatureFlagMixin, admin.ModelAdmin):
+class LocationAdmin(EventsFeatureFlagMixin, TabbedTranslationAdmin):
     form = LocationAdminForm
     list_display = ("name", "room", "street_address", "suburb", "city", "region")
     list_filter = ("region",)
@@ -103,7 +105,7 @@ class LocationAdmin(EventsFeatureFlagMixin, admin.ModelAdmin):
     autocomplete_fields = ("region",)
 
 
-class SessionInline(admin.StackedInline):
+class SessionInline(TranslationStackedInline):
     model = Session
     fk_name = "event"
     extra = 3
@@ -185,7 +187,7 @@ def duplicate_events(modeladmin, request, queryset):
 
 
 @admin.register(Event)
-class EventAdmin(EventsFeatureFlagMixin, admin.ModelAdmin):
+class EventAdmin(EventsFeatureFlagMixin, TabbedTranslationAdmin):
     model = Event
     inlines = [SessionInline]
     actions = [duplicate_events]
@@ -251,6 +253,6 @@ class EventAdmin(EventsFeatureFlagMixin, admin.ModelAdmin):
 
 
 @admin.register(Series)
-class SeriesAdmin(EventsFeatureFlagMixin, admin.ModelAdmin):
+class SeriesAdmin(EventsFeatureFlagMixin, TabbedTranslationAdmin):
     list_display = ("name", "abbreviation")
     search_fields = ("name",)
