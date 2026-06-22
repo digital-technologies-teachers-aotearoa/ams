@@ -48,15 +48,13 @@ class Command(BaseCommand):
             created_locales.append(str(locale))
 
             # Try to get existing home page for this locale
-            try:
-                home = HomePage.objects.get(locale=locale)
+            home = HomePage.objects.filter(locale=locale).first()
+            if home is not None:
                 created = False
-                # Update existing page
                 home.title = "Home"
                 home.slug = f"{lang_code}"
                 home.save()
-            except HomePage.DoesNotExist:
-                # Create new home page and add it to the tree
+            else:
                 home = HomePage(
                     title="Home",
                     slug=f"{lang_code}",
