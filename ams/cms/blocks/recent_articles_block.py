@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 from django.utils import timezone
 from wagtail.blocks import ChoiceBlock
 from wagtail.blocks import StructBlock
+from wagtail.models import Locale
 
 if TYPE_CHECKING:
     from ams.cms.models import ArticlePage
@@ -31,9 +32,13 @@ class RecentArticlesBlock(StructBlock):
 
         count = int(value.get("article_count", 3))
 
+        page = parent_context.get("page") if parent_context else None
+        locale = page.locale if page else Locale.get_active()
+
         articles: list[ArticlePage] = list(
             ArticlePage.objects.live()
             .public()
+            .filter(locale=locale)
             .select_related("cover_image")
             .filter(publication_date__lte=timezone.now())
             .order_by("-publication_date")[:count],
