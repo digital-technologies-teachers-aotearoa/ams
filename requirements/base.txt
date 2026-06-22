@@ -24,6 +24,7 @@ django-tinymce==5.0.0
 django-autoslug==1.9.9
 django-colorfield
 django-money==3.6.1
+django-modeltranslation==0.20.3
 
 # Wagtail
 # ------------------------------------------------------------------------------

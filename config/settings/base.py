@@ -60,6 +60,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/dev/ref/settings/#locale-paths
 LOCALE_PATHS = [str(BASE_DIR / "locale")]
 
+# MODELTRANSLATION
+# ------------------------------------------------------------------------------
+MODELTRANSLATION_DEFAULT_LANGUAGE = "en"
+# Fixed from AVAILABLE_LANGUAGES so _en/_mi columns are always generated in
+# migrations regardless of which languages are enabled at runtime.
+MODELTRANSLATION_LANGUAGES = tuple(code for code, _ in AVAILABLE_LANGUAGES)
+
 # DATABASES
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
@@ -88,6 +95,7 @@ WSGI_APPLICATION = "config.wsgi.application"
 # APPS
 # ------------------------------------------------------------------------------
 DJANGO_APPS = [
+    "modeltranslation",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
