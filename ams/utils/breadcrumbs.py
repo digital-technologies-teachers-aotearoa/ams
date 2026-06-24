@@ -143,6 +143,8 @@ BREADCRUMB_REGISTRY: dict[str, BreadcrumbConfig] = {
     },
     "mfa_index": {
         "parent": "users:detail",
+        # Translators: MFA = Multi-Factor Authentication (two-step login security).
+        # Consider keeping as "MFA" or translating as appropriate.
         "label": _("MFA"),
     },
     "mfa_activate_totp": {

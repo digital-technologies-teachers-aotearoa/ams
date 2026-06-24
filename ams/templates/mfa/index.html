@@ -53,6 +53,7 @@
       {% slot body %}
         {% if authenticators.webauthn|length %}
           {% element p %}
+            {# Translators: A "security key" is a physical USB device used for two-factor login. Singular/plural pair — provide both msgstr[0] (one key) and msgstr[1] (many keys). #}
             {% blocktranslate count count=authenticators.webauthn|length %}You have added {{ count }} security key.{% plural %}You have added {{ count }} security keys.{% endblocktranslate %}
           {% endelement %}
         {% else %}
@@ -85,6 +86,7 @@
         {% slot body %}
           {% if authenticators.recovery_codes %}
             {% element p %}
+              {# Translators: Recovery codes are backup one-time codes to access your account if you lose your phone. {{ unused_count }} = unused codes remaining, {{ total_count }} = total generated. Singular/plural pair — provide both msgstr[0] and msgstr[1]. #}
               {% blocktranslate count unused_count=unused_count %}There is {{ unused_count }} out of {{ total_count }} recovery codes available.{% plural %}There are {{ unused_count }} out of {{ total_count }} recovery codes available.{% endblocktranslate %}
             {% endelement %}
           {% else %}

@@ -130,6 +130,7 @@
               <div>
                 <small class="text-muted d-block">
                   {% with n=locations|length %}
+                    {# Translators: Section label on an event detail page. Singular when there is one venue, plural when there are multiple. #}
                     {% blocktrans context "event detail location label" count n=n %}Location{% plural %}Locations{% endblocktrans %}
                   {% endwith %}
                 </small>

@@ -192,7 +192,7 @@ Available in `ams/utils/views.py`:
 
 ```bash
 # Extract messages
-docker compose run --rm django python manage.py makemessages --all --no-location
+docker compose run --rm django python manage.py makemessages --all
 
 # Compile messages
 docker compose run --rm django python manage.py compilemessages

@@ -17,6 +17,7 @@
                        class="event-card__logo me-1"
                        alt="{{ event.series.name }}" />
                 {% elif event.series.abbreviation %}
+                  {# Translators: {{ abbr }} is the short abbreviation of an event series name, e.g. "NZC". "series" means a group of related events. #}
                   {% blocktrans with abbr=event.series.abbreviation %}{{ abbr }} series{% endblocktrans %}
                 {% endif %}
                 {% for organiser in event.organisers.all %}

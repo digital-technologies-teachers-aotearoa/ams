@@ -9,10 +9,12 @@
     <div class="carousel-indicators">
       {% for slide in self.slides %}
         <button type="button"
-                data-bs-target="#carousel-{{ self.id }}"
-                data-bs-slide-to="{{ forloop.counter0 }}"
-                {% if forloop.first %}class="active" aria-current="true"{% endif %}
-                aria-label="{% blocktrans with n=forloop.counter %}Slide {{ n }}{% endblocktrans %}"></button>
+          data-bs-target="#carousel-{{ self.id }}"
+          data-bs-slide-to="{{ forloop.counter0 }}"
+          {% if forloop.first %}class="active" aria-current="true"{% endif %}
+          {# Translators: Screen reader label for an image carousel button. {{ n }} is a slide number, e.g. "1", "2", "3". #}
+          aria-label="{% blocktrans with n=forloop.counter %}Slide {{ n }}{% endblocktrans %}">
+        </button>
       {% endfor %}
     </div>
   {% endif %}

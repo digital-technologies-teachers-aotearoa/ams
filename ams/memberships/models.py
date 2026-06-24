@@ -50,10 +50,15 @@ class MembershipStatus(TextChoices):
     administrators.
     """
 
+    # Translators: Membership status — the user has no membership at all
     NONE = "NONE", _("None")
+    # Translators: Membership status — application submitted, awaiting admin approval
     PENDING = "PENDING", _("Pending")
+    # Translators: Membership status — membership is current and valid
     ACTIVE = "ACTIVE", _("Active")
+    # Translators: Membership status — membership period has ended
     EXPIRED = "EXPIRED", _("Expired")
+    # Translators: Membership status — membership was cancelled before expiry
     CANCELLED = "CANCELLED", _("Cancelled")
 
 
