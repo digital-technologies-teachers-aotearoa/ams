@@ -61,6 +61,8 @@ def send_organisation_invite_email(request, member: OrganisationMember):
     email_settings_url = request.build_absolute_uri(reverse("account_email"))
 
     # Build subject and send email
+    # Translators: Email subject line. %(organisation_name)s is replaced with
+    # the organisation's name, e.g. "Example Association"
     subject = _(
         "You've been invited to join %(organisation_name)s",
     ) % {"organisation_name": organisation.name}
@@ -103,6 +105,8 @@ def send_staff_organisation_created_notification(organisation, creator):
         return
 
     # Build subject
+    # Translators: Email subject line. %(organisation_name)s is replaced with
+    # the organisation's name, e.g. "Example Association"
     subject = _("New Organisation Created: %(organisation_name)s") % {
         "organisation_name": organisation.name,
     }

@@ -118,6 +118,8 @@ class TermVersion(models.Model):
 
     panels = [
         HelpPanel(
+            # Translators: Admin help panel. Keep the HTML tags (<p>, <strong>)
+            # unchanged — only translate the visible text between them.
             content=_(
                 "<p><strong>Important:</strong> Users always see the version with the "
                 "most recent <strong>activation date</strong>, not the highest version "

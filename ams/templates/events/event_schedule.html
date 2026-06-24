@@ -15,6 +15,7 @@
           <h5 class="schedule-time-slot-time">
             {{ time_slot.start|time:"g:i a" }}
             <br class="d-none d-md-inline" />
+            {# Translators: {{ end }} is a formatted time, e.g. "3:00 pm". Shown next to the start time of a session. #}
             <small class="text-muted">{% blocktrans with end=time_slot.end|time:"g:i a" %}until {{ end }}{% endblocktrans %}</small>
           </h5>
         </div>
@@ -27,6 +28,7 @@
               {% if session.locations.all %}
                 <small class="text-muted">
                   {% with n=session.locations.all|length %}
+                    {# Translators: Label for the venue of a session within an event schedule. Singular/plural depending on how many locations. #}
                     {% blocktrans context "session location label" count n=n %}Location:{% plural %}Locations:{% endblocktrans %}
                   {% endwith %}
                   {% for location in session.locations.all %}

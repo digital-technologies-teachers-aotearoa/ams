@@ -13,6 +13,7 @@
   {% if filter.qs %}
     {% with count=filter.qs.count %}
       <p class="text-muted small mb-2">
+        {# Translators: Shows how many events are displayed. Singular/plural pair — provide both msgstr[0] (one event) and msgstr[1] (many events). #}
         {% blocktrans count count=count %}Showing {{ count }} event{% plural %}Showing {{ count }} events{% endblocktrans %}
       </p>
     {% endwith %}

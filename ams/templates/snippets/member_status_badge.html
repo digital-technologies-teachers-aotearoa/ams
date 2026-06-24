@@ -3,5 +3,6 @@
 {% if is_active %}
   <span class="text-success">{% icon "check-circle-fill" %} {% trans "Active" %}</span>
 {% else %}
+  {# Translators: Status badge shown next to a person who has been invited to join an organisation but has not yet accepted #}
   <span class="text-secondary">{% icon "envelope-plus" %} {% trans "Invited" %}</span>
 {% endif %}

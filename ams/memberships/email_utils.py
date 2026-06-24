@@ -71,12 +71,16 @@ def send_staff_organisation_membership_notification(membership):
 
     # Build subject - add "REQUIRES APPROVAL" prefix if approval is needed
     if requires_approval:
+        # Translators: Email subject line. %(organisation_name)s is replaced with
+        # the organisation's name, e.g. "Example Association"
         subject = _(
             "REQUIRES APPROVAL: Organisation Membership - %(organisation_name)s",
         ) % {
             "organisation_name": membership.organisation.name,
         }
     else:
+        # Translators: Email subject line. %(organisation_name)s is replaced with
+        # the organisation's name, e.g. "Example Association"
         subject = _("New Organisation Membership: %(organisation_name)s") % {
             "organisation_name": membership.organisation.name,
         }
@@ -154,6 +158,8 @@ def send_staff_organisation_seats_added_notification(
         return
 
     # Build subject
+    # Translators: Email subject line. %(organisation_name)s is replaced with
+    # the organisation's name, e.g. "Example Association"
     subject = _("Seats Added to Organisation: %(organisation_name)s") % {
         "organisation_name": organisation.name,
     }
@@ -216,10 +222,14 @@ def send_staff_individual_membership_notification(membership):
 
     # Build subject - add "REQUIRES APPROVAL" prefix if approval is needed
     if requires_approval:
+        # Translators: Email subject line. %(user_name)s is replaced with
+        # the member's full name
         subject = _("REQUIRES APPROVAL: Individual Membership - %(user_name)s") % {
             "user_name": membership.user.get_full_name(),
         }
     else:
+        # Translators: Email subject line. %(user_name)s is replaced with
+        # the member's full name
         subject = _("New Individual Membership: %(user_name)s") % {
             "user_name": membership.user.get_full_name(),
         }

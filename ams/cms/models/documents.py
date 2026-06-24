@@ -11,6 +11,7 @@ class AMSDocument(AbstractDocument):
     file = models.FileField(
         storage=storages["private"],
         upload_to="documents",
+        # Translators: Label for a downloadable file/document
         verbose_name=_("file"),
     )
 

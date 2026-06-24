@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-21 20:44+1200\n"
+"POT-Creation-Date: 2026-06-22 20:45+1200\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -40,7 +40,7 @@ msgstr ""
 msgid "Mark selected invoices for update"
 msgstr ""
 
-#: ams/billing/apps.py:8 ams/memberships/admin.py:57
+#: ams/billing/apps.py:8 ams/memberships/admin.py:58
 msgid "Billing"
 msgstr ""
 
@@ -52,7 +52,8 @@ msgstr ""
 msgid "Dark background, light text"
 msgstr ""
 
-#: ams/cms/models/documents.py:14
+#. Translators: Label for a downloadable file/document
+#: ams/cms/models/documents.py:15
 msgid "file"
 msgstr ""
 
@@ -120,7 +121,7 @@ msgstr ""
 msgid "Optional footer text (e.g., copyright info, disclaimers)."
 msgstr ""
 
-#: ams/cms/models/settings.py:97 ams/memberships/forms.py:96
+#: ams/cms/models/settings.py:97
 msgid "Name"
 msgstr ""
 
@@ -144,46 +145,46 @@ msgstr ""
 msgid "You must have an active membership to view this file"
 msgstr ""
 
-#: ams/events/admin.py:58
+#: ams/events/admin.py:60
 msgid "Coordinates"
 msgstr ""
 
-#: ams/events/admin.py:116
+#: ams/events/admin.py:118
 msgid "time"
 msgstr ""
 
-#: ams/events/admin.py:121 ams/templates/events/upcoming_events.html:6
+#: ams/events/admin.py:123 ams/templates/events/upcoming_events.html:6
 msgid "Upcoming events"
 msgstr ""
 
-#: ams/events/admin.py:122 ams/templates/events/home.html:27
+#: ams/events/admin.py:124 ams/templates/events/home.html:27
 #: ams/templates/events/past_events.html:6
 msgid "Past events"
 msgstr ""
 
-#: ams/events/admin.py:123
+#: ams/events/admin.py:125
 msgid "All events"
 msgstr ""
 
-#: ams/events/admin.py:183
+#: ams/events/admin.py:185
 #, python-format
 msgid "Successfully duplicated %(count)d event(s)."
 msgstr ""
 
-#: ams/events/admin.py:207 ams/utils/breadcrumbs.py:238
+#: ams/events/admin.py:209 ams/utils/breadcrumbs.py:240
 msgid "Location"
 msgstr ""
 
-#: ams/events/admin.py:213
+#: ams/events/admin.py:215
 msgid "Registration"
 msgstr ""
 
-#: ams/events/admin.py:215
+#: ams/events/admin.py:217
 msgid "Currently only registration via URL is available."
 msgstr ""
 
-#: ams/events/admin.py:223 ams/memberships/admin.py:63
-#: ams/resources/admin.py:100
+#: ams/events/admin.py:225 ams/memberships/admin.py:64
+#: ams/resources/admin.py:103
 msgid "Visibility"
 msgstr ""
 
@@ -255,15 +256,15 @@ msgstr ""
 msgid "Select if this event can be attended online"
 msgstr ""
 
-#: ams/events/models.py:214
+#: ams/events/models.py:221
 msgid "Registration link must be empty when event is set to invite only."
 msgstr ""
 
-#: ams/events/models.py:227
+#: ams/events/models.py:234
 msgid "Registration link must be given when event is not set to invite only."
 msgstr ""
 
-#: ams/events/models.py:260
+#: ams/events/models.py:267
 msgid "Session end time must be after start time."
 msgstr ""
 
@@ -279,240 +280,237 @@ msgstr ""
 msgid "You must have an active membership to view this feature"
 msgstr ""
 
-#: ams/memberships/admin.py:41
+#: ams/memberships/admin.py:42
 msgid "Properties"
 msgstr ""
 
-#: ams/memberships/admin.py:52
+#: ams/memberships/admin.py:53
 msgid "Note: These values are read only after creation."
 msgstr ""
 
-#: ams/memberships/admin.py:110
+#: ams/memberships/admin.py:112
 msgid ""
 "Could not delete the following membership options because they have existing "
 "memberships. Archive them instead: {}"
 msgstr ""
 
-#: ams/memberships/admin.py:118
+#: ams/memberships/admin.py:120
 msgid "Successfully deleted {} membership option(s)."
 msgstr ""
 
-#: ams/memberships/admin.py:146 ams/terms/admin.py:116
+#: ams/memberships/admin.py:148 ams/terms/admin.py:124
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr ""
 
 #: ams/memberships/apps.py:8
 #: ams/templates/organisations/organisation_detail.html:53
-#: ams/templates/users/user_detail.html:44
+#: ams/templates/users/user_detail.html:45
 msgid "Memberships"
 msgstr ""
 
-#: ams/memberships/email_utils.py:75
+#: ams/memberships/email_utils.py:77
 #, python-format
 msgid "REQUIRES APPROVAL: Organisation Membership - %(organisation_name)s"
 msgstr ""
 
-#: ams/memberships/email_utils.py:80
+#. Translators: Email subject line. %(organisation_name)s is replaced with
+#. the organisation's name, e.g. "Example Association"
+#: ams/memberships/email_utils.py:84
 #, python-format
 msgid "New Organisation Membership: %(organisation_name)s"
 msgstr ""
 
-#: ams/memberships/email_utils.py:157
+#. Translators: Email subject line. %(organisation_name)s is replaced with
+#. the organisation's name, e.g. "Example Association"
+#: ams/memberships/email_utils.py:163
 #, python-format
 msgid "Seats Added to Organisation: %(organisation_name)s"
 msgstr ""
 
-#: ams/memberships/email_utils.py:219
+#. Translators: Email subject line. %(user_name)s is replaced with
+#. the member's full name
+#: ams/memberships/email_utils.py:227
 #, python-format
 msgid "REQUIRES APPROVAL: Individual Membership - %(user_name)s"
 msgstr ""
 
-#: ams/memberships/email_utils.py:223
+#. Translators: Email subject line. %(user_name)s is replaced with
+#. the member's full name
+#: ams/memberships/email_utils.py:233
 #, python-format
 msgid "New Individual Membership: %(user_name)s"
 msgstr ""
 
-#: ams/memberships/forms.py:69
+#: ams/memberships/forms.py:68
 msgid "Days"
 msgstr ""
 
-#: ams/memberships/forms.py:70
+#: ams/memberships/forms.py:69
 msgid "Weeks"
 msgstr ""
 
-#: ams/memberships/forms.py:71
+#: ams/memberships/forms.py:70
 msgid "Months"
 msgstr ""
 
-#: ams/memberships/forms.py:72
+#: ams/memberships/forms.py:71
 msgid "Years"
 msgstr ""
 
-#: ams/memberships/forms.py:98 ams/templates/events/event_detail.html:35
-#: ams/templates/events/event_detail.html:163 ams/users/admin.py:46
-msgid "Description"
-msgstr ""
-
-#: ams/memberships/forms.py:102 ams/memberships/models.py:83
-msgid ""
-"Optional description of this membership option shown to users when "
-"selecting. Keep concise for best display on pricing cards."
-msgstr ""
-
-#: ams/memberships/forms.py:107
+#: ams/memberships/forms.py:96
 msgid "Type"
 msgstr ""
 
-#: ams/memberships/forms.py:110
+#: ams/memberships/forms.py:99
 #: ams/templates/utils/crispy_forms/pricing_card.html:50
 msgid "Duration"
 msgstr ""
 
-#: ams/memberships/forms.py:111 ams/templates/events/event_detail.html:117
+#: ams/memberships/forms.py:100 ams/templates/events/event_detail.html:117
 msgid "Cost"
 msgstr ""
 
-#: ams/memberships/forms.py:113
+#: ams/memberships/forms.py:102
 msgid "Invoice Reference"
 msgstr ""
 
-#: ams/memberships/forms.py:117
+#: ams/memberships/forms.py:106
 msgid ""
 "What displays as the reference for any generated invoices. For example 'DTTA "
 "Membership'."
 msgstr ""
 
-#: ams/memberships/forms.py:122
+#: ams/memberships/forms.py:111
 msgid "Invoice Due Days"
 msgstr ""
 
-#: ams/memberships/forms.py:126 ams/memberships/models.py:94
+#: ams/memberships/forms.py:115 ams/memberships/models.py:99
 msgid ""
 "Number of days from invoice issue date until payment is due. This setting "
 "only affects new invoices created after changes are saved."
 msgstr ""
 
-#: ams/memberships/forms.py:135 ams/memberships/models.py:104
+#: ams/memberships/forms.py:124 ams/memberships/models.py:109
 msgid "Maximum number of seats for organisation memberships (optional limit)"
 msgstr ""
 
-#: ams/memberships/forms.py:143 ams/memberships/models.py:113
+#: ams/memberships/forms.py:132 ams/memberships/models.py:118
 msgid ""
 "Maximum number of seats that will be charged (optional). If set, seats "
 "beyond this limit are free. Must be ≤ max_seats if both are set."
 msgstr ""
 
-#: ams/memberships/forms.py:149 ams/memberships/models.py:123
+#: ams/memberships/forms.py:138 ams/memberships/models.py:128
 msgid "Mark as archived to prevent new signups"
 msgstr ""
 
-#: ams/memberships/forms.py:152
+#: ams/memberships/forms.py:141
 msgid "Display Order"
 msgstr ""
 
-#: ams/memberships/forms.py:155 ams/memberships/models.py:127
+#: ams/memberships/forms.py:144 ams/memberships/models.py:132
 msgid "Display order (lower numbers appear first)"
 msgstr ""
 
-#: ams/memberships/forms.py:184 ams/memberships/forms.py:329
+#: ams/memberships/forms.py:173 ams/memberships/forms.py:318
 msgid "Membership option"
 msgstr ""
 
-#: ams/memberships/forms.py:193 ams/memberships/forms.py:339
+#: ams/memberships/forms.py:182 ams/memberships/forms.py:328
 msgid "Start date"
 msgstr ""
 
-#: ams/memberships/forms.py:236
+#: ams/memberships/forms.py:225
 msgid "You already have a non-cancelled membership active on this start date."
 msgstr ""
 
-#: ams/memberships/forms.py:271 ams/memberships/forms.py:523
-#: ams/memberships/forms.py:747
+#: ams/memberships/forms.py:260 ams/memberships/forms.py:512
+#: ams/memberships/forms.py:736
 msgid "Could not create billing account. Please contact us."
 msgstr ""
 
-#: ams/memberships/forms.py:295
+#: ams/memberships/forms.py:284
 msgid "Could not create invoice for your membership. Please contact us."
 msgstr ""
 
-#: ams/memberships/forms.py:336
+#: ams/memberships/forms.py:325
 msgid "Select the type of membership for this organisation."
 msgstr ""
 
-#: ams/memberships/forms.py:342
+#: ams/memberships/forms.py:331
 msgid "The date this membership becomes active."
 msgstr ""
 
-#: ams/memberships/forms.py:345
+#: ams/memberships/forms.py:334
 msgid "Number of seats"
 msgstr ""
 
-#: ams/memberships/forms.py:348
+#: ams/memberships/forms.py:337
 msgid "How many member seats should be included in this membership?"
 msgstr ""
 
-#: ams/memberships/forms.py:415
+#: ams/memberships/forms.py:404
 #: ams/templates/organisations/organisation_add_membership.html:7
 #: ams/templates/organisations/organisation_detail.html:57
 #: ams/utils/breadcrumbs.py:87
 msgid "Add Membership"
 msgstr ""
 
-#: ams/memberships/forms.py:434
+#: ams/memberships/forms.py:423
 #, python-format
 msgid ""
 "Seat count (%(count)s) must be at least %(required)s to include all current "
 "active organisation members."
 msgstr ""
 
-#: ams/memberships/forms.py:446
+#: ams/memberships/forms.py:435
 #, python-format
 msgid ""
 "Seat count (%(count)s) cannot exceed the maximum seats (%(max)s) for this "
 "membership option."
 msgstr ""
 
-#: ams/memberships/forms.py:475
+#: ams/memberships/forms.py:464
 msgid ""
 "This start date overlaps with an existing non-cancelled membership. Please "
 "choose a date on or after the current membership's expiry date."
 msgstr ""
 
-#: ams/memberships/forms.py:559
+#: ams/memberships/forms.py:548
 msgid "Could not create invoice for the membership. Please contact us."
 msgstr ""
 
-#: ams/memberships/forms.py:595
+#: ams/memberships/forms.py:584
 msgid "Number of Seats to Add"
 msgstr ""
 
-#: ams/memberships/forms.py:598
+#: ams/memberships/forms.py:587
 msgid "Enter the number of additional seats to purchase."
 msgstr ""
 
-#: ams/memberships/forms.py:641
+#: ams/memberships/forms.py:630
 msgid "Purchase Seats"
 msgstr ""
 
-#: ams/memberships/forms.py:657
+#: ams/memberships/forms.py:646
 msgid "Number of seats must be greater than zero."
 msgstr ""
 
-#: ams/memberships/forms.py:668
+#: ams/memberships/forms.py:657
 msgid ""
 "Cannot add seats - membership expires too soon. Please renew your membership "
 "first."
 msgstr ""
 
-#: ams/memberships/forms.py:684
+#: ams/memberships/forms.py:673
 #, python-format
 msgid ""
 "Cannot add %(add)d seat(s). This would exceed the maximum limit of %(max)d "
 "seats for this membership option. Current seats: %(current)d."
 msgstr ""
 
-#: ams/memberships/forms.py:778
+#: ams/memberships/forms.py:767
 msgid "Could not create invoice for the seat purchase. Please contact us."
 msgstr ""
 
@@ -520,66 +518,77 @@ msgstr ""
 msgid "Individual"
 msgstr ""
 
-#: ams/memberships/models.py:42 ams/utils/breadcrumbs.py:183
+#: ams/memberships/models.py:42 ams/utils/breadcrumbs.py:185
 msgid "Organisation"
 msgstr ""
 
-#: ams/memberships/models.py:53
+#. Translators: Membership status — the user has no membership at all
+#: ams/memberships/models.py:54
 #: ams/templates/snippets/membership_status_badge.html:12
 #: ams/templates/users/tables/organisation_membership_column.html:6
 msgid "None"
 msgstr ""
 
-#: ams/memberships/models.py:54
+#. Translators: Membership status — application submitted, awaiting admin approval
+#: ams/memberships/models.py:56
 #: ams/templates/snippets/membership_status_badge.html:6
 msgid "Pending"
 msgstr ""
 
-#: ams/memberships/models.py:55
+#. Translators: Membership status — membership is current and valid
+#: ams/memberships/models.py:58
 #: ams/templates/snippets/member_status_badge.html:4
 #: ams/templates/snippets/membership_status_badge.html:4
 #: ams/templates/users/tables/organisation_membership_column.html:4
 msgid "Active"
 msgstr ""
 
-#: ams/memberships/models.py:56
+#. Translators: Membership status — membership period has ended
+#: ams/memberships/models.py:60
 #: ams/templates/snippets/membership_status_badge.html:8
 msgid "Expired"
 msgstr ""
 
-#: ams/memberships/models.py:57
+#. Translators: Membership status — membership was cancelled before expiry
+#: ams/memberships/models.py:62
 #: ams/templates/snippets/membership_status_badge.html:10
 msgid "Cancelled"
 msgstr ""
 
-#: ams/memberships/models.py:119
+#: ams/memberships/models.py:88
+msgid ""
+"Optional description of this membership option shown to users when "
+"selecting. Keep concise for best display on pricing cards."
+msgstr ""
+
+#: ams/memberships/models.py:124
 msgid "Allow to vote in association matters."
 msgstr ""
 
-#: ams/memberships/models.py:153
+#: ams/memberships/models.py:158
 msgid "Max charged seats cannot exceed max seats."
 msgstr ""
 
-#: ams/memberships/models.py:163
+#: ams/memberships/models.py:168
 msgid "Max charged seats only applies to organisation memberships."
 msgstr ""
 
-#: ams/memberships/models.py:188
+#: ams/memberships/models.py:193
 msgid ""
 "This field cannot be changed after the membership option has been created."
 msgstr ""
 
-#: ams/memberships/models.py:203
+#: ams/memberships/models.py:208
 msgid ""
 "Cannot delete membership option with existing memberships. Archive it "
 "instead."
 msgstr ""
 
-#: ams/memberships/models.py:234
+#: ams/memberships/models.py:239
 msgid "Expiry date must be after start date."
 msgstr ""
 
-#: ams/memberships/models.py:377
+#: ams/memberships/models.py:382
 msgid ""
 "Number of seats allocated to this membership. Cannot exceed the membership "
 "option's max_seats limit if set."
@@ -642,16 +651,18 @@ msgid "Deactivate selected organisations"
 msgstr ""
 
 #: ams/organisations/apps.py:7 ams/templates/resources/_resource_authors.html:5
-#: ams/templates/users/user_detail.html:74
+#: ams/templates/users/user_detail.html:75
 msgid "Organisations"
 msgstr ""
 
-#: ams/organisations/email_utils.py:65
+#: ams/organisations/email_utils.py:67
 #, python-format
 msgid "You've been invited to join %(organisation_name)s"
 msgstr ""
 
-#: ams/organisations/email_utils.py:106
+#. Translators: Email subject line. %(organisation_name)s is replaced with
+#. the organisation's name, e.g. "Example Association"
+#: ams/organisations/email_utils.py:110
 #, python-format
 msgid "New Organisation Created: %(organisation_name)s"
 msgstr ""
@@ -880,27 +891,27 @@ msgstr ""
 msgid "Invitation successfully resent to %(email)s."
 msgstr ""
 
-#: ams/resources/admin.py:49
+#: ams/resources/admin.py:52
 msgid "At least one author (entity or user) must be listed."
 msgstr ""
 
-#: ams/resources/admin.py:61
+#: ams/resources/admin.py:64
 msgid "Item"
 msgstr ""
 
-#: ams/resources/admin.py:65
+#: ams/resources/admin.py:68
 msgid "Only one of the following fields must be filled for each component."
 msgstr ""
 
-#: ams/resources/admin.py:90
+#: ams/resources/admin.py:93
 msgid "Ownership"
 msgstr ""
 
-#: ams/resources/admin.py:93
+#: ams/resources/admin.py:96
 msgid "Resources can be owned by both users and entities."
 msgstr ""
 
-#: ams/resources/admin.py:98
+#: ams/resources/admin.py:101
 msgid "Tags"
 msgstr ""
 
@@ -944,7 +955,7 @@ msgstr ""
 msgid "Archive"
 msgstr ""
 
-#: ams/resources/file_types.py:84 ams/utils/breadcrumbs.py:255
+#: ams/resources/file_types.py:84 ams/utils/breadcrumbs.py:257
 msgid "Resource"
 msgstr ""
 
@@ -957,26 +968,26 @@ msgstr ""
 msgid "Search resources..."
 msgstr ""
 
-#: ams/resources/models.py:60
+#: ams/resources/models.py:66
 msgid "Public - visible and accessable by everyone"
 msgstr ""
 
-#: ams/resources/models.py:64
+#: ams/resources/models.py:70
 msgid ""
 "Account required to access - anyone can view, logged-in users can access"
 msgstr ""
 
-#: ams/resources/models.py:71
+#: ams/resources/models.py:77
 msgid ""
 "Membership required to access - anyone can view, only members can access "
 "files"
 msgstr ""
 
-#: ams/resources/models.py:75
+#: ams/resources/models.py:81
 msgid "Members only - only members can view or access"
 msgstr ""
 
-#: ams/resources/models.py:85
+#: ams/resources/models.py:91
 msgid ""
 "Controls who can view and access this resource. Public: no restrictions. "
 "Account required to access: anyone can browse, logged-in users can access. "
@@ -984,13 +995,13 @@ msgid ""
 "Members only: only members can view or access."
 msgstr ""
 
-#: ams/resources/models.py:226
+#: ams/resources/models.py:235
 msgid ""
 "Resource components must have exactly one type of data (file, URL, or "
 "another resource)."
 msgstr ""
 
-#: ams/resources/models.py:235
+#: ams/resources/models.py:244
 msgid "Cannot set a resource to be a component of itself."
 msgstr ""
 
@@ -1177,7 +1188,7 @@ msgstr ""
 
 #: ams/templates/account/email/account_email_confirmation.html:378
 #: ams/templates/account/email/account_password_reset.html:366
-#: ams/templates/organisations/emails/organisation_invite.html:604
+#: ams/templates/organisations/emails/organisation_invite.html:605
 msgid ""
 "If the button above doesn't work, copy and paste this link into your browser:"
 msgstr ""
@@ -1372,9 +1383,9 @@ msgstr ""
 #: ams/templates/billing/emails/mock_invoice.txt:14
 #: ams/templates/memberships/emails/staff_individual_membership_created.html:387
 #: ams/templates/memberships/emails/staff_individual_membership_created.txt:24
-#: ams/templates/memberships/emails/staff_organisation_membership_created.html:398
+#: ams/templates/memberships/emails/staff_organisation_membership_created.html:399
 #: ams/templates/memberships/emails/staff_organisation_membership_created.txt:24
-#: ams/templates/memberships/emails/staff_organisation_seats_added.html:251
+#: ams/templates/memberships/emails/staff_organisation_seats_added.html:252
 #: ams/templates/memberships/emails/staff_organisation_seats_added.txt:19
 msgid "Invoice Number:"
 msgstr ""
@@ -1445,17 +1456,18 @@ msgstr ""
 msgid "Amount Due"
 msgstr ""
 
-#: ams/templates/cms/blocks/image_carousel_block.html:15
+#. Translators: Screen reader label for an image carousel button. {{ n }} is a slide number, e.g. "1", "2", "3".
+#: ams/templates/cms/blocks/image_carousel_block.html:16
 #, python-format
 msgid "Slide %(n)s"
 msgstr ""
 
-#: ams/templates/cms/blocks/image_carousel_block.html:38
+#: ams/templates/cms/blocks/image_carousel_block.html:39
 #: ams/templates/cms/pages/articles_index_page.html:23
 msgid "Previous"
 msgstr ""
 
-#: ams/templates/cms/blocks/image_carousel_block.html:45
+#: ams/templates/cms/blocks/image_carousel_block.html:46
 #: ams/templates/cms/pages/articles_index_page.html:47
 msgid "Next"
 msgstr ""
@@ -1468,35 +1480,37 @@ msgstr ""
 msgid "No articles have been published yet."
 msgstr ""
 
-#: ams/templates/cms/partials/article_card.html:14
+#. Translators: Attribution line on an article card. {{ author }} is the author's name.
+#: ams/templates/cms/partials/article_card.html:15
 #, python-format
 msgid "by %(author)s"
 msgstr ""
 
-#: ams/templates/cms/partials/article_card.html:19
+#: ams/templates/cms/partials/article_card.html:20
 msgid "Read more"
 msgstr ""
 
-#: ams/templates/events/event_card.html:20
+#. Translators: {{ abbr }} is the short abbreviation of an event series name, e.g. "NZC". "series" means a group of related events.
+#: ams/templates/events/event_card.html:21
 #, python-format
 msgid "%(abbr)s series"
 msgstr ""
 
-#: ams/templates/events/event_card.html:44
+#: ams/templates/events/event_card.html:45
 msgid "Featured"
 msgstr ""
 
-#: ams/templates/events/event_card.html:73
-#: ams/templates/events/event_detail.html:155
+#: ams/templates/events/event_card.html:74
+#: ams/templates/events/event_detail.html:156
 msgid "Online"
 msgstr ""
 
-#: ams/templates/events/event_card.html:79
+#: ams/templates/events/event_card.html:80
 #: ams/templates/events/event_detail.html:119
 msgid "Free"
 msgstr ""
 
-#: ams/templates/events/event_card.html:84
+#: ams/templates/events/event_card.html:85
 msgid "Invite only"
 msgstr ""
 
@@ -1512,8 +1526,13 @@ msgstr ""
 msgid "Details"
 msgstr ""
 
+#: ams/templates/events/event_detail.html:35
+#: ams/templates/events/event_detail.html:164 ams/users/admin.py:46
+msgid "Description"
+msgstr ""
+
 #: ams/templates/events/event_detail.html:37
-#: ams/templates/events/event_detail.html:166
+#: ams/templates/events/event_detail.html:167
 msgid "Schedule"
 msgstr ""
 
@@ -1533,23 +1552,26 @@ msgstr ""
 msgid "Ends"
 msgstr ""
 
-#: ams/templates/events/event_detail.html:133
+#. Translators: Section label on an event detail page. Singular when there is one venue, plural when there are multiple.
+#: ams/templates/events/event_detail.html:134
 msgctxt "event detail location label"
 msgid "Location"
 msgid_plural "Locations"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ams/templates/events/event_detail.html:156
+#: ams/templates/events/event_detail.html:157
 msgid "Accessible online"
 msgstr ""
 
-#: ams/templates/events/event_schedule.html:18
+#. Translators: {{ end }} is a formatted time, e.g. "3:00 pm". Shown next to the start time of a session.
+#: ams/templates/events/event_schedule.html:19
 #, python-format
 msgid "until %(end)s"
 msgstr ""
 
-#: ams/templates/events/event_schedule.html:30
+#. Translators: Label for the venue of a session within an event schedule. Singular/plural depending on how many locations.
+#: ams/templates/events/event_schedule.html:32
 msgctxt "session location label"
 msgid "Location:"
 msgid_plural "Locations:"
@@ -1605,29 +1627,30 @@ msgstr ""
 msgid "Upcoming events at this location"
 msgstr ""
 
-#: ams/templates/events/past_events.html:16
-#: ams/templates/events/upcoming_events.html:16
+#. Translators: Shows how many events are displayed. Singular/plural pair — provide both msgstr[0] (one event) and msgstr[1] (many events).
+#: ams/templates/events/past_events.html:17
+#: ams/templates/events/upcoming_events.html:17
 #, python-format
 msgid "Showing %(count)s event"
 msgid_plural "Showing %(count)s events"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ams/templates/events/past_events.html:24
+#: ams/templates/events/past_events.html:25
 msgid "No past events found"
 msgstr ""
 
-#: ams/templates/events/past_events.html:25
-#: ams/templates/events/upcoming_events.html:25
+#: ams/templates/events/past_events.html:26
+#: ams/templates/events/upcoming_events.html:26
 msgid "Try adjusting your filters or check back later."
 msgstr ""
 
-#: ams/templates/events/past_events.html:27
-#: ams/templates/events/upcoming_events.html:27
+#: ams/templates/events/past_events.html:28
+#: ams/templates/events/upcoming_events.html:28
 msgid "Clear filters"
 msgstr ""
 
-#: ams/templates/events/upcoming_events.html:24
+#: ams/templates/events/upcoming_events.html:25
 msgid "No upcoming events found"
 msgstr ""
 
@@ -1700,7 +1723,7 @@ msgstr ""
 #: ams/templates/memberships/emails/staff_individual_membership_created.html:262
 #: ams/templates/memberships/emails/staff_individual_membership_created.html:456
 #: ams/templates/memberships/emails/staff_organisation_membership_created.html:262
-#: ams/templates/memberships/emails/staff_organisation_membership_created.html:467
+#: ams/templates/memberships/emails/staff_organisation_membership_created.html:468
 msgid "Review & Approve in Admin"
 msgstr ""
 
@@ -1748,7 +1771,7 @@ msgstr ""
 #: ams/templates/memberships/emails/staff_individual_membership_created.txt:20
 #: ams/templates/memberships/emails/staff_organisation_membership_created.html:360
 #: ams/templates/memberships/emails/staff_organisation_membership_created.txt:20
-#: ams/templates/memberships/emails/staff_organisation_seats_added.html:244
+#: ams/templates/memberships/emails/staff_organisation_seats_added.html:245
 #: ams/templates/memberships/emails/staff_organisation_seats_added.txt:17
 msgid "Expiry Date:"
 msgstr ""
@@ -1762,33 +1785,33 @@ msgstr ""
 
 #: ams/templates/memberships/emails/staff_individual_membership_created.html:372
 #: ams/templates/memberships/emails/staff_individual_membership_created.txt:22
-#: ams/templates/memberships/emails/staff_organisation_membership_created.html:383
+#: ams/templates/memberships/emails/staff_organisation_membership_created.html:384
 #: ams/templates/memberships/emails/staff_organisation_membership_created.txt:22
 msgid "Status:"
 msgstr ""
 
 #: ams/templates/memberships/emails/staff_individual_membership_created.html:377
 #: ams/templates/memberships/emails/staff_individual_membership_created.txt:22
-#: ams/templates/memberships/emails/staff_organisation_membership_created.html:388
+#: ams/templates/memberships/emails/staff_organisation_membership_created.html:389
 #: ams/templates/memberships/emails/staff_organisation_membership_created.txt:22
 msgid "Pending Approval"
 msgstr ""
 
 #: ams/templates/memberships/emails/staff_individual_membership_created.html:380
 #: ams/templates/memberships/emails/staff_individual_membership_created.txt:22
-#: ams/templates/memberships/emails/staff_organisation_membership_created.html:391
+#: ams/templates/memberships/emails/staff_organisation_membership_created.html:392
 #: ams/templates/memberships/emails/staff_organisation_membership_created.txt:22
 msgid "Approved"
 msgstr ""
 
 #: ams/templates/memberships/emails/staff_individual_membership_created.html:458
-#: ams/templates/memberships/emails/staff_organisation_membership_created.html:469
+#: ams/templates/memberships/emails/staff_organisation_membership_created.html:470
 msgid "View in Admin"
 msgstr ""
 
 #: ams/templates/memberships/emails/staff_individual_membership_created.html:536
-#: ams/templates/memberships/emails/staff_organisation_membership_created.html:547
-#: ams/templates/memberships/emails/staff_organisation_seats_added.html:396
+#: ams/templates/memberships/emails/staff_organisation_membership_created.html:548
+#: ams/templates/memberships/emails/staff_organisation_seats_added.html:397
 #: ams/templates/organisations/emails/staff_organisation_created.html:413
 msgid ""
 "You're receiving this because you are a staff member. Contact your "
@@ -1845,17 +1868,17 @@ msgstr ""
 msgid "Seats:"
 msgstr ""
 
-#: ams/templates/memberships/emails/staff_organisation_membership_created.html:373
+#: ams/templates/memberships/emails/staff_organisation_membership_created.html:374
 msgid "charged seat"
 msgstr ""
 
-#: ams/templates/memberships/emails/staff_organisation_membership_created.html:373
-#: ams/templates/memberships/emails/staff_organisation_membership_created.html:376
+#: ams/templates/memberships/emails/staff_organisation_membership_created.html:374
+#: ams/templates/memberships/emails/staff_organisation_membership_created.html:377
 #: ams/templates/utils/crispy_forms/pricing_card.html:24
 msgid "seat"
 msgstr ""
 
-#: ams/templates/memberships/emails/staff_organisation_membership_created.html:374
+#: ams/templates/memberships/emails/staff_organisation_membership_created.html:375
 msgid "free seat"
 msgstr ""
 
@@ -1905,12 +1928,13 @@ msgstr ""
 msgid "New Total Seats:"
 msgstr ""
 
-#: ams/templates/memberships/emails/staff_organisation_seats_added.html:238
+#. Translators: Label in a staff email. "Pro-rata" means the cost is proportional to the time remaining in the membership period.
+#: ams/templates/memberships/emails/staff_organisation_seats_added.html:239
 #: ams/templates/memberships/emails/staff_organisation_seats_added.txt:16
 msgid "Pro-Rata Cost:"
 msgstr ""
 
-#: ams/templates/memberships/emails/staff_organisation_seats_added.html:319
+#: ams/templates/memberships/emails/staff_organisation_seats_added.html:320
 msgid "View Membership in Admin"
 msgstr ""
 
@@ -1977,33 +2001,35 @@ msgstr ""
 msgid "Available:"
 msgstr ""
 
-#: ams/templates/memberships/organisation_add_seats.html:55
+#. Translators: "Pro-rata" means a cost calculated proportionally for the time remaining in the membership period. For example, adding a seat halfway through the year costs half the annual price.
+#: ams/templates/memberships/organisation_add_seats.html:56
 msgid "Pro-Rata Pricing"
 msgstr ""
 
-#: ams/templates/memberships/organisation_add_seats.html:56
+#. Translators: "Pro-rata" means a cost calculated proportionally for the time remaining in the membership period.
+#: ams/templates/memberships/organisation_add_seats.html:58
 msgid ""
 "Additional seats will be charged pro-rata based on the remaining membership "
 "period."
 msgstr ""
 
-#: ams/templates/memberships/organisation_add_seats.html:57
+#: ams/templates/memberships/organisation_add_seats.html:59
 msgid "Enter number of seats to see the cost."
 msgstr ""
 
-#: ams/templates/memberships/organisation_add_seats.html:63
+#: ams/templates/memberships/organisation_add_seats.html:65
 msgid "Seats Breakdown"
 msgstr ""
 
-#: ams/templates/memberships/organisation_add_seats.html:65
+#: ams/templates/memberships/organisation_add_seats.html:67
 msgid "Seats being added:"
 msgstr ""
 
-#: ams/templates/memberships/organisation_add_seats.html:68
+#: ams/templates/memberships/organisation_add_seats.html:70
 msgid "Charged seats:"
 msgstr ""
 
-#: ams/templates/memberships/organisation_add_seats.html:71
+#: ams/templates/memberships/organisation_add_seats.html:73
 msgid "Free seats:"
 msgstr ""
 
@@ -2048,7 +2074,7 @@ msgstr ""
 msgid "Deactivate"
 msgstr ""
 
-#: ams/templates/mfa/index.html:42 ams/templates/mfa/totp/activate_form.html:44
+#: ams/templates/mfa/index.html:42 ams/templates/mfa/totp/activate_form.html:47
 msgid "Activate"
 msgstr ""
 
@@ -2056,31 +2082,33 @@ msgstr ""
 msgid "Security Keys"
 msgstr ""
 
-#: ams/templates/mfa/index.html:56
+#. Translators: A "security key" is a physical USB device used for two-factor login. Singular/plural pair — provide both msgstr[0] (one key) and msgstr[1] (many keys).
+#: ams/templates/mfa/index.html:57
 #, python-format
 msgid "You have added %(count)s security key."
 msgid_plural "You have added %(count)s security keys."
 msgstr[0] ""
 msgstr[1] ""
 
-#: ams/templates/mfa/index.html:60
+#: ams/templates/mfa/index.html:61
 msgid "No security keys have been added."
 msgstr ""
 
-#: ams/templates/mfa/index.html:68
+#: ams/templates/mfa/index.html:69
 msgid "Manage"
 msgstr ""
 
-#: ams/templates/mfa/index.html:73
+#: ams/templates/mfa/index.html:74
 msgid "Add"
 msgstr ""
 
-#: ams/templates/mfa/index.html:83
+#: ams/templates/mfa/index.html:84
 #: ams/templates/mfa/recovery_codes/index.html:8
 msgid "Recovery Codes"
 msgstr ""
 
-#: ams/templates/mfa/index.html:88
+#. Translators: Recovery codes are backup one-time codes to access your account if you lose your phone. {{ unused_count }} = unused codes remaining, {{ total_count }} = total generated. Singular/plural pair — provide both msgstr[0] and msgstr[1].
+#: ams/templates/mfa/index.html:90
 #: ams/templates/mfa/recovery_codes/index.html:17
 #, python-format
 msgid ""
@@ -2090,22 +2118,22 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: ams/templates/mfa/index.html:92
+#: ams/templates/mfa/index.html:94
 msgid ""
 "Recovery codes let you access your account if you lose your phone. Store "
 "them securely offline."
 msgstr ""
 
-#: ams/templates/mfa/index.html:102
+#: ams/templates/mfa/index.html:104
 msgid "View"
 msgstr ""
 
-#: ams/templates/mfa/index.html:108
+#: ams/templates/mfa/index.html:110
 #: ams/templates/resources/resource_detail.html:43
 msgid "Download"
 msgstr ""
 
-#: ams/templates/mfa/index.html:116
+#: ams/templates/mfa/index.html:118
 #: ams/templates/mfa/recovery_codes/generate.html:36
 msgid "Generate"
 msgstr ""
@@ -2173,31 +2201,34 @@ msgstr ""
 msgid "Follow these steps to set up two-factor authentication:"
 msgstr ""
 
-#: ams/templates/mfa/totp/activate_form.html:17
+#. Translators: Keep the HTML tags (<strong>, </strong>) unchanged — only translate the visible text between them.
+#: ams/templates/mfa/totp/activate_form.html:18
 msgid ""
 "<strong>Step 1:</strong> Install an authenticator app on your phone if you "
 "don't have one. Popular options include Google Authenticator, Microsoft "
 "Authenticator, Authy, or 1Password."
 msgstr ""
 
-#: ams/templates/mfa/totp/activate_form.html:20
+#. Translators: Keep the HTML tags (<strong>, </strong>) unchanged — only translate the visible text between them. QR code is a type of barcode — consider keeping in English.
+#: ams/templates/mfa/totp/activate_form.html:22
 msgid ""
 "<strong>Step 2:</strong> Open your authenticator app and scan the QR code "
 "below. Alternatively, you can manually enter the secret key shown below the "
 "QR code."
 msgstr ""
 
-#: ams/templates/mfa/totp/activate_form.html:30
+#: ams/templates/mfa/totp/activate_form.html:32
 msgid "Secret key (for manual entry)"
 msgstr ""
 
-#: ams/templates/mfa/totp/activate_form.html:33
+#: ams/templates/mfa/totp/activate_form.html:35
 msgid ""
 "You can save this secret key to restore your authenticator app if you change "
 "phones."
 msgstr ""
 
-#: ams/templates/mfa/totp/activate_form.html:37
+#. Translators: Keep the HTML tags (<strong>, </strong>) unchanged — only translate the visible text between them.
+#: ams/templates/mfa/totp/activate_form.html:40
 msgid ""
 "<strong>Step 3:</strong> Enter the 6-digit verification code from your "
 "authenticator app to confirm setup."
@@ -2313,7 +2344,8 @@ msgid ""
 "accept or decline it."
 msgstr ""
 
-#: ams/templates/organisations/emails/organisation_invite.html:470
+#. Translators: Keep the HTML tags (<a href="...">, </a>) unchanged — only translate the visible text. The link allows someone to add a new email address to their existing account.
+#: ams/templates/organisations/emails/organisation_invite.html:471
 #, python-format
 msgid ""
 "If you already have an account with a different email address, you can <a "
@@ -2321,28 +2353,28 @@ msgid ""
 "address to your existing account</a> instead of creating a new one."
 msgstr ""
 
-#: ams/templates/organisations/emails/organisation_invite.html:546
+#: ams/templates/organisations/emails/organisation_invite.html:547
 #: ams/templates/organisations/emails/organisation_invite.txt:43
 msgid ""
 "If you did not expect this invitation, you can decline it or safely ignore "
 "this email."
 msgstr ""
 
-#: ams/templates/organisations/emails/organisation_invite.html:558
+#: ams/templates/organisations/emails/organisation_invite.html:559
 msgid ""
 "If the buttons above don't work, copy and paste these links into your "
 "browser:"
 msgstr ""
 
-#: ams/templates/organisations/emails/organisation_invite.html:570
+#: ams/templates/organisations/emails/organisation_invite.html:571
 msgid "Accept:"
 msgstr ""
 
-#: ams/templates/organisations/emails/organisation_invite.html:587
+#: ams/templates/organisations/emails/organisation_invite.html:588
 msgid "Decline:"
 msgstr ""
 
-#: ams/templates/organisations/emails/organisation_invite.html:616
+#: ams/templates/organisations/emails/organisation_invite.html:617
 msgid "Sign Up:"
 msgstr ""
 
@@ -2586,14 +2618,16 @@ msgstr ""
 msgid "Browse and download resources."
 msgstr ""
 
-#: ams/templates/resources/home.html:22
+#. Translators: Count of downloadable resources. Singular/plural pair — provide both msgstr[0] (one resource) and msgstr[1] (many resources).
+#: ams/templates/resources/home.html:23
 #, python-format
 msgid "%(count)s resource"
 msgid_plural "%(count)s resources"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ams/templates/resources/home.html:23
+#. Translators: A "component" is a file or sub-item bundled within a resource (e.g. a PDF within a larger document package). Singular/plural pair.
+#: ams/templates/resources/home.html:25
 #: ams/templates/resources/resource_card.html:33
 #, python-format
 msgid "%(count)s component"
@@ -2601,11 +2635,11 @@ msgid_plural "%(count)s components"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ams/templates/resources/home.html:31
+#: ams/templates/resources/home.html:33
 msgid "No resources available yet"
 msgstr ""
 
-#: ams/templates/resources/home.html:32
+#: ams/templates/resources/home.html:34
 msgid "Check back later for new resources"
 msgstr ""
 
@@ -2673,7 +2707,8 @@ msgstr ""
 msgid "Enter a search term or select filters to find resources."
 msgstr ""
 
-#: ams/templates/snippets/member_status_badge.html:6
+#. Translators: Status badge shown next to a person who has been invited to join an organisation but has not yet accepted
+#: ams/templates/snippets/member_status_badge.html:7
 msgid "Invited"
 msgstr ""
 
@@ -2685,12 +2720,13 @@ msgstr ""
 msgid "Please review and accept the following terms to continue."
 msgstr ""
 
-#: ams/templates/terms/accept.html:15
+#. Translators: Progress indicator shown when a user must accept multiple terms documents. {{ position }} is the current document number (e.g. "1"), {{ total }} is the total count (e.g. "3").
+#: ams/templates/terms/accept.html:16
 #, python-format
 msgid "Reviewing %(position)s of %(total)s documents"
 msgstr ""
 
-#: ams/templates/terms/accept.html:20
+#: ams/templates/terms/accept.html:21
 msgid "By clicking 'I Accept', you agree to these terms."
 msgstr ""
 
@@ -2764,60 +2800,61 @@ msgstr ""
 msgid "1 profile field remaining."
 msgstr ""
 
-#: ams/templates/users/user_detail.html:35
+#. Translators: {{ count }} is the number of unfilled profile fields, e.g. "2". A "profile field" is a piece of information the user hasn't filled in yet (e.g. phone number, job title).
+#: ams/templates/users/user_detail.html:36
 #, python-format
 msgid "%(count)s profile fields remaining."
 msgstr ""
 
-#: ams/templates/users/user_detail.html:37
+#: ams/templates/users/user_detail.html:38
 msgid "Complete your profile"
 msgstr ""
 
-#: ams/templates/users/user_detail.html:46
+#: ams/templates/users/user_detail.html:47
 msgid "You have a current active membership."
 msgstr ""
 
-#: ams/templates/users/user_detail.html:49
+#: ams/templates/users/user_detail.html:50
 msgid "You do not have a current active membership."
 msgstr ""
 
-#: ams/templates/users/user_detail.html:55
+#: ams/templates/users/user_detail.html:56
 msgid "No memberships found."
 msgstr ""
 
-#: ams/templates/users/user_detail.html:59
+#: ams/templates/users/user_detail.html:60
 msgid "Register for a new individual membership"
 msgstr ""
 
-#: ams/templates/users/user_detail.html:65
+#: ams/templates/users/user_detail.html:66
 msgid "Pending Organisation Invitations"
 msgstr ""
 
-#: ams/templates/users/user_detail.html:67
+#: ams/templates/users/user_detail.html:68
 msgid "You have been invited to join the following organisations. Click \\"
 msgstr ""
 
-#: ams/templates/users/user_detail.html:78
+#: ams/templates/users/user_detail.html:79
 msgid "No organisations found."
 msgstr ""
 
-#: ams/templates/users/user_detail.html:81
+#: ams/templates/users/user_detail.html:82
 msgid "Create a new organisation"
 msgstr ""
 
-#: ams/templates/users/user_detail.html:86
+#: ams/templates/users/user_detail.html:87
 msgid "Staff links"
 msgstr ""
 
-#: ams/templates/users/user_detail.html:87
+#: ams/templates/users/user_detail.html:88
 msgid "Administrative and management links."
 msgstr ""
 
-#: ams/templates/users/user_detail.html:90
+#: ams/templates/users/user_detail.html:91
 msgid "Website Admin"
 msgstr ""
 
-#: ams/templates/users/user_detail.html:95
+#: ams/templates/users/user_detail.html:96
 msgid "Wagtail CMS"
 msgstr ""
 
@@ -2883,35 +2920,35 @@ msgstr ""
 msgid "Feature request"
 msgstr ""
 
-#: ams/terms/admin.py:32 ams/terms/models.py:134
+#: ams/terms/admin.py:40 ams/terms/models.py:136
 msgid "Version Info"
 msgstr ""
 
-#: ams/terms/admin.py:38 ams/terms/models.py:141
+#: ams/terms/admin.py:46 ams/terms/models.py:143
 msgid "Activation"
 msgstr ""
 
-#: ams/terms/admin.py:44
+#: ams/terms/admin.py:52
 msgid "Content"
 msgstr ""
 
-#: ams/terms/admin.py:50
+#: ams/terms/admin.py:58
 msgid "Metadata"
 msgstr ""
 
-#: ams/terms/admin.py:64
+#: ams/terms/admin.py:72
 msgid ""
 "Cannot delete this term version because users have accepted it. Term "
 "versions with acceptances are protected to maintain audit history."
 msgstr ""
 
-#: ams/terms/admin.py:83
+#: ams/terms/admin.py:91
 msgid ""
 "Could not delete the following term versions because they have user "
 "acceptances: {}"
 msgstr ""
 
-#: ams/terms/admin.py:91
+#: ams/terms/admin.py:99
 msgid "Successfully deleted {} term version(s)."
 msgstr ""
 
@@ -2965,7 +3002,7 @@ msgid ""
 "accept, regardless of version number."
 msgstr ""
 
-#: ams/terms/models.py:122
+#: ams/terms/models.py:124
 msgid ""
 "<p><strong>Important:</strong> Users always see the version with the most "
 "recent <strong>activation date</strong>, not the highest version number.</"
@@ -2973,31 +3010,31 @@ msgid ""
 "instead of version '2.0' with an older Effective Date.</p>"
 msgstr ""
 
-#: ams/terms/models.py:154
+#: ams/terms/models.py:156
 msgid "Term Version"
 msgstr ""
 
-#: ams/terms/models.py:155
+#: ams/terms/models.py:157
 msgid "Term Versions"
 msgstr ""
 
-#: ams/terms/models.py:191
+#: ams/terms/models.py:193
 msgid "IP address from which acceptance was recorded"
 msgstr ""
 
-#: ams/terms/models.py:194
+#: ams/terms/models.py:196
 msgid "Browser user agent string"
 msgstr ""
 
-#: ams/terms/models.py:199
+#: ams/terms/models.py:201
 msgid "Source of acceptance (e.g., 'web', 'api', 'sso')"
 msgstr ""
 
-#: ams/terms/models.py:204
+#: ams/terms/models.py:206
 msgid "Term Acceptance"
 msgstr ""
 
-#: ams/terms/models.py:205
+#: ams/terms/models.py:207
 msgid "Term Acceptances"
 msgstr ""
 
@@ -3400,20 +3437,22 @@ msgstr ""
 msgid "Email Addresses"
 msgstr ""
 
-#: ams/utils/breadcrumbs.py:146 ams/utils/breadcrumbs.py:150
-#: ams/utils/breadcrumbs.py:154
+#. Translators: MFA = Multi-Factor Authentication (two-step login security).
+#. Consider keeping as "MFA" or translating as appropriate.
+#: ams/utils/breadcrumbs.py:148 ams/utils/breadcrumbs.py:152
+#: ams/utils/breadcrumbs.py:156
 msgid "MFA"
 msgstr ""
 
-#: ams/utils/breadcrumbs.py:202
+#: ams/utils/breadcrumbs.py:204
 msgid "User"
 msgstr ""
 
-#: ams/utils/breadcrumbs.py:220
+#: ams/utils/breadcrumbs.py:222
 msgid "Event"
 msgstr ""
 
-#: ams/utils/breadcrumbs.py:373 ams/utils/templatetags/breadcrumbs.py:46
+#: ams/utils/breadcrumbs.py:375 ams/utils/templatetags/breadcrumbs.py:46
 msgid "Home"
 msgstr ""
 
@@ -3429,271 +3468,271 @@ msgstr ""
 msgid "January"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:20
+#: ams/utils/i18n_date_hints.py:21
 msgid "February"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:20
+#: ams/utils/i18n_date_hints.py:22
 msgid "March"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:20
+#: ams/utils/i18n_date_hints.py:23
 msgid "April"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:21
+#: ams/utils/i18n_date_hints.py:24
 msgid "May"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:21
+#: ams/utils/i18n_date_hints.py:25
 msgid "June"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:21
+#: ams/utils/i18n_date_hints.py:26
 msgid "July"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:21
+#: ams/utils/i18n_date_hints.py:27
 msgid "August"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:22
+#: ams/utils/i18n_date_hints.py:28
 msgid "September"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:22
+#: ams/utils/i18n_date_hints.py:29
 msgid "October"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:22
+#: ams/utils/i18n_date_hints.py:30
 msgid "November"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:22
+#: ams/utils/i18n_date_hints.py:31
 msgid "December"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:26
+#: ams/utils/i18n_date_hints.py:35
 msgid "jan"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:26
+#: ams/utils/i18n_date_hints.py:36
 msgid "feb"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:26
+#: ams/utils/i18n_date_hints.py:37
 msgid "mar"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:26
+#: ams/utils/i18n_date_hints.py:38
 msgid "apr"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:27
+#: ams/utils/i18n_date_hints.py:39
 msgid "may"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:27
+#: ams/utils/i18n_date_hints.py:40
 msgid "jun"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:27
+#: ams/utils/i18n_date_hints.py:41
 msgid "jul"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:27
+#: ams/utils/i18n_date_hints.py:42
 msgid "aug"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:28
+#: ams/utils/i18n_date_hints.py:43
 msgid "sep"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:28
+#: ams/utils/i18n_date_hints.py:44
 msgid "oct"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:28
+#: ams/utils/i18n_date_hints.py:45
 msgid "nov"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:28
+#: ams/utils/i18n_date_hints.py:46
 msgid "dec"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:32
+#: ams/utils/i18n_date_hints.py:50
 msgctxt "abbrev. month"
 msgid "Jan."
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:33
+#: ams/utils/i18n_date_hints.py:51
 msgctxt "abbrev. month"
 msgid "Feb."
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:34
+#: ams/utils/i18n_date_hints.py:52
 msgctxt "abbrev. month"
 msgid "March"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:35
+#: ams/utils/i18n_date_hints.py:53
 msgctxt "abbrev. month"
 msgid "April"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:36
+#: ams/utils/i18n_date_hints.py:54
 msgctxt "abbrev. month"
 msgid "May"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:37
+#: ams/utils/i18n_date_hints.py:55
 msgctxt "abbrev. month"
 msgid "June"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:38
+#: ams/utils/i18n_date_hints.py:56
 msgctxt "abbrev. month"
 msgid "July"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:39
+#: ams/utils/i18n_date_hints.py:57
 msgctxt "abbrev. month"
 msgid "Aug."
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:40
+#: ams/utils/i18n_date_hints.py:58
 msgctxt "abbrev. month"
 msgid "Sept."
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:41
+#: ams/utils/i18n_date_hints.py:59
 msgctxt "abbrev. month"
 msgid "Oct."
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:42
+#: ams/utils/i18n_date_hints.py:60
 msgctxt "abbrev. month"
 msgid "Nov."
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:43
+#: ams/utils/i18n_date_hints.py:61
 msgctxt "abbrev. month"
 msgid "Dec."
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:47
+#: ams/utils/i18n_date_hints.py:65
 msgctxt "alt. month"
 msgid "January"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:48
+#: ams/utils/i18n_date_hints.py:66
 msgctxt "alt. month"
 msgid "February"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:49
+#: ams/utils/i18n_date_hints.py:67
 msgctxt "alt. month"
 msgid "March"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:50
+#: ams/utils/i18n_date_hints.py:68
 msgctxt "alt. month"
 msgid "April"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:51
+#: ams/utils/i18n_date_hints.py:69
 msgctxt "alt. month"
 msgid "May"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:52
+#: ams/utils/i18n_date_hints.py:70
 msgctxt "alt. month"
 msgid "June"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:53
+#: ams/utils/i18n_date_hints.py:71
 msgctxt "alt. month"
 msgid "July"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:54
+#: ams/utils/i18n_date_hints.py:72
 msgctxt "alt. month"
 msgid "August"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:55
+#: ams/utils/i18n_date_hints.py:73
 msgctxt "alt. month"
 msgid "September"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:56
+#: ams/utils/i18n_date_hints.py:74
 msgctxt "alt. month"
 msgid "October"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:57
+#: ams/utils/i18n_date_hints.py:75
 msgctxt "alt. month"
 msgid "November"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:58
+#: ams/utils/i18n_date_hints.py:76
 msgctxt "alt. month"
 msgid "December"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:62
+#: ams/utils/i18n_date_hints.py:80
 msgid "Monday"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:62
+#: ams/utils/i18n_date_hints.py:81
 msgid "Tuesday"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:62
+#: ams/utils/i18n_date_hints.py:82
 msgid "Wednesday"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:62
+#: ams/utils/i18n_date_hints.py:83
 msgid "Thursday"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:63
+#: ams/utils/i18n_date_hints.py:84
 msgid "Friday"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:63
+#: ams/utils/i18n_date_hints.py:85
 msgid "Saturday"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:63
+#: ams/utils/i18n_date_hints.py:86
 msgid "Sunday"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:67
+#: ams/utils/i18n_date_hints.py:90
 msgid "Mon"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:67
+#: ams/utils/i18n_date_hints.py:91
 msgid "Tue"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:67
+#: ams/utils/i18n_date_hints.py:92
 msgid "Wed"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:67
+#: ams/utils/i18n_date_hints.py:93
 msgid "Thu"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:67
+#: ams/utils/i18n_date_hints.py:94
 msgid "Fri"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:67
+#: ams/utils/i18n_date_hints.py:95
 msgid "Sat"
 msgstr ""
 
-#: ams/utils/i18n_date_hints.py:67
+#: ams/utils/i18n_date_hints.py:96
 msgid "Sun"
 msgstr ""
 

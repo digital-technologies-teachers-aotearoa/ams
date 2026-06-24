@@ -12,6 +12,7 @@
       <div class="alert alert-info mb-4">{% translate "Please review and accept the following terms to continue." %}</div>
       {% if pending_count > 1 %}
         <p class="text-center">
+          {# Translators: Progress indicator shown when a user must accept multiple terms documents. {{ position }} is the current document number (e.g. "1"), {{ total }} is the total count (e.g. "3"). #}
           <small>{% blocktranslate with position=current_position total=pending_count %}Reviewing {{ position }} of {{ total }} documents{% endblocktranslate %}</small>
         </p>
       {% endif %}

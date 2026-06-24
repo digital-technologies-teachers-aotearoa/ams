@@ -32,6 +32,7 @@
             {% if profile_incomplete_count == 1 %}
               {% trans "1 profile field remaining." %}
             {% else %}
+              {# Translators: {{ count }} is the number of unfilled profile fields, e.g. "2". A "profile field" is a piece of information the user hasn't filled in yet (e.g. phone number, job title). #}
               {% blocktrans with count=profile_incomplete_count %}{{ count }} profile fields remaining.{% endblocktrans %}
             {% endif %}
             <a href="{% url 'users:update' %}" class="alert-link">{% trans "Complete your profile" %}</a>

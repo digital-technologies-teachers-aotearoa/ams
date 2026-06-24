@@ -19,7 +19,9 @@
 {% block content_container %}
   <div class="col-12">
     <div class="d-flex gap-4 mb-4 text-muted">
+      {# Translators: Count of downloadable resources. Singular/plural pair — provide both msgstr[0] (one resource) and msgstr[1] (many resources). #}
       <span>{% icon "file-earmark-text" %} {% blocktrans count count=resource_count %}{{ count }} resource{% plural %}{{ count }} resources{% endblocktrans %}</span>
+      {# Translators: A "component" is a file or sub-item bundled within a resource (e.g. a PDF within a larger document package). Singular/plural pair. #}
       <span>{% icon "paperclip" %} {% blocktrans count count=component_count %}{{ count }} component{% plural %}{{ count }} components{% endblocktrans %}</span>
     </div>
     {% if resources %}

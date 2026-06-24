@@ -11,6 +11,7 @@
     <p class="card-text text-muted small">
       {{ article.publication_date|date:"F j, Y" }}
       {% if article.author %}
+        {# Translators: Attribution line on an article card. {{ author }} is the author's name. #}
         · {% blocktrans with author=article.author %}by {{ author }}{% endblocktrans %}
       {% endif %}
     </p>
