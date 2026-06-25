@@ -19,6 +19,7 @@ from django.db.models import TextChoices
 from django.db.models import TextField
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ngettext_lazy
 from relativedeltafield import RelativeDeltaField
 
 from ams.memberships.duration import format_membership_duration
@@ -316,8 +317,9 @@ class IndividualMembership(BaseMembership):
     objects = IndividualMembershipQuerySet.as_manager()
 
     class Meta:
-        verbose_name = "Membership: Individual"
-        verbose_name_plural = "Membership: Individual"
+        # Translators: Admin label for an individual (personal) membership record
+        verbose_name = _("Membership: Individual")
+        verbose_name_plural = _("Membership: Individual")
         indexes = [
             Index(
                 fields=[
@@ -387,8 +389,9 @@ class OrganisationMembership(BaseMembership):
     objects = OrganisationMembershipQuerySet.as_manager()
 
     class Meta:
-        verbose_name = "Membership: Organisation"
-        verbose_name_plural = "Membership: Organisation"
+        # Translators: Admin label for an organisation membership record
+        verbose_name = _("Membership: Organisation")
+        verbose_name_plural = _("Membership: Organisation")
         indexes = [
             Index(
                 fields=[
@@ -462,19 +465,33 @@ class OrganisationMembership(BaseMembership):
 
     def seats_summary(self) -> str:
         """Return summary of seat status."""
-        base = f"Occupied: {self.occupied_seats} / {self.seats}"
+        # Translators: Seat usage summary shown in the organisation memberships table.
+        # %(occupied)s = number of filled seats, %(total)s = total seats purchased.
+        base = _("Occupied: %(occupied)s / %(total)s") % {
+            "occupied": self.occupied_seats,
+            "total": self.seats,
+        }
 
-        # Show charged vs free seats if max_charged_seats is set
         if self.membership_option.max_charged_seats:
             charged = self.chargeable_seats
             free = self.free_seats
-            base += f" ({charged} charged, {free} free)"
+            # Translators: Appended to the seat summary when some seats are unbilled.
+            # %(charged)s = billed seats, %(free)s = unbilled seats.
+            base += _(" (%(charged)s charged, %(free)s free)") % {
+                "charged": charged,
+                "free": free,
+            }
 
         if self.membership_option.max_seats:
             max_seats = self.membership_option.max_seats
-            if max_seats == 1:
-                limit = f"Membership has limit of {max_seats} seat"
-            else:
-                limit = f"Membership has limit of {max_seats} seats"
-            return f"{base} ({limit})"
+            # Translators: Seat limit clause. Singular/plural pair — provide both
+            # msgstr[0] (one seat) and msgstr[1] (many seats).
+            # %(count)s is the maximum number of seats allowed.
+            limit = ngettext_lazy(
+                "Membership has limit of %(count)s seat",
+                "Membership has limit of %(count)s seats",
+                "count",
+            ) % {"count": int(max_seats)}
+            # Translators: Full summary: %(base)s (seat usage), %(limit)s (seat limit).
+            return _("%(base)s (%(limit)s)") % {"base": base, "limit": limit}
         return base

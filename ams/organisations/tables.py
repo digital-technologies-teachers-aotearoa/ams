@@ -1,5 +1,6 @@
 from django.template.loader import render_to_string
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 from django_tables2 import TemplateColumn
 from django_tables2.columns import Column
 from django_tables2.columns import DateColumn
@@ -15,31 +16,37 @@ class OrganisationMemberTable(Table):
     """Table for displaying members within an organisation detail page."""
 
     name = Column(
-        verbose_name="Name",
+        # Translators: Column header — the member's full name
+        verbose_name=_("Name"),
         empty_values=(),
         order_by=("user__first_name", "user__last_name"),
     )
     email = Column(
-        verbose_name="Email",
+        # Translators: Column header — the member's email address
+        verbose_name=_("Email"),
         empty_values=(),
         orderable=False,
     )
     status = MemberStatusBadgeColumn(
         accessor="is_active",
-        verbose_name="Status",
+        # Translators: Column header — member account status (active/inactive)
+        verbose_name=_("Status"),
         empty_values=(),
         orderable=False,
     )
     join_date = DateColumn(
         accessor="accepted_datetime",
-        verbose_name="Join Date",
+        # Translators: Column header — the date the member joined the organisation
+        verbose_name=_("Join Date"),
     )
     role = Column(
         accessor="role",
-        verbose_name="Role",
+        # Translators: Column header — user's role in the organisation (Member/Admin)
+        verbose_name=_("Role"),
     )
     actions = Column(
-        verbose_name="Actions",
+        # Translators: Column header — buttons to manage the member
+        verbose_name=_("Actions"),
         empty_values=(),
         orderable=False,
     )
@@ -154,38 +161,46 @@ class OrganisationMembershipTable(Table):
 
     membership = Column(
         accessor="membership_option__name",
-        verbose_name="Membership",
+        # Translators: Column header — the organisation's membership plan name
+        verbose_name=_("Membership"),
     )
     duration = Column(
         accessor="membership_option__duration_display",
-        verbose_name="Duration",
+        # Translators: Column header — the length of the membership period
+        verbose_name=_("Duration"),
         orderable=False,
     )
     status = MembershipStatusBadgeColumn(
-        verbose_name="Status",
+        # Translators: Column header — current membership status (e.g. Active, Expired)
+        verbose_name=_("Status"),
         empty_values=(),
         orderable=False,
     )
     start_date = DateColumn(
         accessor="start_date",
-        verbose_name="Start Date",
+        # Translators: Column header — the date the membership began
+        verbose_name=_("Start Date"),
     )
     expiry_date = DateColumn(
         accessor="expiry_date",
-        verbose_name="Expires Date",
+        # Translators: Column header — the date the membership expires
+        verbose_name=_("Expires Date"),
     )
     seats = Column(
-        verbose_name="Seats",
+        # Translators: Column header — seat usage summary
+        verbose_name=_("Seats"),
         accessor="seats_summary",
         orderable=False,
     )
     invoice = TemplateColumn(
         template_name="users/tables/invoice_column.html",
-        verbose_name="Invoice",
+        # Translators: Column header — link to the billing invoice
+        verbose_name=_("Invoice"),
         orderable=False,
     )
     actions = Column(
-        verbose_name="Actions",
+        # Translators: Column header — buttons to manage this membership
+        verbose_name=_("Actions"),
         empty_values=(),
         orderable=False,
     )

@@ -1,11 +1,14 @@
+{% load i18n %}
+
 {% if messages %}
   {% for message in messages %}
     <div class="alert alert-dismissible {% if message.tags %}alert-{{ message.tags }}{% endif %}">
       {{ message }}
+      {# Translators: Screen reader label for the button that dismisses a flash notification/alert #}
       <button type="button"
               class="btn-close"
               data-bs-dismiss="alert"
-              aria-label="Close"></button>
+              aria-label="{% trans 'Close' %}"></button>
     </div>
   {% endfor %}
 {% endif %}

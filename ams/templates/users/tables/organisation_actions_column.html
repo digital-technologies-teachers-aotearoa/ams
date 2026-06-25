@@ -2,8 +2,9 @@
 
 <div class="d-flex gap-3">
   {% if record.role == "ADMIN" %}
+    {# Translators: Button label linking to an organisation's detail page #}
     <a href="{% url 'organisations:detail' record.organisation.uuid %}"
-       class="btn btn-sm btn-secondary">{% icon "eye" %} View</a>
+       class="btn btn-sm btn-secondary">{% icon "eye" %} {% trans "View" %}</a>
   {% endif %}
   <button type="button"
           class="btn btn-outline-danger btn-sm"

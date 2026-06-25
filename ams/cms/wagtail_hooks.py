@@ -30,19 +30,24 @@ def register_icons(icons):
 
 class ArticlePageListingViewSet(PageListingViewSet):
     icon = "calendar-alt"
-    menu_label = "Articles"
+    # Translators: Label for the Articles section in the Wagtail CMS admin menu
+    menu_label = _("Articles")
     add_to_admin_menu = True
     model = ArticlePage
     columns = [
         *PageListingViewSet.columns,
         Column(
             "publication_date",
-            label="Publication Date",
+            # Translators: Column header in the Wagtail admin articles list
+            # — the date the article was published
+            label=_("Publication Date"),
             sort_key="publication_date",
         ),
         Column(
             "author",
-            label="Author",
+            # Translators: Column header in the Wagtail admin articles list
+            # — the article's author
+            label=_("Author"),
             sort_key="author",
         ),
     ]
@@ -120,19 +125,24 @@ if settings.WAGTAIL_AMS_ADMIN_HELPERS:
 ALIGNMENTS = {
     "align-left": {
         "icon": "align-left",
-        "description": "Align left",
+        # Translators: Tooltip for the "align left" button in the rich-text editor
+        "description": _("Align left"),
     },
     "align-center": {
         "icon": "align-center",
-        "description": "Align center",
+        # Translators: Tooltip for the "align center" button in the rich-text editor
+        "description": _("Align center"),
     },
     "align-right": {
         "icon": "align-right",
-        "description": "Align right",
+        # Translators: Tooltip for the "align right" button in the rich-text editor
+        "description": _("Align right"),
     },
     "align-justify": {
         "icon": "align-justify",
-        "description": "Justify",
+        # Translators: Tooltip for the justify (full-width text alignment)
+        # button in the rich-text editor
+        "description": _("Justify"),
     },
 }
 

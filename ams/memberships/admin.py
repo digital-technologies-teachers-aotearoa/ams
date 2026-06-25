@@ -189,7 +189,8 @@ class IndividualMembershipAdmin(admin.ModelAdmin):
     )
 
     @admin.display(
-        description="User",
+        # Translators: Django admin column — member's name and email
+        description=_("User"),
     )
     def user_display(self, obj):
         if obj.user:
@@ -232,7 +233,8 @@ class OrganisationMembershipAdmin(admin.ModelAdmin):
     )
 
     @admin.display(
-        description="Status",
+        # Translators: Django admin column — current membership status
+        description=_("Status"),
     )
     def status(self, obj):
         return obj.get_status_display()
