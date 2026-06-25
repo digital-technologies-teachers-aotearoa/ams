@@ -139,21 +139,29 @@ class Resource(models.Model):
     @property
     def visibility_badge_label(self):
         return {
-            self.Visibility.ACCESS_ACCOUNT_REQUIRED: "Login required",
-            self.Visibility.ACCESS_MEMBERSHIP_REQUIRED: "Membership required",
-            self.Visibility.MEMBERS_ONLY: "Membership required to view",
+            # Translators: Short badge label — requires an account to access
+            self.Visibility.ACCESS_ACCOUNT_REQUIRED: _("Login required"),
+            # Translators: Short badge label — active membership required to access
+            self.Visibility.ACCESS_MEMBERSHIP_REQUIRED: _("Membership required"),
+            # Translators: Short badge label — resource is only visible to members
+            self.Visibility.MEMBERS_ONLY: _("Membership required to view"),
         }.get(self.visibility, "")
 
     @property
     def visibility_badge_tooltip(self):
         return {
+            # Translators: Tooltip on a resource badge — listed publicly but
+            # login required to download/view it
             self.Visibility.ACCESS_ACCOUNT_REQUIRED: (
-                "Anyone can view, login required to access"
+                _("Anyone can view, login required to access")
             ),
+            # Translators: Tooltip on a resource badge — listed publicly but
+            # an active membership is needed to download/view it
             self.Visibility.ACCESS_MEMBERSHIP_REQUIRED: (
-                "Anyone can view, membership required to access"
+                _("Anyone can view, membership required to access")
             ),
-            self.Visibility.MEMBERS_ONLY: "Only members can view or access",
+            # Translators: Resource badge tooltip — hidden entirely from non-members
+            self.Visibility.MEMBERS_ONLY: _("Only members can view or access"),
         }.get(self.visibility, "")
 
     @property

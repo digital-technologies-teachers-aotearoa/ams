@@ -1,7 +1,8 @@
 {% load i18n %}
 
 {% if breadcrumbs %}
-  <nav aria-label="breadcrumb" class="breadcrumb-nav">
+  {# Translators: Screen reader label for the breadcrumb navigation element — "breadcrumb" is a standard web navigation pattern #}
+  <nav aria-label="{% trans 'breadcrumb' %}" class="breadcrumb-nav">
     <ol class="breadcrumb">
       {% for crumb in breadcrumbs %}
         <li class="breadcrumb-item {% if crumb.is_active %}active{% endif %}"

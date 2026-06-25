@@ -145,7 +145,9 @@ class EventUpcomingListFilter(admin.SimpleListFilter):
             }
 
 
-@admin.action(description="Duplicate selected events")
+# Translators: Label for the bulk action in the Django admin events list
+# that duplicates the selected events
+@admin.action(description=_("Duplicate selected events"))
 def duplicate_events(modeladmin, request, queryset):
     count = 0
     for event in queryset:

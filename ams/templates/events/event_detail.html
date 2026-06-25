@@ -139,9 +139,10 @@
                     {% if location.room %}{{ location.room }},{% endif %}
                     {{ location.name }}
                   </a>
+                  {# Translators: Tooltip on a filter link that narrows the events list to the region of this event's location #}
                   <a href="{% url 'events:upcoming' %}?locations__region={{ location.region_id }}"
                      class="text-muted ms-1"
-                     title="Browse events in this region">{% icon "funnel" %}</a>
+                     title="{% trans 'Browse events in this region' %}">{% icon "funnel" %}</a>
                   {% if not forloop.last %}<br />{% endif %}
                 {% endfor %}
               </div>

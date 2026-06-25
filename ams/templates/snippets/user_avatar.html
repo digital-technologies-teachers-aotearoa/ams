@@ -1,4 +1,4 @@
-{% load icon %}
+{% load icon i18n %}
 
 {% comment %}
 Reusable user avatar snippet
@@ -6,10 +6,14 @@ Parameters:
   - user: The user object
 {% endcomment %}
 {% if user.profile_picture %}
+  {# Translators: Alt text for a user's profile picture image. {{ name }} is the user's full name. #}
   <img src="{{ user.profile_picture_thumbnail.url }}"
-       alt="{{ user.get_full_name }}'s profile picture"
+       alt="{% blocktrans with name=user.get_full_name %}{{ name }}'s profile picture{% endblocktrans %}"
        class="rounded-circle object-fit-cover w-100 h-100" />
 {% else %}
+  {# Translators: Screen reader label for the icon shown when a user has no profile picture. {{ name }} is the user's full name. #}
   <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center user-avatar-placeholder w-100 h-100"
-       aria-label="{{ user.get_full_name }}'s profile placeholder">{% icon "person-fill" "text-white" %}</div>
+       aria-label="{% blocktrans with name=user.get_full_name %}{{ name }}'s profile placeholder{% endblocktrans %}">
+    {% icon "person-fill" "text-white" %}
+  </div>
 {% endif %}

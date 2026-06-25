@@ -1,4 +1,4 @@
-{% load wagtailcore_tags %}
+{% load wagtailcore_tags i18n %}
 
 <div class="recent-articles-block mb-5">
   {% if articles %}
@@ -8,6 +8,7 @@
       {% endfor %}
     </div>
   {% else %}
-    <p class="text-muted">No articles have been published yet.</p>
+    {# Translators: Empty-state message shown in the articles listing block when no articles have been published #}
+    <p class="text-muted">{% trans "No articles have been published yet." %}</p>
   {% endif %}
 </div>
