@@ -7,15 +7,15 @@ psycopg[c]==3.3.4  # https://github.com/psycopg/psycopg
 # Testing
 # ------------------------------------------------------------------------------
 mypy==1.20.2  # https://github.com/python/mypy
-django-stubs[compatible-mypy]==6.0.5  # https://github.com/typeddjango/django-stubs
-pytest==9.1.0  # https://github.com/pytest-dev/pytest
+django-stubs[compatible-mypy]==6.0.6  # https://github.com/typeddjango/django-stubs
+pytest==9.1.1  # https://github.com/pytest-dev/pytest
 pytest-sugar==1.1.1  # https://github.com/Teemu/pytest-sugar
 
 # Code quality
 # ------------------------------------------------------------------------------
-ruff==0.15.18  # https://github.com/astral-sh/ruff
-coverage==7.14.1  # https://github.com/nedbat/coveragepy
-djlint==1.39.2  # https://github.com/Riverside-Healthcare/djLint
+ruff==0.15.20  # https://github.com/astral-sh/ruff
+coverage==7.14.3  # https://github.com/nedbat/coveragepy
+djlint==1.39.4  # https://github.com/Riverside-Healthcare/djLint
 pre-commit==4.6.0  # https://github.com/pre-commit/pre-commit
 
 # Django
