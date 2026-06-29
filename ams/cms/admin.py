@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from wagtail.contrib.settings.forms import SiteSwitchForm
 from wagtail.models import Site
+from wagtailmenus.forms import SiteSwitchForm as MainMenuSiteSwitchForm
 from wagtailmenus.menuadmin import MainMenuEditView
 
 from ams.cms.models import ThemeSettingsRevision
@@ -70,7 +71,7 @@ def fixed_main_menu_setup(self, request, *args, **kwargs):
 
     self.site_switcher = None
     if Site.objects.count() > 1:
-        self.site_switcher = SiteSwitchForm(self.site, self.edit_url_name)
+        self.site_switcher = MainMenuSiteSwitchForm(self.site, self.edit_url_name)
 
 
 def fixed_get_edit_url(self):
