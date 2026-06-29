@@ -663,6 +663,40 @@ class ThemeSettings(BaseSiteSetting):
             "Line height for body text.<br>Default: <code>1.5</code>",
         ),
     )
+    # ==== SEPARATOR SETTINGS ====
+    separator_type = models.CharField(
+        max_length=10,
+        choices=[
+            ("line", "Line"),
+            ("image", "Tiled image"),
+            ("centered", "Centered image"),
+        ],
+        default="line",
+        verbose_name="Separator type",
+        help_text="Default horizontal separator style. Authors can override per block.",
+    )
+    separator_image = models.ForeignKey(
+        "wagtailimages.Image",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+        verbose_name="Separator image",
+        help_text=(
+            "Image to tile horizontally. Used when separator type is 'Tiled image'."
+            " PNG or SVG recommended."
+        ),
+    )
+    separator_width = models.CharField(
+        max_length=10,
+        choices=[("content", "Content width"), ("full", "Full window width")],
+        default="content",
+        verbose_name="Separator width",
+        help_text=(
+            "Default width for horizontal separators."
+            " Note: 'Full window width' may not render correctly inside column blocks."
+        ),
+    )
     # ==== CUSTOM CSS OVERRIDES ====
     custom_css = models.TextField(
         blank=True,
@@ -1035,6 +1069,18 @@ class ThemeSettings(BaseSiteSetting):
             ],
             "Fonts",
             help_text="Typography settings for font families, sizes, and spacing.",
+        ),
+        MultiFieldPanel(
+            [
+                FieldRowPanel([FieldPanel("separator_type")]),
+                FieldRowPanel([FieldPanel("separator_image")]),
+                FieldRowPanel([FieldPanel("separator_width")]),
+            ],
+            "Separator",
+            help_text=(
+                "Default style for horizontal separators."
+                " Authors can override per block."
+            ),
         ),
         MultiFieldPanel(
             [

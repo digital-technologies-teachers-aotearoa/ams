@@ -1,0 +1,17 @@
+.content-divider--image {
+  background-repeat: repeat-x;
+  border: none;
+}
+
+.content-divider--centered {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.content-divider--full {
+  position: relative;
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+}

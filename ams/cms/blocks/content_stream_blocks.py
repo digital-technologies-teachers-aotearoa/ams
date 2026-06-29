@@ -4,7 +4,7 @@ from wagtail.embeds.blocks import EmbedBlock
 
 from ams.cms.blocks.captioned_image_block import CaptionedImageBlock
 from ams.cms.blocks.heading_block import HeadingBlock
-from ams.cms.blocks.horizontal_rule_block import HorizontalRuleBlock
+from ams.cms.blocks.horizontal_separator_block import HorizontalSeparatorBlock
 from ams.cms.blocks.image_carousel_block import ImageCarouselBlock
 from ams.cms.blocks.image_grid_block import ImageGridBlock
 from ams.cms.blocks.lead_paragraph_block import LeadParagraphBlock
@@ -34,7 +34,7 @@ class ContentStreamBlocks(StreamBlock):
     image_block = CaptionedImageBlock()
     image_grid_block = ImageGridBlock()
     image_carousel_block = ImageCarouselBlock()
-    horizontal_rule_block = HorizontalRuleBlock()
+    horizontal_rule_block = HorizontalSeparatorBlock()
     embed_block = EmbedBlock(
         help_text="Insert a URL to embed. For example, https://www.youtube.com/watch?v=ScMzIvxBSi4",
         icon="media",

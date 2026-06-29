@@ -4,7 +4,7 @@ from ams.cms.blocks.content_stream_blocks import ColumnContentStreamBlocks
 from ams.cms.blocks.content_stream_blocks import ContentStreamBlocks
 from ams.cms.blocks.full_width_section_block import FullWidthSectionBlock
 from ams.cms.blocks.heading_block import HeadingBlock
-from ams.cms.blocks.horizontal_rule_block import HorizontalRuleBlock
+from ams.cms.blocks.horizontal_separator_block import HorizontalSeparatorBlock
 from ams.cms.blocks.image_carousel_block import ImageCarouselBlock
 from ams.cms.blocks.image_grid_block import ImageGridBlock
 from ams.cms.blocks.layout_stream_blocks import ContentPageBlocks
@@ -20,7 +20,7 @@ __all__ = [
     "FullWidthSectionBlock",
     "HeadingBlock",
     "HomePageBlocks",
-    "HorizontalRuleBlock",
+    "HorizontalSeparatorBlock",
     "ImageCarouselBlock",
     "ImageGridBlock",
     "RecentArticlesBlock",

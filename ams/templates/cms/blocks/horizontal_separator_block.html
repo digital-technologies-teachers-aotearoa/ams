@@ -1,0 +1,15 @@
+{% load wagtailimages_tags %}
+
+{% if effective_type == "image" and effective_image %}
+  {% image effective_image original preserve-svg as sep_img %}
+  <div class="content-divider content-divider--image{% if effective_width == 'full' %} content-divider--full{% endif %}"
+       style="background-image: url('{{ sep_img.url }}');
+              height: {{ sep_img.height }}px;
+              background-size: {{ sep_img.width }}px {{ sep_img.height }}px"></div>
+{% elif effective_type == "centered" and effective_image %}
+  <div class="content-divider content-divider--centered{% if effective_width == 'full' %} content-divider--full{% endif %}">
+    {% image effective_image original preserve-svg %}
+  </div>
+{% else %}
+  <hr class="content-divider{% if effective_width == 'full' %} content-divider--full{% endif %}" />
+{% endif %}
