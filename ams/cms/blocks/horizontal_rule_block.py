@@ -1,9 +1,5 @@
-from wagtail.blocks import StaticBlock
+from ams.cms.blocks.horizontal_separator_block import (
+    HorizontalSeparatorBlock as HorizontalRuleBlock,
+)
 
-
-class HorizontalRuleBlock(StaticBlock):
-    class Meta:
-        label = "Horizontal rule"
-        icon = "minus"
-        template = "cms/blocks/horizontal_rule_block.html"
-        help_text = "Inserts a horizontal divider line."
+__all__ = ["HorizontalRuleBlock"]
