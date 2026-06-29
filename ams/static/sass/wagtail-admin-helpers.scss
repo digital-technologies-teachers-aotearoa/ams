@@ -50,3 +50,11 @@
 [data-contentpath='columns'] [data-streamfield-list-container] {
   counter-reset: column-number;
 }
+
+/* Monospace textarea for code/HTML/CSS fields */
+.monospace-field textarea {
+  font-family:
+    SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
+    monospace;
+  font-size: 0.875em;
+}

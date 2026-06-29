@@ -667,6 +667,19 @@ class ThemeSettings(BaseSiteSetting):
             "This field accepts pure CSS code that will be injected into all pages.",
         ),
     )
+    custom_html = models.TextField(
+        blank=True,
+        default="",
+        verbose_name="Custom HTML (head)",
+        help_text=mark_safe(
+            "<strong>⚠️ WARNING:</strong> Raw HTML injected into every page's "
+            "<code>&lt;head&gt;</code>. Useful for Google Fonts "
+            "<code>&lt;link&gt;</code> tags, analytics scripts, or meta tags. "
+            "Invalid or malicious HTML may "
+            "break pages or introduce security risks. "
+            "This field accepts raw HTML that will be injected into all pages.",
+        ),
+    )
     panels = [
         MultiFieldPanel(
             [
@@ -1001,7 +1014,7 @@ class ThemeSettings(BaseSiteSetting):
         ),
         MultiFieldPanel(
             [
-                FieldRowPanel(["custom_css"]),
+                FieldRowPanel([FieldPanel("custom_css", classname="monospace-field")]),
             ],
             "⚠️ Advanced: Custom CSS Overrides",
             help_text=mark_safe(
@@ -1009,6 +1022,19 @@ class ThemeSettings(BaseSiteSetting):
                 "Custom CSS can override all theme settings and break site design. "
                 "Only use if you understand CSS and are prepared to troubleshoot "
                 "potential conflicts. Changes apply immediately to all site pages.",
+            ),
+            classname="collapsed",
+        ),
+        MultiFieldPanel(
+            [
+                FieldRowPanel([FieldPanel("custom_html", classname="monospace-field")]),
+            ],
+            "⚠️ Advanced: Custom HTML (head)",
+            help_text=mark_safe(
+                "<strong style='color: #dc3545;'>DANGER ZONE:</strong> "
+                "Raw HTML injected into &lt;head&gt; on every page. "
+                "Can break layout or introduce security vulnerabilities. "
+                "Only use if you understand HTML.",
             ),
             classname="collapsed",
         ),
