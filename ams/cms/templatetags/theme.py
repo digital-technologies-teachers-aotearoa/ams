@@ -3,6 +3,7 @@
 from django import template
 from django.core.cache import cache
 from django.template.loader import render_to_string
+from django.utils.safestring import mark_safe
 from wagtail.models import Site
 
 from ams.cms.models import ThemeSettings
@@ -101,3 +102,50 @@ def theme_css(context):
     cache.set(css_cache_key, html, None)
 
     return html
+
+
+@register.simple_tag(takes_context=True)
+def theme_html(context):
+    """Render custom HTML for injection into <head>.
+
+    Uses the same caching strategy as theme_css, keyed on cache_version.
+    """
+    request = context.get("request")
+    if not request:
+        return ""
+
+    site = Site.find_for_request(request)
+    if not site:
+        return ""
+
+    version_cache_key = f"theme_version_site{site.id}"
+    html_cache_key_template = "theme_html_v{version}_site{site_id}"
+
+    cached_version = cache.get(version_cache_key)
+    if cached_version is not None:
+        html_cache_key = html_cache_key_template.format(
+            version=cached_version,
+            site_id=site.id,
+        )
+        cached_html = cache.get(html_cache_key)
+        if cached_html is not None:
+            return mark_safe(cached_html)  # noqa: S308
+
+    try:
+        theme_settings_obj = ThemeSettings.for_site(site)
+    except ThemeSettings.DoesNotExist:
+        return ""
+
+    if not theme_settings_obj:
+        return ""
+
+    html = theme_settings_obj.custom_html
+
+    html_cache_key = html_cache_key_template.format(
+        version=theme_settings_obj.cache_version,
+        site_id=site.id,
+    )
+    cache.set(version_cache_key, theme_settings_obj.cache_version, None)
+    cache.set(html_cache_key, html, None)
+
+    return mark_safe(html)  # noqa: S308
