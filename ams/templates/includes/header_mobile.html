@@ -34,14 +34,20 @@
       {% else %}
         <li class="nav-item">
           {# URL provided by django-allauth/account/urls.py #}
-          <a id="log-in-link" class="nav-link" href="{% url 'account_login' %}">{% translate "Sign In" %}</a>
+          {% with signin_style=settings.cms.ThemeSettings.navbar_signin_style %}
+            <a id="log-in-link"
+               class="{% if signin_style == 'outline' %}btn btn-outline-primary{% elif signin_style == 'solid' %}btn btn-primary{% else %}nav-link{% endif %}"
+               href="{% url 'account_login' %}">{% translate "Sign In" %}</a>
+          {% endwith %}
         </li>
         {% if ACCOUNT_ALLOW_REGISTRATION %}
           <li class="nav-item">
             {# URL provided by django-allauth/account/urls.py #}
-            <a id="sign-up-link"
-               class="btn btn-primary"
-               href="{% url 'account_signup' %}">{% translate "Sign Up" %}</a>
+            {% with signup_style=settings.cms.ThemeSettings.navbar_signup_style %}
+              <a id="sign-up-link"
+                 class="{% if signup_style == 'outline' %}btn btn-outline-primary{% elif signup_style == 'link' %}nav-link{% else %}btn btn-primary{% endif %}"
+                 href="{% url 'account_signup' %}">{% translate "Sign Up" %}</a>
+            {% endwith %}
           </li>
         {% endif %}
       {% endif %}

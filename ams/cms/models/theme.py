@@ -258,6 +258,48 @@ class ThemeSettings(BaseSiteSetting):
             "Dark mode: Emphasized primary text.<br>Default: <code>#6ea8fe</code>",
         ),
     )
+    primary_btn_text_color = ColorField(
+        default="#ffffff",
+        verbose_name="Primary button text color",
+        help_text=mark_safe(
+            "Text color for filled primary buttons (e.g. <code>btn-primary</code>).<br>"
+            "Ensure sufficient contrast with your primary color"
+            "(WCAG AA requires 4.5:1).<br>"
+            "Default: <code>#ffffff</code> (white)",
+        ),
+    )
+    navbar_signin_style = models.CharField(
+        max_length=10,
+        choices=[
+            ("link", "Link (default)"),
+            ("outline", "Outlined button"),
+            ("solid", "Filled button"),
+        ],
+        default="link",
+        verbose_name="Sign In style",
+        help_text="How the Sign In link in the navbar is rendered.",
+    )
+    navbar_signup_style = models.CharField(
+        max_length=10,
+        choices=[
+            ("link", "Link"),
+            ("outline", "Outlined button"),
+            ("solid", "Filled button (default)"),
+        ],
+        default="solid",
+        verbose_name="Sign Up style",
+        help_text="How the Sign Up link in the navbar is rendered.",
+    )
+    btn_font_weight = models.CharField(
+        max_length=10,
+        default="400",
+        verbose_name="Button font weight",
+        help_text=mark_safe(
+            "Font weight for all buttons.<br>"
+            "Common values: <code>400</code> (normal), <code>600</code> (semi-bold), "
+            "<code>700</code> (bold).<br>Default: <code>400</code>",
+        ),
+    )
     # ==== SUCCESS THEME COLOR ====
     # Theme color used for positive or successful actions and information
     success_color = ColorField(
@@ -751,6 +793,12 @@ class ThemeSettings(BaseSiteSetting):
                         FieldPanel("navbar_colour_mode"),
                     ],
                 ),
+                FieldRowPanel(
+                    [
+                        FieldPanel("navbar_signin_style"),
+                        FieldPanel("navbar_signup_style"),
+                    ],
+                ),
             ],
             "Navbar",
             help_text="Background color and color mode for the navigation bar.",
@@ -875,6 +923,11 @@ class ThemeSettings(BaseSiteSetting):
                     [
                         NativeColorPanel("primary_text_emphasis_light"),
                         NativeColorPanel("primary_text_emphasis_dark"),
+                    ],
+                ),
+                FieldRowPanel(
+                    [
+                        NativeColorPanel("primary_btn_text_color"),
                     ],
                 ),
             ],
@@ -1066,6 +1119,7 @@ class ThemeSettings(BaseSiteSetting):
                         "body_line_height",
                     ],
                 ),
+                FieldRowPanel(["btn_font_weight"]),
             ],
             "Fonts",
             help_text="Typography settings for font families, sizes, and spacing.",
