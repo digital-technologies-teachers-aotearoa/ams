@@ -27,7 +27,8 @@
           {% comment %} (item.title and item.link_page) or (item.title and item.link_url) {% endcomment %}
           {% if item.title and item.link_page or item.title and item.link_url %}
             <a href="{% if item.link_page %}{% pageurl item.link_page %}{% else %}{{ item.link_url|localise_url }}{% endif %}"
-               class="stretched-link">
+               class="stretched-link"
+               {% if not item.link_page and item.link_url %}target="_blank" rel="noopener noreferrer"{% endif %}>
               <h4 class="image-grid__item__title h5 mb-2 {% if self.text_alignment == 'center' %} text-center {% else %} text-start {% endif %}">
                 {{ item.title }}
               </h4>
@@ -40,7 +41,8 @@
             {% endif %}
             {% if item.link_page or item.link_url %}
               <a href="{% if item.link_page %}{% pageurl item.link_page %}{% else %}{{ item.link_url|localise_url }}{% endif %}"
-                 class="stretched-link"></a>
+                 class="stretched-link"
+                 {% if not item.link_page and item.link_url %}target="_blank" rel="noopener noreferrer"{% endif %}></a>
             {% endif %}
           {% endif %}
         </div>
