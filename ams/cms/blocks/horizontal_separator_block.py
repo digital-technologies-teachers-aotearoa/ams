@@ -50,6 +50,9 @@ class HorizontalSeparatorBlock(StructBlock):
             value = {}
         return super().to_python(value)
 
+    def bulk_to_python(self, values):
+        return super().bulk_to_python([{} if v is None else v for v in values])
+
     def get_context(self, value, parent_context=None):
         context = super().get_context(value, parent_context=parent_context)
         request = parent_context.get("request") if parent_context else None
