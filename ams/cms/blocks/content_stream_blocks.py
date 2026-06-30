@@ -8,6 +8,7 @@ from ams.cms.blocks.horizontal_separator_block import HorizontalSeparatorBlock
 from ams.cms.blocks.image_carousel_block import ImageCarouselBlock
 from ams.cms.blocks.image_grid_block import ImageGridBlock
 from ams.cms.blocks.lead_paragraph_block import LeadParagraphBlock
+from ams.cms.blocks.timeline_block import TimelineBlock
 
 
 class ContentStreamBlocks(StreamBlock):
@@ -35,6 +36,7 @@ class ContentStreamBlocks(StreamBlock):
     image_grid_block = ImageGridBlock()
     image_carousel_block = ImageCarouselBlock()
     horizontal_rule_block = HorizontalSeparatorBlock()
+    timeline_block = TimelineBlock()
     embed_block = EmbedBlock(
         help_text="Insert a URL to embed. For example, https://www.youtube.com/watch?v=ScMzIvxBSi4",
         icon="media",
