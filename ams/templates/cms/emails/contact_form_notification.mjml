@@ -1,0 +1,71 @@
+<mjml>
+  <mj-head>
+    <mj-title>{% trans "New Contact Form Submission" %}</mj-title>
+    <!-- prettier-ignore -->
+    <mj-preview>
+      {% blocktrans with name=submission.name %}New message from {{ name }}{% endblocktrans %}
+    </mj-preview>
+    <mj-attributes>
+      <mj-include path="../../_email_includes/_head_attributes.mjml" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body background-color="#f8f9fa">
+    <!-- Header Section -->
+    <mj-section mj-class="section-header-primary">
+      <mj-column>
+        <mj-text mj-class="header-primary">
+          {% trans "New Contact Form Submission" %}
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <mj-section mj-class="section-content">
+      <mj-column>
+        <!-- prettier-ignore -->
+        <mj-text mj-class="text-body">
+          {% blocktrans with name=submission.name page_title=page.title %}A new contact form submission has been received from <strong>{{ name }}</strong> via the <strong>{{ page_title }}</strong> page.{% endblocktrans %}
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Submission Details Section -->
+    <mj-section mj-class="section-detail-box">
+      <mj-column>
+        <mj-text mj-class="text-section-heading">
+          {% trans "Submission Details" %}
+        </mj-text>
+        <mj-table>
+          <tr>
+            <td style="padding: 8px 0; font-weight: bold; width: 40%">
+              {% trans "Name:" %}
+            </td>
+            <td style="padding: 8px 0">{{ submission.name }}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; font-weight: bold">
+              {% trans "Email:" %}
+            </td>
+            <td style="padding: 8px 0">
+              <a href="mailto:{{ submission.email }}">{{ submission.email }}</a>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; font-weight: bold">
+              {% trans "Page:" %}
+            </td>
+            <td style="padding: 8px 0">{{ page.title }}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; font-weight: bold; vertical-align: top">
+              {% trans "Message:" %}
+            </td>
+            <td style="padding: 8px 0">{{ submission.message|linebreaksbr }}</td>
+          </tr>
+        </mj-table>
+      </mj-column>
+    </mj-section>
+
+    <!-- Footer Section -->
+    <mj-include path="../../_email_includes/_staff_footer.mjml" />
+  </mj-body>
+</mjml>

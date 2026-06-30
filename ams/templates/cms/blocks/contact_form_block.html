@@ -1,0 +1,6 @@
+{% load crispy_forms_tags %}
+
+<div class="contact-form-block">
+  {% if value.intro_text %}<p class="mb-3">{{ value.intro_text }}</p>{% endif %}
+  {% crispy contact_form %}
+</div>

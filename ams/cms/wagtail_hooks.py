@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from django.templatetags.static import static
+from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 from wagtail import hooks
@@ -11,8 +12,12 @@ from wagtail.admin.rich_text.converters.html_to_contentstate import BlockElement
 from wagtail.admin.rich_text.editors.draftail.features import BlockFeature
 from wagtail.admin.ui.components import Component
 from wagtail.admin.ui.tables import Column
+from wagtail.admin.ui.tables import TitleColumn
 from wagtail.admin.viewsets.pages import PageListingViewSet
+from wagtail.snippets.models import register_snippet
+from wagtail.snippets.views.snippets import SnippetViewSet
 
+from ams.cms.models.contact import ContactFormSubmission
 from ams.cms.models.pages import ArticlePage
 from ams.utils.permissions import user_has_active_membership
 
@@ -59,6 +64,28 @@ article_page_listing_viewset = ArticlePageListingViewSet("article_pages")
 @hooks.register("register_admin_viewset")
 def register_article_page_listing_viewset():
     return article_page_listing_viewset
+
+
+class ContactFormSubmissionViewSet(SnippetViewSet):
+    model = ContactFormSubmission
+    list_display = [
+        "name",
+        "email",
+        TitleColumn(
+            "page",
+            label=_("Page"),
+            get_url=lambda sub: reverse("wagtailadmin_pages:edit", args=[sub.page_id]),
+        ),
+        "submitted_at",
+    ]
+    search_fields = ["name", "email", "message"]
+    ordering = ["-submitted_at"]
+    icon = "mail"
+    menu_label = _("Contact Submissions")
+    add_to_admin_menu = True
+
+
+register_snippet(ContactFormSubmissionViewSet)
 
 
 @hooks.register("construct_help_menu")
