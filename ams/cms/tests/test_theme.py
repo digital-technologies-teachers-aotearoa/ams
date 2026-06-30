@@ -153,6 +153,32 @@ class TestThemeCSSGeneration:
         assert "<style>" in html
         assert "</style>" in html
 
+    def test_primary_button_css_vars_rendered(self, site):
+        """Test that primary button CSS variable overrides are rendered."""
+        theme = ThemeSettings.objects.create(
+            site=site,
+            primary_color="#abcd12",
+            primary_btn_text_color="#000000",
+        )
+
+        html = render_to_string("templatetags/theme_css.html", {"theme": theme})
+
+        assert ".btn-primary" in html
+        assert "--bs-btn-bg: var(--bs-primary)" in html
+        assert "--bs-btn-border-color: var(--bs-primary)" in html
+        assert "--bs-btn-color: #000000" in html
+        assert "--bs-btn-focus-shadow-rgb: 171, 205, 18" in html
+        assert ".btn-outline-primary" in html
+
+    def test_btn_font_weight_rendered(self, site):
+        """Test that button font weight override is rendered."""
+        theme = ThemeSettings.objects.create(site=site, btn_font_weight="700")
+
+        html = render_to_string("templatetags/theme_css.html", {"theme": theme})
+
+        assert ".btn" in html
+        assert "--bs-btn-font-weight: 700" in html
+
     def test_dark_mode_css_separate(self, site):
         """Test that dark mode colors are in separate selector."""
         theme = ThemeSettings.objects.create(

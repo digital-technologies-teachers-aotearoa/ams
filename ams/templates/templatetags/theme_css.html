@@ -162,6 +162,39 @@
   --bs-link-hover-color-rgb: {{ theme.link_hover_color_dark|hex_to_rgb }};
 }
 
+/* Primary button overrides */
+.btn-primary {
+  --bs-btn-color: {{ theme.primary_btn_text_color }};
+  --bs-btn-bg: var(--bs-primary);
+  --bs-btn-border-color: var(--bs-primary);
+  --bs-btn-hover-color: {{ theme.primary_btn_text_color }};
+  --bs-btn-hover-bg: color-mix(in srgb, var(--bs-primary) 85%, #000);
+  --bs-btn-hover-border-color: color-mix(in srgb, var(--bs-primary) 80%, #000);
+  --bs-btn-active-color: {{ theme.primary_btn_text_color }};
+  --bs-btn-active-bg: color-mix(in srgb, var(--bs-primary) 80%, #000);
+  --bs-btn-active-border-color: color-mix(in srgb, var(--bs-primary) 75%, #000);
+  --bs-btn-disabled-color: {{ theme.primary_btn_text_color }};
+  --bs-btn-disabled-bg: var(--bs-primary);
+  --bs-btn-disabled-border-color: var(--bs-primary);
+  --bs-btn-focus-shadow-rgb: {{ theme.primary_color|hex_to_rgb }};
+}
+.btn-outline-primary {
+  --bs-btn-color: var(--bs-primary);
+  --bs-btn-border-color: var(--bs-primary);
+  --bs-btn-hover-color: {{ theme.primary_btn_text_color }};
+  --bs-btn-hover-bg: var(--bs-primary);
+  --bs-btn-hover-border-color: var(--bs-primary);
+  --bs-btn-active-color: {{ theme.primary_btn_text_color }};
+  --bs-btn-active-bg: var(--bs-primary);
+  --bs-btn-active-border-color: var(--bs-primary);
+  --bs-btn-focus-shadow-rgb: {{ theme.primary_color|hex_to_rgb }};
+}
+
+/* Button font weight */
+.btn {
+  --bs-btn-font-weight: {{ theme.btn_font_weight }};
+}
+
 /* Navbar */
 nav.navbar,
 .offcanvas-header {
