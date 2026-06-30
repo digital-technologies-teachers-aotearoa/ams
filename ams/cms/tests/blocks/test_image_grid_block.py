@@ -283,3 +283,13 @@ class TestImageGridBlock:
         block = GridItemBlock()
         assert block.meta.icon == "user"
         assert block.meta.label == "Grid Item"
+
+    def test_image_grid_block_has_grayscale_field(self):
+        """Test that ImageGridBlock has a grayscale field."""
+        block = ImageGridBlock()
+        assert "grayscale" in block.child_blocks
+
+    def test_image_grid_block_grayscale_default_false(self):
+        """Test that grayscale field defaults to False."""
+        block = ImageGridBlock()
+        assert block.child_blocks["grayscale"].meta.default is False

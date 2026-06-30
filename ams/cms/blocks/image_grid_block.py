@@ -1,3 +1,4 @@
+from wagtail.blocks import BooleanBlock
 from wagtail.blocks import CharBlock
 from wagtail.blocks import ChoiceBlock
 from wagtail.blocks import ListBlock
@@ -71,6 +72,14 @@ class ImageGridBlock(StructBlock):
         default="none",
         required=True,
         help_text="Choose the image border style",
+    )
+    grayscale = BooleanBlock(
+        required=False,
+        default=False,
+        help_text=(
+            "Apply a greyscale filter to images that reveals colour on hover. "
+            "Suitable for photo/people grids. Avoid for logo or sponsor grids."
+        ),
     )
     image_alignment = ChoiceBlock(
         choices=[
