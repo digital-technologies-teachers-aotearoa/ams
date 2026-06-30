@@ -1,0 +1,29 @@
+{% load wagtailcore_tags wagtailimages_tags %}
+
+<div class="timeline">
+  {% for item in self.items %}
+    <div class="timeline__item">
+      <div class="timeline__side">
+        <div class="timeline__marker"></div>
+        <div class="timeline__line"></div>
+      </div>
+      <div class="timeline__body">
+        <div class="timeline__date">{{ item.date }}</div>
+        {% if self.style == "plain" %}
+          {% if item.heading %}<h4 class="mt-0 mb-1">{{ item.heading }}</h4>{% endif %}
+          {% if item.body %}<div class="margin-trim">{{ item.body|richtext }}</div>{% endif %}
+        {% else %}
+          <div class="card">
+            {% if item.image %}
+              {% image item.image fill-800x450 loading="lazy" class="card-img-top object-fit-cover" %}
+            {% endif %}
+            <div class="card-body">
+              {% if item.heading %}<h4 class="card-title mb-2">{{ item.heading }}</h4>{% endif %}
+              {% if item.body %}<div class="card-text margin-trim">{{ item.body|richtext }}</div>{% endif %}
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  {% endfor %}
+</div>

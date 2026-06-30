@@ -10,6 +10,7 @@ from ams.cms.blocks.image_grid_block import ImageGridBlock
 from ams.cms.blocks.layout_stream_blocks import ContentPageBlocks
 from ams.cms.blocks.layout_stream_blocks import HomePageBlocks
 from ams.cms.blocks.recent_articles_block import RecentArticlesBlock
+from ams.cms.blocks.timeline_block import TimelineBlock
 
 __all__ = [
     "CaptionedImageBlock",
@@ -24,4 +25,5 @@ __all__ = [
     "ImageCarouselBlock",
     "ImageGridBlock",
     "RecentArticlesBlock",
+    "TimelineBlock",
 ]
