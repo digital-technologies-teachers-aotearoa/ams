@@ -1,5 +1,6 @@
 from ams.cms.blocks.captioned_image_block import CaptionedImageBlock
 from ams.cms.blocks.columns_block import ColumnsBlock
+from ams.cms.blocks.contact_form_block import ContactFormBlock
 from ams.cms.blocks.content_stream_blocks import ColumnContentStreamBlocks
 from ams.cms.blocks.content_stream_blocks import ContentStreamBlocks
 from ams.cms.blocks.full_width_section_block import FullWidthSectionBlock
@@ -16,6 +17,7 @@ __all__ = [
     "CaptionedImageBlock",
     "ColumnContentStreamBlocks",
     "ColumnsBlock",
+    "ContactFormBlock",
     "ContentPageBlocks",
     "ContentStreamBlocks",
     "FullWidthSectionBlock",

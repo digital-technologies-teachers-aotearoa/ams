@@ -4,6 +4,9 @@ This module re-exports all models to maintain backward compatibility with
 existing code that imports from ams.cms.models.
 """
 
+# Contact form models
+from ams.cms.models.contact import ContactFormSubmission
+
 # Page models
 # Document models
 from ams.cms.models.documents import AMSDocument
@@ -25,6 +28,7 @@ __all__ = [
     "ArticlePage",
     "ArticlesIndexPage",
     "AssociationSettings",
+    "ContactFormSubmission",
     "ContentPage",
     "HomePage",
     "SiteSettings",

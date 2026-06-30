@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
@@ -6,6 +7,7 @@ from django.db import models
 from django.http import Http404
 from django.http import HttpResponseForbidden
 from django.shortcuts import redirect
+from django.template.response import TemplateResponse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from wagtail.admin.panels import FieldPanel
@@ -16,6 +18,9 @@ from wagtail.models import Page
 from ams.cms.blocks import ContentPageBlocks
 from ams.cms.blocks import ContentStreamBlocks
 from ams.cms.blocks import HomePageBlocks
+from ams.cms.forms import ContactForm
+from ams.cms.models.contact import ContactFormSubmission
+from ams.utils.email import send_templated_email
 from ams.utils.permissions import user_has_active_membership
 from ams.utils.reserved_paths import get_reserved_paths_set
 
@@ -96,7 +101,49 @@ class ContentPage(Page):
             # If no descendants, return 404
             raise Http404(_("This page has no published content."))
 
+        if request.method == "POST" and "contact_form_submit" in request.POST:
+            return self._handle_contact_form(request, *args, **kwargs)
+
         return super().serve(request, *args, **kwargs)
+
+    def _handle_contact_form(self, request, *args, **kwargs):
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            recipient_email = None
+            subject = _("Contact Form Submission")
+            for block_value in self.body:
+                if block_value.block_type == "contact_form_block":
+                    recipient_email = block_value.value.get("recipient_email")
+                    block_subject = block_value.value.get("subject")
+                    if block_subject:
+                        subject = block_subject
+                    break
+
+            submission = ContactFormSubmission.objects.create(
+                page=self,
+                name=form.cleaned_data["name"],
+                email=form.cleaned_data["email"],
+                message=form.cleaned_data["message"],
+            )
+
+            if recipient_email:
+                send_templated_email(
+                    subject=str(subject),
+                    template_name="cms/emails/contact_form_notification",
+                    context={"submission": submission, "page": self},
+                    recipient_list=[recipient_email],
+                    fail_silently=True,
+                )
+
+            messages.success(
+                request,
+                _("Your message has been sent. We'll be in touch soon."),
+            )
+            return redirect(self.url)
+
+        context = self.get_context(request, *args, **kwargs)
+        context["contact_form"] = form
+        return TemplateResponse(request, self.template, context)
 
     def clean(self):
         """Validate that the page slug doesn't conflict with reserved URLs."""
