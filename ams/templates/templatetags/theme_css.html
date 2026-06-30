@@ -190,6 +190,11 @@
   --bs-btn-focus-shadow-rgb: {{ theme.primary_color|hex_to_rgb }};
 }
 
+/* Primary badge text color */
+.badge.bg-primary {
+  --bs-badge-color: {{ theme.primary_btn_text_color }};
+}
+
 /* Button font weight */
 .btn {
   --bs-btn-font-weight: {{ theme.btn_font_weight }};
@@ -200,6 +205,15 @@ nav.navbar,
 .offcanvas-header {
   background-color: {{ theme.navbar_bg_color }};
 }
+
+nav.navbar .navbar-toggler {
+  border-color: {{ theme.navbar_toggler_color }};
+}
+
+nav.navbar .navbar-toggler-icon {
+  --bs-navbar-toggler-icon-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28{{ theme.navbar_toggler_color|hex_to_rgb }}, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
 
 /* Footer */
 footer.footer {

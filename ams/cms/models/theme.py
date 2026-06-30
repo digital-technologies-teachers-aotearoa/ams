@@ -46,6 +46,15 @@ class ThemeSettings(BaseSiteSetting):
         verbose_name="Navbar color mode",
         help_text="Color mode for the navbar (determines text color contrast)",
     )
+    navbar_toggler_color = ColorField(
+        default="#dee2e6",
+        verbose_name="Navbar toggler color",
+        help_text=mark_safe(
+            "Color for the hamburger menu button.<br>"
+            "Choose a color that contrasts with your navbar background.<br>"
+            "Default: <code>#dee2e6</code>",
+        ),
+    )
 
     # ==== FOOTER SETTINGS ====
     footer_bg_color = ColorField(
@@ -786,6 +795,7 @@ class ThemeSettings(BaseSiteSetting):
                 FieldRowPanel(
                     [
                         NativeColorPanel("navbar_bg_color"),
+                        NativeColorPanel("navbar_toggler_color"),
                     ],
                 ),
                 FieldRowPanel(
