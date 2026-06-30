@@ -111,6 +111,16 @@ main > .container {
   object-fit: cover;
 }
 
+// Image grid: opt-in greyscale with colour reveal on hover
+.image-grid--grayscale .image-grid__item__image img {
+  filter: grayscale(100%);
+  transition: filter 0.3s ease;
+}
+
+.image-grid--grayscale .image-grid__item:hover .image-grid__item__image img {
+  filter: grayscale(0%);
+}
+
 // Icons
 .icon {
   display: block;

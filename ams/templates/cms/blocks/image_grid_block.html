@@ -1,6 +1,6 @@
 {% load wagtailcore_tags wagtailimages_tags localise_url %}
 
-<div class="image-grid row row-cols-2 row-cols-lg-{{ self.columns }} g-4 {% if self.image_alignment == 'center' %}justify-content-center{% endif %} {% if self.image_vertical_alignment == 'center' %}align-items-center{% endif %}">
+<div class="image-grid {% if self.grayscale %}image-grid--grayscale{% endif %} row row-cols-2 row-cols-lg-{{ self.columns }} g-5 {% if self.image_alignment == 'center' %}justify-content-center{% endif %} {% if self.image_vertical_alignment == 'center' %}align-items-center{% endif %}">
   {% for item in self.items %}
     <div class="col">
       <div class="image-grid__item text-center">
