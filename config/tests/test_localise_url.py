@@ -36,6 +36,31 @@ def test_localise_url_falls_back_to_active_language():
         ("events/", "mi", "/mi/events/"),
         # Trailing slash is preserved
         ("/resources/", "mi", "/mi/resources/"),
+        # Non-i18n app roots (registered outside i18n_patterns in
+        # config/urls.py) stay unprefixed regardless of language.
+        ("/forum/", "en", "/forum/"),
+        ("/forum/", "mi", "/forum/"),
+        # No trailing slash — exercises the APPEND_SLASH resolve() fallback.
+        ("/forum", "en", "/forum"),
+        # Wagtail admin root.
+        ("/cms/", "en", "/cms/"),
+        # Billing endpoint (billing/ itself has no root view — use a real
+        # leaf route).
+        ("/billing/xero/webhooks/", "en", "/billing/xero/webhooks/"),
+        # Wagtail document serve endpoint (cms-documents/ has no root view
+        # either).
+        ("/cms-documents/1/test-file.pdf", "en", "/cms-documents/1/test-file.pdf"),
+        # Query string / fragment are preserved and don't break the
+        # resolve() check.
+        ("/forum/?tab=active", "en", "/forum/?tab=active"),
+        ("/forum/#top", "en", "/forum/#top"),
+        # Root redirect view — deliberate behavior change: this now
+        # resolves without a prefix, so it's left as the user's
+        # preferred-language root rather than forced to /en/.
+        ("/", "en", "/"),
+        # Genuinely unresolvable path still falls back to prefixing
+        # (regression guard for the fail-safe design).
+        ("/does-not-exist/", "en", "/en/does-not-exist/"),
     ],
 )
 @override_settings(LANGUAGES=[("en", "English"), ("mi", "Te Reo Māori")])
