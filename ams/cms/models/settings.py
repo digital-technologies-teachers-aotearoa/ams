@@ -14,7 +14,7 @@ class SiteSettings(BaseSiteSetting):
         max_length=10,
         verbose_name=_("Language"),
         blank=True,
-        choices=settings.LANGUAGES,
+        choices=settings.ENABLED_LANGUAGES,
     )
 
     panels = [
