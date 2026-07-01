@@ -46,8 +46,18 @@ EXTRA_LANG_INFO = {
 django.conf.locale.LANG_INFO.update(EXTRA_LANG_INFO)
 
 # See docs/docs/developer/feature-flags.md. "en" should always be included.
+# AMS_ENABLED_LANGUAGES also controls the order languages are shown in the UI.
 AMS_ENABLED_LANGUAGES = env.list("AMS_ENABLED_LANGUAGES", default=["en"])
+_available_languages = dict(AVAILABLE_LANGUAGES)
 LANGUAGES = [
+    (code, _available_languages[code])
+    for code in AMS_ENABLED_LANGUAGES
+    if code in _available_languages
+]
+# Same set as LANGUAGES but always in AVAILABLE_LANGUAGES' fixed order. Use
+# this (not LANGUAGES) for model field `choices` so migration state doesn't
+# depend on the order of the AMS_ENABLED_LANGUAGES env var.
+ENABLED_LANGUAGES = [
     (code, name) for code, name in AVAILABLE_LANGUAGES if code in AMS_ENABLED_LANGUAGES
 ]
 
