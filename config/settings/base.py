@@ -445,9 +445,6 @@ DISCOURSE_CONNECT_SECRET = env("DISCOURSE_CONNECT_SECRET", default=None)
 DJANGO_TABLES2_TEMPLATE = "django_tables2/bootstrap5-responsive.html"
 DJANGO_TABLES2_TABLE_ATTRS = {
     "class": "table align-middle",
-    "thead": {
-        "class": "table-light",
-    },
 }
 
 # Sample data generation
