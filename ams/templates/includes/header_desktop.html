@@ -50,19 +50,21 @@
           {% else %}
             <li class="nav-item ms-lg-3">
               {# URL provided by django-allauth/account/urls.py #}
+              {% translate "Sign In" as default_signin_label %}
               {% with signin_style=settings.cms.ThemeSettings.navbar_signin_style %}
                 <a id="log-in-link"
                    class="{% if signin_style == 'outline' %}btn btn-outline-primary{% elif signin_style == 'solid' %}btn btn-primary{% else %}nav-link{% endif %}"
-                   href="{% url 'account_login' %}">{% translate "Sign In" %}</a>
+                   href="{% url 'account_login' %}">{{ settings.cms.AssociationSettings.navbar_signin_label|default:default_signin_label }}</a>
               {% endwith %}
             </li>
             {% if ACCOUNT_ALLOW_REGISTRATION %}
               <li class="nav-item">
                 {# URL provided by django-allauth/account/urls.py #}
+                {% translate "Sign Up" as default_signup_label %}
                 {% with signup_style=settings.cms.ThemeSettings.navbar_signup_style %}
                   <a id="sign-up-link"
                      class="{% if signup_style == 'outline' %}btn btn-outline-primary{% elif signup_style == 'link' %}nav-link{% else %}btn btn-primary{% endif %}"
-                     href="{% url 'account_signup' %}">{% translate "Sign Up" %}</a>
+                     href="{% url 'account_signup' %}">{{ settings.cms.AssociationSettings.navbar_signup_label|default:default_signup_label }}</a>
                 {% endwith %}
               </li>
             {% endif %}
