@@ -87,6 +87,24 @@ class AssociationSettings(BaseSiteSetting):
         ],
         help_text=_("Optional footer text (e.g., copyright info, disclaimers)."),
     )
+    navbar_signin_label = models.CharField(
+        max_length=50,
+        verbose_name=_("Sign In label"),
+        blank=True,
+        help_text=_(
+            "Custom text for the Sign In button in the navbar. "
+            "Leave blank to use the default 'Sign In' text.",
+        ),
+    )
+    navbar_signup_label = models.CharField(
+        max_length=50,
+        verbose_name=_("Sign Up label"),
+        blank=True,
+        help_text=_(
+            "Custom text for the Sign Up button in the navbar. "
+            "Leave blank to use the default 'Sign Up' text.",
+        ),
+    )
 
     panels = [
         MultiFieldPanel(
@@ -111,6 +129,13 @@ class AssociationSettings(BaseSiteSetting):
                 FieldPanel("facebook_url"),
             ],
             _("Social networks"),
+        ),
+        MultiFieldPanel(
+            [
+                FieldPanel("navbar_signin_label"),
+                FieldPanel("navbar_signup_label"),
+            ],
+            _("Navbar"),
         ),
         MultiFieldPanel(
             [
