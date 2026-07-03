@@ -25,7 +25,14 @@ from ams.utils.permissions import user_has_active_membership
 from ams.utils.reserved_paths import get_reserved_paths_set
 
 
-class HomePage(Page):
+class BasePage(Page):
+    show_in_menus_default = True
+
+    class Meta:
+        abstract = True
+
+
+class HomePage(BasePage):
     body = StreamField(
         HomePageBlocks(),
         blank=True,
@@ -38,7 +45,7 @@ class HomePage(Page):
     template = "cms/pages/home.html"
 
 
-class ContentPage(Page):
+class ContentPage(BasePage):
     VISIBILITY_PUBLIC = "public"
     VISIBILITY_MEMBERS = "members"
     VISIBILITY_CHOICES = [
@@ -80,7 +87,6 @@ class ContentPage(Page):
     template = "cms/pages/content.html"
     parent_page_types = ["cms.HomePage", "cms.ContentPage"]
     subpage_types = ["cms.ContentPage"]
-    show_in_menus = True
 
     def serve(self, request, *args, **kwargs):
         """Override serve to enforce visibility restrictions and handle structure-only
@@ -165,7 +171,7 @@ class ContentPage(Page):
             )
 
 
-class ArticlesIndexPage(Page):
+class ArticlesIndexPage(BasePage):
     """Container page that holds and lists all articles."""
 
     intro = RichTextField(blank=True)
@@ -205,7 +211,7 @@ class ArticlesIndexPage(Page):
         return context
 
 
-class ArticlePage(Page):
+class ArticlePage(BasePage):
     """Individual article page."""
 
     publication_date = models.DateTimeField(
