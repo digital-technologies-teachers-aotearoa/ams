@@ -45,7 +45,10 @@ def forum_sso_login_callback(request: HttpRequest) -> HttpResponse:
     external_id = request.user.id
 
     # Prepare SSO parameters
-    sso_params = {"name": name}
+    sso_params = {
+        "name": name,
+        "admin": "true" if request.user.is_superuser else "false",
+    }
 
     # Add avatar URL if user has a profile picture
     if request.user.profile_picture.name:
