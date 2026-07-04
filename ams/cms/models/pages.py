@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
 from django.core.paginator import Paginator
+from django.core.validators import RegexValidator
 from django.db import models
 from django.http import Http404
 from django.http import HttpResponseForbidden
@@ -27,6 +28,32 @@ from ams.utils.reserved_paths import get_reserved_paths_set
 
 class BasePage(Page):
     show_in_menus_default = True
+
+    css_id = models.CharField(
+        max_length=100,
+        blank=True,
+        default="",
+        validators=[
+            RegexValidator(
+                regex=r"^[a-zA-Z][a-zA-Z0-9_-]*$",
+                message=_(
+                    "CSS ID must start with a letter and contain only letters, "
+                    "numbers, hyphens, and underscores.",
+                ),
+                code="invalid_css_id",
+            ),
+        ],
+        verbose_name=_("CSS ID"),
+        help_text=_(
+            "Optional identifier rendered as the id attribute on this page's "
+            "<body> tag. Use it to target this page with custom CSS rules "
+            "(e.g. #my-page-id .some-class) in the theme's Custom CSS field. "
+            "Must start with a letter; only letters, numbers, hyphens, and "
+            "underscores allowed.",
+        ),
+    )
+
+    settings_panels = [*Page.settings_panels, FieldPanel("css_id")]
 
     class Meta:
         abstract = True
