@@ -4,7 +4,7 @@
 <!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE }}">
   <head>{% include "includes/head.html" %}</head>
-  <body class="min-vh-100 d-flex flex-column {% block bodyclass %}{% endblock bodyclass %}
+  <body {% if page.css_id %}id="{{ page.css_id }}"{% endif %} class="min-vh-100 d-flex flex-column {% block bodyclass %}{% endblock bodyclass %}
      " data-bs-theme="{{ settings.cms.ThemeSettings.base_colour_mode }}">
     {% block body %}
       {% include "includes/header_desktop.html" %}

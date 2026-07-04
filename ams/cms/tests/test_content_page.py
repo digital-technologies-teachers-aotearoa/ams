@@ -395,3 +395,87 @@ class TestContentPageStructureOnly:
         response = self.client.get(parent.url)
         assert response.status_code == HTTPStatus.FOUND
         assert response.url == child.url
+
+
+@pytest.mark.django_db
+class TestContentPageCssId:
+    """Test css_id field validation and rendering for ContentPage."""
+
+    def setup_method(self):
+        self.homepage = HomePage.objects.first()
+        if not self.homepage:
+            root = Page.get_first_root_node()
+            self.homepage = HomePage(title="Home", slug="home")
+            root.add_child(instance=self.homepage)
+            self.homepage.save()
+
+        self.client = Client()
+
+    def test_valid_css_id_passes_validation(self):
+        page = ContentPage(
+            title="Valid Css Id Page",
+            slug="valid-css-id-page",
+            css_id="my-page-id",
+        )
+        self.homepage.add_child(instance=page)
+        try:
+            page.full_clean(exclude=["path", "depth"])
+        except ValidationError:
+            pytest.fail("ValidationError should not be raised for a valid css_id")
+
+    @pytest.mark.parametrize("invalid_css_id", ["1abc", "my id", "my@id"])
+    def test_invalid_css_id_raises_validation_error(self, invalid_css_id):
+        page = ContentPage(
+            title="Invalid Css Id Page",
+            slug="invalid-css-id-page",
+            css_id=invalid_css_id,
+        )
+
+        with pytest.raises(ValidationError) as exc_info:
+            self.homepage.add_child(instance=page)
+
+        assert "css_id" in exc_info.value.message_dict
+
+    def test_blank_css_id_is_valid(self):
+        page = ContentPage(
+            title="Blank Css Id Page",
+            slug="blank-css-id-page",
+        )
+        self.homepage.add_child(instance=page)
+        try:
+            page.full_clean(exclude=["path", "depth"])
+        except ValidationError:
+            pytest.fail("ValidationError should not be raised for a blank css_id")
+
+    def test_template_renders_id_attribute_when_css_id_set(self):
+        page = ContentPage(
+            title="Css Id Rendered Page",
+            slug="css-id-rendered-page",
+            css_id="my-page-id",
+        )
+        self.homepage.add_child(instance=page)
+        page.save_revision().publish()
+
+        response = self.client.get(page.url)
+        assert response.status_code == HTTPStatus.OK
+        assert b'id="my-page-id"' in response.content
+
+    def test_template_omits_id_attribute_when_css_id_unset(self):
+        page = ContentPage(
+            title="Css Id Unset Page",
+            slug="css-id-unset-page",
+        )
+        self.homepage.add_child(instance=page)
+        page.save_revision().publish()
+
+        response = self.client.get(page.url)
+        assert response.status_code == HTTPStatus.OK
+        assert b'id=""' not in response.content
+
+    def test_css_id_panel_present_in_settings_panels(self):
+        panel_field_names = [
+            panel.field_name
+            for panel in ContentPage.settings_panels
+            if hasattr(panel, "field_name")
+        ]
+        assert "css_id" in panel_field_names
