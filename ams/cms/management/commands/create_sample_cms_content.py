@@ -47,7 +47,7 @@ class Command(management.base.BaseCommand):
             pages = self._create_pages(home, images, prefix=prefix)
 
             self.stdout.write("🏠 Building homepage body...")
-            self._build_homepage_body(home, images, pages, prefix=prefix)
+            self._build_homepage_body(home, images, pages, site, prefix=prefix)
 
             self.stdout.write("🗺️  Creating navigation menus...")
             self._create_menus(site, pages, prefix=prefix)
@@ -202,7 +202,7 @@ class Command(management.base.BaseCommand):
     # Homepage body
     # -------------------------------------------------------------------------
 
-    def _build_homepage_body(self, home, images, pages, prefix=""):
+    def _build_homepage_body(self, home, images, pages, site, prefix=""):
         hero = images["hero"]
         content_img = images["content"]
         grid_img = images["grid"]
@@ -328,7 +328,11 @@ class Command(management.base.BaseCommand):
                 {
                     "heading": f"{prefix}Key Features",
                     "text": f"<p>{prefix}Explore what AMS has to offer.</p>",
-                    "background_image": hero,
+                    "background_image": {
+                        "image": hero,
+                        "alt_text": f"{prefix}Key Features background",
+                        "decorative": False,
+                    },
                     "background_image_opacity": "25",
                     "colour_mode": "dark",
                     "item_shape": "default",
@@ -345,7 +349,7 @@ class Command(management.base.BaseCommand):
                         {
                             "text": f"{prefix}Events",
                             "link_page": None,
-                            "link_url": "/events/",
+                            "link_url": f"{site.root_url}/events/",
                             "background_image": None,
                             "background_image_opacity": "15",
                             "background_colour": "#2d5a27",
@@ -448,7 +452,11 @@ class Command(management.base.BaseCommand):
             (
                 "image_block",
                 {
-                    "image": content_img,
+                    "image": {
+                        "image": content_img,
+                        "alt_text": f"{prefix}Sample content image",
+                        "decorative": False,
+                    },
                     "image_scaling": "fit",
                     "caption": f"{prefix}CaptionedImageBlock — Fit scaling, no border",
                     "attribution": "placehold.co",
@@ -458,7 +466,11 @@ class Command(management.base.BaseCommand):
             (
                 "image_block",
                 {
-                    "image": content_img,
+                    "image": {
+                        "image": content_img,
+                        "alt_text": f"{prefix}Sample content image",
+                        "decorative": False,
+                    },
                     "image_scaling": "fill",
                     "caption": (
                         f"{prefix}CaptionedImageBlock — Fill scaling, rounded border"
@@ -470,7 +482,11 @@ class Command(management.base.BaseCommand):
             (
                 "image_block",
                 {
-                    "image": square_img,
+                    "image": {
+                        "image": square_img,
+                        "alt_text": f"{prefix}Sample square image",
+                        "decorative": False,
+                    },
                     "image_scaling": "fit",
                     "caption": (
                         f"{prefix}CaptionedImageBlock — Fit scaling, circle border"
@@ -492,7 +508,11 @@ class Command(management.base.BaseCommand):
                     "text_alignment": "center",
                     "items": [
                         {
-                            "image": grid_img,
+                            "image": {
+                                "image": grid_img,
+                                "alt_text": f"{prefix}Grid Item One",
+                                "decorative": False,
+                            },
                             "image_scaling": "fit",
                             "title": f"{prefix}Grid Item One",
                             "subtitle": f"{prefix}2-column grid",
@@ -501,7 +521,11 @@ class Command(management.base.BaseCommand):
                             "link_url": "",
                         },
                         {
-                            "image": grid_img,
+                            "image": {
+                                "image": grid_img,
+                                "alt_text": f"{prefix}Grid Item Two",
+                                "decorative": False,
+                            },
                             "image_scaling": "fit",
                             "title": f"{prefix}Grid Item Two",
                             "subtitle": f"{prefix}2-column grid",
@@ -522,7 +546,11 @@ class Command(management.base.BaseCommand):
                     "text_alignment": "center",
                     "items": [
                         {
-                            "image": grid_img,
+                            "image": {
+                                "image": grid_img,
+                                "alt_text": f"{prefix}Item {i}",
+                                "decorative": False,
+                            },
                             "image_scaling": "fill",
                             "title": f"{prefix}Item {i}",
                             "subtitle": f"{prefix}4-column grid",
@@ -542,7 +570,11 @@ class Command(management.base.BaseCommand):
                 {
                     "slides": [
                         {
-                            "image": content_img,
+                            "image": {
+                                "image": content_img,
+                                "alt_text": f"{prefix}Slide {i} — slide transition",
+                                "decorative": False,
+                            },
                             "caption": f"{prefix}Slide {i} — slide transition",
                             "attribution": "placehold.co",
                         }
@@ -561,7 +593,11 @@ class Command(management.base.BaseCommand):
                 {
                     "slides": [
                         {
-                            "image": content_img,
+                            "image": {
+                                "image": content_img,
+                                "alt_text": f"{prefix}Slide {i} — fade transition",
+                                "decorative": False,
+                            },
                             "caption": f"{prefix}Slide {i} — fade transition",
                             "attribution": "placehold.co",
                         }
