@@ -34,3 +34,7 @@ The production image runs `compilemessages` automatically at build time, so as l
 ## Month and weekday name translations
 
 Django's `|date:` template filter renders month and weekday names (format chars `F`, `M`, `l`, `D`) using strings from `django.utils.dates`, which is Django's own source and is not scanned by `makemessages`. To ensure these strings appear in every language catalog, `ams/utils/i18n_date_hints.py` re-declares the same `pgettext_lazy` calls so `makemessages` picks them up automatically.
+
+## django-allauth and password validator translations
+
+Similarly, `django-allauth` (e.g. the "Already have an account?" sign-in prompt and the "Password" field label) and Django's own `password_validation.py` (the password requirements help text) render strings from their own installed source, which is outside `ams/` and not scanned by `makemessages`. `ams/utils/i18n_auth_hints.py` re-declares the same `gettext`/`ngettext` calls so these strings appear in every language catalog automatically.

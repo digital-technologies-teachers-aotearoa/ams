@@ -62,7 +62,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: AMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-25 13:11+1200\n"
+"POT-Creation-Date: 2026-07-04 20:37+1200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Te Reo Māori\n"
@@ -122,19 +122,79 @@ msgstr ""
 msgid "Dark background, light text"
 msgstr ""
 
+#. Translators: Column header — the member's full name
+#: ams/cms/forms.py:9 ams/cms/models/settings.py:115
+#: ams/organisations/tables.py:20
+msgid "Name"
+msgstr ""
+
+# -----------------------------------------------------------------
+# [MEDIUM PRIORITY] ORGANISATION FORMS & ACTIONS
+# Used when creating, editing, and managing organisations. The
+# success/error messages below are shown directly to members.
+# -----------------------------------------------------------------
+#. Translators: Column header — the member's email address
+#: ams/cms/forms.py:10 ams/organisations/forms.py:26
+#: ams/organisations/forms.py:102 ams/organisations/tables.py:26
+#: ams/users/admin.py:230
+msgid "Email"
+msgstr "Īmēra"
+
+#: ams/cms/forms.py:12
+msgid "Message"
+msgstr ""
+
+#: ams/cms/forms.py:26
+msgid "Send message"
+msgstr ""
+
+#: ams/cms/models/contact.py:19
+msgid "Contact form submission"
+msgstr ""
+
+#: ams/cms/models/contact.py:20
+msgid "Contact form submissions"
+msgstr ""
+
 #. Translators: Label for a downloadable file/document
 #: ams/cms/models/documents.py:15
 msgid "file"
 msgstr ""
 
-#: ams/cms/models/pages.py:63
+#: ams/cms/models/pages.py:40
+msgid ""
+"CSS ID must start with a letter and contain only letters, numbers, hyphens, "
+"and underscores."
+msgstr ""
+
+#: ams/cms/models/pages.py:46
+msgid "CSS ID"
+msgstr ""
+
+#: ams/cms/models/pages.py:48
+msgid ""
+"Optional identifier rendered as the id attribute on this page's <body> tag. "
+"Use it to target this page with custom CSS rules (e.g. #my-page-id .some-"
+"class) in the theme's Custom CSS field. Must start with a letter; only "
+"letters, numbers, hyphens, and underscores allowed."
+msgstr ""
+
+#: ams/cms/models/pages.py:102
 msgid ""
 "If checked, this page cannot be viewed directly and will redirect to its "
 "first child page."
 msgstr ""
 
-#: ams/cms/models/pages.py:97
+#: ams/cms/models/pages.py:135
 msgid "This page has no published content."
+msgstr ""
+
+#: ams/cms/models/pages.py:146
+msgid "Contact Form Submission"
+msgstr ""
+
+#: ams/cms/models/pages.py:173
+msgid "Your message has been sent. We'll be in touch soon."
 msgstr ""
 
 #: ams/cms/models/settings.py:15
@@ -191,66 +251,93 @@ msgstr ""
 msgid "Optional footer text (e.g., copyright info, disclaimers)."
 msgstr ""
 
-#. Translators: Column header — the member's full name
-#: ams/cms/models/settings.py:97 ams/organisations/tables.py:20
-msgid "Name"
+#: ams/cms/models/settings.py:92
+msgid "Sign In label"
 msgstr ""
 
-#: ams/cms/models/settings.py:106
+#: ams/cms/models/settings.py:95
+msgid ""
+"Custom text for the Sign In button in the navbar. Leave blank to use the "
+"default 'Sign In' text."
+msgstr ""
+
+#: ams/cms/models/settings.py:101
+msgid "Sign Up label"
+msgstr ""
+
+#: ams/cms/models/settings.py:104
+msgid ""
+"Custom text for the Sign Up button in the navbar. Leave blank to use the "
+"default 'Sign Up' text."
+msgstr ""
+
+#: ams/cms/models/settings.py:124
 msgid "Images"
 msgstr ""
 
-#: ams/cms/models/settings.py:113
+#: ams/cms/models/settings.py:131
 msgid "Social networks"
 msgstr ""
 
-#: ams/cms/models/settings.py:119
+#: ams/cms/models/settings.py:138
+msgid "Navbar"
+msgstr ""
+
+#: ams/cms/models/settings.py:144
 msgid "Footer"
 msgstr ""
 
 #. Translators: Label for the Articles section in the Wagtail CMS admin menu
-#: ams/cms/wagtail_hooks.py:34
+#: ams/cms/wagtail_hooks.py:39
 msgid "Articles"
 msgstr ""
 
 #. Translators: Column header in the Wagtail admin articles list
 #. — the date the article was published
-#: ams/cms/wagtail_hooks.py:43
+#: ams/cms/wagtail_hooks.py:48
 msgid "Publication Date"
 msgstr ""
 
 #. Translators: Column header in the Wagtail admin articles list
 #. — the article's author
-#: ams/cms/wagtail_hooks.py:50
+#: ams/cms/wagtail_hooks.py:55
 msgid "Author"
 msgstr ""
 
-#: ams/cms/wagtail_hooks.py:69
+#: ams/cms/wagtail_hooks.py:76
+msgid "Page"
+msgstr ""
+
+#: ams/cms/wagtail_hooks.py:84
+msgid "Contact Submissions"
+msgstr ""
+
+#: ams/cms/wagtail_hooks.py:96
 msgid "AMS help"
 msgstr ""
 
-#: ams/cms/wagtail_hooks.py:86
+#: ams/cms/wagtail_hooks.py:113
 msgid "You must have an active membership to view this file"
 msgstr ""
 
 #. Translators: Tooltip for the "align left" button in the rich-text editor
-#: ams/cms/wagtail_hooks.py:129
+#: ams/cms/wagtail_hooks.py:156
 msgid "Align left"
 msgstr ""
 
 #. Translators: Tooltip for the "align center" button in the rich-text editor
-#: ams/cms/wagtail_hooks.py:134
+#: ams/cms/wagtail_hooks.py:161
 msgid "Align center"
 msgstr ""
 
 #. Translators: Tooltip for the "align right" button in the rich-text editor
-#: ams/cms/wagtail_hooks.py:139
+#: ams/cms/wagtail_hooks.py:166
 msgid "Align right"
 msgstr ""
 
 #. Translators: Tooltip for the justify (full-width text alignment)
 #. button in the rich-text editor
-#: ams/cms/wagtail_hooks.py:145
+#: ams/cms/wagtail_hooks.py:172
 msgid "Justify"
 msgstr ""
 
@@ -449,7 +536,7 @@ msgstr ""
 
 #: ams/memberships/apps.py:8
 #: ams/templates/organisations/organisation_detail.html:53
-#: ams/templates/users/user_detail.html:45
+#: ams/templates/users/user_detail.html:48
 msgid "Memberships"
 msgstr ""
 
@@ -858,7 +945,7 @@ msgid "Deactivate selected organisations"
 msgstr ""
 
 #: ams/organisations/apps.py:7 ams/templates/resources/_resource_authors.html:5
-#: ams/templates/users/user_detail.html:75
+#: ams/templates/users/user_detail.html:78
 msgid "Organisations"
 msgstr ""
 
@@ -872,17 +959,6 @@ msgstr ""
 #: ams/organisations/email_utils.py:110
 #, python-format
 msgid "New Organisation Created: %(organisation_name)s"
-msgstr ""
-
-# -----------------------------------------------------------------
-# [MEDIUM PRIORITY] ORGANISATION FORMS & ACTIONS
-# Used when creating, editing, and managing organisations. The
-# success/error messages below are shown directly to members.
-# -----------------------------------------------------------------
-#. Translators: Column header — the member's email address
-#: ams/organisations/forms.py:26 ams/organisations/forms.py:102
-#: ams/organisations/tables.py:26 ams/users/admin.py:230
-msgid "Email"
 msgstr ""
 
 #: ams/organisations/forms.py:29
@@ -1653,13 +1729,13 @@ msgstr ""
 # [HIGH PRIORITY] NAVIGATION & SIGN IN / SIGN UP
 # Appears in the top navigation bar and login page, seen by all users.
 # -----------------------------------------------------------------
-#: ams/templates/allauth/layouts/entrance.html:15
+#: ams/templates/allauth/layouts/entrance.html:11
 #: ams/templates/includes/header_desktop.html:53
 #: ams/templates/includes/header_mobile.html:37
 #: ams/templates/mfa/authenticate.html:8 ams/templates/mfa/authenticate.html:27
 #: ams/utils/breadcrumbs.py:130
 msgid "Sign In"
-msgstr ""
+msgstr "Te Takiuru"
 
 #: ams/templates/billing/emails/mock_invoice.html:52
 #, python-format
@@ -1794,8 +1870,71 @@ msgstr ""
 msgid "No articles have been published yet."
 msgstr ""
 
+#: ams/templates/cms/emails/contact_form_notification.html:5
+#: ams/templates/cms/emails/contact_form_notification.html:56
+#: ams/templates/cms/emails/contact_form_notification.html:91
+msgid "New Contact Form Submission"
+msgstr ""
+
+#: ams/templates/cms/emails/contact_form_notification.html:52
+#, python-format
+msgid "New message from %(name)s"
+msgstr ""
+
+#: ams/templates/cms/emails/contact_form_notification.html:141
+#, python-format
+msgid ""
+"A new contact form submission has been received from <strong>%(name)s</"
+"strong> via the <strong>%(page_title)s</strong> page."
+msgstr ""
+
+#: ams/templates/cms/emails/contact_form_notification.html:195
+msgid "Submission Details"
+msgstr ""
+
+#: ams/templates/cms/emails/contact_form_notification.html:210
+#: ams/templates/organisations/emails/organisation_invite.html:216
+#: ams/templates/organisations/emails/organisation_invite.txt:12
+#: ams/templates/organisations/emails/staff_organisation_created.html:214
+#: ams/templates/organisations/emails/staff_organisation_created.html:331
+#: ams/templates/organisations/emails/staff_organisation_created.txt:12
+#: ams/templates/organisations/emails/staff_organisation_created.txt:25
+msgid "Name:"
+msgstr ""
+
+#: ams/templates/cms/emails/contact_form_notification.html:216
+#: ams/templates/memberships/emails/staff_individual_membership_created.html:342
+#: ams/templates/memberships/emails/staff_individual_membership_created.txt:17
+#: ams/templates/organisations/emails/organisation_invite.html:228
+#: ams/templates/organisations/emails/organisation_invite.txt:14
+#: ams/templates/organisations/emails/staff_organisation_created.html:226
+#: ams/templates/organisations/emails/staff_organisation_created.html:337
+#: ams/templates/organisations/emails/staff_organisation_created.txt:14
+#: ams/templates/organisations/emails/staff_organisation_created.txt:26
+#: ams/templates/organisations/organisation_detail.html:21
+msgid "Email:"
+msgstr ""
+
+#: ams/templates/cms/emails/contact_form_notification.html:224
+msgid "Page:"
+msgstr ""
+
+#: ams/templates/cms/emails/contact_form_notification.html:230
+msgid "Message:"
+msgstr ""
+
+#: ams/templates/cms/emails/contact_form_notification.html:306
+#: ams/templates/memberships/emails/staff_individual_membership_created.html:536
+#: ams/templates/memberships/emails/staff_organisation_membership_created.html:547
+#: ams/templates/memberships/emails/staff_organisation_seats_added.html:396
+#: ams/templates/organisations/emails/staff_organisation_created.html:413
+msgid ""
+"You're receiving this because you are a staff member. Contact your "
+"administrator to change notification settings."
+msgstr ""
+
 #. Translators: Attribution line on an article page. {{ author }} is the author's full name.
-#: ams/templates/cms/pages/article_page.html:12
+#: ams/templates/cms/pages/article_page.html:13
 #, python-format
 msgid "· by %(author)s"
 msgstr ""
@@ -1987,7 +2126,7 @@ msgid "No upcoming events found"
 msgstr ""
 
 #: ams/templates/includes/action_modal.html:15
-#: ams/templates/includes/messages.html:10
+#: ams/templates/includes/messages.html:11
 #: ams/templates/memberships/membership_actions_column.html:11
 msgid "Close"
 msgstr ""
@@ -2014,10 +2153,10 @@ msgstr ""
 msgid "Logout"
 msgstr ""
 
-#: ams/templates/includes/header_desktop.html:60
-#: ams/templates/includes/header_mobile.html:44 ams/utils/breadcrumbs.py:134
+#: ams/templates/includes/header_desktop.html:63
+#: ams/templates/includes/header_mobile.html:47 ams/utils/breadcrumbs.py:134
 msgid "Sign Up"
-msgstr ""
+msgstr "Te Rēhita Mai"
 
 #. Translators: Screen reader label for the language switcher button in the navigation bar
 #: ams/templates/includes/language_dropdown.html:10
@@ -2095,18 +2234,6 @@ msgstr ""
 msgid "Member:"
 msgstr ""
 
-#: ams/templates/memberships/emails/staff_individual_membership_created.html:342
-#: ams/templates/memberships/emails/staff_individual_membership_created.txt:17
-#: ams/templates/organisations/emails/organisation_invite.html:228
-#: ams/templates/organisations/emails/organisation_invite.txt:14
-#: ams/templates/organisations/emails/staff_organisation_created.html:226
-#: ams/templates/organisations/emails/staff_organisation_created.html:337
-#: ams/templates/organisations/emails/staff_organisation_created.txt:14
-#: ams/templates/organisations/emails/staff_organisation_created.txt:26
-#: ams/templates/organisations/organisation_detail.html:21
-msgid "Email:"
-msgstr ""
-
 #: ams/templates/memberships/emails/staff_individual_membership_created.html:348
 #: ams/templates/memberships/emails/staff_individual_membership_created.txt:18
 #: ams/templates/memberships/emails/staff_organisation_membership_created.html:342
@@ -2163,15 +2290,6 @@ msgstr ""
 #: ams/templates/memberships/emails/staff_individual_membership_created.html:458
 #: ams/templates/memberships/emails/staff_organisation_membership_created.html:469
 msgid "View in Admin"
-msgstr ""
-
-#: ams/templates/memberships/emails/staff_individual_membership_created.html:536
-#: ams/templates/memberships/emails/staff_organisation_membership_created.html:547
-#: ams/templates/memberships/emails/staff_organisation_seats_added.html:396
-#: ams/templates/organisations/emails/staff_organisation_created.html:413
-msgid ""
-"You're receiving this because you are a staff member. Contact your "
-"administrator to change notification settings."
 msgstr ""
 
 #: ams/templates/memberships/emails/staff_individual_membership_created.txt:6
@@ -2646,15 +2764,6 @@ msgstr ""
 #: ams/templates/organisations/emails/staff_organisation_created.html:199
 #: ams/templates/organisations/emails/staff_organisation_created.txt:10
 msgid "Organisation Details"
-msgstr ""
-
-#: ams/templates/organisations/emails/organisation_invite.html:216
-#: ams/templates/organisations/emails/organisation_invite.txt:12
-#: ams/templates/organisations/emails/staff_organisation_created.html:214
-#: ams/templates/organisations/emails/staff_organisation_created.html:331
-#: ams/templates/organisations/emails/staff_organisation_created.txt:12
-#: ams/templates/organisations/emails/staff_organisation_created.txt:25
-msgid "Name:"
 msgstr ""
 
 #: ams/templates/organisations/emails/organisation_invite.html:222
@@ -3183,74 +3292,83 @@ msgstr ""
 msgid "Update my e-mails"
 msgstr ""
 
-#: ams/templates/users/user_detail.html:24
+#: ams/templates/users/user_detail.html:26
+#: ams/templates/users/user_form.html:14
+msgid "Update password"
+msgstr ""
+
+#: ams/templates/users/user_detail.html:27
 msgid "Manage MFA"
 msgstr ""
 
-#: ams/templates/users/user_detail.html:33
+#: ams/templates/users/user_detail.html:36
 msgid "1 profile field remaining."
 msgstr ""
 
 #. Translators: {{ count }} is the number of unfilled profile fields, e.g. "2". A "profile field" is a piece of information the user hasn't filled in yet (e.g. phone number, job title).
-#: ams/templates/users/user_detail.html:36
+#: ams/templates/users/user_detail.html:39
 #, python-format
 msgid "%(count)s profile fields remaining."
 msgstr ""
 
-#: ams/templates/users/user_detail.html:38
+#: ams/templates/users/user_detail.html:41
 msgid "Complete your profile"
 msgstr ""
 
-#: ams/templates/users/user_detail.html:47
+#: ams/templates/users/user_detail.html:50
 msgid "You have a current active membership."
 msgstr ""
 
-#: ams/templates/users/user_detail.html:50
+#: ams/templates/users/user_detail.html:53
 msgid "You do not have a current active membership."
 msgstr ""
 
-#: ams/templates/users/user_detail.html:56
+#: ams/templates/users/user_detail.html:59
 msgid "No memberships found."
 msgstr ""
 
-#: ams/templates/users/user_detail.html:60
+#: ams/templates/users/user_detail.html:63
 msgid "Register for a new individual membership"
 msgstr ""
 
-#: ams/templates/users/user_detail.html:66
+#: ams/templates/users/user_detail.html:69
 msgid "Pending Organisation Invitations"
 msgstr ""
 
-#: ams/templates/users/user_detail.html:68
+#: ams/templates/users/user_detail.html:71
 msgid "You have been invited to join the following organisations. Click \\"
 msgstr ""
 
-#: ams/templates/users/user_detail.html:79
+#: ams/templates/users/user_detail.html:82
 msgid "No organisations found."
 msgstr ""
 
-#: ams/templates/users/user_detail.html:82
+#: ams/templates/users/user_detail.html:85
 msgid "Create a new organisation"
 msgstr ""
 
-#: ams/templates/users/user_detail.html:87
+#: ams/templates/users/user_detail.html:90
 msgid "Staff links"
 msgstr ""
 
-#: ams/templates/users/user_detail.html:88
+#: ams/templates/users/user_detail.html:91
 msgid "Administrative and management links."
 msgstr ""
 
-#: ams/templates/users/user_detail.html:91
+#: ams/templates/users/user_detail.html:94
 msgid "Website Admin"
 msgstr ""
 
-#: ams/templates/users/user_detail.html:96
+#: ams/templates/users/user_detail.html:99
 msgid "Wagtail CMS"
 msgstr ""
 
 #: ams/templates/users/user_form.html:6 ams/templates/users/user_form.html:12
 msgid "Update your account"
+msgstr ""
+
+#: ams/templates/users/user_form.html:14
+msgid "Want to update your password?"
 msgstr ""
 
 #: ams/templates/utils/crispy_forms/pricing_card.html:32
@@ -3491,7 +3609,7 @@ msgstr ""
 
 #: ams/users/admin.py:233 ams/users/forms.py:80 ams/users/forms.py:84
 msgid "Username"
-msgstr ""
+msgstr "Ingoa kaiwhakamahi"
 
 #: ams/users/admin.py:234
 msgid "Active Member"
@@ -3563,19 +3681,19 @@ msgstr ""
 
 #: ams/users/forms.py:66 ams/users/forms.py:69
 msgid "First name"
-msgstr ""
+msgstr "Ingoa tuatahi"
 
 #: ams/users/forms.py:73 ams/users/forms.py:76
 msgid "Last name"
-msgstr ""
+msgstr "Ingoa whānau"
 
 #: ams/users/forms.py:82
 msgid "This is used in the community forum."
-msgstr ""
+msgstr "Ka whakamahia tēnei i te papa kōrero ā-hapori"
 
 #: ams/users/forms.py:88
 msgid "Preferred language"
-msgstr ""
+msgstr "Te reo e hiahiatia ana"
 
 #: ams/users/forms.py:106 ams/users/forms.py:157
 msgid "No preference"
@@ -3950,6 +4068,38 @@ msgstr ""
 msgid "Required for membership"
 msgstr ""
 
+#: ams/utils/i18n_auth_hints.py:11
+#, python-format
+msgid "Already have an account? Then please %(link)ssign in%(end_link)s."
+msgstr "He pūkete kē tāu? %(link)sMe takiuru mai%(end_link)s"
+
+#: ams/utils/i18n_auth_hints.py:12
+msgid "Password"
+msgstr "Kuhupuna"
+
+#: ams/utils/i18n_auth_hints.py:13
+msgid "Password (again)"
+msgstr "Kupuhuna (anō)"
+
+#: ams/utils/i18n_auth_hints.py:14
+msgid "Your password can’t be too similar to your other personal information."
+msgstr "Me kaua tō kupuhuna e ōrite ki ētahi atu o ō pitopito whaiaro"
+
+#: ams/utils/i18n_auth_hints.py:16
+#, python-format
+msgid "Your password must contain at least %(min_length)d character."
+msgid_plural "Your password must contain at least %(min_length)d characters."
+msgstr[0] "Me neke atu i te waru ngā pūtohu"
+msgstr[1] "Me neke atu i te waru ngā pūtohu"
+
+#: ams/utils/i18n_auth_hints.py:20
+msgid "Your password can’t be a commonly used password."
+msgstr "Me kaua e rite tonu tō whakamahi i tō kupuhuna"
+
+#: ams/utils/i18n_auth_hints.py:21
+msgid "Your password can’t be entirely numeric."
+msgstr "Me kaua tō kupuhuna e whai nama noa iho"
+
 # -----------------------------------------------------------------
 # [HIGH PRIORITY] DATE & TIME LABELS
 # Month and weekday names used throughout the site in dates and schedules.
@@ -4235,8 +4385,8 @@ msgstr ""
 # -----------------------------------------------------------------
 #: config/settings/base.py:35
 msgid "English"
-msgstr ""
+msgstr "English"
 
 #: config/settings/base.py:36
 msgid "Te Reo Māori"
-msgstr ""
+msgstr "Te Reo Māori"
