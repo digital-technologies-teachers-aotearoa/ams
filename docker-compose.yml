@@ -61,7 +61,7 @@ services:
       - '3001:3001'
 
   discourse:
-    image: discourse/discourse:3.5.1
+    image: discourse/discourse:2026.1.5
     container_name: ams_discourse
     depends_on:
       - discourse_postgres
@@ -75,7 +75,7 @@ services:
       - ./.envs/.local/discourse.ini
 
   discourse_init:
-    image: discourse/discourse:3.5.1
+    image: discourse/discourse:2026.1.5
     container_name: ams_discourse_init
     depends_on:
       - discourse
