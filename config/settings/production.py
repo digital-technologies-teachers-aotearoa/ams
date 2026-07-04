@@ -61,10 +61,11 @@ SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
 # CACHES
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#caches
-# Could upgrade in future to dedicated cache server
+# Caching is disabled entirely until a shared cache backend (e.g. Redis) is
+# configurable.
 CACHES = {
     "default": {
-        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "BACKEND": "django.core.cache.backends.dummy.DummyCache",
         "LOCATION": "",
     },
 }

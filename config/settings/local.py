@@ -22,9 +22,11 @@ if NGROK_HOST:
 # CACHES
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#caches
+# Disabled to match production (see config/settings/production.py) so dev
+# doesn't rely on cache behavior that doesn't hold in prod.
 CACHES = {
     "default": {
-        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "BACKEND": "django.core.cache.backends.dummy.DummyCache",
         "LOCATION": "default-cache",
     },
 }
