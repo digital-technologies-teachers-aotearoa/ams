@@ -1,11 +1,11 @@
-from wagtail.blocks import CharBlock
 from wagtail.blocks import ChoiceBlock
 from wagtail.blocks import StructBlock
+from wagtail.blocks import TextBlock
 from wagtail_color_panel.blocks import NativeColorBlock
 
 
 class TypographyBlock(StructBlock):
-    text = CharBlock(required=True)
+    text = TextBlock(required=True)
     size = ChoiceBlock(
         choices=[
             ("1", "Display size 1"),
@@ -43,7 +43,7 @@ class TypographyBlock(StructBlock):
 
 class SubtitleSettingsBlock(TypographyBlock):
     # Override text attribute to not required
-    text = CharBlock(required=False)
+    text = TextBlock(required=False)
     position = ChoiceBlock(
         choices=[
             ("before", "Before title"),
