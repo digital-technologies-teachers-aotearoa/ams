@@ -4075,7 +4075,7 @@ msgstr "He pūkete kē tāu? %(link)sMe takiuru mai%(end_link)s"
 
 #: ams/utils/i18n_auth_hints.py:12
 msgid "Password"
-msgstr "Kuhupuna"
+msgstr "Kupuhuna"
 
 #: ams/utils/i18n_auth_hints.py:13
 msgid "Password (again)"
