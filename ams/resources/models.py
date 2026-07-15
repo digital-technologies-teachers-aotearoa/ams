@@ -99,8 +99,10 @@ class Resource(models.Model):
     )
     datetime_added = models.DateTimeField(auto_now_add=True)
     datetime_updated = models.DateTimeField(auto_now=True)
-    # Maintained by Postgres triggers (see migration 0003).
-    # Weights: name=A, description & component names=B, author user & entity names=C.
+    # Maintained by Postgres triggers (see migration 0015). Indexes the _en/_mi
+    # translation columns, not the base columns: name=A, description & component
+    # names=B, tag names/abbreviations & author user/entity names=C. English via
+    # the 'english' config, Maori via 'simple'.
     search_vector = SearchVectorField(null=True, editable=False)
     author_users = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
