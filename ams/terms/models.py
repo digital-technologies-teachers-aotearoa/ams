@@ -10,6 +10,17 @@ from wagtail.admin.panels import MultiFieldPanel
 from wagtail.fields import RichTextField
 from wagtail.search import index
 
+from ams.utils.panels import TranslatedFieldsForm
+from ams.utils.panels import translated_field_panels
+
+
+class TermForm(TranslatedFieldsForm):
+    translated_required_fields = ("name",)
+
+
+class TermVersionForm(TranslatedFieldsForm):
+    translated_required_fields = ("content",)
+
 
 class Term(models.Model):
     """Represents a logical legal document (e.g., Privacy Policy, Terms of Service)."""
@@ -30,9 +41,11 @@ class Term(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    base_form_class = TermForm
+
     panels = [
         FieldPanel("key"),
-        FieldPanel("name"),
+        translated_field_panels("name", _("Name")),
         FieldPanel("description"),
     ]
 
@@ -142,9 +155,11 @@ class TermVersion(models.Model):
             ],
             heading=_("Activation"),
         ),
-        FieldPanel("content"),
+        translated_field_panels("content", _("Content")),
         FieldPanel("change_log"),
     ]
+
+    base_form_class = TermVersionForm
 
     search_fields = [
         index.SearchField("version"),

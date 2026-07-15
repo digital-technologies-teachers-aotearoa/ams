@@ -114,7 +114,11 @@ class ResourceSearchView(generic.TemplateView):
             qs = qs.exclude(visibility=Resource.Visibility.MEMBERS_ONLY)
 
         if q:
-            query = SearchQuery(q, search_type="websearch")
+            query = SearchQuery(
+                q,
+                config="english",
+                search_type="websearch",
+            ) | SearchQuery(q, config="simple", search_type="websearch")
             qs = (
                 qs.filter(search_vector=query)
                 .annotate(rank=SearchRank(F("search_vector"), query))
