@@ -99,11 +99,17 @@ class Resource(models.Model):
     )
     datetime_added = models.DateTimeField(auto_now_add=True)
     datetime_updated = models.DateTimeField(auto_now=True)
-    # Maintained by Postgres triggers (see migration 0015). Indexes the _en/_mi
-    # translation columns, not the base columns: name=A, description & component
-    # names=B, tag names/abbreviations & author user/entity names=C. English via
-    # the 'english' config, Maori via 'simple'.
-    search_vector = SearchVectorField(null=True, editable=False)
+    # One search vector per language, maintained by Postgres triggers (see
+    # migration 0016) so search can be scoped to the active UI language.
+    # Weights: name=A, description & component names=B, tag
+    # names/abbreviations & author user/entity names=C.
+    # search_vector_en indexes the _en columns with the 'english' config.
+    # search_vector_mi indexes the _mi columns with the 'simple' config,
+    # falling back per field to the _en value when the _mi value is blank
+    # (mirroring modeltranslation's display fallback). Author user and entity
+    # names are language-neutral and indexed in both vectors.
+    search_vector_en = SearchVectorField(null=True, editable=False)
+    search_vector_mi = SearchVectorField(null=True, editable=False)
     author_users = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         related_name="resources",
@@ -123,7 +129,8 @@ class Resource(models.Model):
     class Meta:
         ordering = ["-datetime_updated"]
         indexes = [
-            GinIndex(fields=["search_vector"]),
+            GinIndex(fields=["search_vector_en"]),
+            GinIndex(fields=["search_vector_mi"]),
         ]
 
     def __str__(self):
