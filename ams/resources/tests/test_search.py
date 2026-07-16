@@ -1,5 +1,6 @@
 import pytest
 
+from ams.entities.tests.factories import EntityFactory
 from ams.resources.models import Resource
 from ams.resources.models import ResourceComponent
 from ams.resources.models import ResourceTag
@@ -8,8 +9,8 @@ from ams.resources.tests.factories import ResourceCategoryFactory
 pytestmark = pytest.mark.django_db
 
 
-def _search(client, q):
-    response = client.get("/en/resources/search/", {"q": q})
+def _search(client, q, lang="en"):
+    response = client.get(f"/{lang}/resources/search/", {"q": q})
     return list(response.context["results"])
 
 
@@ -22,15 +23,45 @@ class TestSearchUsesTranslatedColumns:
         )
         assert resource in _search(client, "firefighting")
 
-    def test_finds_by_maori_name_that_is_an_english_stopword(self, client):
+    def test_maori_name_found_in_maori_search_but_not_english(self, client):
         # "he" is an English stopword (dropped by the english config) but a common
-        # Maori word. The simple-config query branch must still match it.
+        # Maori word. It must match in Maori search (simple config, _mi vector) and
+        # must NOT match in English search now that the languages are isolated.
         resource = Resource.objects.create(
             name_en="Placeholder",
             name_mi="He pukapuka whakangungu",
             published=True,
         )
-        assert resource in _search(client, "he")
+        assert resource in _search(client, "he", lang="mi")
+        assert resource not in _search(client, "he", lang="en")
+
+    def test_english_only_content_not_found_in_maori_search_by_maori_word(self, client):
+        # A word unique to name_mi is found in Maori mode but not in English mode.
+        resource = Resource.objects.create(
+            name_en="Firefighting manual",
+            name_mi="Puna kohatu whakamataku",
+            published=True,
+        )
+        assert resource in _search(client, "puna", lang="mi")
+        assert resource not in _search(client, "puna", lang="en")
+
+    def test_english_only_resource_found_in_maori_search_via_fallback(self, client):
+        # A resource with no Maori translation still displays its English title in
+        # Maori mode (modeltranslation fallback), so it must remain findable in
+        # Maori search by that English text.
+        resource = Resource.objects.create(
+            name_en="Firefighting manual",
+            published=True,
+        )
+        assert resource in _search(client, "firefighting", lang="mi")
+
+    def test_author_name_found_in_both_languages(self, client):
+        entity = EntityFactory(name="Zzentity")
+        resource = Resource.objects.create(name_en="Tagged resource", published=True)
+        resource.author_entities.add(entity)
+
+        assert resource in _search(client, "zzentity", lang="en")
+        assert resource in _search(client, "zzentity", lang="mi")
 
     def test_finds_when_base_column_is_blank(self, client):
         # The production regression: authoritative content lives in name_en and

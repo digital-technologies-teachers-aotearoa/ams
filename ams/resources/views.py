@@ -6,6 +6,7 @@ from django.core.exceptions import PermissionDenied
 from django.db.models import F
 from django.http import Http404
 from django.http import HttpResponseRedirect
+from django.utils.translation import get_language
 from django.views import generic
 
 from ams.resources.forms import ResourceSearchForm
@@ -31,6 +32,14 @@ def _user_can_access(user, resource):
 
 
 _RESOURCE_LIST_PREFETCHES = ("components", "author_users", "author_entities", "tags")
+
+# Maps the active language to its per-language search vector column and the
+# Postgres text-search config used to build it. Defaults to English for any
+# unrecognised or missing language.
+_SEARCH_BY_LANGUAGE = {
+    "en": ("search_vector_en", "english"),
+    "mi": ("search_vector_mi", "simple"),
+}
 
 
 class ResourceHomeView(generic.TemplateView):
@@ -114,14 +123,14 @@ class ResourceSearchView(generic.TemplateView):
             qs = qs.exclude(visibility=Resource.Visibility.MEMBERS_ONLY)
 
         if q:
-            query = SearchQuery(
-                q,
-                config="english",
-                search_type="websearch",
-            ) | SearchQuery(q, config="simple", search_type="websearch")
+            column, config = _SEARCH_BY_LANGUAGE.get(
+                get_language(),
+                _SEARCH_BY_LANGUAGE["en"],
+            )
+            query = SearchQuery(q, config=config, search_type="websearch")
             qs = (
-                qs.filter(search_vector=query)
-                .annotate(rank=SearchRank(F("search_vector"), query))
+                qs.filter(**{column: query})
+                .annotate(rank=SearchRank(F(column), query))
                 .order_by("-rank")
             )
 
