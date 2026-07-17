@@ -4,6 +4,7 @@ from http import HTTPStatus
 import pytest
 from django.utils import timezone
 from django.utils import translation
+from django.utils.formats import date_format
 
 from ams.events.tests.factories import EventFactory
 from ams.events.tests.factories import LocationFactory
@@ -25,7 +26,7 @@ class TestHomeView:
 
     def test_map_location_date_format(self, client):
         location = LocationFactory()
-        start = datetime.datetime(2026, 7, 15, 0, 0, 0, tzinfo=datetime.UTC)
+        start = timezone.now() + datetime.timedelta(days=10)
         EventFactory(
             locations=[location],
             start=start,
@@ -33,7 +34,7 @@ class TestHomeView:
         )
         response = client.get("/en/events/")
         event_date = response.context["map_locations"][0]["events"][0]["date"]
-        assert event_date == "15 Jul 2026"
+        assert event_date == date_format(start, "j M Y")
 
     @pytest.mark.skip(reason="Te Reo Māori translation required")
     def test_map_location_date_uses_active_language(self, rf):
