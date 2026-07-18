@@ -22,6 +22,10 @@ markdown_extensions:
 nav:
   - Home: index.md
   - Features: features.md
+  - Getting started:
+      - getting-started/index.md
+  - Building your website:
+      - tutorials/index.md
   - Website administrator guide:
       - admin/index.md
       - admin/cms.md
@@ -30,8 +34,11 @@ nav:
       - admin/forum.md
       - admin/xero-billing.md
       - admin/theme-customization.md
+  - Provider guide:
+      - provider/index.md
   - Developer documentation:
       - developer/contributing.md
+      - developer/docs-conventions.md
       - developer/feature-flags.md
       - developer/resources.md
       - developer/billing.md
