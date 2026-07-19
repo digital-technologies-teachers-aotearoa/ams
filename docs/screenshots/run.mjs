@@ -16,6 +16,7 @@ const MANIFEST_PATH = path.join(__dirname, "manifest.json");
 
 const BASE_URL = process.env.DOCS_SCREENSHOTS_BASE_URL ?? "http://localhost:3000";
 const VIEWPORT = { width: 1280, height: 800 };
+const DEVICE_SCALE_FACTOR = 2;
 const DEMO_ORG_NAME = "Mathematics Teachers Association";
 
 function readEnvFile(relPath) {
@@ -98,7 +99,7 @@ async function main() {
       continue;
     }
 
-    const page = await browser.newPage({ viewport: VIEWPORT });
+    const page = await browser.newPage({ viewport: VIEWPORT, deviceScaleFactor: DEVICE_SCALE_FACTOR });
     try {
       await stepFn(page);
       await prepareForCapture(page);

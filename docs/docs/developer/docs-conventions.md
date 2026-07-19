@@ -70,6 +70,8 @@ Provider guide pages use the opposite register deliberately: terse, technical, n
 2. **File naming:** `<page-slug>-<step-number>-<short-description>.png`, all lowercase, words separated by hyphens.
    Example: `branding-theme-03-colour-picker.png` for step 3 of the branding & theme tutorial.
 3. **Fixed viewport:** 1280×800px for every screenshot, regardless of the audience reading the docs on a tablet — the Wagtail/Django admin UI itself is desktop-oriented, and a fixed viewport is what makes screenshots byte-stable across regenerations (required by T02).
+   The suite captures at a 2x device scale factor, so exported PNGs are 2560×1600px (twice the pixel density) for crisper rendering on high-DPI/Retina displays.
+   This doesn't change on-page display size — Material for MkDocs scales images to fit the content column — only sharpness.
 4. **Demo organisation:** all screenshots and examples use a fictional association **"Mathematics Teachers Association"**.
    This name is **not** what `sample_data` currently produces — `setup_cms`/`sample_data` set `AssociationSettings.association_short_name`/`association_long_name` to `"{Language} AMS"` (e.g. "English AMS"), not a fixed org name.
    **This is a requirement on T02**: the screenshot suite's setup step must update `AssociationSettings` for the seeded site(s) to "Mathematics Teachers Association" after running `sample_data`, so screenshots show a stable, deliberately-chosen name rather than the language-derived placeholder.
