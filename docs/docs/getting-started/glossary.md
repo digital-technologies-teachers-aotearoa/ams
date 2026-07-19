@@ -49,7 +49,7 @@ Think of it like renting space for your site to live in: a hosting company suppl
 ## Production
 
 Production is the live version of your website — what the public and your members actually see and use.
-Changes are checked on a private copy first (see [staging](#staging) and [UAT](#uat)) before they go live on production.
+It's a separate environment from your [staging/UAT](#uat) site; changes are built and checked there first, then your provider copies them across to production, rather than switching the staging/UAT site itself into production.
 
 ## Provider
 
@@ -69,7 +69,7 @@ It means signing in once on your main website and being automatically recognised
 ## Staging
 
 A staging site is a private, work-in-progress copy of your website, used to test and review changes before they go live.
-AMS's staging site is usually called the UAT site — see [UAT](#uat).
+AMS's staging site is usually called the UAT site — see [UAT](#uat) — and stays a separate environment from [production](#production) even after launch, not an earlier version of the same one.
 
 ## Subdomain
 
@@ -90,4 +90,4 @@ It's different from your everyday email inbox (like Google Workspace) — a webs
 
 UAT stands for User Acceptance Testing.
 It's a private version of your website where you and your team check that everything works and looks right before the public launch.
-You'll be given a link to your UAT site partway through onboarding and asked to review it before it becomes your live [production](#production) site.
+You'll be given a link to your UAT site partway through onboarding; once you've signed off, your provider copies everything across to your separate [production](#production) site before it goes live, and your UAT site stays available afterwards for checking future changes.

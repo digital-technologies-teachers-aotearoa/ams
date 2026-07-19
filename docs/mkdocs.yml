@@ -16,7 +16,11 @@ markdown_extensions:
   - tables
   - admonition
   - pymdownx.details
-  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
   - toc
     # permalink: true
 
@@ -29,6 +33,9 @@ nav:
   - Features: features.md
   - Getting started:
       - getting-started/index.md
+      - getting-started/decision-questionnaire.md
+      - getting-started/costs-sheet.md
+      - getting-started/accounts-checklist.md
       - getting-started/settings-glossary.md
       - getting-started/glossary.md
   - Building your website:
