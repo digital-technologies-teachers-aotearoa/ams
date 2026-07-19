@@ -67,6 +67,9 @@ jobs:
       - name: Run database migrations
         run: docker compose run --rm django python manage.py migrate
 
+      - name: Check settings glossary is in sync with base.py
+        run: docker compose run --rm django python manage.py check_settings_glossary
+
       - name: Generate static files for tests
         run: docker compose run --rm node npm run build
 

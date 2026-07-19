@@ -29,6 +29,7 @@ nav:
   - Features: features.md
   - Getting started:
       - getting-started/index.md
+      - getting-started/settings-glossary.md
   - Building your website:
       - tutorials/index.md
   - Website administrator guide:
