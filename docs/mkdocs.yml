@@ -30,6 +30,7 @@ nav:
   - Getting started:
       - getting-started/index.md
       - getting-started/settings-glossary.md
+      - getting-started/glossary.md
   - Building your website:
       - tutorials/index.md
   - Website administrator guide:
