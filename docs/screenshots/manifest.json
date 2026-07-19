@@ -1,0 +1,16 @@
+[
+  {
+    "id": "example-login",
+    "file": "developer/docs-conventions-01-example-login.png",
+    "step": "exampleLogin",
+    "pages": ["developer/docs-conventions.md"],
+    "description": "The AMS sign-in page, captured by the example pipeline step referenced in \"How to regenerate screenshots\" below."
+  },
+  {
+    "id": "example-dashboard",
+    "file": "developer/docs-conventions-02-example-dashboard.png",
+    "step": "exampleDashboard",
+    "pages": ["developer/docs-conventions.md"],
+    "description": "The Wagtail CMS dashboard immediately after signing in as the sample admin account, captured by the example pipeline step."
+  }
+]

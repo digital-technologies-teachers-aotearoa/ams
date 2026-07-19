@@ -94,4 +94,36 @@ A PR that changes UI covered by these docs is not done until:
 
 ## How to regenerate screenshots
 
-_Added once the Playwright suite exists — see that task's completion notes for the exact command._
+The screenshot suite lives in `docs/screenshots/`.
+It captures against Chromium only, since a single deterministic renderer is what matters for byte-stable images, not cross-browser coverage.
+
+**Prerequisites:**
+
+1. From the repo root, run `./docs/screenshots/seed.sh` (or `just docs-seed`).
+   This flushes the database and rebuilds a clean skeleton site — `setup_cms` (sites, home pages, locales) plus an admin account — deliberately **not** `sample_data`, since screenshots should show what a real new client's site looks like (empty), not `sample_data`'s fixture events, resources, and articles.
+   It also sets every site's `AssociationSettings` to the fixed demo name (`setup_cms` on its own sets a language-derived placeholder like "English AMS" instead) and starts the Django dev server in the background, waiting until it responds before exiting.
+   `manage.py flush` truncates data but doesn't replay migrations, which deletes Wagtail's root page/collection (created by data migrations inside the `wagtail` package) without restoring them — `seed.sh` runs `manage.py ensure_wagtail_root` straight after flushing to recreate them, otherwise `setup_cms` fails silently with "Root page not found."
+   Screenshot content reflects whichever languages `AMS_ENABLED_LANGUAGES` has enabled in your `.envs/.local/django.ini` (e.g. the CMS dashboard's page list differs between an `en`-only env and an `mi,en` env) — keep this env var stable across regenerations of the same image, or expect unrelated-looking diffs.
+
+**Regenerate every screenshot in the manifest:**
+
+```
+docker-compose exec node npm run docs:screenshots
+```
+
+This overwrites every image listed in `docs/screenshots/manifest.json` deterministically — running it twice produces the same images (the suite hides `#djDebugRoot`, the Django Debug Toolbar's container, before every capture, since its live query/timing stats would otherwise change on every request and break determinism).
+
+**Check for orphaned images** (in the manifest but not embedded in a doc page, or on disk but not in the manifest, or embedded in a doc page but missing from the manifest):
+
+```
+docker-compose exec node npm run docs:screenshots:check
+```
+
+**Adding a new screenshot:** add a capture step to the `steps` object in `docs/screenshots/run.mjs`, add an entry to `docs/screenshots/manifest.json` (file path per the naming convention above, the step name, and the doc page(s) that will embed it), embed the image in the doc page, then run the two commands above.
+
+Two example screenshots below prove the pipeline end to end; they're captured by `run.mjs`'s `exampleLogin` and `exampleDashboard` steps.
+Tutorial tasks (T13 onward) add their own steps for the screens they document, rather than reusing these.
+
+![The AMS sign-in page](../images/developer/docs-conventions-01-example-login.png)
+
+![The Wagtail CMS dashboard](../images/developer/docs-conventions-02-example-dashboard.png)

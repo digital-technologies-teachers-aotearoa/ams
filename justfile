@@ -35,6 +35,10 @@ logs *args:
 manage +args:
     @docker compose run --rm django python ./manage.py {{args}}
 
+# docs-seed: Flush, reseed, set the demo org name, and start the dev server for the docs screenshot suite.
+docs-seed:
+    @./docs/screenshots/seed.sh
+
 # Run Jest test suite
 jest *args:
     @echo "Running Jest test suite..."
