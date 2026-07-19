@@ -86,6 +86,23 @@ Provider guide pages use the opposite register deliberately: terse, technical, n
    - is recorded in the T02 manifest with a note of which base image it annotates and what tool/steps produced the annotation, so a future contributor can redo it after a UI change;
    - prefer a plain caption over an annotation whenever the caption alone resolves the ambiguity.
 
+## Settings glossary anti-drift check
+
+`docs/docs/getting-started/settings-glossary.md` documents every client-decidable `AMS_*` env var (settings a client decides during onboarding, via the decision questionnaire — part of the onboarding intake pack, not yet its own page as of T03).
+It must never drift from `config/settings/base.py`: if a setting is added to the code but not documented, or removed from the code but left in the glossary, the docs would silently go stale.
+
+**Mechanism (decision — generated check over hand-written page, not a fully generated page):** the glossary page is hand-written prose (so descriptions can stay plain-language for a non-technical audience), but a management command statically parses `config/settings/base.py` with Python's `ast` module to find every `AMS_*` string literal passed to `env(...)`/`env.bool(...)`/`env.list(...)`, and compares that set against every `AMS_*` name documented as a level-2 heading in the glossary.
+A generated page was rejected: plain-language descriptions of what a setting does for a committee member can't be generated from a one-line `env.bool()` call, so the source of truth for *prose* has to stay hand-written — the check only needs to guarantee the *set of settings* can't drift, which a comparison script does without needing to generate content.
+
+Run it with:
+
+```
+docker-compose exec django python manage.py check_settings_glossary
+```
+
+It fails loudly (non-zero exit, listing exactly which settings are missing or stale) if the two sides disagree.
+It also runs as a step in the `django-test` job in `.github/workflows/ci.yml`, so a PR that adds or removes an `AMS_*` setting without updating the glossary fails CI — this is what makes the glossary page's "cannot silently go out of date" claim true, rather than just possible if someone remembers to run the check locally.
+
 ## Definition of done for feature PRs that change documented UI
 
 A PR that changes UI covered by these docs is not done until:
