@@ -86,6 +86,20 @@ Provider guide pages use the opposite register deliberately: terse, technical, n
    - is recorded in the T02 manifest with a note of which base image it annotates and what tool/steps produced the annotation, so a future contributor can redo it after a UI change;
    - prefer a plain caption over an annotation whenever the caption alone resolves the ambiguity.
 
+## Diagrams
+
+Mermaid diagrams are supported via a `custom_fences` entry on `pymdownx.superfences` in `docs/mkdocs.yml` (added in T05, following [Material for MkDocs' documented approach](https://squidfunk.github.io/mkdocs-material/reference/diagrams/)) — no extra JavaScript is needed beyond that config, since the `squidfunk/mkdocs-material` image this project's `docs` service runs bundles Mermaid rendering natively.
+Use a fenced code block with the `mermaid` language tag:
+
+````markdown
+```mermaid
+graph LR
+    A[Step one] --> B[Step two]
+```
+````
+
+Prefer a diagram for sequence/flow relationships (e.g. an onboarding phase sequence) and a table when the content needs per-item detail (durations, owners, links) alongside the sequence — the two aren't mutually exclusive on the same page.
+
 ## Settings glossary anti-drift check
 
 `docs/docs/getting-started/settings-glossary.md` documents every client-decidable `AMS_*` env var (settings a client decides during onboarding, via the decision questionnaire — part of the onboarding intake pack, not yet its own page as of T03).
