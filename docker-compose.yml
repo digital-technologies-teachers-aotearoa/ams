@@ -107,8 +107,11 @@ services:
     command: redis-server --appendonly yes
 
   docs:
+    build:
+      context: .
+      dockerfile: ./compose/local/docs/Dockerfile
+    image: ams_docs
     container_name: ams_docs
-    image: squidfunk/mkdocs-material
     ports:
       - '8001:8000'
     volumes:
