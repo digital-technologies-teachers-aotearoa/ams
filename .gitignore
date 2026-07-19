@@ -295,6 +295,12 @@ docs/site/
 # Local secrets
 .envs/.local/django-private.ini
 
+# Client-identifying onboarding planning docs — never commit (public repo)
+docs/onboarding-source-notes.md
+docs/onboarding-documentation-tasks.md
+docs/onboarding-documentation-tasks-original.md
+docs/onboarding-documentation-scope.md
+
 # AI
 .ai/
 .claude/
