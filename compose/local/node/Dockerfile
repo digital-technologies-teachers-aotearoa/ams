@@ -15,6 +15,12 @@ COPY --chown=node:node ./package.json /app
 
 RUN npm install && npm cache clean --force
 
+# Chromium + its OS-level dependencies, for the docs screenshot suite (docs/screenshots/)
+USER root
+RUN npx playwright install-deps chromium
+USER node
+RUN npx playwright install chromium
+
 COPY --chown=node:node ./compose/local/node/entrypoint.sh /entrypoint.sh
 
 # Switch to root temporarily to chmod the entrypoint
