@@ -1,6 +1,7 @@
 import logging
 
 import sentry_sdk
+from django.core.exceptions import ImproperlyConfigured
 from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk.integrations.logging import LoggingIntegration
 
@@ -97,13 +98,41 @@ ADMIN_URL = env("DJANGO_ADMIN_URL")
 INSTALLED_APPS += ["anymail"]
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
 # https://anymail.readthedocs.io/en/stable/installation/#anymail-settings-reference
-# https://anymail.readthedocs.io/en/stable/esps/mailgun/
-EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
-ANYMAIL = {
-    "MAILGUN_API_KEY": env("MAILGUN_API_KEY"),
-    "MAILGUN_SENDER_DOMAIN": env("MAILGUN_DOMAIN"),
-    "MAILGUN_API_URL": env("MAILGUN_API_URL", default="https://api.mailgun.net/v3"),
-}
+
+# Select the email service provider (ESP) with a single env var.
+# Supported: "mailgun" (default), "postmark", "mailtrap".
+# https://anymail.readthedocs.io/en/stable/esps/
+EMAIL_ESP = env("DJANGO_EMAIL_ESP", default="mailgun")
+EMAIL_BACKEND = f"anymail.backends.{EMAIL_ESP}.EmailBackend"
+
+if EMAIL_ESP == "mailgun":
+    # https://anymail.readthedocs.io/en/stable/esps/mailgun/
+    ANYMAIL = {
+        "MAILGUN_API_KEY": env("MAILGUN_API_KEY"),
+        "MAILGUN_SENDER_DOMAIN": env("MAILGUN_DOMAIN"),
+        "MAILGUN_API_URL": env(
+            "MAILGUN_API_URL",
+            default="https://api.mailgun.net/v3",
+        ),
+    }
+elif EMAIL_ESP == "postmark":
+    # https://anymail.readthedocs.io/en/stable/esps/postmark/
+    ANYMAIL = {
+        "POSTMARK_SERVER_TOKEN": env("POSTMARK_SERVER_TOKEN"),
+    }
+elif EMAIL_ESP == "mailtrap":
+    # https://anymail.readthedocs.io/en/stable/esps/mailtrap/
+    ANYMAIL = {
+        "MAILTRAP_API_TOKEN": env("MAILTRAP_API_TOKEN"),
+        # Set MAILTRAP_SANDBOX_ID to use a Mailtrap sandbox/test inbox.
+        "MAILTRAP_SANDBOX_ID": env("MAILTRAP_SANDBOX_ID", default=None),
+    }
+else:
+    msg = (
+        f"Unsupported DJANGO_EMAIL_ESP={EMAIL_ESP!r}. "
+        "Expected one of: mailgun, postmark, mailtrap."
+    )
+    raise ImproperlyConfigured(msg)
 
 # LOGGING
 # ------------------------------------------------------------------------------

@@ -103,9 +103,13 @@ The following environment variables are available, with some required for runnin
 | `DJANGO_SECRET_KEY` | 🔴 Required | `secret-key` | The Django secret key |
 | `DJANGO_ADMIN_URL` | 🔴 Required | `admin/` | The URL for the Django admin |
 | `DJANGO_ALLOWED_HOSTS` | 🔴 Required | `*` | The allowed hosts for Django |
-| `MAILGUN_API_KEY` | 🔴 Required | `redacted-api-key` | The API key for Mailgun |
-| `MAILGUN_DOMAIN` | 🔴 Required | `sandbox.mailgun.org` | The domain for Mailgun |
-| `MAILGUN_API_URL` | 🔴 Required | `https://api.mailgun.net` | The API URL for Mailgun |
+| `DJANGO_EMAIL_ESP` | ⚪ Optional | `mailgun` | The email service provider to send transactional email through. One of `mailgun` (default), `postmark`, `mailtrap` |
+| `MAILGUN_API_KEY` | 🔴 Required if `DJANGO_EMAIL_ESP=mailgun` | `redacted-api-key` | The API key for Mailgun |
+| `MAILGUN_DOMAIN` | 🔴 Required if `DJANGO_EMAIL_ESP=mailgun` | `sandbox.mailgun.org` | The domain for Mailgun |
+| `MAILGUN_API_URL` | ⚪ Optional | `https://api.mailgun.net/v3` | The API URL for Mailgun (EU accounts use the EU URL) |
+| `POSTMARK_SERVER_TOKEN` | 🔴 Required if `DJANGO_EMAIL_ESP=postmark` | `redacted-server-token` | The server token for Postmark |
+| `MAILTRAP_API_TOKEN` | 🔴 Required if `DJANGO_EMAIL_ESP=mailtrap` | `redacted-api-token` | The API token for Mailtrap |
+| `MAILTRAP_SANDBOX_ID` | ⚪ Optional | `123456` | The Mailtrap sandbox/test inbox ID (live sending is used if unset) |
 | `AMS_BILLING_SERVICE_CLASS` | 🔴 Required | `ams.billing.providers.xero.XeroBillingService` | The provider to use for billing |
 | `AMS_BILLING_EMAIL_WHITELIST_REGEX` | ⚪ Optional | `@domain.com` | Allowed emails to send billing emails to (sends all emails when unset) |
 | `DISCOURSE_REDIRECT_DOMAIN` | 🔴 Required | `https://forum.ams.com` | The domain of the forum to send users to |
