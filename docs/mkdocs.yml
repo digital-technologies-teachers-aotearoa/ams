@@ -1,4 +1,5 @@
 site_name: Association Management System Documentation
+site_url: https://digital-technologies-teachers-aotearoa.github.io/ams/
 repo_url: https://github.com/digital-technologies-teachers-aotearoa/ams
 repo_name: AMS on GitHub
 
@@ -27,6 +28,8 @@ markdown_extensions:
 plugins:
   - search
   - glightbox
+  - macros:
+      render_by_default: false
 
 nav:
   - Home: index.md
@@ -52,6 +55,7 @@ nav:
   - Provider guide:
       - provider/index.md
       - provider/provisioning-runbook.md
+      - provider/client-communication-templates.md
   - Developer documentation:
       - developer/contributing.md
       - developer/docs-conventions.md

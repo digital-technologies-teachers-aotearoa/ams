@@ -8,5 +8,4 @@ It is deliberately opinionated about the provider's actual stack (DigitalOcean, 
 For platform-agnostic deployment information that applies to any AMS installation, see [Developer documentation](../developer/deployment.md).
 
 - [Provisioning runbook](provisioning-runbook.md) — ordered steps to stand up a new client instance, from server setup through production cutover.
-
-<!-- Client-communication templates are added by a later task in the onboarding documentation effort (see .ai/onboarding-documentation-tasks.md). -->
+- [Client-communication templates](client-communication-templates.md) — copy-pasteable emails for the intake, UAT-handover, and launch handoffs.
