@@ -7,4 +7,4 @@ This section covers standing up a new client instance end to end and the communi
 It is deliberately opinionated about the provider's actual stack (DigitalOcean, Postmark, Discourse, Xero).
 For platform-agnostic deployment information that applies to any AMS installation, see [Developer documentation](../developer/deployment.md).
 
-<!-- Content for this section is added by later tasks in the onboarding documentation effort (see docs/onboarding-documentation-tasks.md). -->
+<!-- Content for this section is added by later tasks in the onboarding documentation effort (see .ai/docs/onboarding-documentation-tasks.md). -->

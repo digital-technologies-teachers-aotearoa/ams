@@ -2,7 +2,7 @@
 
 **Who this page is for:** developers and the operator writing or updating AMS documentation.
 
-This page is binding: it records the structural decisions made for the [client onboarding & website setup documentation effort](https://github.com/digital-technologies-teachers-aotearoa/ams) (see `docs/onboarding-documentation-scope.md` and `docs/onboarding-documentation-tasks.md` in the repo root for the full plan).
+This page is binding: it records the structural decisions made for the [client onboarding & website setup documentation effort](https://github.com/digital-technologies-teachers-aotearoa/ams).
 Later documentation tasks follow these conventions rather than re-deciding them.
 
 ## Where each doc type lives
@@ -106,7 +106,7 @@ Prefer a diagram for sequence/flow relationships (e.g. an onboarding phase seque
 It must never drift from `config/settings/base.py`: if a setting is added to the code but not documented, or removed from the code but left in the glossary, the docs would silently go stale.
 
 **Mechanism (decision — generated check over hand-written page, not a fully generated page):** the glossary page is hand-written prose (so descriptions can stay plain-language for a non-technical audience), but a management command statically parses `config/settings/base.py` with Python's `ast` module to find every `AMS_*` string literal passed to `env(...)`/`env.bool(...)`/`env.list(...)`, and compares that set against every `AMS_*` name documented as a level-2 heading in the glossary.
-A generated page was rejected: plain-language descriptions of what a setting does for a committee member can't be generated from a one-line `env.bool()` call, so the source of truth for *prose* has to stay hand-written — the check only needs to guarantee the *set of settings* can't drift, which a comparison script does without needing to generate content.
+A generated page was rejected: plain-language descriptions of what a setting does for a committee member can't be generated from a one-line `env.bool()` call, so the source of truth for _prose_ has to stay hand-written — the check only needs to guarantee the _set of settings_ can't drift, which a comparison script does without needing to generate content.
 
 Run it with:
 
