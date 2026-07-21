@@ -32,7 +32,7 @@ Provision each client with their own small GitOps repository, following the patt
 - A GitHub Actions workflow per environment (`deploy-uat.yml`, `deploy-prod.yml`), triggered on push to that environment's path, deploying via `digitalocean/app_action/deploy@v2` with `project_id` and `app_spec_location` pointing at that environment's files.
 - Secrets (`DJANGO_SECRET_KEY`, storage keys, `XERO_*`, etc.) stored in a GitHub Environment per deployment target and injected as `env:` on the deploy step — never committed to the repo.
 
-The AMS project's own `.do/app.yaml` is a second, simpler working example of the same App Platform spec syntax (job/component structure, instance sizing) — useful as a syntax reference, but `dtta-website`'s split-by-environment repo is the structure to actually follow for a client.
+The AMS project's own `.do/app.yaml` (see [AMS project development site](../developer/project-dev-site.md)) is a second, simpler working example of the same App Platform spec syntax (job/component structure, instance sizing) — useful as a syntax reference, but `dtta-website`'s split-by-environment repo is the structure to actually follow for a client.
 
 None of this needs to be written by hand up front.
 For the initial stand-up, it's fine (and often easier) to create each app through DigitalOcean's own web console — this is also the simplest way to attach UAT's database: the console's database-creation step offers **Dev Database** as a plain option, rather than requiring you to already know that a bare `engine: PG` entry with no `cluster_name` is what produces one in the YAML (§5).
@@ -44,7 +44,7 @@ Clone `dtta-website`'s structure for the new client's own repo, then per environ
 2. Add each environment's database — see §5 for why UAT's differs from production's.
 3. Add the `django` web component from the [`ams-django` GHCR image](https://github.com/digital-technologies-teachers-aotearoa/ams/pkgs/container/ams-django), pinned to a specific released tag/digest — not a floating `latest` — so the client's site doesn't move underneath them on an unrelated AMS release.
    `http_port: 5000`, `run_command: /start-web.sh`, instance size `apps-s-1vcpu-0.5gb` (512MB) to start.
-   This single component runs both gunicorn and the Django Q worker via supervisord — see [Deployment](../developer/deployment.md#container-resources) for when traffic justifies splitting into separate `django` and `django-worker` components instead, and for sizing up to `apps-s-1vcpu-1gb`.
+   This component runs gunicorn only — there's no separate worker process to size or split out — see [Deployment](../developer/deployment.md#container-resources) for sizing up to `apps-s-1vcpu-1gb` when traffic justifies it.
 4. Add a `job-deploy` **PRE_DEPLOY** job on each environment: `run_command: python /app/manage.py deploy_steps`, instance size `apps-s-1vcpu-1gb-fixed` (extra headroom, since migrations can spike memory; runs once per deploy then stops).
 5. If the client chose Xero billing (questionnaire Q5), add a `fetch-invoice-updates` **SCHEDULED** job on each environment, same image: `run_command: python /app/manage.py fetch_invoice_updates`, cron `*/15 * * * *` — this is the fallback for any webhook Xero fails to deliver (see §7).
 6. Set ingress: route `/` to the `django` component.
