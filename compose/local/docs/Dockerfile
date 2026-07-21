@@ -1,3 +1,3 @@
 FROM squidfunk/mkdocs-material
 
-RUN pip install --no-cache-dir mkdocs-glightbox==0.5.2
+RUN pip install --no-cache-dir mkdocs-glightbox==0.5.2 mkdocs-macros-plugin==1.3.7
