@@ -88,7 +88,7 @@ If data location isn't a concern for your organisation, the default is the faste
 3. **Fonts:** do you use particular fonts in your existing branding?
    A font name, or a file/URL where we can get it, is enough.
 4. Who on your team supplies these — is it your committee, a volunteer, or an external designer/agency?
-   If you're working with an external agency, ask your provider for the working-with-designers guidance before they start.
+   If you're working with an external agency, send them the [working-with-designers](working-with-designers.md) page before they start.
 
 ## 8. Named roles
 
