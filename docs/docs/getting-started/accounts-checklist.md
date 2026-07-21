@@ -114,13 +114,16 @@ That's exactly the steps above — an email from Xero itself, not a password you
 *(Only needed if you chose the forum in [decision questionnaire, question 5](decision-questionnaire.md#5-optional-features).)*
 
 **Account and plan:** the Discourse **Pro** plan, $100 USD/month, or $50 USD/month once the non-profit discount is applied (see the [costs sheet](costs-sheet.md)).
-Do this once your provider tells you your forum is ready — it's set up as part of provisioning, not something you create from scratch yourself.
+You create this yourself, on Discourse's own site — there's no forum for your provider to prepare in advance; signing up is what creates it.
 
 **Where to load payment and how to grant access:**
 
-1. Once your provider says your forum is ready, sign up for a personal account on your forum's website using your own name and email.
+1. Sign up directly on [discourse.org](https://discourse.org) for a Pro plan (or a free trial, if you want to try it first) using your own name and email.
+   You'll be asked for a temporary subdomain (you can point your own domain at it later) and a name for your community — signing up is what creates your forum, not something your provider sets up beforehand.
+   Because you're the first person on your brand-new forum, Discourse makes your account an admin automatically.
    This account is temporary.
-2. Ask your provider to grant that account admin access, temporarily.
+2. Add your provider as an admin too — invite them from your forum's admin panel if they don't already have an account there, then grant admin.
+   They need admin access to configure the technical integration ([SSO](glossary.md#sso)) in the next step.
 3. Go to `<your-forum-address>/admin/manage-account`.
 4. Click **Start Subscription** and choose the **Pro** plan.
    You can start on the Free plan instead if you want to trial it first, but the non-profit discount only applies to Pro (or Business), so you'll need to move to Pro before requesting it.

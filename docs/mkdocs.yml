@@ -51,6 +51,7 @@ nav:
       - admin/theme-customization.md
   - Provider guide:
       - provider/index.md
+      - provider/provisioning-runbook.md
   - Developer documentation:
       - developer/contributing.md
       - developer/docs-conventions.md
