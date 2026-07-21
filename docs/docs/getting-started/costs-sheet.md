@@ -18,11 +18,13 @@ Add up every row below (using the lower end of any range) and you get your total
 | Transactional email (Postmark) | Sends automatic emails your site generates on its own — sign-up confirmations, password resets, membership notices | $15 USD | per month | The Basic plan — this is the plan that supports adding your provider as a [team member](glossary.md#team-member), rather than sharing a single login. AMS requires this service to send any email at all; it isn't optional. Price checked 2026-07. |
 | Forum hosting (Discourse) | Runs your members' [forum](glossary.md#forum), if you enable it | $100 USD, or $50 USD with proof of non-profit status | per month | Qualifying proof: an incorporation certificate, or documentation showing official tax-exempt status. Send it to `team@discourse.org`. Only applies if you enable the forum — see the [decision questionnaire](decision-questionnaire.md#5-optional-features). This is your **live** forum cost; the UAT site's forum cost is in the row above. Price checked 2026-06. |
 | Backups, scheduled jobs & Xero sync | Automatic backups and behind-the-scenes maintenance tasks, including syncing with Xero if you enable it | $0.50–$3 USD | per month | Price checked 2026-02. |
+| Xero Custom Connection | The Xero add-on required to connect AMS to your Xero account, if you enable Xero billing | $10 USD | per month | Charged directly by Xero through your own Xero account — your provider doesn't bill you for this, and it's separate from whatever Xero plan you already pay for. Only applies if you enable Xero billing — see the [decision questionnaire](decision-questionnaire.md#5-optional-features) and the [accounts & access checklist](accounts-checklist.md#billing-integration-example-xero) for how it's set up. Price checked 2026-07. |
 | Provider fees | Your provider's own time — setup, support, and maintenance | Discussed separately | — | Not included in any figure on this page. |
 
 ### What this adds up to
 
-Once launched, with the forum's non-profit discount applied and your UAT site kept running: adding every row above (except the annual domain and provider fees) comes to roughly **$137–$140 USD/month**, plus **~$25 USD/year** for your domain.
+Once launched, with the forum's non-profit discount applied and your UAT site kept running: adding every row above (except the annual domain, the Xero Custom Connection, and provider fees) comes to roughly **$137–$140 USD/month**, plus **~$25 USD/year** for your domain.
+If you enable Xero billing, add **$10 USD/month** for the Xero Custom Connection to that total.
 This does not include provider fees, which are discussed separately.
 
 ## Not billed through AMS
@@ -32,4 +34,5 @@ These are costs your organisation already has, or would have regardless of AMS �
 - **Google Workspace** — your organisation's everyday email and office software.
   Separate from, and unaffected by, [transactional email](glossary.md#transactional-email) above — see the glossary entry for why a website needs its own dedicated email service.
 - **Xero** — your organisation's accounting software, if you use one for membership billing.
-  Connecting AMS to Xero doesn't add a Xero subscription cost of its own; you'd need your own Xero plan regardless of AMS.
+  You'd need your own Xero plan regardless of AMS.
+  Connecting AMS to Xero does add one small extra cost of its own — the Xero Custom Connection row in the table above — which is billed by Xero, not your provider.
