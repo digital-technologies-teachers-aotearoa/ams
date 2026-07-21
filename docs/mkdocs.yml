@@ -64,6 +64,7 @@ nav:
       - developer/urls.md
       - developer/permission-caching.md
       - developer/deployment.md
+      - developer/project-dev-site.md
       - developer/wagtail-cms.md
       - developer/theme-system.md
       - developer/email-templates.md

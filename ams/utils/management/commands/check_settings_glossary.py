@@ -41,13 +41,23 @@ def find_documented_vars(source: str) -> set[str]:
     return set(HEADING_PATTERN.findall(source))
 
 
+TABLE_ROW_PATTERN = re.compile(r"^\|\s*`(AMS_[A-Z0-9_]+)`\s*\|", re.MULTILINE)
+
+
+def find_ams_vars_in_table(source: str) -> set[str]:
+    """Find every `AMS_*` name used as a leading table-row cell."""
+    return set(TABLE_ROW_PATTERN.findall(source))
+
+
 class Command(management.base.BaseCommand):
     """Required command class for the custom Django check_settings_glossary command."""
 
     help = (
         "Verify every AMS_* client-decidable setting in config/settings/base.py "
         "has exactly one entry in docs/docs/getting-started/settings-glossary.md, "
-        "and vice versa, so the glossary cannot silently drift from the code."
+        "and vice versa, so the glossary cannot silently drift from the code. "
+        "Also verifies docs/docs/developer/deployment.md doesn't duplicate any of "
+        "those settings in its own environment variable table."
     )
 
     def handle(self, *args, **options):
@@ -62,12 +72,17 @@ class Command(management.base.BaseCommand):
             / "getting-started"
             / "settings-glossary.md"
         )
+        deployment_path = (
+            Path(settings.BASE_DIR) / "docs" / "docs" / "developer" / "deployment.md"
+        )
 
         code_vars = find_ams_env_vars(base_settings_path.read_text())
         documented_vars = find_documented_vars(glossary_path.read_text())
+        deployment_table_vars = find_ams_vars_in_table(deployment_path.read_text())
 
         undocumented = sorted(code_vars - documented_vars)
         stale = sorted(documented_vars - code_vars)
+        duplicated_in_deployment = sorted(code_vars & deployment_table_vars)
 
         if undocumented:
             self.stdout.write(
@@ -79,13 +94,22 @@ class Command(management.base.BaseCommand):
                 "❌ In the glossary but not read from config/settings/base.py: "
                 + ", ".join(stale),
             )
-        if undocumented or stale:
-            msg = "Settings glossary has drifted from config/settings/base.py."
+        if duplicated_in_deployment:
+            self.stdout.write(
+                "❌ Documented in the settings glossary but also duplicated in "
+                "deployment.md's environment variable table (should only live in "
+                "the glossary): " + ", ".join(duplicated_in_deployment),
+            )
+        if undocumented or stale or duplicated_in_deployment:
+            msg = (
+                "Settings glossary has drifted from config/settings/base.py "
+                "or from deployment.md."
+            )
             raise management.base.CommandError(
                 msg,
             )
 
         self.stdout.write(
             f"✅ {len(code_vars)} AMS_* settings match exactly between "
-            "base.py and the glossary.\n",
+            "base.py and the glossary, with no duplication in deployment.md.\n",
         )
