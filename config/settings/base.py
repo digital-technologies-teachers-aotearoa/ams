@@ -414,7 +414,7 @@ MFA_TOTP_ISSUER = env("MFA_TOTP_ISSUER", default="")
 # ------------------------------------------------------------------------------
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 10_000
 WAGTAIL_ENABLE_UPDATE_CHECK = "lts"
-WAGTAIL_SITE_NAME = "AMS Demo"
+WAGTAIL_SITE_NAME = "Content management system"
 WAGTAIL_APPEND_SLASH = True
 WAGTAIL_I18N_ENABLED = True
 WAGTAIL_CONTENT_LANGUAGES = LANGUAGES

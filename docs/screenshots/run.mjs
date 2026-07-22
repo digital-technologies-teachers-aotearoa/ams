@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Regenerates every screenshot in manifest.json against a local instance seeded
-// with `sample_data`. Run inside the node container: `npm run docs:screenshots`.
+// by seed.sh (an empty skeleton site, not `sample_data`). Run inside the node
+// container: `npm run docs:screenshots`.
 // See docs/docs/developer/docs-conventions.md ("How to regenerate screenshots")
 // for the seeding prerequisites.
 
@@ -151,17 +152,6 @@ const steps = {
   async exampleLogin(page) {
     await page.goto(`${BASE_URL}/en/accounts/login/`);
     await page.waitForLoadState("networkidle");
-    // The site navbar/footer (not the Wagtail admin dashboard, which uses its
-    // own "site_name" nickname) is where AssociationSettings.association_*
-    // actually renders, so this is the reliable place to sanity-check seeding.
-    const bodyText = await page.textContent("body");
-    if (!bodyText.includes(DEMO_ORG_NAME)) {
-      console.warn(
-        `Warning: expected to see the demo organisation name "${DEMO_ORG_NAME}" on the ` +
-          "site but didn't. Did you run the AssociationSettings seeding step from " +
-          "docs-conventions.md after sample_data?",
-      );
-    }
   },
 
   async exampleDashboard(page) {
@@ -194,6 +184,21 @@ const steps = {
   async brandingAssociationSettings(page) {
     await login(page);
     await openAssociationSettings(page);
+  },
+
+  // Sets the demo organisation name through the CMS itself, the same way a
+  // real client would -- this is the only place DEMO_ORG_NAME gets written,
+  // now that seed.sh no longer seeds it directly. Every later capture step
+  // in this run (and every screenshot after this one in manifest.json's
+  // order) inherits the saved name; anything captured earlier still shows
+  // setup_cms's placeholder, which is expected.
+  async brandingAssociationName(page) {
+    await login(page);
+    await openAssociationSettings(page);
+    await page.locator("#id_association_short_name").fill(DEMO_ORG_NAME);
+    await page.locator("#id_association_long_name").fill(DEMO_ORG_NAME);
+    await page.getByRole("button", { name: "Save" }).click();
+    await page.waitForLoadState("networkidle");
   },
 
   async brandingUploadTab(page) {
