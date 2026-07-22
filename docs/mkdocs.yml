@@ -44,6 +44,8 @@ nav:
       - getting-started/glossary.md
   - Building your website:
       - tutorials/index.md
+      - tutorials/orientation.md
+      - tutorials/branding-theme.md
   - Website administrator guide:
       - admin/index.md
       - admin/cms.md

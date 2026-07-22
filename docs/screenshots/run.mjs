@@ -76,6 +76,27 @@ const steps = {
     await page.goto(`${BASE_URL}/cms/`);
     await page.waitForLoadState("networkidle");
   },
+
+  async orientationSignIn(page) {
+    await page.goto(`${BASE_URL}/en/accounts/login/`);
+    await page.waitForLoadState("networkidle");
+  },
+
+  async orientationYourAccount(page) {
+    await login(page);
+  },
+
+  async orientationCmsDashboard(page) {
+    await login(page);
+    await page.goto(`${BASE_URL}/cms/`);
+    await page.waitForLoadState("networkidle");
+  },
+
+  async orientationDjangoAdmin(page) {
+    await login(page);
+    await page.goto(`${BASE_URL}/admin/`);
+    await page.waitForLoadState("networkidle");
+  },
 };
 
 async function main() {
