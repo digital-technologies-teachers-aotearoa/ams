@@ -77,9 +77,10 @@ Provider guide pages use the opposite register deliberately: terse, technical, n
    The suite captures at a 2x device scale factor, so exported PNGs are 2560×1600px (twice the pixel density) for crisper rendering on high-DPI/Retina displays.
    This doesn't change on-page display size — Material for MkDocs scales images to fit the content column — only sharpness.
 4. **Demo organisation:** all screenshots and examples use a fictional association **"Mathematics Teachers Association"**.
-   This name is **not** what `sample_data` currently produces — `setup_cms`/`sample_data` set `AssociationSettings.association_short_name`/`association_long_name` to `"{Language} AMS"` (e.g. "English AMS"), not a fixed org name.
-   **This is a requirement on T02**: the screenshot suite's setup step must update `AssociationSettings` for the seeded site(s) to "Mathematics Teachers Association" after running `sample_data`, so screenshots show a stable, deliberately-chosen name rather than the language-derived placeholder.
-   Do not rename the organisation in `sample_data` itself as part of that work unless the developer docs audit (T24) decides sample data should default to it too — that's a separate decision.
+   This name is **not** what `sample_data`/`setup_cms` produce on their own — they leave `AssociationSettings.association_short_name`/`association_long_name` at `"{Language} AMS"` (e.g. "English AMS"), a language-derived placeholder, not a fixed org name.
+   The demo name is set through the CMS itself, by `run.mjs`'s `brandingAssociationName` capture step — the same "enter your association's name" step [Tutorial 2](../tutorials/branding-theme.md) documents for a real client — rather than by `seed.sh` or any other out-of-tutorial script.
+   **Consequence:** any screenshot captured earlier than that step in `manifest.json`'s order (the docs-conventions examples below, all of Tutorial 1, and Tutorial 2's own "before" shot of the Association settings page) still shows the language-derived placeholder, not "Mathematics Teachers Association" — expected, since a real new client's site has no name set until they do this step.
+   Do not rename the organisation in `sample_data` itself unless a future decision says sample data should default to it too — that's a separate decision.
 5. **Playwright-regenerable rule:** no screenshot may be committed unless the Playwright suite can regenerate it byte-for-visually-identical.
    If a page needs a screenshot before T02 exists (or before that screen is added to the manifest), leave a placeholder comment instead: `<!-- TODO screenshot: <description of what the image should show> -->` and note the gap in that task's completion notes.
 6. **Annotated-image exception:** rare.
@@ -186,7 +187,8 @@ It captures against Chromium only, since a single deterministic renderer is what
 
 1. From the repo root, run `./docs/screenshots/seed.sh` (or `just docs-seed`).
    This flushes the database and rebuilds a clean skeleton site — `setup_cms` (sites, home pages, locales) plus an admin account — deliberately **not** `sample_data`, since screenshots should show what a real new client's site looks like (empty), not `sample_data`'s fixture events, resources, and articles.
-   It also sets every site's `AssociationSettings` to the fixed demo name (`setup_cms` on its own sets a language-derived placeholder like "English AMS" instead) and starts the Django dev server in the background, waiting until it responds before exiting.
+   It starts the Django dev server in the background, waiting until it responds before exiting.
+   It deliberately does **not** set `AssociationSettings` to the demo name — `setup_cms` leaves that at a language-derived placeholder like "English AMS", and `run.mjs` sets it to "Mathematics Teachers Association" itself, through the CMS, as part of capturing Tutorial 2's own steps (see the demo organisation convention above).
    `manage.py flush` truncates data but doesn't replay migrations, which deletes Wagtail's root page/collection (created by data migrations inside the `wagtail` package) without restoring them — `seed.sh` runs `manage.py ensure_wagtail_root` straight after flushing to recreate them, otherwise `setup_cms` fails silently with "Root page not found."
    Screenshot content reflects whichever languages `AMS_ENABLED_LANGUAGES` has enabled in your `.envs/.local/django.ini` (e.g. the CMS dashboard's page list differs between an `en`-only env and an `mi,en` env) — keep this env var stable across regenerations of the same image, or expect unrelated-looking diffs.
 

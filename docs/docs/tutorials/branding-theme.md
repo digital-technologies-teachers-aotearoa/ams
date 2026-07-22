@@ -4,6 +4,7 @@
 
 ## What you'll have at the end
 
+Your association's name will be set.
 Your logo will show in your website's navbar and footer.
 Your website's main colour and font will match your brand.
 You'll know where to go for every other colour and font option.
@@ -19,38 +20,43 @@ You should already be signed in to the [CMS](../getting-started/glossary.md#cms)
 
 1. In the CMS, open **Settings** in the left sidebar, then click **Association settings**.
 
-    ![The Association settings page, before a logo has been added](../images/tutorials/branding-theme-01-association-settings.png)
+    ![The Association settings page, before the association name has been set](../images/tutorials/branding-theme-01-association-settings.png)
 
-2. In the **Images** section, click **Choose an image** next to **Association logo**, then click the **Upload** tab.
+2. In the **Name** section, enter your association's short name and long name, then click **Save**.
+    The short name appears in places like the navbar and footer; the long name is for more formal contexts, such as legal or official documents.
 
-    ![The image chooser's Upload tab, open and empty](../images/tutorials/branding-theme-02-upload-logo.png)
+    ![A confirmation message after saving the association's short and long name](../images/tutorials/branding-theme-02-name-saved.png)
 
-3. Add a title for your logo, choose your logo file, then click **Upload**.
+3. In the **Images** section, click **Choose an image** next to **Association logo**, then click the **Upload** tab.
+
+    ![The image chooser's Upload tab, open and empty](../images/tutorials/branding-theme-03-upload-logo.png)
+
+4. Add a title for your logo, choose your logo file, then click **Upload**.
     Your logo now appears in the Association logo field.
 
-    ![The uploaded logo selected in the Association logo field](../images/tutorials/branding-theme-03-logo-selected.png)
+    ![The uploaded logo selected in the Association logo field](../images/tutorials/branding-theme-04-logo-selected.png)
 
-4. Turn on **Use logo in navbar** and **Use logo in footer**, then click **Save**.
+5. Turn on **Use logo in navbar** and **Use logo in footer**, then click **Save**.
 
-    ![A confirmation message after saving the logo](../images/tutorials/branding-theme-04-logo-saved.png)
+    ![A confirmation message after saving the logo](../images/tutorials/branding-theme-05-logo-saved.png)
 
-5. Open your website's home page in a new tab to see your logo live.
+6. Open your website's home page in a new tab to see your logo live.
 
-    ![The logo showing in the navbar and footer of the public site](../images/tutorials/branding-theme-05-logo-live.png)
+    ![The logo showing in the navbar and footer of the public site](../images/tutorials/branding-theme-06-logo-live.png)
 
-6. Back in the CMS, open **Settings** again, click **Theme Settings**, and scroll down to the **Primary** section.
+7. Back in the CMS, open **Settings** again, click **Theme Settings**, and scroll down to the **Primary** section.
     This is your website's main colour, used for links, buttons, and highlights across every page.
 
-    ![The Primary colour section of Theme Settings, showing the default blue](../images/tutorials/branding-theme-06-theme-settings.png)
+    ![The Primary colour section of Theme Settings, showing the default blue](../images/tutorials/branding-theme-07-theme-settings.png)
 
-7. Replace the **Primary** value with your brand colour's hex code, then click **Save**.
+8. Replace the **Primary** value with your brand colour's hex code, then click **Save**.
 
-    ![The Primary field now showing a purple brand colour after saving](../images/tutorials/branding-theme-07-primary-saved.png)
+    ![The Primary field now showing a purple brand colour after saving](../images/tutorials/branding-theme-08-primary-saved.png)
 
-8. Further down the same page, find **Fonts**.
+9. Further down the same page, find **Fonts**.
     Replace **Sans-serif font stack** with your font's name, then click **Save**.
 
-    ![The Sans-serif font stack field now showing a different font after saving](../images/tutorials/branding-theme-08-font-saved.png)
+    ![The Sans-serif font stack field now showing a different font after saving](../images/tutorials/branding-theme-09-font-saved.png)
 
 ## Every other colour and font
 

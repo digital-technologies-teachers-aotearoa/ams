@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 # Flushes the database, rebuilds a clean skeleton site (no sample_data fake
 # content -- a real new client's site is empty, not full of demo events and
-# articles), sets the demo organisation name, and starts the Django dev
-# server. Everything the screenshot suite (docs/screenshots/run.mjs) needs,
-# short of an already-rebuilt `node` image (see docs-conventions.md).
+# articles), and starts the Django dev server. The demo organisation name is
+# set later, by the screenshot suite itself (docs/screenshots/run.mjs), as
+# part of capturing Tutorial 2's own "enter your association's name" step --
+# not by this script. Everything else the suite needs, short of an
+# already-rebuilt `node` image (see docs-conventions.md).
 #
 # Run from the repo root: ./docs/screenshots/seed.sh (or `just docs-seed`).
 
@@ -29,17 +31,6 @@ docker compose run --rm django python manage.py setup_cms
 
 echo "Creating the admin account..."
 docker compose run --rm django python manage.py create_sample_admin
-
-echo "Setting the demo organisation name..."
-docker compose run --rm django python manage.py shell -c "
-from wagtail.models import Site
-from ams.cms.models import AssociationSettings
-for site in Site.objects.all():
-    s = AssociationSettings.for_site(site)
-    s.association_short_name = 'Mathematics Teachers Association'
-    s.association_long_name = 'Mathematics Teachers Association'
-    s.save()
-"
 
 echo "Starting the Django dev server..."
 docker compose exec -d django python manage.py runserver 0.0.0.0:8000
