@@ -40,5 +40,61 @@
     "step": "orientationDjangoAdmin",
     "pages": ["tutorials/orientation.md"],
     "description": "The Django admin index, reached via the Website Admin button."
+  },
+  {
+    "id": "branding-association-settings",
+    "file": "tutorials/branding-theme-01-association-settings.png",
+    "step": "brandingAssociationSettings",
+    "pages": ["tutorials/branding-theme.md"],
+    "description": "The Association settings page before a logo has been added."
+  },
+  {
+    "id": "branding-upload-tab",
+    "file": "tutorials/branding-theme-02-upload-logo.png",
+    "step": "brandingUploadTab",
+    "pages": ["tutorials/branding-theme.md"],
+    "description": "The image chooser's Upload tab, open and empty, reached from the Association logo field."
+  },
+  {
+    "id": "branding-logo-selected",
+    "file": "tutorials/branding-theme-03-logo-selected.png",
+    "step": "brandingLogoSelected",
+    "pages": ["tutorials/branding-theme.md"],
+    "description": "The uploaded logo now selected in the Association logo field, before the form is saved."
+  },
+  {
+    "id": "branding-logo-saved",
+    "file": "tutorials/branding-theme-04-logo-saved.png",
+    "step": "brandingLogoSaved",
+    "pages": ["tutorials/branding-theme.md"],
+    "description": "The confirmation message after saving the logo with both navbar and footer toggles on."
+  },
+  {
+    "id": "branding-logo-live",
+    "file": "tutorials/branding-theme-05-logo-live.png",
+    "step": "brandingLogoLive",
+    "pages": ["tutorials/branding-theme.md"],
+    "description": "The public homepage showing the logo in the navbar and footer."
+  },
+  {
+    "id": "branding-theme-settings",
+    "file": "tutorials/branding-theme-06-theme-settings.png",
+    "step": "brandingThemeSettings",
+    "pages": ["tutorials/branding-theme.md"],
+    "description": "Theme Settings scrolled to the Primary colour section, showing the default blue."
+  },
+  {
+    "id": "branding-primary-saved",
+    "file": "tutorials/branding-theme-07-primary-saved.png",
+    "step": "brandingPrimarySaved",
+    "pages": ["tutorials/branding-theme.md"],
+    "description": "The Primary field now showing a purple brand colour after saving."
+  },
+  {
+    "id": "branding-font-saved",
+    "file": "tutorials/branding-theme-08-font-saved.png",
+    "step": "brandingFontSaved",
+    "pages": ["tutorials/branding-theme.md"],
+    "description": "The Sans-serif font stack field now showing a different font after saving."
   }
 ]
