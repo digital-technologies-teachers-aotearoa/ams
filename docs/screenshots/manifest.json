@@ -103,5 +103,75 @@
     "step": "brandingFontSaved",
     "pages": ["tutorials/branding-theme.md"],
     "description": "The Sans-serif font stack field now showing a different font after saving."
+  },
+  {
+    "id": "first-pages-home-edit-empty",
+    "file": "tutorials/first-pages-01-home-edit-empty.png",
+    "step": "firstPagesHomeEditEmpty",
+    "pages": ["tutorials/first-pages.md"],
+    "description": "The home page's edit form, before any content has been added to its Body."
+  },
+  {
+    "id": "first-pages-home-title",
+    "file": "tutorials/first-pages-02-home-title.png",
+    "step": "firstPagesHomeTitle",
+    "pages": ["tutorials/first-pages.md"],
+    "description": "A Title block added to the home page's Body as its main heading, saved as a draft."
+  },
+  {
+    "id": "first-pages-home-tagline",
+    "file": "tutorials/first-pages-03-home-tagline.png",
+    "step": "firstPagesHomeTagline",
+    "pages": ["tutorials/first-pages.md"],
+    "description": "A Lead paragraph tagline added under the Title block, saved as a draft."
+  },
+  {
+    "id": "first-pages-home-preview",
+    "file": "tutorials/first-pages-04-home-preview.png",
+    "step": "firstPagesHomePreview",
+    "pages": ["tutorials/first-pages.md"],
+    "description": "The preview panel showing the title and tagline as they will appear on the live site, before publishing."
+  },
+  {
+    "id": "first-pages-home-published",
+    "file": "tutorials/first-pages-05-home-published.png",
+    "step": "firstPagesHomePublished",
+    "pages": ["tutorials/first-pages.md"],
+    "description": "The confirmation message after publishing the home page."
+  },
+  {
+    "id": "first-pages-add-child-page",
+    "file": "tutorials/first-pages-06-add-child-page.png",
+    "step": "firstPagesAddChildPage",
+    "pages": ["tutorials/first-pages.md"],
+    "description": "The page type chooser shown after clicking Add child page under Home."
+  },
+  {
+    "id": "first-pages-about-content",
+    "file": "tutorials/first-pages-07-about-content.png",
+    "step": "firstPagesAboutContent",
+    "pages": ["tutorials/first-pages.md"],
+    "description": "The new About page with its title and a Paragraph block filled in, saved as a draft."
+  },
+  {
+    "id": "first-pages-about-published",
+    "file": "tutorials/first-pages-08-about-published.png",
+    "step": "firstPagesAboutPublished",
+    "pages": ["tutorials/first-pages.md"],
+    "description": "The confirmation message after publishing the About page, shown on the home page's child page list."
+  },
+  {
+    "id": "first-pages-contact-form-block",
+    "file": "tutorials/first-pages-09-contact-form-block.png",
+    "step": "firstPagesContactFormBlock",
+    "pages": ["tutorials/first-pages.md"],
+    "description": "The new Contact page with a Contact Form block added and its recipient email filled in, saved as a draft."
+  },
+  {
+    "id": "first-pages-contact-live",
+    "file": "tutorials/first-pages-10-contact-live.png",
+    "step": "firstPagesContactLive",
+    "pages": ["tutorials/first-pages.md"],
+    "description": "The published Contact page on the live site, showing the contact form visitors see."
   }
 ]

@@ -23,6 +23,12 @@ const DEMO_LOGO_TITLE = "Mathematics Teachers Association logo";
 const DEMO_LOGO_FIXTURE = path.join(__dirname, "fixtures", "demo-logo.png");
 const THEME_PRIMARY_BRAND = "#7b1fa2";
 const THEME_FONT_BRAND = '"Poppins", "Helvetica Neue", sans-serif';
+const HOME_TITLE_TEXT = "Welcome to Mathematics Teachers Association";
+const HOME_TAGLINE_TEXT =
+  "Supporting maths teachers with resources, events, and a community.";
+const ABOUT_BODY_TEXT =
+  "Mathematics Teachers Association supports maths teachers across the country with resources, events, and a community forum.";
+const CONTACT_RECIPIENT_EMAIL = "hello@mathematicsteachers.example";
 
 function readEnvFile(relPath) {
   const text = fs.readFileSync(path.join(REPO_ROOT, relPath), "utf8");
@@ -43,9 +49,19 @@ const ADMIN_PASSWORD = localEnv.SAMPLE_DATA_ADMIN_PASSWORD;
 
 // django-debug-toolbar renders live query/timing stats that differ on every
 // request, which would make screenshots non-deterministic. Hide it before
-// every capture.
+// every capture. The Wagtail preview panel (first used in the Your first
+// pages tutorial) loads the public page in its own iframe, a separate
+// browsing context with its own #djDebugRoot -- page.addStyleTag() alone only
+// reaches the top-level document, so it's applied to every frame, not just
+// the main one. Found by inspecting a captured preview screenshot and seeing
+// the toolbar's panel (already expanded, not just its closed handle)
+// covering the preview content.
 async function prepareForCapture(page) {
-  await page.addStyleTag({ content: "#djDebugRoot { display: none !important; }" });
+  for (const frame of page.frames()) {
+    await frame
+      .addStyleTag({ content: "#djDebugRoot { display: none !important; }" })
+      .catch(() => {});
+  }
 }
 
 const MEDIA_LOCALHOST_ORIGIN = "http://localhost:9000";
@@ -144,6 +160,179 @@ async function uploadDemoLogo(page) {
     DEMO_LOGO_TITLE,
   );
 }
+
+// Your first pages (tutorial 3) capture steps create and edit real pages, so
+// like branding & theme's steps, they only produce correct screenshots when
+// run in manifest.json's declared order against a just-seeded site -- see
+// docs-conventions.md's "Ordering for capture steps that change site state"
+// bullet.
+
+// The English home page's ID depends on AMS_ENABLED_LANGUAGES's order (see
+// docs-conventions.md's "Screenshot content depends on AMS_ENABLED_LANGUAGES"
+// note) -- setup_cms creates one HomePage per configured language, in that
+// order, so which numeric page ID ends up English varies with the env var.
+// Resolved once per run by reading the page explorer, rather than
+// hard-coding a page ID that would silently point at the wrong (Māori) home
+// page in a differently-configured environment.
+let englishHomePageId;
+async function getEnglishHomePageId(page) {
+  if (englishHomePageId) return englishHomePageId;
+  await page.goto(`${BASE_URL}/cms/pages/1/`);
+  await page.waitForLoadState("networkidle");
+  const englishRow = page.getByRole("row").filter({ hasText: "English" });
+  const homeLink = englishRow.getByRole("link", { name: "Home", exact: true });
+  const href = await homeLink.getAttribute("href");
+  englishHomePageId = href.match(/\/pages\/(\d+)\//)[1];
+  return englishHomePageId;
+}
+
+async function openHomeEdit(page) {
+  const homeId = await getEnglishHomePageId(page);
+  await page.goto(`${BASE_URL}/cms/pages/${homeId}/edit/`);
+  await page.waitForLoadState("networkidle");
+}
+
+async function openAddChildPage(page, parentId) {
+  await page.goto(`${BASE_URL}/cms/pages/${parentId}/add_subpage/`);
+  await page.waitForLoadState("networkidle");
+}
+
+// Starts a new Content page under parentId and fills in its title. Wagtail
+// assigns the new page a real ID and switches the URL from .../add/... to
+// .../<id>/edit/ as soon as the first body block is inserted (observed
+// directly, not assumed) -- callers read that ID back off page.url() after
+// inserting a block, rather than guessing it.
+async function createContentPage(page, parentId, title) {
+  await openAddChildPage(page, parentId);
+  await page.getByRole("link", { name: "Content page", exact: true }).click();
+  await page.waitForLoadState("networkidle");
+  await page.getByRole("textbox", { name: "Title*" }).fill(title);
+}
+
+// Uses the *last* "Insert a block" button, not the first, so this works both
+// to start an empty Body (only one such button exists, first === last) and
+// to append a further block after one already inserted (e.g. a tagline
+// after a Title block) -- the first button in that second case would insert
+// *before* the existing block instead of after it.
+async function insertBodyBlock(page, blockName) {
+  await page.getByRole("button", { name: "Insert a block" }).last().click();
+  await page.getByRole("option", { name: blockName, exact: true }).click();
+}
+
+// Draftail (the rich text editor behind paragraph_block/lead_paragraph_block)
+// renders a contenteditable div whose own React state -- not just its DOM
+// text -- is what gets serialized on save. locator.fill() sets the DOM text
+// directly and looked like it worked when inspected live, but saved an empty
+// value: Draftail never saw real input events, so its internal EditorState
+// stayed empty. pressSequentially() dispatches real keystrokes instead,
+// which Draftail does pick up. Found by checking the saved page content
+// directly (it was blank) after fill() appeared to work in the browser.
+// Targets the *last* matching textbox, not the only one -- when a Title
+// block sits earlier in the same Body (its own Text field only reachable
+// while its "Title Settings" panel is expanded), the block being filled here
+// is always the most recently inserted one.
+//
+// Typing alone isn't enough, either: Draftail debounces syncing its React
+// state to the hidden `body-<n>-value[-text]` input the form actually saves
+// from, so saving immediately after typing can still race that debounce and
+// persist an empty value -- even though the typed text is already visible
+// on screen and readable back via textContent(). A fixed pause after typing
+// (tried first) was flaky: it happened to be long enough in some runs and
+// not others, especially on the home page where a Title block's extra
+// widgets add more going on before this field's own sync settles. Instead
+// of guessing a pause, wait for the actual hidden input to contain the
+// typed text -- a deterministic signal instead of a timing guess.
+async function fillBodyText(page, text) {
+  const textbox = page.getByRole("region", { name: "Body" }).getByRole("textbox").last();
+  await textbox.click();
+  await textbox.pressSequentially(text);
+  await page.waitForFunction(
+    (expected) => {
+      const inputs = document.querySelectorAll('input[type="hidden"][id^="body-"]');
+      return Array.from(inputs).some((el) => el.value && el.value.includes(expected));
+    },
+    text,
+    { timeout: 5000 },
+  );
+}
+
+// The Title block (Home page only) wraps a plain TextBlock, not Draftail --
+// fill() works correctly here (confirmed by checking the saved value), no
+// pressSequentially() needed. Its "Title Settings" sub-panel starts
+// collapsed (Meta.collapsed = True on TypographyBlock), so the Text field
+// isn't present/focusable until that panel is expanded. Assumes the Title
+// block is the first block in Body (block index 0), true whenever it's the
+// first block inserted into a fresh page -- the only way this tutorial uses
+// it.
+async function fillTitleBlockText(page, text) {
+  const panelId = "block_group-body-0-value-title-section";
+  await page.locator(`#${panelId} button[data-panel-toggle]`).click();
+  await page.locator(`#${panelId}`).getByRole("textbox", { name: "Text*" }).fill(text);
+}
+
+async function saveDraft(page) {
+  await page.getByRole("button", { name: "Save draft" }).click();
+  await page.waitForLoadState("networkidle");
+}
+
+async function publishViaMoreActions(page) {
+  await page.getByRole("button", { name: "More actions" }).click();
+  await page.getByRole("button", { name: "Publish" }).click();
+  await page.waitForLoadState("networkidle");
+}
+
+function pageIdFromEditUrl(page) {
+  return page.url().match(/\/pages\/(\d+)\/edit\/?/)[1];
+}
+
+// The Wagtail admin's CSS sets `scroll-behavior: smooth` (used for its
+// minimap anchor links), so a plain scrollIntoView() animates over several
+// hundred ms instead of jumping immediately -- a screenshot taken right
+// after would still show the pre-scroll position. Found by instrumenting a
+// capture step: two boundingBox() reads immediately before/after
+// scrollIntoView() were identical, only a real wait or an explicit instant
+// scroll fixed it. `behavior: "instant"` sidesteps the animation instead of
+// guessing a wait long enough to outlast it.
+async function scrollIntoViewInstantly(locator) {
+  await locator.evaluate((el) => el.scrollIntoView({ block: "center", behavior: "instant" }));
+}
+
+// Home's parent is Root, so publishing it lands the confirmation banner on
+// the Root explorer -- which also lists the Māori home page and Wagtail's
+// own unrelated "Welcome to your new Wagtail site!" leftover page (see
+// docs-conventions.md's AMS_ENABLED_LANGUAGES note; this is the page-tree
+// version of that same multi-language dev environment quirk). None of that
+// is meaningful to a first-time reader following the tutorial with a single
+// language, and re-navigating to a cleaner page would lose the one-time
+// flash message this screenshot exists to show. Hiding the unrelated rows
+// in place keeps the real "published" confirmation while dropping the
+// confusing detail, and is still fully scripted/regenerable (not a manual
+// annotation -- see docs-conventions.md's annotated-image exception, which
+// this isn't).
+async function hideUnrelatedRootPages(page) {
+  await page.evaluate(() => {
+    document.querySelectorAll("table tbody tr").forEach((row) => {
+      const text = row.textContent || "";
+      if (text.includes("Māori") || text.includes("Welcome to your new Wagtail site")) {
+        row.style.display = "none";
+      }
+    });
+    // Root's own explanatory callout ("The root level is where you can add
+    // new sites...") is Wagtail-internal jargon a first-time reader doesn't
+    // need and could easily misread as "your home page isn't accessible yet"
+    // -- hide its containing block same as the unrelated rows above.
+    document.querySelectorAll("p").forEach((p) => {
+      if ((p.textContent || "").includes("The root level is where")) {
+        (p.closest("div") ?? p).style.display = "none";
+      }
+    });
+  });
+}
+
+// Set by firstPagesAboutContent/firstPagesContactFormBlock for the publish
+// steps just after them in manifest.json order to read back.
+let aboutPageId;
+let contactPageId;
 
 // Capture steps, keyed by the "step" field in manifest.json. Tutorial tasks
 // (T13+) add their own steps and manifest entries here as they document
@@ -259,6 +448,141 @@ const steps = {
     await page.getByRole("button", { name: "Save" }).click();
     await page.waitForLoadState("networkidle");
     await page.locator("#panel-fonts-section").scrollIntoViewIfNeeded();
+  },
+
+  // Relies on running against a freshly-seeded site, before
+  // firstPagesHomeTitle adds content to the home page later in this same
+  // run.
+  async firstPagesHomeEditEmpty(page) {
+    await login(page);
+    await openHomeEdit(page);
+  },
+
+  // Home page content starts with a Title block -- the page's main heading.
+  // Saved on its own, separately from firstPagesHomeTagline below, not
+  // merely for narrative pacing: see that step's comment for why this
+  // actually has to be two separate saves, not one.
+  async firstPagesHomeTitle(page) {
+    await login(page);
+    await openHomeEdit(page);
+    await insertBodyBlock(page, "Title block");
+    await fillTitleBlockText(page, HOME_TITLE_TEXT);
+    await saveDraft(page);
+  },
+
+  // Adds a Lead paragraph block under the Title block as a short tagline.
+  //
+  // This has to be its own save, run against a page that already has the
+  // Title block saved from firstPagesHomeTitle -- typing the tagline in the
+  // *same* editing session as the Title block (insert Title, fill it,
+  // insert Lead paragraph, fill that, save once) intermittently saved an
+  // empty tagline, confirmed not to be the Draftail-sync race fillBodyText
+  // already guards against (see its own comment): instrumenting the hidden
+  // `body-1-value-text` input showed it briefly held the correct typed
+  // value, then reset to `null` a few hundred ms later, well before Save
+  // draft was even clicked -- something about the Title block's own widgets
+  // (its colour pickers, its autosize textarea) appears to trigger a
+  // StreamField-wide re-render that clobbers a sibling block's still-fresh,
+  // unsaved edit. Reproduced this 3 runs in a row with the single-session
+  // approach (each one failed a different way -- empty save, or the
+  // deterministic hidden-field wait timing out entirely), then reproduced
+  // *reliably* the fix of saving the Title block first and only inserting
+  // the Lead paragraph afterward, against a page where the Title block is
+  // now server-rendered/static rather than a live, still-mounting widget:
+  // 4 runs in a row, correct every time. This changed the tutorial's own
+  // step sequence to match (an extra numbered step, not just an
+  // implementation detail): saving after each block is what's actually
+  // reliable, so that's what the page now tells a real reader to do too.
+  async firstPagesHomeTagline(page) {
+    await login(page);
+    await openHomeEdit(page);
+    await insertBodyBlock(page, "Lead paragraph block");
+    await fillBodyText(page, HOME_TAGLINE_TEXT);
+    await saveDraft(page);
+    // Same floating-bar overlap as firstPagesAboutContent/
+    // firstPagesContactFormBlock below -- the Title block above it pushes
+    // this field further down the page than a single block would.
+    await scrollIntoViewInstantly(
+      page.getByRole("region", { name: "Body" }).getByRole("textbox").last(),
+    );
+  },
+
+  // Relies on firstPagesHomeTitle and firstPagesHomeTagline (the two
+  // manifest entries just before this one) having already saved the title
+  // and tagline as drafts earlier in this same run -- the edit form always
+  // loads the latest revision, draft or published, so no re-typing is
+  // needed here.
+  async firstPagesHomePreview(page) {
+    await login(page);
+    await openHomeEdit(page);
+    await page.getByRole("button", { name: "Toggle preview" }).click();
+    const frame = page.frameLocator("iframe").first();
+    await frame.getByText(HOME_TITLE_TEXT).waitFor({ state: "visible" });
+  },
+
+  async firstPagesHomePublished(page) {
+    await login(page);
+    await openHomeEdit(page);
+    await publishViaMoreActions(page);
+    await hideUnrelatedRootPages(page);
+  },
+
+  async firstPagesAddChildPage(page) {
+    await login(page);
+    const homeId = await getEnglishHomePageId(page);
+    await openAddChildPage(page, homeId);
+  },
+
+  async firstPagesAboutContent(page) {
+    await login(page);
+    const homeId = await getEnglishHomePageId(page);
+    await createContentPage(page, homeId, "About");
+    await insertBodyBlock(page, "Paragraph block");
+    await fillBodyText(page, ABOUT_BODY_TEXT);
+    await saveDraft(page);
+    aboutPageId = pageIdFromEditUrl(page);
+    // The floating Save draft/More actions bar would otherwise cover the
+    // bottom of the paragraph text -- see the same fix on
+    // firstPagesContactFormBlock below.
+    await scrollIntoViewInstantly(
+      page.getByRole("region", { name: "Body" }).getByRole("textbox"),
+    );
+  },
+
+  // Relies on firstPagesAboutContent (just before this one) having already
+  // created and saved the About page as a draft earlier in this same run.
+  async firstPagesAboutPublished(page) {
+    await login(page);
+    await page.goto(`${BASE_URL}/cms/pages/${aboutPageId}/edit/`);
+    await page.waitForLoadState("networkidle");
+    await publishViaMoreActions(page);
+  },
+
+  async firstPagesContactFormBlock(page) {
+    await login(page);
+    const homeId = await getEnglishHomePageId(page);
+    await createContentPage(page, homeId, "Contact");
+    await insertBodyBlock(page, "Contact Form");
+    const recipientField = page.getByRole("textbox", { name: "Recipient email*" });
+    await recipientField.fill(CONTACT_RECIPIENT_EMAIL);
+    await saveDraft(page);
+    contactPageId = pageIdFromEditUrl(page);
+    // The floating Save draft/More actions bar sits over the bottom of the
+    // viewport; scrollIntoViewIfNeeded() alone would land the field right
+    // behind it (nearest-edge scrolling), so centre it instead.
+    await scrollIntoViewInstantly(recipientField);
+  },
+
+  // Relies on firstPagesContactFormBlock (just before this one) having
+  // already created and saved the Contact page as a draft earlier in this
+  // same run.
+  async firstPagesContactLive(page) {
+    await login(page);
+    await page.goto(`${BASE_URL}/cms/pages/${contactPageId}/edit/`);
+    await page.waitForLoadState("networkidle");
+    await publishViaMoreActions(page);
+    await page.goto(`${BASE_URL}/en/contact/`);
+    await page.waitForLoadState("networkidle");
   },
 };
 

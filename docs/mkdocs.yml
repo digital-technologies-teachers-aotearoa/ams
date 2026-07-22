@@ -47,6 +47,7 @@ nav:
       - tutorials/orientation.md
       - tutorials/branding-theme.md
       - tutorials/first-pages.md
+      - tutorials/navigation-menus.md
   - Website administrator guide:
       - admin/index.md
       - admin/cms.md
