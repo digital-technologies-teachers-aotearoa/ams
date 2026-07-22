@@ -8,7 +8,7 @@ Work through the tutorials in order; each one builds on the last.
 1. [Orientation](orientation.md)
 2. [Make it yours: branding & theme](branding-theme.md)
 3. [Your first pages](first-pages.md)
-4. Navigation & menus
+4. [Navigation & menus](navigation-menus.md)
 5. Languages & translations
 6. Memberships
 7. Forum
@@ -16,4 +16,4 @@ Work through the tutorials in order; each one builds on the last.
 9. Inviting your team
 10. Launch checklist
 
-<!-- Tutorials 4-10 are added by later tasks in the onboarding documentation effort (see .ai/onboarding-documentation-tasks.md). -->
+<!-- Tutorials 5-10 are added by later tasks in the onboarding documentation effort (see .ai/onboarding-documentation-tasks.md). -->
