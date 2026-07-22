@@ -5,4 +5,15 @@
 This is the guided path from an empty, freshly-provisioned site to a published, branded website ready to launch.
 Work through the tutorials in order; each one builds on the last.
 
-<!-- Content for this section is added by later tasks in the onboarding documentation effort (see .ai/docs/onboarding-documentation-tasks.md). -->
+1. [Orientation](orientation.md)
+2. [Make it yours: branding & theme](branding-theme.md)
+3. Your first pages
+4. Navigation & menus
+5. Languages & translations
+6. Memberships
+7. Forum
+8. Events and resources
+9. Inviting your team
+10. Launch checklist
+
+<!-- Tutorials 3-10 are added by later tasks in the onboarding documentation effort (see .ai/onboarding-documentation-tasks.md). -->

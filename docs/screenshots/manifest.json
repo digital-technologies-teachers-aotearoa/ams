@@ -12,5 +12,33 @@
     "step": "exampleDashboard",
     "pages": ["developer/docs-conventions.md"],
     "description": "The Wagtail CMS dashboard immediately after signing in as the sample admin account, captured by the example pipeline step."
+  },
+  {
+    "id": "orientation-sign-in",
+    "file": "tutorials/orientation-01-sign-in.png",
+    "step": "orientationSignIn",
+    "pages": ["tutorials/orientation.md"],
+    "description": "The AMS sign-in page, before entering any credentials."
+  },
+  {
+    "id": "orientation-your-account",
+    "file": "tutorials/orientation-02-your-account.png",
+    "step": "orientationYourAccount",
+    "pages": ["tutorials/orientation.md"],
+    "description": "The page you land on immediately after signing in, showing the Staff links section with the Website Admin and Wagtail CMS buttons."
+  },
+  {
+    "id": "orientation-cms-dashboard",
+    "file": "tutorials/orientation-03-cms-dashboard.png",
+    "step": "orientationCmsDashboard",
+    "pages": ["tutorials/orientation.md"],
+    "description": "The Wagtail CMS dashboard, reached via the Wagtail CMS button."
+  },
+  {
+    "id": "orientation-django-admin",
+    "file": "tutorials/orientation-04-django-admin.png",
+    "step": "orientationDjangoAdmin",
+    "pages": ["tutorials/orientation.md"],
+    "description": "The Django admin index, reached via the Website Admin button."
   }
 ]

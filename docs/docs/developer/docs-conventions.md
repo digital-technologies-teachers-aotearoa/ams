@@ -48,6 +48,10 @@ Developer docs may omit this header (audience is implicit: developers) unless th
   Markdown joins consecutive lines within a paragraph into one flowing line when rendered, so this is a source-only convention — it does not change how a page displays.
   Applies to prose paragraphs and list-item text across all documentation pages, including client-facing, provider, and developer pages; tables and code blocks are exempt (there's no useful "sentence" to split them by).
   A list item with more than one sentence continues on the next line, indented to align under the item's text, rather than starting a new list item.
+- **Numbered list continuations use a fixed 4-space indent, not marker-width alignment.** Python-Markdown (which MkDocs uses) requires exactly 4 spaces for a list item's continuation content — a 3-space indent (visually aligned under `1. `) silently breaks the item out of the list, and if that happens right before a blank line and the next marker, each item renders as its own separate list restarting at "1." instead of one continuous list.
+  Found in T13 (`tutorials/orientation.md`), where a step's continuation sentence *and* its screenshot both need to stay inside the same list item.
+  Confirmed by testing directly against this project's Python-Markdown: a 3-space indent split a two-item list into two separate `<ol>` elements; a 4-space indent kept both items in one list with correct loose-list `<li><p>...</p></li>` structure.
+  This matters most for the tutorial series (T13–T22), where every numbered step has a screenshot on its own indented, blank-line-separated line below the step text.
 
 ## Style rules for client-facing pages
 
@@ -85,6 +89,18 @@ Provider guide pages use the opposite register deliberately: terse, technical, n
    - is named with an `-annotated` suffix, e.g. `branding-theme-03-colour-picker-annotated.png`;
    - is recorded in the T02 manifest with a note of which base image it annotates and what tool/steps produced the annotation, so a future contributor can redo it after a UI change;
    - prefer a plain caption over an annotation whenever the caption alone resolves the ambiguity.
+
+## Tutorial series page template
+
+Established by T13 (`tutorials/orientation.md`), binding on every later page in the "Building your website" series (T14–T22).
+
+- **Structure:** "Who this page is for" header, then a short "What you'll have at the end" intro stating concrete outcomes, then an optional "Before you start" section for prerequisites, then a numbered **Steps** list (one action per step, one screenshot per step showing the result of that step), then any reference material the task's own guidance calls for (e.g. a table distinguishing several parts of the system), then a "What's next" footer linking to the following tutorial.
+- **Screenshot reuse within a page:** if a step's result is "you're back on a page already screenshotted earlier on the same page" (for example, returning from the CMS to your account page), reuse that screenshot's file rather than capturing a near-duplicate.
+  It's still one manifest entry; the page just embeds it twice.
+- **Forward-chaining stubs:** each tutorial task creates a minimal stub for the *next* tutorial in the series (same pattern T01/T05 used for forward references), so its own "What's next" link resolves under the strict build.
+  The next task then replaces that stub in place, same filename, rather than renaming the file or re-editing the nav.
+- **Series index:** `tutorials/index.md` keeps a numbered list of all ten tutorials.
+  Only the tutorials that exist so far are links; the rest stay as plain text until their task lands.
 
 ## Diagrams
 
