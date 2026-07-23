@@ -173,5 +173,103 @@
     "step": "firstPagesContactLive",
     "pages": ["tutorials/first-pages.md"],
     "description": "The published Contact page on the live site, showing the contact form visitors see."
+  },
+  {
+    "id": "navigation-main-menu-empty",
+    "file": "tutorials/navigation-menus-01-main-menu-empty.png",
+    "step": "navigationMainMenuEmpty",
+    "pages": ["tutorials/navigation-menus.md"],
+    "description": "The Main menu editor for the English site, before any menu items have been added."
+  },
+  {
+    "id": "navigation-about-item-added",
+    "file": "tutorials/navigation-menus-02-about-item-added.png",
+    "step": "navigationAboutItemAdded",
+    "pages": ["tutorials/navigation-menus.md"],
+    "description": "A menu item linked to the About page, chosen but not yet saved."
+  },
+  {
+    "id": "navigation-contact-item-added",
+    "file": "tutorials/navigation-menus-03-contact-item-added.png",
+    "step": "navigationContactItemAdded",
+    "pages": ["tutorials/navigation-menus.md"],
+    "description": "Both the About and Contact menu items filled in, not yet saved."
+  },
+  {
+    "id": "navigation-items-saved",
+    "file": "tutorials/navigation-menus-04-items-saved.png",
+    "step": "navigationItemsSaved",
+    "pages": ["tutorials/navigation-menus.md"],
+    "description": "The confirmation message after saving the menu with About and Contact added."
+  },
+  {
+    "id": "navigation-menu-live",
+    "file": "tutorials/navigation-menus-05-menu-live.png",
+    "step": "navigationMenuLive",
+    "pages": ["tutorials/navigation-menus.md"],
+    "description": "The public site showing About and Contact in the navigation menu."
+  },
+  {
+    "id": "navigation-about-child-added",
+    "file": "tutorials/navigation-menus-06-about-child-added.png",
+    "step": "navigationAboutChildAdded",
+    "pages": ["tutorials/navigation-menus.md"],
+    "description": "The confirmation message after publishing a new \"Our story\" page under About, shown on About's own child page list."
+  },
+  {
+    "id": "navigation-dropdown-live",
+    "file": "tutorials/navigation-menus-07-dropdown-live.png",
+    "step": "navigationDropdownLive",
+    "pages": ["tutorials/navigation-menus.md"],
+    "description": "The public site with the About menu item expanded, showing Our story as a dropdown item, added automatically because About now has a published child page."
+  },
+  {
+    "id": "navigation-reorder-saved",
+    "file": "tutorials/navigation-menus-08-reorder-saved.png",
+    "step": "navigationReorderSaved",
+    "pages": ["tutorials/navigation-menus.md"],
+    "description": "The confirmation message after moving Contact above About in the menu editor and saving."
+  },
+  {
+    "id": "footer-flat-menu-empty",
+    "file": "tutorials/navigation-menus-09-footer-flat-menu-empty.png",
+    "step": "footerFlatMenuEmpty",
+    "pages": ["tutorials/navigation-menus.md"],
+    "description": "The empty Add flat menu form."
+  },
+  {
+    "id": "footer-flat-menu-filled",
+    "file": "tutorials/navigation-menus-10-footer-flat-menu-filled.png",
+    "step": "footerFlatMenuFilled",
+    "pages": ["tutorials/navigation-menus.md"],
+    "description": "The Add flat menu form filled in with a title, site, handle, and heading, not yet saved."
+  },
+  {
+    "id": "footer-internal-item",
+    "file": "tutorials/navigation-menus-11-footer-internal-item.png",
+    "step": "footerInternalItemAdded",
+    "pages": ["tutorials/navigation-menus.md"],
+    "description": "A footer menu item linked to the About page, not yet saved."
+  },
+  {
+    "id": "footer-external-item",
+    "file": "tutorials/navigation-menus-12-footer-external-item.png",
+    "step": "footerExternalItemAdded",
+    "pages": ["tutorials/navigation-menus.md"],
+    "description": "A footer menu item linking to an external website via a custom URL and custom link text, not yet saved."
+  },
+  {
+    "id": "footer-column-saved",
+    "file": "tutorials/navigation-menus-13-footer-column-saved.png",
+    "step": "footerColumn1Saved",
+    "pages": ["tutorials/navigation-menus.md"],
+    "description": "The confirmation message after saving the footer column, listed among the site's flat menus."
+  },
+  {
+    "id": "footer-live",
+    "file": "tutorials/navigation-menus-14-footer-live.png",
+    "step": "footerLive",
+    "pages": ["tutorials/navigation-menus.md"],
+    "description": "The public site's footer showing two independently named columns, each with its own heading and links."
   }
 ]

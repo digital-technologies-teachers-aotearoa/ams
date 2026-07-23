@@ -48,6 +48,7 @@ nav:
       - tutorials/branding-theme.md
       - tutorials/first-pages.md
       - tutorials/navigation-menus.md
+      - tutorials/languages-translations.md
   - Website administrator guide:
       - admin/index.md
       - admin/cms.md
