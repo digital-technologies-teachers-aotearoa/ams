@@ -271,5 +271,54 @@
     "step": "footerLive",
     "pages": ["tutorials/navigation-menus.md"],
     "description": "The public site's footer showing two independently named columns, each with its own heading and links."
+  },
+  {
+    "id": "languages-switcher-open",
+    "file": "tutorials/languages-translations-01-switcher-open.png",
+    "step": "languagesSwitcherOpen",
+    "pages": ["tutorials/languages-translations.md"],
+    "description": "The public site's language switcher open, as seen by a signed-out visitor, listing Te Reo Māori and English."
+  },
+  {
+    "id": "languages-maori-home-empty",
+    "file": "tutorials/languages-translations-02-maori-home-empty.png",
+    "step": "languagesMaoriHomeEmpty",
+    "pages": ["tutorials/languages-translations.md"],
+    "description": "The Te Reo Māori home page, reached via the language switcher, still empty because no content has been added to it yet."
+  },
+  {
+    "id": "languages-pages-root",
+    "file": "tutorials/languages-translations-03-pages-root.png",
+    "step": "languagesPagesRoot",
+    "pages": ["tutorials/languages-translations.md"],
+    "description": "The Pages explorer at the root level, showing a separate Home page for each enabled language."
+  },
+  {
+    "id": "languages-maori-about-chooser",
+    "file": "tutorials/languages-translations-04-add-child-chooser.png",
+    "step": "languagesMaoriAboutChooser",
+    "pages": ["tutorials/languages-translations.md"],
+    "description": "The page type chooser shown after clicking Add child page under the Te Reo Māori Home."
+  },
+  {
+    "id": "languages-maori-about-content-slug",
+    "file": "tutorials/languages-translations-05-about-content-slug.png",
+    "step": "languagesMaoriAboutContentSlug",
+    "pages": ["tutorials/languages-translations.md"],
+    "description": "The new Māori About page's Promote tab, with its title and content already filled in and its slug corrected to match the English About page's web address."
+  },
+  {
+    "id": "languages-maori-about-published",
+    "file": "tutorials/languages-translations-06-about-published.png",
+    "step": "languagesMaoriAboutPublished",
+    "pages": ["tutorials/languages-translations.md"],
+    "description": "The confirmation message after publishing the Māori About page."
+  },
+  {
+    "id": "languages-switch-round-trip",
+    "file": "tutorials/languages-translations-07-switch-round-trip.png",
+    "step": "languagesSwitchRoundTrip",
+    "pages": ["tutorials/languages-translations.md"],
+    "description": "The Māori About page, reached directly from the English About page by clicking the language switcher, proving the two matching web addresses line up."
   }
 ]
