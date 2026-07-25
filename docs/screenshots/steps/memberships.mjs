@@ -4,12 +4,14 @@
 // and application only exist once earlier steps in manifest.json's order
 // have created them in this run.
 
-import { BASE_URL, MAILPIT_ORIGIN, VIEWPORT } from "../shared/config.mjs";
+import { BASE_URL } from "../shared/config.mjs";
 import {
   login,
   saveAdminForm,
   saveAdminFormContinueEditing,
   scrollIntoViewInstantly,
+  clearMailpit,
+  screenshotMailpitEmail,
 } from "../shared/browser-helpers.mjs";
 
 const MEMBERSHIP_OPTION_NAME = "Standard membership";
@@ -61,53 +63,6 @@ async function selectFirstMembershipOption(page) {
 async function registerMembership(page) {
   await page.getByRole("button", { name: "Register membership" }).click();
   await page.waitForLoadState("networkidle");
-}
-
-// Deletes every message Mailpit is currently holding via its HTTP API, called
-// from the script's own Node process (not the browser) -- this doesn't need
-// a page open, just a network call from inside the same node container,
-// which can already reach every other compose service by name.
-async function clearMailpit() {
-  await fetch(`${MAILPIT_ORIGIN}/api/v1/messages`, { method: "DELETE" });
-}
-
-// Finds the ID of the one message from a given sender address, via Mailpit's
-// own HTTP API (not the browser) -- used to open a specific message directly
-// by its /view/<id> URL rather than picking through the inbox list on
-// screen. Assumes clearMailpit() ran earlier in this same step, so exactly
-// the messages a single action produced are present.
-async function getMailpitMessageIdByFrom(fromAddress) {
-  const res = await fetch(`${MAILPIT_ORIGIN}/api/v1/messages`);
-  const data = await res.json();
-  const match = data.messages.find((m) => m.From?.Address === fromAddress);
-  return match ? match.ID : null;
-}
-
-// Finds how far down an iframe's real (non-whitespace) text content extends,
-// in the iframe's own local coordinate space. Mailpit's #preview-html iframe
-// (the email's rendered HTML) is forced to a fixed height regardless of the
-// actual email's length -- MJML-generated emails set html/body to fill their
-// container for consistent background colour across email clients, so the
-// iframe's own scrollHeight is *not* a usable signal for where the visible
-// content actually ends. Walking every text node and taking the lowest one's
-// bounding rect finds the real answer regardless of surrounding layout
-// wrappers or background-only filler elements.
-async function getIframeContentBottom(page, iframeSelector) {
-  return await page.evaluate((sel) => {
-    const el = document.querySelector(sel);
-    const doc = el.contentDocument;
-    const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT);
-    let node;
-    let maxBottom = 0;
-    while ((node = walker.nextNode())) {
-      if (!node.textContent.trim()) continue;
-      const range = doc.createRange();
-      range.selectNodeContents(node);
-      const rect = range.getBoundingClientRect();
-      if (rect.bottom > maxBottom) maxBottom = rect.bottom;
-    }
-    return maxBottom;
-  }, iframeSelector);
 }
 
 // This run's only Membership: Individual record, so the single result row's
@@ -178,55 +133,11 @@ export const steps = {
 
   // Relies on membershipsSignupSubmitted having already cleared Mailpit and
   // triggered exactly two emails earlier in this same run -- this step only
-  // views the result, it doesn't send anything itself.
-  //
-  // Screenshots just the rendered email itself (the #preview-html iframe's
-  // real content), not the surrounding Mailpit inbox/tabs/sidebar chrome --
-  // a client reader only ever needs to know what the *email* looks like, and
-  // Mailpit's own UI (a local-dev-only tool that doesn't exist on their live
-  // site) would otherwise be the most visually prominent thing in the image.
-  // Returning true tells main() this step already wrote its own screenshot,
-  // skipping the usual whole-viewport capture.
-  //
-  // A plain `locator.screenshot()` on the iframe (tried first) produced two
-  // visible problems: a 1-2px dark line along the very top edge, and a large
-  // blank gap at the bottom. Both come from the same cause -- the iframe
-  // element's own box is a fixed 919px tall regardless of the email's actual
-  // length (Mailpit/MJML fill it for background-colour consistency), so an
-  // automatic element screenshot clips to that fixed box: its top edge lands
-  // exactly on the boundary with Mailpit's tab bar above it (a fractional
-  // clip coordinate rounds the wrong way and grabs a sliver of the tab bar's
-  // dark border), and its bottom extends ~80px past the email's real last
-  // line of text into empty filler space. Taking an explicit `page.screenshot`
-  // with a manually computed `clip` fixes both: starting 2px below the
-  // iframe's own top (skips the tab-bar sliver) and ending just below the
-  // real content's lowest text (found via `getIframeContentBottom`, not the
-  // iframe's own height) plus a little breathing room.
-  //
-  // This needs a taller viewport than the suite's usual 1280x800 -- the
-  // clip region this produces is taller than 800px, and Chromium silently
-  // truncates a `clip` that extends past the page's current viewport rather
-  // than rendering past it. Only this page instance's viewport changes
-  // (each capture step gets its own fresh page in main()'s loop), so this
-  // doesn't affect any other screenshot's fixed-viewport determinism.
+  // views the result, it doesn't send anything itself. Returning true tells
+  // main() this step already wrote its own screenshot (via
+  // screenshotMailpitEmail), skipping the usual whole-viewport capture.
   async membershipsStaffNotification(page, outPath) {
-    await page.setViewportSize({ width: VIEWPORT.width, height: 1600 });
-    const messageId = await getMailpitMessageIdByFrom("webmaster@localhost");
-    await page.goto(`${MAILPIT_ORIGIN}/view/${messageId}`);
-    await page.waitForLoadState("networkidle");
-    const box = await page.locator("#preview-html").boundingBox();
-    const contentBottom = await getIframeContentBottom(page, "#preview-html");
-    const TOP_INSET = 2;
-    const BOTTOM_PADDING = 24;
-    await page.screenshot({
-      path: outPath,
-      clip: {
-        x: box.x,
-        y: box.y + TOP_INSET,
-        width: box.width,
-        height: Math.min(contentBottom - TOP_INSET + BOTTOM_PADDING, box.height - TOP_INSET),
-      },
-    });
+    await screenshotMailpitEmail(page, outPath, "webmaster@localhost");
     return true;
   },
 };

@@ -488,5 +488,40 @@
     "step": "resourcesDetail",
     "pages": ["tutorials/resources.md"],
     "description": "The resource's own public page, showing its description, component, and author."
+  },
+  {
+    "id": "inviting-form-empty",
+    "file": "tutorials/inviting-01-form-empty.png",
+    "step": "invitingFormEmpty",
+    "pages": ["tutorials/inviting-your-team.md"],
+    "description": "The empty Add user form in the Django admin."
+  },
+  {
+    "id": "inviting-user-created",
+    "file": "tutorials/inviting-02-user-created.png",
+    "step": "invitingUserCreated",
+    "pages": ["tutorials/inviting-your-team.md"],
+    "description": "The new user's Change user page, reached automatically after saving the Add user form."
+  },
+  {
+    "id": "inviting-permissions-saved",
+    "file": "tutorials/inviting-03-permissions-saved.png",
+    "step": "invitingPermissionsSaved",
+    "pages": ["tutorials/inviting-your-team.md"],
+    "description": "The Permissions fieldset after ticking Staff status and adding Editors under Groups, then saving."
+  },
+  {
+    "id": "inviting-confirmation-email",
+    "file": "tutorials/inviting-04-confirmation-email.png",
+    "step": "invitingConfirmationEmail",
+    "pages": ["tutorials/inviting-your-team.md"],
+    "description": "The confirmation email a new team member receives before they can sign in."
+  },
+  {
+    "id": "inviting-staff-links",
+    "file": "tutorials/inviting-05-staff-links.png",
+    "step": "invitingStaffLinks",
+    "pages": ["tutorials/inviting-your-team.md"],
+    "description": "The new team member's own account page, showing the Staff links they now have access to."
   }
 ]

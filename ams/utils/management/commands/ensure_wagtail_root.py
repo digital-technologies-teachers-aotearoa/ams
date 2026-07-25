@@ -98,6 +98,25 @@ class Command(management.base.BaseCommand):
                     page=root,
                     permission=page_permissions[codename],
                 )
+
+            # Mirrors wagtail.admin's own 0001_create_admin_access_permissions
+            # migration, which assigns this permission to Moderators/Editors
+            # by name. That migration doesn't rerun on `flush` (Django only
+            # replays data migrations on a real `migrate`), so without this,
+            # a flushed-and-recovered dev database leaves both groups unable
+            # to sign in to /cms/ at all -- unlike every real, migrated site.
+            wagtailadmin_content_type, _ = ContentType.objects.get_or_create(
+                app_label="wagtailadmin",
+                model="admin",
+            )
+            access_admin_permission, _ = Permission.objects.get_or_create(
+                content_type=wagtailadmin_content_type,
+                codename="access_admin",
+                defaults={"name": "Can access Wagtail admin"},
+            )
+            moderators_group.permissions.add(access_admin_permission)
+            editors_group.permissions.add(access_admin_permission)
+
             self.stdout.write("✅ Root page created.\n")
 
         if Collection.objects.filter(depth=1).exists():
