@@ -13,8 +13,8 @@ Work through the tutorials in order; each one builds on the last.
 6. [Memberships](memberships.md)
 7. [Forum](forum.md)
 8. [Events](events.md)
-9. Resources
-10. Inviting your team
+9. [Resources](resources.md)
+10. [Inviting your team](inviting-your-team.md)
 11. Launch checklist
 
-<!-- Tutorials 9-11 are added by later tasks in the onboarding documentation effort (see .ai/onboarding-documentation-tasks.md). -->
+<!-- Tutorial 11 is added by a later task in the onboarding documentation effort (see .ai/onboarding-documentation-tasks.md). -->

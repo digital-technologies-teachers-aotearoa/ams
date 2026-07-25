@@ -453,5 +453,40 @@
     "step": "eventsEventDetail",
     "pages": ["tutorials/events.md"],
     "description": "The event's own public page, showing its details and the Register to attend event button."
+  },
+  {
+    "id": "resources-form-empty",
+    "file": "tutorials/resources-01-form-empty.png",
+    "step": "resourcesFormEmpty",
+    "pages": ["tutorials/resources.md"],
+    "description": "The empty Add resource form."
+  },
+  {
+    "id": "resources-form-saved",
+    "file": "tutorials/resources-02-form-saved.png",
+    "step": "resourcesFormSaved",
+    "pages": ["tutorials/resources.md"],
+    "description": "The new resource listed after saving, showing Published: False."
+  },
+  {
+    "id": "resources-published",
+    "file": "tutorials/resources-03-published.png",
+    "step": "resourcesPublished",
+    "pages": ["tutorials/resources.md"],
+    "description": "The resource's admin record after checking Published and saving."
+  },
+  {
+    "id": "resources-live",
+    "file": "tutorials/resources-04-live.png",
+    "step": "resourcesLive",
+    "pages": ["tutorials/resources.md"],
+    "description": "The public resources page, showing the published resource listed."
+  },
+  {
+    "id": "resources-detail",
+    "file": "tutorials/resources-05-detail.png",
+    "step": "resourcesDetail",
+    "pages": ["tutorials/resources.md"],
+    "description": "The resource's own public page, showing its description, component, and author."
   }
 ]
