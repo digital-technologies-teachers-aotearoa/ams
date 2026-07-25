@@ -369,5 +369,40 @@
     "step": "membershipsStaffNotification",
     "pages": ["tutorials/memberships.md"],
     "description": "The rendered HTML content of the staff notification email sent when the application was submitted."
+  },
+  {
+    "id": "forum-sign-in-prompt",
+    "file": "tutorials/forum-01-sign-in-prompt.png",
+    "step": "forumSignInPrompt",
+    "pages": ["tutorials/forum.md"],
+    "description": "The AMS sign-in page, reached by visiting the forum's own address before signing in to the website."
+  },
+  {
+    "id": "forum-home",
+    "file": "tutorials/forum-02-home.png",
+    "step": "forumHome",
+    "pages": ["tutorials/forum.md"],
+    "description": "The forum's home page, signed in as the site admin, with the Admin link visible in the sidebar."
+  },
+  {
+    "id": "forum-categories",
+    "file": "tutorials/forum-03-categories.png",
+    "step": "forumCategories",
+    "pages": ["tutorials/forum.md"],
+    "description": "The forum's Categories page, showing the three starter categories: General, Site Feedback, and Staff."
+  },
+  {
+    "id": "forum-new-category-form",
+    "file": "tutorials/forum-04-new-category-form.png",
+    "step": "forumNewCategoryForm",
+    "pages": ["tutorials/forum.md"],
+    "description": "The empty New category form, not submitted."
+  },
+  {
+    "id": "forum-membership-required",
+    "file": "tutorials/forum-05-membership-required.png",
+    "step": "forumMembershipRequired",
+    "pages": ["tutorials/forum.md"],
+    "description": "A member's account page, showing the \"you must have an active membership\" message after trying to visit the forum without one."
   }
 ]
