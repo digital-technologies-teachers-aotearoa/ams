@@ -45,6 +45,9 @@ const MEMBERSHIP_OPTION_DURATION_NUM = "1";
 const MEMBERSHIP_OPTION_COST = "40";
 const MEMBERSHIP_OPTION_INVOICE_REFERENCE = "MTA Membership";
 const MAILPIT_ORIGIN = "http://mailpit:8025";
+const NO_MEMBERSHIP_USER_EMAIL = "demo.member@ams-demo.test";
+const NO_MEMBERSHIP_USER_PASSWORD = "Demo-Member-Forum-26";
+const NO_MEMBERSHIP_USER_USERNAME = "demo_member";
 
 function readEnvFile(relPath) {
   const text = fs.readFileSync(path.join(REPO_ROOT, relPath), "utf8");
@@ -62,6 +65,11 @@ function readEnvFile(relPath) {
 const localEnv = readEnvFile(".envs/.local/django.ini");
 const ADMIN_EMAIL = localEnv.SAMPLE_DATA_ADMIN_EMAIL;
 const ADMIN_PASSWORD = localEnv.SAMPLE_DATA_ADMIN_PASSWORD;
+// Forum tutorial (T19) needs the same address AMS itself redirects to for its
+// `/forum/` SSO entry point, not a value made up separately -- reads the same
+// env var `ams/forum/views.py` reads (`settings.DISCOURSE_REDIRECT_DOMAIN`),
+// so this can't drift from what a capture step actually gets redirected to.
+const DISCOURSE_ORIGIN = localEnv.DISCOURSE_REDIRECT_DOMAIN;
 
 // django-debug-toolbar renders live query/timing stats that differ on every
 // request, which would make screenshots non-deterministic. Hide it before
@@ -95,6 +103,39 @@ async function prepareForCapture(page) {
       })
       .catch(() => {});
   }
+  await prepareForumCapture(page);
+}
+
+// Discourse (the forum, T19) carries its own per-account, history-dependent
+// chrome that AMS's own #djDebugRoot-style hiding doesn't touch: an unread-
+// notification bell badge, an unread dot next to "Topics" in the sidebar, a
+// "New (N)" count in the top tab strip, and a personalised "Welcome back,
+// <username>!"/"Welcome, <username>!" banner that differs depending on
+// whether this SSO account has ever signed in to the forum before. None of
+// these are reset by seed.sh -- Discourse has its own database, entirely
+// separate from Django's, and seed.sh only flushes Django's. Left alone, a
+// screenshot's exact pixels would depend on how many times *any* previous
+// pipeline run (on this machine, potentially over the project's whole
+// lifetime) happened to sign this account into the forum, not just on
+// today's seeded state -- the same "remove the nondeterministic chrome
+// element" fix already used for #djDebugRoot above, applied to Discourse's
+// own volatile elements instead. Harmless no-op on every non-Discourse page,
+// since none of these selectors exist there.
+async function prepareForumCapture(page) {
+  await page
+    .evaluate(() => {
+      document
+        .querySelectorAll(
+          ".badge-notification.unread-notifications, .sidebar-section-link-suffix.icon.unread, .welcome-banner__title",
+        )
+        .forEach((el) => el.remove());
+      document
+        .querySelectorAll("#navigation-bar .nav-item_new a, #navigation-bar .nav-item_unread a")
+        .forEach((a) => {
+          a.textContent = a.textContent.replace(/\(\d+\)/, "").trim();
+        });
+    })
+    .catch(() => {});
 }
 
 const MEDIA_LOCALHOST_ORIGIN = "http://localhost:9000";
@@ -118,11 +159,64 @@ async function proxyMinioMedia(page) {
   });
 }
 
-async function login(page) {
+// Same class of problem as MEDIA_LOCALHOST_ORIGIN above, for the forum
+// (T19): DISCOURSE_ORIGIN (read from DISCOURSE_REDIRECT_DOMAIN, http://
+// localhost with no port -- i.e. port 80) is correct for a browser on the
+// host machine, but the `node` container's own "localhost" is the `node`
+// container itself, where nothing listens on port 80.
+//
+// A page.route()-based proxy (the same pattern proxyMinioMedia uses) was
+// tried first and rejected after real testing, not by inspection: Discourse's
+// SSO flow is a multi-hop redirect chain that crosses back and forth between
+// this origin and AMS's own (localhost:3000, already reachable), and two
+// separate problems showed up live. First, route.fetch()'s own automatic
+// redirect-following resolves each hop's literal (unreachable) Location
+// header itself, bypassing page.route() entirely for that hop -- setting
+// `maxRedirects: 0` and re-fulfilling each hop by hand avoided that, but
+// second, fulfilling a request with content actually fetched from a
+// *different* origin (e.g. serving AMS's login page under a URL the browser
+// still believes is `http://localhost`) breaks that page's own relative
+// asset URLs, which resolve against the URL the browser is on, not the
+// origin the content actually came from -- confirmed live by seeing the
+// login page render with no CSS, all its static assets 404ing.
+//
+// The fix that actually works, with none of that complexity: Chromium's own
+// `--host-resolver-rules` launch flag, which remaps a hostname:port at the
+// browser's network layer itself, before any request is even made -- so
+// every request the browser makes to `localhost:80` (the initial navigation,
+// every background request Discourse's own Ember app makes back to its own
+// origin as it runs, everything) transparently reaches the `discourse`
+// container instead, indistinguishably from actually being on that origin.
+// No interception, no content fulfillment across origins, so no broken
+// asset resolution -- confirmed live, complete with correct CSS/JS loading.
+// Set once on the single `chromium.launch()` call in main(), covering every
+// step's page for the whole run; harmless for every non-forum step, which
+// never requests `localhost:80` at all.
+const CHROMIUM_ARGS = ["--host-resolver-rules=MAP localhost:80 discourse:80"];
+
+async function loginAs(page, email, password) {
   await page.goto(`${BASE_URL}/en/accounts/login/`);
-  await page.fill("#id_login", ADMIN_EMAIL);
-  await page.fill("#id_password", ADMIN_PASSWORD);
+  await page.fill("#id_login", email);
+  await page.fill("#id_password", password);
   await page.click("button[type=submit], input[type=submit]");
+  await page.waitForLoadState("networkidle");
+}
+
+async function login(page) {
+  await loginAs(page, ADMIN_EMAIL, ADMIN_PASSWORD);
+}
+
+// Forum tutorial (T19) needs a second signed-in identity mid-step, to show
+// what a member *without* an active membership sees -- the admin account
+// used everywhere else in this suite can't demonstrate that, since
+// user_has_active_membership() (docs-conventions.md bullet 21) returns True
+// for any superuser regardless of its own membership rows. Confirms sign-out
+// actually happened by waiting for the Sign In link to reappear, rather than
+// just clicking and moving on -- allauth's logout is a confirm-then-POST
+// flow, not a single click.
+async function logout(page) {
+  await page.goto(`${BASE_URL}/en/accounts/logout/`);
+  await page.getByRole("button", { name: "Sign Out" }).click();
   await page.waitForLoadState("networkidle");
 }
 
@@ -674,6 +768,67 @@ async function approveViaTodayNow(page) {
 // Pending to Active in place, rather than navigating away to prove it.
 async function saveAdminFormContinueEditing(page) {
   await page.getByRole("button", { name: "Save and continue editing" }).click();
+  await page.waitForLoadState("networkidle");
+}
+
+// Forum (tutorial 7). Discourse itself is not reset by seed.sh -- it has its
+// own database, entirely separate from Django's, so category/topic content
+// created here would persist (and, if steps posted anything, accumulate)
+// across every future run of this suite forever. Every forum step below is
+// deliberately read-only on the Discourse side (view categories, view the
+// empty New category form without submitting it) for exactly that reason --
+// see docs-conventions.md's "Discourse baseline" note under "How to
+// regenerate screenshots" for the resulting assumption this suite makes
+// about Discourse's starting state.
+
+// Carries an already-logged-in-to-AMS page through the same `/forum/`
+// SSO entry point a real "visit your forum" link would use, landing on
+// Discourse's own home page signed in as that AMS account.
+// Waits for "load", not this suite's usual "networkidle" -- confirmed live
+// that Discourse's own Ember app keeps a background connection open (for
+// live update polling) that never goes idle, so "networkidle" reliably timed
+// out here even once the page had genuinely finished rendering.
+async function loginToForum(page) {
+  await page.goto(`${BASE_URL}/forum/`);
+  await page.waitForLoadState("load");
+}
+
+// Creates a second AMS account with no membership at all, for the "member
+// without an active membership" screenshot -- the admin account used
+// throughout the rest of this suite can't demonstrate that gate (see the
+// comment on logout() above). Built entirely through Django admin forms
+// (Add user, then Add email address) rather than the public signup form:
+// this tutorial isn't teaching account signup, only what the forum's own
+// membership gate looks like, and ACCOUNT_EMAIL_VERIFICATION="mandatory"
+// means a real signup would need its own confirmation-email/Mailpit
+// round trip for no benefit here. Django's UserAdmin.response_add() always
+// redirects to the new user's own change page after saving (a Django
+// default specific to UserAdmin, unlike every other ModelAdmin), which is
+// what lets this read the new user's id straight back off the URL.
+async function createNoMembershipUser(page) {
+  await page.goto(`${BASE_URL}/admin/users/user/add/`);
+  await page.waitForLoadState("networkidle");
+  await page.getByRole("textbox", { name: "Email address:" }).fill(NO_MEMBERSHIP_USER_EMAIL);
+  await page
+    .getByRole("textbox", { name: "Password:", exact: true })
+    .fill(NO_MEMBERSHIP_USER_PASSWORD);
+  await page
+    .getByRole("textbox", { name: "Password confirmation:" })
+    .fill(NO_MEMBERSHIP_USER_PASSWORD);
+  await page.getByRole("textbox", { name: "First name:" }).fill("Demo");
+  await page.getByRole("textbox", { name: "Last name:" }).fill("Member");
+  await page.getByRole("textbox", { name: "Username:" }).fill(NO_MEMBERSHIP_USER_USERNAME);
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  await page.waitForLoadState("networkidle");
+  const userId = page.url().match(/\/user\/(\d+)\/change\//)[1];
+
+  await page.goto(`${BASE_URL}/admin/account/emailaddress/add/`);
+  await page.waitForLoadState("networkidle");
+  await page.getByRole("textbox", { name: "User:" }).fill(userId);
+  await page.getByRole("textbox", { name: "Email address:" }).fill(NO_MEMBERSHIP_USER_EMAIL);
+  await page.getByRole("checkbox", { name: "Verified" }).check();
+  await page.getByRole("checkbox", { name: "Primary" }).check();
+  await page.getByRole("button", { name: "Save", exact: true }).click();
   await page.waitForLoadState("networkidle");
 }
 
@@ -1268,6 +1423,52 @@ const steps = {
     });
     return true;
   },
+
+  // Forum (tutorial 7). Deliberately does not call login() -- the same
+  // "no explicit logout needed, browser.newPage() is already signed out"
+  // pattern bullet 19 established, and the point of this specific step is
+  // what an unauthenticated visit to the forum actually does (redirects
+  // into AMS's own sign-in page).
+  async forumSignInPrompt(page) {
+    await page.goto(`${BASE_URL}/forum/`);
+    await page.waitForLoadState("networkidle");
+  },
+
+  async forumHome(page) {
+    await login(page);
+    await loginToForum(page);
+  },
+
+  async forumCategories(page) {
+    await login(page);
+    await loginToForum(page);
+    await page.goto(`${DISCOURSE_ORIGIN}/categories`);
+    await page.waitForLoadState("load");
+  },
+
+  // Read-only: opens the New category form but never submits it, so this
+  // step never adds to Discourse's own persisted category list -- see the
+  // "Forum" comment above the helpers this relies on.
+  async forumNewCategoryForm(page) {
+    await login(page);
+    await loginToForum(page);
+    await page.goto(`${DISCOURSE_ORIGIN}/new-category`);
+    await page.waitForLoadState("load");
+  },
+
+  // Self-contained: creates its own second AMS account (with no membership
+  // at all) rather than depending on any earlier step, since no other
+  // screenshot in this suite needs one. Never reaches Discourse -- the
+  // membership gate in ams/forum/views.py's forum_sso_login_callback runs
+  // and redirects before the SSO handshake with Discourse even starts.
+  async forumMembershipRequired(page) {
+    await login(page);
+    await createNoMembershipUser(page);
+    await logout(page);
+    await loginAs(page, NO_MEMBERSHIP_USER_EMAIL, NO_MEMBERSHIP_USER_PASSWORD);
+    await page.goto(`${BASE_URL}/forum/`);
+    await page.waitForLoadState("networkidle");
+  },
 };
 
 async function main() {
@@ -1280,7 +1481,7 @@ async function main() {
   }
 
   const manifest = JSON.parse(fs.readFileSync(MANIFEST_PATH, "utf8"));
-  const browser = await chromium.launch();
+  const browser = await chromium.launch({ args: CHROMIUM_ARGS });
   let failures = 0;
 
   for (const entry of manifest) {
