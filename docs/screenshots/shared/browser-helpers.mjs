@@ -353,6 +353,22 @@ export async function scrollIntoViewInstantly(locator) {
   await locator.evaluate((el) => el.scrollIntoView({ block: "center", behavior: "instant" }));
 }
 
+// TinyMCE (Event/Session.description in T20, Resource.description in T21 --
+// both HTMLField, unlike Draftail elsewhere in this suite, see fillBodyText's
+// own comment above) exposes an editor API rather than a plain
+// contenteditable, and setContent() is its own documented way to set content
+// programmatically. Confirmed live: this syncs the underlying hidden textarea
+// a form submit actually reads from immediately, with none of fillBodyText's
+// debounce race to guard against. Promoted here from events.mjs (its
+// original, T20-only home) once T21 needed the same helper for a second
+// tutorial -- this file's own top-of-file rule for what belongs here.
+export async function fillTinyMce(page, fieldId, html) {
+  await page.evaluate(
+    ({ fieldId, html }) => window.tinymce.get(fieldId).setContent(html),
+    { fieldId, html },
+  );
+}
+
 // Scoped to "Save", not "Save and add another"/"Save and continue editing" --
 // Django admin's add/change forms always offer all three.
 // .first() matters for a ModelAdmin with save_on_top = True (EventAdmin,

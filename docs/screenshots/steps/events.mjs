@@ -9,6 +9,7 @@ import {
   saveAdminForm,
   saveAdminFormContinueEditing,
   scrollIntoViewInstantly,
+  fillTinyMce,
 } from "../shared/browser-helpers.mjs";
 
 const EVENT_LOCATION_NAME = "Wellington Conference Centre";
@@ -59,20 +60,6 @@ async function fillLocationForm(page) {
 async function openEventAdd(page) {
   await page.goto(`${BASE_URL}/admin/events/event/add/`);
   await page.waitForLoadState("networkidle");
-}
-
-// TinyMCE (the Description fields' rich text widget here, unlike Draftail
-// elsewhere in this suite -- see browser-helpers.mjs's fillBodyText comment)
-// exposes an editor API rather than a plain contenteditable, and
-// setContent() is its own documented way to set content programmatically.
-// Confirmed live: this syncs the underlying hidden textarea a form submit
-// actually reads from immediately, with none of fillBodyText's debounce
-// race to guard against.
-async function fillTinyMce(page, fieldId, html) {
-  await page.evaluate(
-    ({ fieldId, html }) => window.tinymce.get(fieldId).setContent(html),
-    { fieldId, html },
-  );
 }
 
 // The Locations field (django-autocomplete-light) opens a search-as-you-type

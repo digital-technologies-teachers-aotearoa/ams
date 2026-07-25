@@ -26,6 +26,7 @@ import { steps as languagesTranslationsSteps } from "./steps/languages-translati
 import { steps as membershipsSteps } from "./steps/memberships.mjs";
 import { steps as forumSteps } from "./steps/forum.mjs";
 import { steps as eventsSteps } from "./steps/events.mjs";
+import { steps as resourcesSteps } from "./steps/resources.mjs";
 
 // Capture steps, keyed by the "step" field in manifest.json. Tutorial tasks
 // (T13+) add their own module to steps/ and list it here as they document
@@ -40,6 +41,7 @@ const steps = {
   ...membershipsSteps,
   ...forumSteps,
   ...eventsSteps,
+  ...resourcesSteps,
 };
 
 // Optional argv filter (`node run.mjs [prefix...]`, or `npm run
