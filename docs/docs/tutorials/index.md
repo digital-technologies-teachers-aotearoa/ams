@@ -15,6 +15,4 @@ Work through the tutorials in order; each one builds on the last.
 8. [Events](events.md)
 9. [Resources](resources.md)
 10. [Inviting your team](inviting-your-team.md)
-11. Launch checklist
-
-<!-- Tutorial 11 is added by a later task in the onboarding documentation effort (see .ai/onboarding-documentation-tasks.md). -->
+11. [Launch checklist](launch-checklist.md)
