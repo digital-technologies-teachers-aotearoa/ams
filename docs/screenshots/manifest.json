@@ -404,5 +404,54 @@
     "step": "forumMembershipRequired",
     "pages": ["tutorials/forum.md"],
     "description": "A member's account page, showing the \"you must have an active membership\" message after trying to visit the forum without one."
+  },
+  {
+    "id": "events-location-form-empty",
+    "file": "tutorials/events-01-location-form-empty.png",
+    "step": "eventsLocationFormEmpty",
+    "pages": ["tutorials/events.md"],
+    "description": "The empty Add location form."
+  },
+  {
+    "id": "events-location-saved",
+    "file": "tutorials/events-02-location-saved.png",
+    "step": "eventsLocationSaved",
+    "pages": ["tutorials/events.md"],
+    "description": "The new location listed after saving."
+  },
+  {
+    "id": "events-event-form-empty",
+    "file": "tutorials/events-03-event-form-empty.png",
+    "step": "eventsEventFormEmpty",
+    "pages": ["tutorials/events.md"],
+    "description": "The empty Add event form."
+  },
+  {
+    "id": "events-event-saved",
+    "file": "tutorials/events-04-event-saved.png",
+    "step": "eventsEventSaved",
+    "pages": ["tutorials/events.md"],
+    "description": "The new event listed after saving, showing Published: False."
+  },
+  {
+    "id": "events-event-published",
+    "file": "tutorials/events-05-event-published.png",
+    "step": "eventsEventPublished",
+    "pages": ["tutorials/events.md"],
+    "description": "The event's admin record after checking Published and saving."
+  },
+  {
+    "id": "events-event-live",
+    "file": "tutorials/events-06-event-live.png",
+    "step": "eventsEventLive",
+    "pages": ["tutorials/events.md"],
+    "description": "The public events page, showing the published event in Upcoming Events and on the map."
+  },
+  {
+    "id": "events-event-detail",
+    "file": "tutorials/events-07-event-detail.png",
+    "step": "eventsEventDetail",
+    "pages": ["tutorials/events.md"],
+    "description": "The event's own public page, showing its details and the Register to attend event button."
   }
 ]

@@ -51,7 +51,8 @@ nav:
       - tutorials/languages-translations.md
       - tutorials/memberships.md
       - tutorials/forum.md
-      - tutorials/events-resources.md
+      - tutorials/events.md
+      - tutorials/resources.md
   - Website administrator guide:
       - admin/index.md
       - admin/cms.md
