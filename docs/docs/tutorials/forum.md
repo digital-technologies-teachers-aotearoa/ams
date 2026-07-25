@@ -61,4 +61,4 @@ Add it the same way you'd link to any other external website: see [Footer links]
 
 ## What's next
 
-The next tutorial covers [events and resources](events-resources.md) — if your association uses them.
+The next tutorial covers [events](events.md) — if your association uses them.
