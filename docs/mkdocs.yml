@@ -50,6 +50,7 @@ nav:
       - tutorials/navigation-menus.md
       - tutorials/languages-translations.md
       - tutorials/memberships.md
+      - tutorials/forum.md
   - Website administrator guide:
       - admin/index.md
       - admin/cms.md

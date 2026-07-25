@@ -11,9 +11,9 @@ Work through the tutorials in order; each one builds on the last.
 4. [Navigation & menus](navigation-menus.md)
 5. [Languages & translations](languages-translations.md)
 6. [Memberships](memberships.md)
-7. Forum
+7. [Forum](forum.md)
 8. Events and resources
 9. Inviting your team
 10. Launch checklist
 
-<!-- Tutorials 7-10 are added by later tasks in the onboarding documentation effort (see .ai/onboarding-documentation-tasks.md). -->
+<!-- Tutorials 8-10 are added by later tasks in the onboarding documentation effort (see .ai/onboarding-documentation-tasks.md). -->
