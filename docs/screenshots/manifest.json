@@ -320,5 +320,54 @@
     "step": "languagesSwitchRoundTrip",
     "pages": ["tutorials/languages-translations.md"],
     "description": "The Māori About page, reached directly from the English About page by clicking the language switcher, proving the two matching web addresses line up."
+  },
+  {
+    "id": "memberships-option-form-empty",
+    "file": "tutorials/memberships-01-option-form-empty.png",
+    "step": "membershipsOptionFormEmpty",
+    "pages": ["tutorials/memberships.md"],
+    "description": "The empty Add membership option form in the Django admin."
+  },
+  {
+    "id": "memberships-option-saved",
+    "file": "tutorials/memberships-02-option-saved.png",
+    "step": "membershipsOptionSaved",
+    "pages": ["tutorials/memberships.md"],
+    "description": "The new Standard membership option listed after saving, in the Django admin."
+  },
+  {
+    "id": "memberships-signup-form",
+    "file": "tutorials/memberships-03-signup-form.png",
+    "step": "membershipsSignupForm",
+    "pages": ["tutorials/memberships.md"],
+    "description": "The membership application page, showing the new membership option as a pricing card, exactly as a member sees it."
+  },
+  {
+    "id": "memberships-signup-submitted",
+    "file": "tutorials/memberships-04-signup-submitted.png",
+    "step": "membershipsSignupSubmitted",
+    "pages": ["tutorials/memberships.md"],
+    "description": "The account page after applying, showing the pending-review message and the new membership's Pending status and awaiting-payment invoice."
+  },
+  {
+    "id": "memberships-approval-pending",
+    "file": "tutorials/memberships-05-approval-pending.png",
+    "step": "membershipsApprovalPending",
+    "pages": ["tutorials/memberships.md"],
+    "description": "The pending membership's admin record, showing Status: Pending and an empty Approved datetime field."
+  },
+  {
+    "id": "memberships-approval-approved",
+    "file": "tutorials/memberships-06-approval-approved.png",
+    "step": "membershipsApprovalApproved",
+    "pages": ["tutorials/memberships.md"],
+    "description": "The same admin record after filling in Approved datetime and saving, now showing Status: Active."
+  },
+  {
+    "id": "memberships-staff-notification",
+    "file": "tutorials/memberships-07-staff-notification.png",
+    "step": "membershipsStaffNotification",
+    "pages": ["tutorials/memberships.md"],
+    "description": "The rendered HTML content of the staff notification email sent when the application was submitted."
   }
 ]
