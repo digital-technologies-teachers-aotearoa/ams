@@ -8,8 +8,8 @@ You'll have worked through a pre-launch review of your site, know what happens o
 
 ## Before you start
 
-You've worked through the rest of this series and loaded your content onto your [UAT site](../getting-started/glossary.md#uat).
-Your provider sends a UAT-handover email once it's ready for you to check — see the [Getting started](../getting-started/index.md#the-onboarding-process-phase-by-phase) phase table if you want the full picture of how this fits into the wider process.
+You've worked through the rest of this series and loaded your content onto your [UAT site](../../getting-started/glossary.md#uat).
+Your provider sends a UAT-handover email once it's ready for you to check — see the [Getting started](../../getting-started/index.md#the-onboarding-process-phase-by-phase) phase table if you want the full picture of how this fits into the wider process.
 
 ## Pre-launch review
 
@@ -29,9 +29,9 @@ Work through this list with your team before telling your provider you're ready 
 You don't do the technical work of launching your site — your provider does.
 
 Once you've worked through the pre-launch review above and you're happy with your site, tell your provider you're ready to go live.
-Your provider then copies everything from your UAT site to your separate [production](../getting-started/glossary.md#production) site, and switches your domain's [DNS](../getting-started/glossary.md#dns) so production is what your members see from then on.
+Your provider then copies everything from your UAT site to your separate [production](../../getting-started/glossary.md#production) site, and switches your domain's [DNS](../../getting-started/glossary.md#dns) so production is what your members see from then on.
 This normally happens the same day, once your content is finalised on UAT.
-(If you're curious what that involves technically, your provider's [provisioning runbook](../provider/provisioning-runbook.md#8-production-cutover-and-dns) covers the exact steps — there's nothing there you need to do yourself.)
+(If you're curious what that involves technically, your provider's [provisioning runbook](../../hosting/provisioning-runbook.md#8-production-cutover-and-dns) covers the exact steps — there's nothing there you need to do yourself.)
 
 ## What to tell your members
 
@@ -47,7 +47,7 @@ Forward it, or write your own announcement — either way, it's worth covering:
 ## What's next
 
 That's the whole "Building your website" series complete.
-Your UAT and production sites stay separate after launch (see [UAT site vs production site](../getting-started/index.md#uat-site-vs-production-site)), so check with your provider which one to use before making any further changes.
+Your UAT and production sites stay separate after launch (see [UAT site vs production site](../../getting-started/index.md#uat-site-vs-production-site)), so check with your provider which one to use before making any further changes.
 
 Launch is the start, not the finish — here are some ways to keep growing your site and your community once you're live:
 

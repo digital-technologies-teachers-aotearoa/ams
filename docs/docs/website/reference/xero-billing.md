@@ -221,4 +221,4 @@ Once the Xero integration is configured and verified:
 - Establish billing workflows and processes
 - Monitor the integration during the first billing cycle
 
-For additional support, contact your AMS implementation team or refer to the [developer documentation](../developer/billing.md).
+For additional support, contact your AMS implementation team or refer to the [developer documentation](../../developer/billing.md).

@@ -17,11 +17,11 @@ If your association only offers free memberships, most of the steps still apply 
 
 1. In the Django admin, click **Memberships**, then click **Add** next to **Membership options**.
 
-    ![The empty Add membership option form](../images/tutorials/memberships-01-option-form-empty.png)
+    ![The empty Add membership option form](../../images/website/setup/memberships-01-option-form-empty.png)
 
 2. Fill in the fields below, then click **Save**.
 
-    ![The new membership option listed after saving](../images/tutorials/memberships-02-option-saved.png)
+    ![The new membership option listed after saving](../../images/website/setup/memberships-02-option-saved.png)
 
     | Field | What it does | Can you change it later? |
     | --- | --- | --- |
@@ -44,11 +44,11 @@ If your association only offers free memberships, most of the steps still apply 
 
 3. On your account page, click **Register for a new individual membership** — this is exactly what a visitor sees when they apply.
 
-    ![The membership application page, showing the new membership option as a pricing card](../images/tutorials/memberships-03-signup-form.png)
+    ![The membership application page, showing the new membership option as a pricing card](../../images/website/setup/memberships-03-signup-form.png)
 
 4. Choose the membership and a start date, then click **Register membership**.
 
-    ![The account page after applying, showing the pending-review message and the membership's Pending status](../images/tutorials/memberships-04-signup-submitted.png)
+    ![The account page after applying, showing the pending-review message and the membership's Pending status](../../images/website/setup/memberships-04-signup-submitted.png)
 
     The green message near the top always says "you have a current active membership" for a site administrator's own account, like the one used throughout this tutorial series — administrators always have full access to the site, whatever their own membership status is, so this message isn't the one to trust here.
     The **Status** column in the table below it is the real indicator: it shows **Pending** until someone approves the membership.
@@ -62,15 +62,15 @@ Here's how, using the membership you just created as the example:
 
 In the Django admin, click **Memberships**, then **Membership: Individual**, and open the pending record.
 
-![The pending membership's admin record, with an empty Approved datetime field](../images/tutorials/memberships-05-approval-pending.png)
+![The pending membership's admin record, with an empty Approved datetime field](../../images/website/setup/memberships-05-approval-pending.png)
 
 Next to **Approved datetime**, click **Today**, then click **Now**, then click **Save and continue editing**.
 
-![The same admin record after saving, now showing Status: Active](../images/tutorials/memberships-06-approval-approved.png)
+![The same admin record after saving, now showing Status: Active](../../images/website/setup/memberships-06-approval-approved.png)
 
 ### Free memberships
 
-If your association also offers a free membership option, whether it needs the same approval step depends on [`AMS_REQUIRE_FREE_MEMBERSHIP_APPROVAL`](../getting-started/settings-glossary.md#ams_require_free_membership_approval) — a decision made during onboarding (see [the decision questionnaire, question 3](../getting-started/decision-questionnaire.md#3-membership-model)).
+If your association also offers a free membership option, whether it needs the same approval step depends on [`AMS_REQUIRE_FREE_MEMBERSHIP_APPROVAL`](../../getting-started/settings-glossary.md#ams_require_free_membership_approval) — a decision made during onboarding (see [the decision questionnaire, question 3](../../getting-started/decision-questionnaire.md#3-membership-model)).
 
 With this setting off, the default, a free membership is approved automatically the moment someone applies — there's nothing for you to do.
 With it on, a free membership sits **Pending** exactly like the paid example above, and you approve it the same way, in **Membership: Individual**.
@@ -85,9 +85,9 @@ Approving their record by hand, the same way as above, is how you reflect a paym
 Whenever someone applies for a membership, everyone with staff access gets an email about it.
 Here's an example of what that email looks like:
 
-![The notification email a staff member receives when a membership is applied for](../images/tutorials/memberships-07-staff-notification.png)
+![The notification email a staff member receives when a membership is applied for](../../images/website/setup/memberships-07-staff-notification.png)
 
-Whether this email is sent is controlled by [`AMS_NOTIFY_STAFF_MEMBERSHIP_EVENTS`](../getting-started/settings-glossary.md#ams_notify_staff_membership_events) — decided during onboarding, not something you change yourself.
+Whether this email is sent is controlled by [`AMS_NOTIFY_STAFF_MEMBERSHIP_EVENTS`](../../getting-started/settings-glossary.md#ams_notify_staff_membership_events) — decided during onboarding, not something you change yourself.
 There's one exception: a free membership that needs approval always sends this email, even with the setting off, since somebody still has to approve it.
 You can tell the two cases apart by the subject line: an application that needs approval is subject "REQUIRES APPROVAL: ...", one that doesn't is just "New Individual Membership: ...".
 

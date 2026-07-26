@@ -4,7 +4,7 @@ Upon a push to the `main` branch, a Docker image is built and stored on [GitHub 
 By running this image, AMS can be deployed on any platform that supports Docker containers — for example [DigitalOcean](https://www.digitalocean.com/) App Platform, or a self-managed system such as [Kubernetes](https://kubernetes.io/).
 This page describes what any deployment needs, independent of platform.
 
-If you're the provider standing up a new client instance on the project's recommended stack (DigitalOcean, Postmark, Cloudflare), see the [Provisioning runbook](../provider/provisioning-runbook.md) instead — it's deliberately opinionated about that stack and cross-links back here for the generic parts rather than repeating them.
+If you're the provider standing up a new client instance on the project's recommended stack (DigitalOcean, Postmark, Cloudflare), see the [Provisioning runbook](../hosting/provisioning-runbook.md) instead — it's deliberately opinionated about that stack and cross-links back here for the generic parts rather than repeating them.
 For the AMS project's own development site (used by contributors, not client instances), see [AMS project development site](project-dev-site.md).
 
 ## Container architecture
@@ -139,7 +139,7 @@ During the deployment, there is a Django management command `deploy_steps` that 
 
 AMS has no persistent background worker process — there's no task queue to run.
 The one piece of scheduled work today is Xero invoice syncing: `python manage.py fetch_invoice_updates` should be run periodically (every 15 minutes in the provider's own stack) as a fallback for any Xero webhook that doesn't arrive.
-Run it however your platform schedules one-off commands (a cron job, or a platform feature like DigitalOcean App Platform's scheduled jobs — see the [Provisioning runbook](../provider/provisioning-runbook.md#2-server-setup-digitalocean-app-platform) for that specific setup) — it only applies if Xero billing is enabled.
+Run it however your platform schedules one-off commands (a cron job, or a platform feature like DigitalOcean App Platform's scheduled jobs — see the [Provisioning runbook](../hosting/provisioning-runbook.md#2-server-setup-digitalocean-app-platform) for that specific setup) — it only applies if Xero billing is enabled.
 
 ## Email service providers
 

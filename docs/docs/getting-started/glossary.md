@@ -9,7 +9,7 @@ Terms are listed alphabetically.
 ## CMS
 
 A CMS (content management system) is the software you use to add, edit, and publish pages on your website — text, images, and layout — without writing any code.
-AMS's CMS is called Wagtail; you'll use it every time you update a page (see the [Building your website](../tutorials/index.md) tutorials).
+AMS's CMS is called Wagtail; you'll use it every time you update a page (see the [Building your website](../website/setup/index.md) tutorials).
 
 ## DNS
 
@@ -39,7 +39,7 @@ You won't set these yourself — your provider configures them based on your ans
 
 The forum is the discussion area of your website, where members post and reply to each other.
 AMS's forum is powered by a separate product called Discourse, connected to your main site so members sign in once (see [SSO](#sso)) instead of needing a second password.
-See the [forum admin guide](../admin/forum.md) for how it's set up and run.
+See the [forum admin guide](../website/reference/forum.md) for how it's set up and run.
 
 ## Hosting
 

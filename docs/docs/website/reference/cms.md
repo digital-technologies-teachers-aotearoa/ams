@@ -2,7 +2,7 @@
 
 **Who this page is for:** client website admins — the volunteers who load content and run the day-to-day site.
 
-The website uses a content management system (CMS) called [Wagtail](../getting-started/glossary.md#cms) to allow editing of website content.
+The website uses a content management system (CMS) called [Wagtail](../../getting-started/glossary.md#cms) to allow editing of website content.
 This includes:
 
 - Editing page content
@@ -10,7 +10,7 @@ This includes:
 - Managing menus
 - Uploading images and documents
 
-See [Tutorial 1: Orientation](../tutorials/orientation.md) for how to sign in and find the CMS, and [Tutorial 3: Your first pages](../tutorials/first-pages.md) for a step-by-step walkthrough of creating and publishing a page.
+See [Tutorial 1: Orientation](../setup/orientation.md) for how to sign in and find the CMS, and [Tutorial 3: Your first pages](../setup/first-pages.md) for a step-by-step walkthrough of creating and publishing a page.
 
 ## Admin interface
 
@@ -20,7 +20,7 @@ The CMS can be accessed at the `/cms/` path.
 
 Pages in the CMS come in a few types:
 
-- **Home page** — the top-level page for each enabled language. Your provider creates this for you; it starts empty. See [Tutorial 3: Your first pages](../tutorials/first-pages.md) for how to add content to it.
+- **Home page** — the top-level page for each enabled language. Your provider creates this for you; it starts empty. See [Tutorial 3: Your first pages](../setup/first-pages.md) for how to add content to it.
 - **Content page** — the type used for everything else: About, Contact, and any other page you create. Each content page can be:
     - **Public** or **Members only** — a members-only page is hidden from visitors without an active membership.
     - **Structure only** — a page that redirects straight to its first child page, rather than showing its own content. Useful for a parent page that exists only to group other pages in the menu.
@@ -31,8 +31,8 @@ Pages in the CMS come in a few types:
 Both Home and Content pages are built from content blocks, added one at a time in the **Body** section of the page editor.
 Content pages and Home pages share most blocks (Heading, Paragraph, Lead paragraph, Image, Image grid, Image carousel, Horizontal separator, Timeline, Embed, Columns, Full width section), with a few extras only available on one or the other:
 
-- **Home page only:** Title block (the large hero-style heading — see [Tutorial 2: Branding & theme](../tutorials/branding-theme.md)), Recent articles.
-- **Content page only:** Contact Form (see [Tutorial 3: Your first pages](../tutorials/first-pages.md)).
+- **Home page only:** Title block (the large hero-style heading — see [Tutorial 2: Branding & theme](../setup/branding-theme.md)), Recent articles.
+- **Content page only:** Contact Form (see [Tutorial 3: Your first pages](../setup/first-pages.md)).
 
 ## Images and documents
 
@@ -57,7 +57,7 @@ A page directly under Home can't use certain words as its web address (its slug,
 
 There are a few dozen more, less obvious ones (shorter technical words already used somewhere inside the site) — rather than list every one, the CMS checks for you automatically and shows a clear error if a page's slug collides with one, so you'll only need this list if you want to understand why an error appeared.
 
-See [Tutorial 3: Your first pages, "Create more pages the same way"](../tutorials/first-pages.md#create-more-pages-the-same-way) for where this comes up in practice.
+See [Tutorial 3: Your first pages, "Create more pages the same way"](../setup/first-pages.md#create-more-pages-the-same-way) for where this comes up in practice.
 Pages nested more deeply (for example, a page under About) are not affected by this restriction — only direct children of Home are checked.
 
 ## Menus
@@ -65,7 +65,7 @@ Pages nested more deeply (for example, a page under About) are not affected by t
 When creating menus within the CMS, you may want to link to a page that is not created in the CMS, but a different part of the website.
 You can use the following URLs within the 'External URL' field on a menu item to link to the following pages:
 
-- Discourse forum = `/forum/` - This will automatically redirect visitors to the forum with proper authentication. See [Tutorial 7: Forum, "Let members find the forum"](../tutorials/forum.md#let-members-find-the-forum) for why this is the recommended way to link to your forum.
+- Discourse forum = `/forum/` - This will automatically redirect visitors to the forum with proper authentication. See [Tutorial 7: Forum, "Let members find the forum"](../setup/forum.md#let-members-find-the-forum) for why this is the recommended way to link to your forum.
 - Terms and Conditions = `/terms/` - This displays all current terms and policies.
 
-See [Tutorial 4: Navigation & menus](../tutorials/navigation-menus.md) for a full walkthrough of adding pages and links to your menus.
+See [Tutorial 4: Navigation & menus](../setup/navigation-menus.md) for a full walkthrough of adding pages and links to your menus.

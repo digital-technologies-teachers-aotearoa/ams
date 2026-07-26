@@ -20,38 +20,38 @@ If your site only has one language enabled, most of this tutorial won't apply ye
     This particular switcher only appears for signed-out visitors — once you're signed in, you're assumed to already be viewing the site in the language you want, so it's hidden.
     Every page also has a second switcher at the very bottom, in the footer, which is always there whether you're signed in or not — that's the one to point people to if they ever ask how to change language while signed in.
 
-    ![The public site's language switcher open, listing Te Reo Māori and English](../images/tutorials/languages-translations-01-switcher-open.png)
+    ![The public site's language switcher open, listing Te Reo Māori and English](../../images/website/setup/languages-translations-01-switcher-open.png)
 
 2. Click **Te Reo Māori**.
 
-    ![The Te Reo Māori home page, still empty because no content has been added to it yet](../images/tutorials/languages-translations-02-maori-home-empty.png)
+    ![The Te Reo Māori home page, still empty because no content has been added to it yet](../../images/website/setup/languages-translations-02-maori-home-empty.png)
 
     Your site now shows its Te Reo Māori version — but it's empty, because switching languages takes visitors to a completely separate set of pages, and nobody has added anything to this one yet.
 
 3. Sign back in to the CMS and click **Pages**.
 
-    ![The Pages explorer at the root level, showing a separate Home page for each enabled language](../images/tutorials/languages-translations-03-pages-root.png)
+    ![The Pages explorer at the root level, showing a separate Home page for each enabled language](../../images/website/setup/languages-translations-03-pages-root.png)
 
     Notice there are two **Home** pages, one labelled English and one labelled Te Reo Māori.
     Each language has its own separate set of pages underneath its own Home — adding a page in English never adds it anywhere else.
 
 4. Open the Te Reo Māori **Home**, click **Add child page**, then click **Content page** — the same as [Tutorial 3](first-pages.md).
 
-    ![The page type chooser shown after clicking Add child page under the Te Reo Māori Home](../images/tutorials/languages-translations-04-add-child-chooser.png)
+    ![The page type chooser shown after clicking Add child page under the Te Reo Māori Home](../../images/website/setup/languages-translations-04-add-child-chooser.png)
 
 5. Type a title in your other language, and add your content, the same as Tutorial 3.
     Then click **Promote**, and look at the **Slug** field.
     Wagtail fills this in automatically from your title — but because this page needs to line up with its English version, change it to match that page's web address exactly: here, `about`.
 
-    ![The new Māori About page's Promote tab, with its slug corrected to match the English About page's web address](../images/tutorials/languages-translations-05-about-content-slug.png)
+    ![The new Māori About page's Promote tab, with its slug corrected to match the English About page's web address](../../images/website/setup/languages-translations-05-about-content-slug.png)
 
 6. Click the arrow next to **Save draft**, then click **Publish**.
 
-    ![The confirmation message after publishing the Māori About page](../images/tutorials/languages-translations-06-about-published.png)
+    ![The confirmation message after publishing the Māori About page](../../images/website/setup/languages-translations-06-about-published.png)
 
 7. Go to your English About page and click the language switcher again, as a signed-out visitor.
 
-    ![The Māori About page, reached directly from the English About page by clicking the language switcher](../images/tutorials/languages-translations-07-switch-round-trip.png)
+    ![The Māori About page, reached directly from the English About page by clicking the language switcher](../../images/website/setup/languages-translations-07-switch-round-trip.png)
 
     This time, it takes you straight to your new Māori About page, because the two pages now share the same web address.
 
@@ -63,7 +63,7 @@ You don't have to translate every page — a page can exist in only one language
 
 ## Changing which language shows first
 
-Which languages your site has enabled, and the order they appear in the switcher, is decided during onboarding — this is the [`AMS_ENABLED_LANGUAGES`](../getting-started/settings-glossary.md#ams_enabled_languages) setting.
+Which languages your site has enabled, and the order they appear in the switcher, is decided during onboarding — this is the [`AMS_ENABLED_LANGUAGES`](../../getting-started/settings-glossary.md#ams_enabled_languages) setting.
 It's set by your provider, not something you change yourself in the CMS.
 If you want to change the order later — for example, to show Te Reo Māori before English — ask your provider to update it for you.
 

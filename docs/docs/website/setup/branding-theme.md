@@ -12,56 +12,56 @@ You'll know where to go for every other colour and font option.
 ## Before you start
 
 You need your logo file ready.
-Your website can use PNG, JPEG, GIF, WEBP, AVIF, or SVG formats — see [question 7 of the decision questionnaire](../getting-started/decision-questionnaire.md#7-branding-assets) if you're not sure yours is ready.
+Your website can use PNG, JPEG, GIF, WEBP, AVIF, or SVG formats — see [question 7 of the decision questionnaire](../../getting-started/decision-questionnaire.md#7-branding-assets) if you're not sure yours is ready.
 It helps to also have your brand's main colour as a hex code, such as `#7B1FA2`, though your provider can match a colour "by eye" from your logo if you don't have one.
-You should already be signed in to the [CMS](../getting-started/glossary.md#cms) — see [Tutorial 1: Orientation](orientation.md) if you're not.
+You should already be signed in to the [CMS](../../getting-started/glossary.md#cms) — see [Tutorial 1: Orientation](orientation.md) if you're not.
 
 ## Steps
 
 1. In the CMS, open **Settings** in the left sidebar, then click **Association settings**.
 
-    ![The Association settings page, before the association name has been set](../images/tutorials/branding-theme-01-association-settings.png)
+    ![The Association settings page, before the association name has been set](../../images/website/setup/branding-theme-01-association-settings.png)
 
 2. In the **Name** section, enter your association's short name and long name, then click **Save**.
     The short name appears in places like the navbar and footer; the long name is for more formal contexts, such as legal or official documents.
 
-    ![A confirmation message after saving the association's short and long name](../images/tutorials/branding-theme-02-name-saved.png)
+    ![A confirmation message after saving the association's short and long name](../../images/website/setup/branding-theme-02-name-saved.png)
 
 3. In the **Images** section, click **Choose an image** next to **Association logo**, then click the **Upload** tab.
 
-    ![The image chooser's Upload tab, open and empty](../images/tutorials/branding-theme-03-upload-logo.png)
+    ![The image chooser's Upload tab, open and empty](../../images/website/setup/branding-theme-03-upload-logo.png)
 
 4. Add a title for your logo, choose your logo file, then click **Upload**.
     Your logo now appears in the Association logo field.
 
-    ![The uploaded logo selected in the Association logo field](../images/tutorials/branding-theme-04-logo-selected.png)
+    ![The uploaded logo selected in the Association logo field](../../images/website/setup/branding-theme-04-logo-selected.png)
 
 5. Turn on **Use logo in navbar** and **Use logo in footer**, then click **Save**.
 
-    ![A confirmation message after saving the logo](../images/tutorials/branding-theme-05-logo-saved.png)
+    ![A confirmation message after saving the logo](../../images/website/setup/branding-theme-05-logo-saved.png)
 
 6. Open your website's home page in a new tab to see your logo live.
 
-    ![The logo showing in the navbar and footer of the public site](../images/tutorials/branding-theme-06-logo-live.png)
+    ![The logo showing in the navbar and footer of the public site](../../images/website/setup/branding-theme-06-logo-live.png)
 
 7. Back in the CMS, open **Settings** again, click **Theme Settings**, and scroll down to the **Primary** section.
     This is your website's main colour, used for links, buttons, and highlights across every page.
 
-    ![The Primary colour section of Theme Settings, showing the default blue](../images/tutorials/branding-theme-07-theme-settings.png)
+    ![The Primary colour section of Theme Settings, showing the default blue](../../images/website/setup/branding-theme-07-theme-settings.png)
 
 8. Replace the **Primary** value with your brand colour's hex code, then click **Save**.
 
-    ![The Primary field now showing a purple brand colour after saving](../images/tutorials/branding-theme-08-primary-saved.png)
+    ![The Primary field now showing a purple brand colour after saving](../../images/website/setup/branding-theme-08-primary-saved.png)
 
 9. Further down the same page, find **Fonts**.
     Replace **Sans-serif font stack** with your font's name, then click **Save**.
 
-    ![The Sans-serif font stack field now showing a different font after saving](../images/tutorials/branding-theme-09-font-saved.png)
+    ![The Sans-serif font stack field now showing a different font after saving](../../images/website/setup/branding-theme-09-font-saved.png)
 
 ## Every other colour and font
 
 Every other field on this page — navbar and footer colours, body text, buttons, and the rest of the font settings — works exactly the same way as the two you just changed: enter a value, then click **Save**.
-The [theme customization reference](../admin/theme-customization.md) covers every field, along with accessibility guidance for choosing colours with enough contrast.
+The [theme customization reference](../reference/theme-customization.md) covers every field, along with accessibility guidance for choosing colours with enough contrast.
 
 ## What's next
 

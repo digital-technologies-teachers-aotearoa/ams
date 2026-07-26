@@ -17,7 +17,7 @@ Want to learn more?
 
 Ready to explore AMS?
 
-- **[Administrator Guide](admin/index.md):** Configure and manage your AMS instance
+- **[Administrator Guide](website/reference/index.md):** Configure and manage your AMS instance
 - **[Developer Documentation](developer/contributing.md):** Develop or deploy AMS
 
 <!-- markdownlint-disable -->

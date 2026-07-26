@@ -1,7 +1,7 @@
 # Theming
 
 This document provides technical details about the AMS theme customization system for developers.
-For the client-facing view of every field this system exposes, see the [admin guide: Theme customization](../admin/theme-customization.md).
+For the client-facing view of every field this system exposes, see the [admin guide: Theme customization](../website/reference/theme-customization.md).
 
 ## Architecture Overview
 

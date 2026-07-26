@@ -52,4 +52,4 @@ Tags appear as grouped filter facets on the search page, allowing users to filte
 You can add links to resources pages via the Wagtail CMS menu system (Main Menu or Flat Menus).
 Menu items pointing to `/resources/` URLs cannot be added while the resources module is disabled.
 
-See [Tutorial 9: Resources](../tutorials/resources.md) for a step-by-step walkthrough of adding a resource.
+See [Tutorial 9: Resources](../setup/resources.md) for a step-by-step walkthrough of adding a resource.

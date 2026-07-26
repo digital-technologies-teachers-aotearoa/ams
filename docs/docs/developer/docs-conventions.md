@@ -7,18 +7,19 @@ Later documentation tasks follow these conventions rather than re-deciding them.
 
 ## Where each doc type lives
 
-| Nav section                 | Directory                    | Audience                | What goes here                                                                                                                                                       |
-| --------------------------- | ---------------------------- | ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Home                        | `docs/docs/index.md`         | Everyone                | What AMS is                                                                                                                                                          |
-| Features                    | `docs/docs/features.md`      | Everyone                | Product capability overview                                                                                                                                          |
-| Getting started             | `docs/docs/getting-started/` | Client decision-makers  | Onboarding overview, decision questionnaire, costs sheet, accounts & access checklist, working-with-designers one-pager, and the two glossaries (settings and terms) |
-| Building your website       | `docs/docs/tutorials/`       | Client website admins   | The empty-site-to-launch tutorial series                                                                                                                             |
-| Website administrator guide | `docs/docs/admin/`           | Client website admins   | Standing reference (not a guided path) for CMS, events, resources, forum, billing, theme customization                                                               |
-| Provider guide              | `docs/docs/provider/`        | Provider                | Provisioning runbook, client-communication templates                                                                                                                 |
-| Developer documentation     | `docs/docs/developer/`       | Developer / contributor | Codebase contribution, architecture, platform-agnostic deployment                                                                                                    |
+| Nav section                      | Directory                       | Audience                 | What goes here                                                                                                                                                       |
+| --------------------------------- | -------------------------------- | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Home                              | `docs/docs/index.md`             | Everyone                  | What AMS is                                                                                                                                                          |
+| Features                          | `docs/docs/features.md`          | Everyone                  | Product capability overview                                                                                                                                          |
+| Getting started                   | `docs/docs/getting-started/`     | Client decision-makers    | Onboarding overview, decision questionnaire, costs sheet, accounts & access checklist, working-with-designers one-pager, and the two glossaries (settings and terms) |
+| Your website                      | `docs/docs/website/index.md`     | Client website admins     | Landing page routing between the Setup guide and Feature reference groups                                                                                            |
+| Your website → Setup guide        | `docs/docs/website/setup/`       | Client website admins     | The empty-site-to-launch tutorial series                                                                                                                             |
+| Your website → Feature reference  | `docs/docs/website/reference/`   | Client website admins     | Standing reference (not a guided path) for CMS, events, resources, forum, billing, theme customization                                                               |
+| Hosting AMS                       | `docs/docs/hosting/`             | Provider                  | Provisioning runbook, client-communication templates                                                                                                                 |
+| Developing AMS                    | `docs/docs/developer/`           | Developer / contributor   | Codebase contribution, architecture, platform-agnostic deployment                                                                                                    |
 
-**Decision — Provider guide is top-level, not under Developer documentation.**
-The operator runbook's audience is "person running a client's instance," which has more in common with the Getting started/Building your website audiences (a concrete client, a concrete handoff) than with "person contributing to the AMS codebase."
+**Decision — Hosting AMS is top-level, not under Developing AMS.**
+The provider's audience is "person running a client's instance," which has more in common with the Getting started/Your website audiences (a concrete client, a concrete handoff) than with "person contributing to the AMS codebase."
 Keeping it top-level also means it doesn't get lost under codebase-contribution content a client-facing reader would never open.
 The repo stays public and the runbook contains no secrets, so there's no publishing reason to nest it.
 
@@ -26,13 +27,13 @@ The repo stays public and the runbook contains no secrets, so there's no publish
 Both are primarily consulted during onboarding and by non-technical readers, and adding a fourth top-level section for two pages isn't worth the nav complexity.
 Other pages link to them with `getting-started/glossary.md#term` anchors.
 
-**Decision — each new top-level section gets its own `index.md` landing page**, distinct from its content pages, following the existing pattern in `admin/index.md`.
+**Decision — each new top-level section gets its own `index.md` landing page**, distinct from its content pages, following the existing pattern in `website/reference/index.md` (formerly `admin/index.md`).
 The landing page states what the section is, who it's for, and links to its pages.
 `getting-started/index.md` in particular becomes the onboarding overview & timeline page (T05) — the "front door" of the intake pack — rather than a separate landing plus a separate overview page.
 
 ## "Who this page is for" header
 
-Every page in Getting started, Building your website, the Website administrator guide, the Provider guide, and the working-with-designers one-pager starts with:
+Every page in Getting started, Your website (both the Setup guide and Feature reference groups), Hosting AMS, and the working-with-designers one-pager starts with:
 
 ```markdown
 **Who this page is for:** <audience>, <one clause of calibration if useful>.
@@ -49,28 +50,29 @@ Developer docs may omit this header (audience is implicit: developers) unless th
   Applies to prose paragraphs and list-item text across all documentation pages, including client-facing, provider, and developer pages; tables and code blocks are exempt (there's no useful "sentence" to split them by).
   A list item with more than one sentence continues on the next line, indented to align under the item's text, rather than starting a new list item.
 - **Numbered list continuations use a fixed 4-space indent, not marker-width alignment.** Python-Markdown (which MkDocs uses) requires exactly 4 spaces for a list item's continuation content — a 3-space indent (visually aligned under `1. `) silently breaks the item out of the list, and if that happens right before a blank line and the next marker, each item renders as its own separate list restarting at "1." instead of one continuous list.
-  Found in T13 (`tutorials/orientation.md`), where a step's continuation sentence *and* its screenshot both need to stay inside the same list item.
+  Found in T13 (`website/setup/orientation.md`), where a step's continuation sentence *and* its screenshot both need to stay inside the same list item.
   Confirmed by testing directly against this project's Python-Markdown: a 3-space indent split a two-item list into two separate `<ol>` elements; a 4-space indent kept both items in one list with correct loose-list `<li><p>...</p></li>` structure.
   This matters most for the tutorial series (T13–T23), where every numbered step has a screenshot on its own indented, blank-line-separated line below the step text.
 
 ## Style rules for client-facing pages
 
-Client-facing pages (Getting started, Building your website, Website administrator guide) are written for the audiences in scope §3 — assume no technical knowledge and possibly a tablet, not a desktop with two monitors.
+Client-facing pages (Getting started, Your website: Setup guide and Feature reference) are written for the audiences in scope §3 — assume no technical knowledge and possibly a tablet, not a desktop with two monitors.
 
 - **Reading level:** aim for [Flesch–Kincaid grade 8](https://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests) or lower.
   Short sentences, common words, no unexplained acronyms.
 - **Numbered steps:** any procedure is a numbered list, not prose paragraphs.
 - **One action per step:** each numbered step is a single click, field entry, or decision — never "do X, then Y, then check Z."
-- **Screenshot per step:** each step in a tutorial (Building your website series) carries one screenshot showing the result of that step.
-  Reference pages (Website administrator guide) use screenshots more sparingly, where they resolve ambiguity rather than illustrating every click.
-- **Glossary linking:** the first use of a jargon term on a page links to its entry in `getting-started/glossary.md#term` (e.g. `[DNS](../getting-started/glossary.md#dns)`).
+- **Screenshot per step:** each step in a tutorial (Setup guide series) carries one screenshot showing the result of that step.
+  Reference pages (Feature reference) use screenshots more sparingly, where they resolve ambiguity rather than illustrating every click.
+- **Glossary linking:** the first use of a jargon term on a page links to its entry in `getting-started/glossary.md#term`, with a relative path matching the page's own depth: one `../` from a top-level section page (e.g. `[DNS](../getting-started/glossary.md#dns)` from a Hosting AMS or Developing AMS page), two from a Setup guide/Feature reference page (e.g. `[DNS](../../getting-started/glossary.md#dns)`).
   Don't re-explain the term inline — link instead.
 
-Provider guide pages use the opposite register deliberately: terse, technical, no glossary links, no reading-level target — the operator is technical (scope §3).
+Hosting AMS pages use the opposite register deliberately: terse, technical, no glossary links, no reading-level target — the provider is technical (scope §3).
 
 ## Screenshot conventions
 
-1. **Directory layout:** `docs/docs/images/<section>/`, mirroring the nav section directory names above, e.g. `docs/docs/images/tutorials/`, `docs/docs/images/getting-started/`, `docs/docs/images/admin/`.
+1. **Directory layout:** `docs/docs/images/<section>/`, mirroring the nav section directory names above, e.g. `docs/docs/images/getting-started/`, `docs/docs/images/website/reference/`.
+   The Setup guide section nests one level deeper than the others (`docs/docs/website/setup/`), so its images live at the matching two-level path, `docs/docs/images/website/setup/`, not `docs/docs/images/setup/`.
 2. **File naming:** `<page-slug>-<step-number>-<short-description>.png`, all lowercase, words separated by hyphens.
    Example: `branding-theme-03-colour-picker.png` for step 3 of the branding & theme tutorial.
 3. **Fixed viewport:** 1280×800px for every screenshot, regardless of the audience reading the docs on a tablet — the Wagtail/Django admin UI itself is desktop-oriented, and a fixed viewport is what makes screenshots byte-stable across regenerations (required by T02).
@@ -78,7 +80,7 @@ Provider guide pages use the opposite register deliberately: terse, technical, n
    This doesn't change on-page display size — Material for MkDocs scales images to fit the content column — only sharpness.
 4. **Demo organisation:** all screenshots and examples use a fictional association **"Mathematics Teachers Association"**.
    This name is **not** what `sample_data`/`setup_cms` produce on their own — they leave `AssociationSettings.association_short_name`/`association_long_name` at `"{Language} AMS"` (e.g. "English AMS"), a language-derived placeholder, not a fixed org name.
-   The demo name is set through the CMS itself, by `steps/branding-theme.mjs`'s `brandingAssociationName` capture step — the same "enter your association's name" step [Tutorial 2](../tutorials/branding-theme.md) documents for a real client — rather than by `seed.sh` or any other out-of-tutorial script.
+   The demo name is set through the CMS itself, by `steps/branding-theme.mjs`'s `brandingAssociationName` capture step — the same "enter your association's name" step [Tutorial 2](../website/setup/branding-theme.md) documents for a real client — rather than by `seed.sh` or any other out-of-tutorial script.
    **Consequence:** any screenshot captured earlier than that step in `manifest.json`'s order (the docs-conventions examples below, all of Tutorial 1, and Tutorial 2's own "before" shot of the Association settings page) still shows the language-derived placeholder, not "Mathematics Teachers Association" — expected, since a real new client's site has no name set until they do this step.
    Do not rename the organisation in `sample_data` itself unless a future decision says sample data should default to it too — that's a separate decision.
 5. **Playwright-regenerable rule:** no screenshot may be committed unless the Playwright suite can regenerate it byte-for-visually-identical.
@@ -117,7 +119,7 @@ Provider guide pages use the opposite register deliberately: terse, technical, n
     Found in T15 (`first-pages.md`'s home-page publish step).
 15. **A Title block's own widgets (its colour pickers, its autosize textarea) can clobber a sibling block's still-unsaved edit — this is a real Wagtail-editor bug a real user could hit too, not just an automation-timing issue, and it changes what the *tutorial page itself* says to do, not only `run.mjs`.** Inserting a Title block, filling it, inserting a Lead paragraph block underneath, filling that, and saving once — all in one editing session — intermittently saved an empty tagline. This isn't the same race as bullet 11: instrumenting the hidden `body-1-value-text` input showed it briefly held the *correct* typed value a moment after typing, then reset to `null` on its own several hundred ms later, well before Save draft was even clicked. The reset didn't reproduce with the Lead paragraph block alone (no Title block present) — something about the Title block's widgets appears to trigger a StreamField-wide re-render that overwrites a sibling block's fresh edit before it's saved.
     No amount of waiting inside one session was found to be reliable (reproduced the failure 3 different ways: empty save, and the deterministic hidden-field wait from bullet 11 timing out entirely — the reset can also happen mid-wait). What *was* reliable, 4 clean runs in a row: save the Title block on its own first, then insert and fill the Lead paragraph block against a page reload where the Title block is now server-rendered/static rather than a live, still-mounting widget.
-    Because this is a real editing hazard and not just a scripting inconvenience, the tutorial text itself was changed to match — [Tutorial 3](../tutorials/first-pages.md) has separate "add your title, save" and "add your tagline, save" steps, rather than describing the two-block sequence as one step and only splitting it in the capture script.
+    Because this is a real editing hazard and not just a scripting inconvenience, the tutorial text itself was changed to match — [Tutorial 3](../website/setup/first-pages.md) has separate "add your title, save" and "add your tagline, save" steps, rather than describing the two-block sequence as one step and only splitting it in the capture script.
 16. **Adding a child page under an existing content page (rather than under Home) skips the page-type chooser screen entirely, going straight to the add form.** `ContentPage.subpage_types` (`ams/cms/models/pages.py`) restricts a content page's own children to further content pages only, one allowed type — Wagtail's `add_subpage` view only shows the intermediate "choose a page type" screen when more than one type is allowed, so `createContentPage`'s `.getByRole("link", { name: "Content page", exact: true }).click()` step (needed under Home, which allows several types) has nothing to click on and would hang.
     `shared/browser-helpers.mjs`'s `createChildContentPage()` is a separate helper for this case: it opens the add-subpage URL and fills the title directly, with no type-selection click.
     Found in T16 (`navigation-menus.md`'s "Our story" page, created as a child of About to demonstrate an automatic dropdown) — confirmed live via the Playwright MCP browser before writing the capture step, not assumed from the model code alone.
@@ -136,7 +138,7 @@ Provider guide pages use the opposite register deliberately: terse, technical, n
     The field is driven by a `w-slug` Stimulus controller (`data-action="blur->w-slug#slugify w-sync:check->w-slug#compare w-sync:apply->w-slug#urlify:prevent"`), which appears not to count a `fill()`-set value as a real edit, so it re-syncs from the title on the next block-insertion event regardless of what the field currently displays. The exact internal trigger wasn't root-caused (not needed once the fix direction changed, the same call made for bullet 18's warning-timing gotcha) — the reliable fix is to do the slug edit *last*, after every content block is already in place, never before.
     Found in T17 (`languages-translations.md`), the first page needing a client to deliberately override the auto-filled slug (to match the same page's web address in another language) rather than accept it. `shared/browser-helpers.mjs`'s `setPageSlug()` clicks the field, clears it with `Control+a`/`Backspace`, types the replacement with `pressSequentially()`, and waits for the field's real value to match before returning — and is only ever called immediately before publishing.
 21. **`user_has_active_membership()` (`ams/utils/permissions.py`) returns `True` immediately for any superuser, before it ever looks at that user's own memberships — and `create_sample_admin` creates a full superuser, not just an `is_staff` account.** This means the account page's "you have a current active membership" banner is always shown while signed in as the account used throughout this tutorial series, regardless of what its own membership rows actually say. Confirmed live: applying for a brand-new paid membership (still `Pending`, no payment recorded) still showed the green "active" banner immediately after submitting.
-    This isn't a documentation bug to work around — it's real product behaviour worth telling a reader about, since a site administrator applying for their own membership would see the same misleading banner. The per-membership **Status** column in the table below it (driven by `MembershipStatusBadgeColumn`, which reads each row's own `status()` independent of the viewing user) is what actually reflects `Pending`/`Active`, and is what [Tutorial 6](../tutorials/memberships.md) tells a reader to trust instead.
+    This isn't a documentation bug to work around — it's real product behaviour worth telling a reader about, since a site administrator applying for their own membership would see the same misleading banner. The per-membership **Status** column in the table below it (driven by `MembershipStatusBadgeColumn`, which reads each row's own `status()` independent of the viewing user) is what actually reflects `Pending`/`Active`, and is what [Tutorial 6](../website/setup/memberships.md) tells a reader to trust instead.
     Found in T18 (`memberships.md`), the first tutorial to apply for something whose approval state matters to what's on screen.
 22. **Mailpit (the local dev mail catcher) is reachable directly by its compose service hostname, `mailpit:8025`, from both the script's own Node process and the Playwright-controlled browser it launches — no `localhost` rewrite or route interception needed, unlike bullet 9's Minio case.** Confirmed live: a plain `fetch("http://mailpit:8025/api/v1/messages")` from `run.mjs` itself (not from a `page`) successfully reached Mailpit's HTTP API to clear its inbox and to look up a specific message's ID, and `page.goto("http://mailpit:8025/view/<id>")` in the capture browser rendered that message directly.
     Mailpit accumulates every message sent since the environment last started — it isn't reset by `seed.sh` — so a capture step that screenshots an email needs to clear the inbox first (`DELETE /api/v1/messages`) immediately before triggering whatever sends it, otherwise leftover messages from earlier manual testing or an earlier partial run make the result non-deterministic (which message is "the" staff notification). `steps/memberships.mjs`'s `clearMailpit()` does this; a later step that only *views* a message Mailpit already holds relies on manifest order rather than clearing again itself, the same "mutate once, view later" pattern bullet 8 already establishes for on-site state. `getMailpitMessageIdByFrom()` then finds that message's ID via the API (matching on the sender address) so the step can open it by URL, rather than clicking through Mailpit's own inbox UI to find it.
@@ -167,14 +169,14 @@ Provider guide pages use the opposite register deliberately: terse, technical, n
 
 ## Tutorial series page template
 
-Established by T13 (`tutorials/orientation.md`), binding on every later page in the "Building your website" series (T14–T23).
+Established by T13 (`website/setup/orientation.md`), binding on every later page in the "Setup guide" series (T14–T23).
 
 - **Structure:** "Who this page is for" header, then a short "What you'll have at the end" intro stating concrete outcomes, then an optional "Before you start" section for prerequisites, then a numbered **Steps** list (one action per step, one screenshot per step showing the result of that step), then any reference material the task's own guidance calls for (e.g. a table distinguishing several parts of the system), then a "What's next" footer linking to the following tutorial.
 - **Screenshot reuse within a page:** if a step's result is "you're back on a page already screenshotted earlier on the same page" (for example, returning from the CMS to your account page), reuse that screenshot's file rather than capturing a near-duplicate.
   It's still one manifest entry; the page just embeds it twice.
 - **Forward-chaining stubs:** each tutorial task creates a minimal stub for the *next* tutorial in the series (same pattern T01/T05 used for forward references), so its own "What's next" link resolves under the strict build.
   The next task then replaces that stub in place, same filename, rather than renaming the file or re-editing the nav.
-- **Series index:** `tutorials/index.md` keeps a numbered list of all eleven tutorials.
+- **Series index:** `website/setup/index.md` keeps a numbered list of all eleven tutorials.
   Only the tutorials that exist so far are links; the rest stay as plain text until their task lands.
 
 ## Diagrams
@@ -194,7 +196,7 @@ Prefer a diagram for sequence/flow relationships (e.g. an onboarding phase seque
 ## Public absolute links (mkdocs-macros)
 
 Most pages link to each other with ordinary relative Markdown links (`../getting-started/index.md`), which the strict build verifies resolve and which work identically in a local preview and on the published site.
-Some pages are meant to be **copied out of the docs site** rather than read in place — `provider/client-communication-templates.md` is the first example, since its email templates need real, clickable URLs once pasted into an email client, not relative paths that only resolve inside a docs build.
+Some pages are meant to be **copied out of the docs site** rather than read in place — `hosting/client-communication-templates.md` is the first example, since its email templates need real, clickable URLs once pasted into an email client, not relative paths that only resolve inside a docs build.
 
 **Mechanism:** the [`mkdocs-macros` plugin](https://github.com/fralau/mkdocs-macros-plugin) (installed in `compose/local/docs/Dockerfile`, enabled in `docs/mkdocs.yml`) lets a page use `{{ config.site_url }}` — `site_url` is set in `docs/mkdocs.yml` to the site's real published URL — to build an absolute link that renders correctly regardless of where the docs are served from.
 
