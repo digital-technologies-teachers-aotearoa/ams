@@ -16,7 +16,7 @@ There are several key settings that need to be set to ensure the forum works as 
 These need to be set by the administrator account for Discourse, and can be set on the site settings page.
 
 !!! warning "Replace `discourse_connect_secret`"
-    `changeme` below is a placeholder, not a value to copy verbatim. Generate your own secret and set it here, then set the exact same value as AMS's `DISCOURSE_CONNECT_SECRET` environment variable (see [deployment: environment variables](../developer/deployment.md#environment-variables)) — if the two don't match, SSO login fails.
+    `changeme` below is a placeholder, not a value to copy verbatim. Generate your own secret and set it here, then set the exact same value as AMS's `DISCOURSE_CONNECT_SECRET` environment variable (see [deployment: environment variables](../../developer/deployment.md#environment-variables)) — if the two don't match, SSO login fails.
 
 ```yaml
 # The following settings set up single sign on
@@ -54,4 +54,4 @@ bootstrap_mode_min_users: '0'
 
 AMS is the source of truth for forum admin status. On every SSO login, AMS sends an `admin` field to Discourse based on whether the Django user is a superuser: superusers are granted Discourse admin, and everyone else has admin explicitly revoked. This means demoting a superuser in Django removes their forum admin rights on their next login, and it will also demote any user who was manually made an admin directly in Discourse. Regular Django staff (`is_staff`) are not granted any elevated forum role.
 
-See [Tutorial 7: Forum](../tutorials/forum.md) for a walkthrough of what this looks like from a client's side, including the "you must have an active membership" message a member without one sees.
+See [Tutorial 7: Forum](../setup/forum.md) for a walkthrough of what this looks like from a client's side, including the "you must have an active membership" message a member without one sees.

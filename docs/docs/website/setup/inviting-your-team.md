@@ -14,23 +14,23 @@ New team member accounts are created in the **Django admin**, not the CMS — se
 
 1. In the Django admin, click **Users**, then click **Add** next to **Users**.
 
-    ![The empty Add user form](../images/tutorials/inviting-01-form-empty.png)
+    ![The empty Add user form](../../images/website/setup/inviting-01-form-empty.png)
 
 2. Fill in their name, email address, and a password, then click **Save**.
     The username becomes part of their own account page's web address, and is also used for [the forum](forum.md) — anything short and simple works.
 
-    ![The new user's page, reached automatically after saving](../images/tutorials/inviting-02-user-created.png)
+    ![The new user's page, reached automatically after saving](../../images/website/setup/inviting-02-user-created.png)
 
     You choose this password yourself — there's no way to invite someone without setting one first.
     Give it to them however you'd share any password, or skip that altogether and tell them to click **Forgot your password?** on the sign-in page to set their own the first time they sign in.
 
 3. Under **Permissions**, tick **Staff status** and add them to **Editors** or **Moderators** under **Groups** (see the table below for the difference), then click **Save and continue editing**.
 
-    ![The Permissions section after saving, showing Staff status ticked and Editors added under Groups](../images/tutorials/inviting-03-permissions-saved.png)
+    ![The Permissions section after saving, showing Staff status ticked and Editors added under Groups](../../images/website/setup/inviting-03-permissions-saved.png)
 
 4. Tell your new team member to check their email.
 
-    ![The confirmation email a new team member receives](../images/tutorials/inviting-04-confirmation-email.png)
+    ![The confirmation email a new team member receives](../../images/website/setup/inviting-04-confirmation-email.png)
 
     Every new account has to be confirmed by email before it can sign in — this isn't optional, and it happens the first time they try to sign in, not the moment you create the account.
 
@@ -38,7 +38,7 @@ New team member accounts are created in the **Django admin**, not the CMS — se
 
 Once they've confirmed their email and signed in, they'll land on their own account page, with buttons under **Staff links** for whichever access you gave them.
 
-![A new team member's account page, showing their Staff links](../images/tutorials/inviting-05-staff-links.png)
+![A new team member's account page, showing their Staff links](../../images/website/setup/inviting-05-staff-links.png)
 
 ## What each permission level does
 

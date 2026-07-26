@@ -56,7 +56,7 @@ Migrating or changing your everyday email is a separate service, out of scope fo
 Which of these do you want switched on for launch?
 Each can also be switched on later if you're not sure yet.
 
-1. **Forum** — a discussion area for members, powered by Discourse (see the [forum admin guide](../admin/forum.md)).
+1. **Forum** — a discussion area for members, powered by Discourse (see the [forum admin guide](../website/reference/forum.md)).
    Has its own separate subscription cost — see the [costs sheet](costs-sheet.md).
 2. **Events** — publish and manage events on your site.
    See [`AMS_EVENTS_ENABLED`](settings-glossary.md#ams_events_enabled).
@@ -95,7 +95,7 @@ If data location isn't a concern for your organisation, the default is the faste
 Tell us who holds each of the following — the same person can hold more than one role:
 
 1. **Site admin** — has full control of your website's content and settings.
-2. **Content loader(s)** — the volunteer(s) who will add your pages, events, and resources (see the [Building your website](../tutorials/index.md) tutorials).
+2. **Content loader(s)** — the volunteer(s) who will add your pages, events, and resources (see the [Building your website](../website/setup/index.md) tutorials).
 3. **DNS controller** — whoever has access to your domain registrar account, since they'll need to add DNS records when asked.
 4. **Credit-card holder** — for each service in the [accounts & access checklist](accounts-checklist.md), who is loading payment details?
    This can differ per service.

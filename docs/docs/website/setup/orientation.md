@@ -18,27 +18,27 @@ If you don't have these yet, ask your provider before continuing.
 1. Go to your website's sign-in page.
     Your provider will give you the exact web address, or you can click **Sign In** at the top of any page on your site.
 
-    ![The AMS sign-in page](../images/tutorials/orientation-01-sign-in.png)
+    ![The AMS sign-in page](../../images/website/setup/orientation-01-sign-in.png)
 
 2. Enter your email and password, then click **Sign In**.
     You'll land on your own account page.
 
-    ![Your account page immediately after signing in](../images/tutorials/orientation-02-your-account.png)
+    ![Your account page immediately after signing in](../../images/website/setup/orientation-02-your-account.png)
 
 3. Scroll down past **Memberships** and **Organisations** to **Staff links**, then click **Wagtail CMS**.
-    This opens the [CMS](../getting-started/glossary.md#cms) — the tool you'll use most often to edit pages, upload images, and manage menus.
+    This opens the [CMS](../../getting-started/glossary.md#cms) — the tool you'll use most often to edit pages, upload images, and manage menus.
 
-    ![The Wagtail CMS dashboard](../images/tutorials/orientation-03-cms-dashboard.png)
+    ![The Wagtail CMS dashboard](../../images/website/setup/orientation-03-cms-dashboard.png)
 
 4. Click your profile icon (top right of any page) and choose **My Dashboard** to go back to your account page.
 
-    ![Your account page again](../images/tutorials/orientation-02-your-account.png)
+    ![Your account page again](../../images/website/setup/orientation-02-your-account.png)
 
 5. Scroll down to **Staff links** again, and this time click **Website Admin**.
     This opens the Django admin: a more technical screen, mainly used by your provider for setup and troubleshooting.
     You probably won't need it for everyday content work — the rest of this tutorial series uses the CMS.
 
-    ![The Django admin](../images/tutorials/orientation-04-django-admin.png)
+    ![The Django admin](../../images/website/setup/orientation-04-django-admin.png)
 
 ## The four parts of your site
 
@@ -50,9 +50,9 @@ This tutorial series is mostly about the second one.
 | Public site | Your website's normal address | What visitors and members see and use | Everyone |
 | CMS (Wagtail) | `/cms/`, via the **Wagtail CMS** button | Editing pages, images, documents, and menus — your main work area | Content loaders, editors, the site admin |
 | Django admin | `/admin/`, via the **Website Admin** button | Technical records such as memberships, billing, and user accounts — used occasionally, mostly for setup | The site admin, your provider |
-| [Forum](../getting-started/glossary.md#forum) | A separate address your provider gives you | Member discussions, powered by a connected product called Discourse | Members, forum moderators |
+| [Forum](../../getting-started/glossary.md#forum) | A separate address your provider gives you | Member discussions, powered by a connected product called Discourse | Members, forum moderators |
 
-Signing in to the public site also signs you in to the forum automatically, through [single sign-on](../getting-started/glossary.md#sso) — you never need a separate forum password.
+Signing in to the public site also signs you in to the forum automatically, through [single sign-on](../../getting-started/glossary.md#sso) — you never need a separate forum password.
 
 ## What's next
 

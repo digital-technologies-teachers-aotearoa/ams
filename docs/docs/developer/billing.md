@@ -2,7 +2,7 @@
 
 AMS uses a pluggable billing service architecture that allows integration with various billing providers. Currently, Xero is the supported billing provider using the Custom Connection flow.
 
-This page is the canonical, detailed reference for that flow — the [admin guide: Xero billing](../admin/xero-billing.md) and the [provisioning runbook](../provider/provisioning-runbook.md#7-xero-connection) both link back here rather than duplicating it.
+This page is the canonical, detailed reference for that flow — the [admin guide: Xero billing](../website/reference/xero-billing.md) and the [provisioning runbook](../hosting/provisioning-runbook.md#7-xero-connection) both link back here rather than duplicating it.
 
 ## Overview
 

@@ -1,12 +1,11 @@
-# Website administrator guide
+# Feature reference
 
 **Who this page is for:** client website admins — the volunteers who run the day-to-day site once it's launched, and anyone who needs to look up how a specific feature works.
 
-This section is a **standing reference**, not a guided path.
-If you're setting up your site for the first time, start with [Building your website](../tutorials/index.md) instead — it walks you through the same features in order, from an empty site to launch.
-Come back here afterwards, whenever you need to look up a detail the tutorials didn't cover in full, or need a refresher on something you set up a while ago.
+This section is a **standing reference**, not a guided path — see [Setup guide](../setup/index.md) for that.
+Come back here whenever you need to look up a detail the setup guide didn't cover in full, or need a refresher on something you set up a while ago.
 
-Most pages in this section assume the same non-technical background as the tutorials.
+Most pages in this section assume the same non-technical background as the setup guide.
 Two are the exception, because the feature itself is technical: [Forum](forum.md)'s setup section quotes raw Discourse configuration values, and [Xero billing](xero-billing.md) is a one-time integration setup normally handled by your provider. Both still explain what each step is for in plain language.
 
 ## Pages in this section

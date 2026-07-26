@@ -2,7 +2,7 @@
 
 Customize your website's colors and appearance directly from the Wagtail admin interface—no code changes or technical knowledge required.
 
-See [Tutorial 2: Branding & theme](../tutorials/branding-theme.md) for a step-by-step walkthrough of uploading your logo and setting your primary colour and font — this page covers every field in full.
+See [Tutorial 2: Branding & theme](../setup/branding-theme.md) for a step-by-step walkthrough of uploading your logo and setting your primary colour and font — this page covers every field in full.
 
 ## Quick Start
 

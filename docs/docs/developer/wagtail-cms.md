@@ -262,5 +262,5 @@ When developing CMS features:
 
 ### Client-facing documentation
 
-- [Admin guide: CMS](../admin/cms.md) — the same page types and concepts, explained for non-technical website admins.
-- [Building your website](../tutorials/index.md) — the guided tutorial series that walks a client through using this system for the first time.
+- [Admin guide: CMS](../website/reference/cms.md) — the same page types and concepts, explained for non-technical website admins.
+- [Building your website](../website/setup/index.md) — the guided tutorial series that walks a client through using this system for the first time.

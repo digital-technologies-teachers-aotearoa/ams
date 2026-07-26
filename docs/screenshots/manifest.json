@@ -15,513 +15,513 @@
   },
   {
     "id": "orientation-sign-in",
-    "file": "tutorials/orientation-01-sign-in.png",
+    "file": "website/setup/orientation-01-sign-in.png",
     "step": "orientationSignIn",
-    "pages": ["tutorials/orientation.md"],
+    "pages": ["website/setup/orientation.md"],
     "description": "The AMS sign-in page, before entering any credentials."
   },
   {
     "id": "orientation-your-account",
-    "file": "tutorials/orientation-02-your-account.png",
+    "file": "website/setup/orientation-02-your-account.png",
     "step": "orientationYourAccount",
-    "pages": ["tutorials/orientation.md"],
+    "pages": ["website/setup/orientation.md"],
     "description": "The page you land on immediately after signing in, showing the Staff links section with the Website Admin and Wagtail CMS buttons."
   },
   {
     "id": "orientation-cms-dashboard",
-    "file": "tutorials/orientation-03-cms-dashboard.png",
+    "file": "website/setup/orientation-03-cms-dashboard.png",
     "step": "orientationCmsDashboard",
-    "pages": ["tutorials/orientation.md"],
+    "pages": ["website/setup/orientation.md"],
     "description": "The Wagtail CMS dashboard, reached via the Wagtail CMS button."
   },
   {
     "id": "orientation-django-admin",
-    "file": "tutorials/orientation-04-django-admin.png",
+    "file": "website/setup/orientation-04-django-admin.png",
     "step": "orientationDjangoAdmin",
-    "pages": ["tutorials/orientation.md"],
+    "pages": ["website/setup/orientation.md"],
     "description": "The Django admin index, reached via the Website Admin button."
   },
   {
     "id": "branding-association-settings",
-    "file": "tutorials/branding-theme-01-association-settings.png",
+    "file": "website/setup/branding-theme-01-association-settings.png",
     "step": "brandingAssociationSettings",
-    "pages": ["tutorials/branding-theme.md"],
+    "pages": ["website/setup/branding-theme.md"],
     "description": "The Association settings page before the association name has been set."
   },
   {
     "id": "branding-association-name-saved",
-    "file": "tutorials/branding-theme-02-name-saved.png",
+    "file": "website/setup/branding-theme-02-name-saved.png",
     "step": "brandingAssociationName",
-    "pages": ["tutorials/branding-theme.md"],
+    "pages": ["website/setup/branding-theme.md"],
     "description": "The confirmation message after saving the association's short and long name."
   },
   {
     "id": "branding-upload-tab",
-    "file": "tutorials/branding-theme-03-upload-logo.png",
+    "file": "website/setup/branding-theme-03-upload-logo.png",
     "step": "brandingUploadTab",
-    "pages": ["tutorials/branding-theme.md"],
+    "pages": ["website/setup/branding-theme.md"],
     "description": "The image chooser's Upload tab, open and empty, reached from the Association logo field."
   },
   {
     "id": "branding-logo-selected",
-    "file": "tutorials/branding-theme-04-logo-selected.png",
+    "file": "website/setup/branding-theme-04-logo-selected.png",
     "step": "brandingLogoSelected",
-    "pages": ["tutorials/branding-theme.md"],
+    "pages": ["website/setup/branding-theme.md"],
     "description": "The uploaded logo now selected in the Association logo field, before the form is saved."
   },
   {
     "id": "branding-logo-saved",
-    "file": "tutorials/branding-theme-05-logo-saved.png",
+    "file": "website/setup/branding-theme-05-logo-saved.png",
     "step": "brandingLogoSaved",
-    "pages": ["tutorials/branding-theme.md"],
+    "pages": ["website/setup/branding-theme.md"],
     "description": "The confirmation message after saving the logo with both navbar and footer toggles on."
   },
   {
     "id": "branding-logo-live",
-    "file": "tutorials/branding-theme-06-logo-live.png",
+    "file": "website/setup/branding-theme-06-logo-live.png",
     "step": "brandingLogoLive",
-    "pages": ["tutorials/branding-theme.md"],
+    "pages": ["website/setup/branding-theme.md"],
     "description": "The public homepage showing the logo in the navbar and footer."
   },
   {
     "id": "branding-theme-settings",
-    "file": "tutorials/branding-theme-07-theme-settings.png",
+    "file": "website/setup/branding-theme-07-theme-settings.png",
     "step": "brandingThemeSettings",
-    "pages": ["tutorials/branding-theme.md"],
+    "pages": ["website/setup/branding-theme.md"],
     "description": "Theme Settings scrolled to the Primary colour section, showing the default blue."
   },
   {
     "id": "branding-primary-saved",
-    "file": "tutorials/branding-theme-08-primary-saved.png",
+    "file": "website/setup/branding-theme-08-primary-saved.png",
     "step": "brandingPrimarySaved",
-    "pages": ["tutorials/branding-theme.md"],
+    "pages": ["website/setup/branding-theme.md"],
     "description": "The Primary field now showing a purple brand colour after saving."
   },
   {
     "id": "branding-font-saved",
-    "file": "tutorials/branding-theme-09-font-saved.png",
+    "file": "website/setup/branding-theme-09-font-saved.png",
     "step": "brandingFontSaved",
-    "pages": ["tutorials/branding-theme.md"],
+    "pages": ["website/setup/branding-theme.md"],
     "description": "The Sans-serif font stack field now showing a different font after saving."
   },
   {
     "id": "first-pages-home-edit-empty",
-    "file": "tutorials/first-pages-01-home-edit-empty.png",
+    "file": "website/setup/first-pages-01-home-edit-empty.png",
     "step": "firstPagesHomeEditEmpty",
-    "pages": ["tutorials/first-pages.md"],
+    "pages": ["website/setup/first-pages.md"],
     "description": "The home page's edit form, before any content has been added to its Body."
   },
   {
     "id": "first-pages-home-title",
-    "file": "tutorials/first-pages-02-home-title.png",
+    "file": "website/setup/first-pages-02-home-title.png",
     "step": "firstPagesHomeTitle",
-    "pages": ["tutorials/first-pages.md"],
+    "pages": ["website/setup/first-pages.md"],
     "description": "A Title block added to the home page's Body as its main heading, saved as a draft."
   },
   {
     "id": "first-pages-home-tagline",
-    "file": "tutorials/first-pages-03-home-tagline.png",
+    "file": "website/setup/first-pages-03-home-tagline.png",
     "step": "firstPagesHomeTagline",
-    "pages": ["tutorials/first-pages.md"],
+    "pages": ["website/setup/first-pages.md"],
     "description": "A Lead paragraph tagline added under the Title block, saved as a draft."
   },
   {
     "id": "first-pages-home-preview",
-    "file": "tutorials/first-pages-04-home-preview.png",
+    "file": "website/setup/first-pages-04-home-preview.png",
     "step": "firstPagesHomePreview",
-    "pages": ["tutorials/first-pages.md"],
+    "pages": ["website/setup/first-pages.md"],
     "description": "The preview panel showing the title and tagline as they will appear on the live site, before publishing."
   },
   {
     "id": "first-pages-home-published",
-    "file": "tutorials/first-pages-05-home-published.png",
+    "file": "website/setup/first-pages-05-home-published.png",
     "step": "firstPagesHomePublished",
-    "pages": ["tutorials/first-pages.md"],
+    "pages": ["website/setup/first-pages.md"],
     "description": "The confirmation message after publishing the home page."
   },
   {
     "id": "first-pages-add-child-page",
-    "file": "tutorials/first-pages-06-add-child-page.png",
+    "file": "website/setup/first-pages-06-add-child-page.png",
     "step": "firstPagesAddChildPage",
-    "pages": ["tutorials/first-pages.md"],
+    "pages": ["website/setup/first-pages.md"],
     "description": "The page type chooser shown after clicking Add child page under Home."
   },
   {
     "id": "first-pages-about-content",
-    "file": "tutorials/first-pages-07-about-content.png",
+    "file": "website/setup/first-pages-07-about-content.png",
     "step": "firstPagesAboutContent",
-    "pages": ["tutorials/first-pages.md"],
+    "pages": ["website/setup/first-pages.md"],
     "description": "The new About page with its title and a Paragraph block filled in, saved as a draft."
   },
   {
     "id": "first-pages-about-published",
-    "file": "tutorials/first-pages-08-about-published.png",
+    "file": "website/setup/first-pages-08-about-published.png",
     "step": "firstPagesAboutPublished",
-    "pages": ["tutorials/first-pages.md"],
+    "pages": ["website/setup/first-pages.md"],
     "description": "The confirmation message after publishing the About page, shown on the home page's child page list."
   },
   {
     "id": "first-pages-contact-form-block",
-    "file": "tutorials/first-pages-09-contact-form-block.png",
+    "file": "website/setup/first-pages-09-contact-form-block.png",
     "step": "firstPagesContactFormBlock",
-    "pages": ["tutorials/first-pages.md"],
+    "pages": ["website/setup/first-pages.md"],
     "description": "The new Contact page with a Contact Form block added and its recipient email filled in, saved as a draft."
   },
   {
     "id": "first-pages-contact-live",
-    "file": "tutorials/first-pages-10-contact-live.png",
+    "file": "website/setup/first-pages-10-contact-live.png",
     "step": "firstPagesContactLive",
-    "pages": ["tutorials/first-pages.md"],
+    "pages": ["website/setup/first-pages.md"],
     "description": "The published Contact page on the live site, showing the contact form visitors see."
   },
   {
     "id": "navigation-main-menu-empty",
-    "file": "tutorials/navigation-menus-01-main-menu-empty.png",
+    "file": "website/setup/navigation-menus-01-main-menu-empty.png",
     "step": "navigationMainMenuEmpty",
-    "pages": ["tutorials/navigation-menus.md"],
+    "pages": ["website/setup/navigation-menus.md"],
     "description": "The Main menu editor for the English site, before any menu items have been added."
   },
   {
     "id": "navigation-about-item-added",
-    "file": "tutorials/navigation-menus-02-about-item-added.png",
+    "file": "website/setup/navigation-menus-02-about-item-added.png",
     "step": "navigationAboutItemAdded",
-    "pages": ["tutorials/navigation-menus.md"],
+    "pages": ["website/setup/navigation-menus.md"],
     "description": "A menu item linked to the About page, chosen but not yet saved."
   },
   {
     "id": "navigation-contact-item-added",
-    "file": "tutorials/navigation-menus-03-contact-item-added.png",
+    "file": "website/setup/navigation-menus-03-contact-item-added.png",
     "step": "navigationContactItemAdded",
-    "pages": ["tutorials/navigation-menus.md"],
+    "pages": ["website/setup/navigation-menus.md"],
     "description": "Both the About and Contact menu items filled in, not yet saved."
   },
   {
     "id": "navigation-items-saved",
-    "file": "tutorials/navigation-menus-04-items-saved.png",
+    "file": "website/setup/navigation-menus-04-items-saved.png",
     "step": "navigationItemsSaved",
-    "pages": ["tutorials/navigation-menus.md"],
+    "pages": ["website/setup/navigation-menus.md"],
     "description": "The confirmation message after saving the menu with About and Contact added."
   },
   {
     "id": "navigation-menu-live",
-    "file": "tutorials/navigation-menus-05-menu-live.png",
+    "file": "website/setup/navigation-menus-05-menu-live.png",
     "step": "navigationMenuLive",
-    "pages": ["tutorials/navigation-menus.md"],
+    "pages": ["website/setup/navigation-menus.md"],
     "description": "The public site showing About and Contact in the navigation menu."
   },
   {
     "id": "navigation-about-child-added",
-    "file": "tutorials/navigation-menus-06-about-child-added.png",
+    "file": "website/setup/navigation-menus-06-about-child-added.png",
     "step": "navigationAboutChildAdded",
-    "pages": ["tutorials/navigation-menus.md"],
+    "pages": ["website/setup/navigation-menus.md"],
     "description": "The confirmation message after publishing a new \"Our story\" page under About, shown on About's own child page list."
   },
   {
     "id": "navigation-dropdown-live",
-    "file": "tutorials/navigation-menus-07-dropdown-live.png",
+    "file": "website/setup/navigation-menus-07-dropdown-live.png",
     "step": "navigationDropdownLive",
-    "pages": ["tutorials/navigation-menus.md"],
+    "pages": ["website/setup/navigation-menus.md"],
     "description": "The public site with the About menu item expanded, showing Our story as a dropdown item, added automatically because About now has a published child page."
   },
   {
     "id": "navigation-reorder-saved",
-    "file": "tutorials/navigation-menus-08-reorder-saved.png",
+    "file": "website/setup/navigation-menus-08-reorder-saved.png",
     "step": "navigationReorderSaved",
-    "pages": ["tutorials/navigation-menus.md"],
+    "pages": ["website/setup/navigation-menus.md"],
     "description": "The confirmation message after moving Contact above About in the menu editor and saving."
   },
   {
     "id": "footer-flat-menu-empty",
-    "file": "tutorials/navigation-menus-09-footer-flat-menu-empty.png",
+    "file": "website/setup/navigation-menus-09-footer-flat-menu-empty.png",
     "step": "footerFlatMenuEmpty",
-    "pages": ["tutorials/navigation-menus.md"],
+    "pages": ["website/setup/navigation-menus.md"],
     "description": "The empty Add flat menu form."
   },
   {
     "id": "footer-flat-menu-filled",
-    "file": "tutorials/navigation-menus-10-footer-flat-menu-filled.png",
+    "file": "website/setup/navigation-menus-10-footer-flat-menu-filled.png",
     "step": "footerFlatMenuFilled",
-    "pages": ["tutorials/navigation-menus.md"],
+    "pages": ["website/setup/navigation-menus.md"],
     "description": "The Add flat menu form filled in with a title, site, handle, and heading, not yet saved."
   },
   {
     "id": "footer-internal-item",
-    "file": "tutorials/navigation-menus-11-footer-internal-item.png",
+    "file": "website/setup/navigation-menus-11-footer-internal-item.png",
     "step": "footerInternalItemAdded",
-    "pages": ["tutorials/navigation-menus.md"],
+    "pages": ["website/setup/navigation-menus.md"],
     "description": "A footer menu item linked to the About page, not yet saved."
   },
   {
     "id": "footer-external-item",
-    "file": "tutorials/navigation-menus-12-footer-external-item.png",
+    "file": "website/setup/navigation-menus-12-footer-external-item.png",
     "step": "footerExternalItemAdded",
-    "pages": ["tutorials/navigation-menus.md"],
+    "pages": ["website/setup/navigation-menus.md"],
     "description": "A footer menu item linking to an external website via a custom URL and custom link text, not yet saved."
   },
   {
     "id": "footer-column-saved",
-    "file": "tutorials/navigation-menus-13-footer-column-saved.png",
+    "file": "website/setup/navigation-menus-13-footer-column-saved.png",
     "step": "footerColumn1Saved",
-    "pages": ["tutorials/navigation-menus.md"],
+    "pages": ["website/setup/navigation-menus.md"],
     "description": "The confirmation message after saving the footer column, listed among the site's flat menus."
   },
   {
     "id": "footer-live",
-    "file": "tutorials/navigation-menus-14-footer-live.png",
+    "file": "website/setup/navigation-menus-14-footer-live.png",
     "step": "footerLive",
-    "pages": ["tutorials/navigation-menus.md"],
+    "pages": ["website/setup/navigation-menus.md"],
     "description": "The public site's footer showing two independently named columns, each with its own heading and links."
   },
   {
     "id": "languages-switcher-open",
-    "file": "tutorials/languages-translations-01-switcher-open.png",
+    "file": "website/setup/languages-translations-01-switcher-open.png",
     "step": "languagesSwitcherOpen",
-    "pages": ["tutorials/languages-translations.md"],
+    "pages": ["website/setup/languages-translations.md"],
     "description": "The public site's language switcher open, as seen by a signed-out visitor, listing Te Reo Māori and English."
   },
   {
     "id": "languages-maori-home-empty",
-    "file": "tutorials/languages-translations-02-maori-home-empty.png",
+    "file": "website/setup/languages-translations-02-maori-home-empty.png",
     "step": "languagesMaoriHomeEmpty",
-    "pages": ["tutorials/languages-translations.md"],
+    "pages": ["website/setup/languages-translations.md"],
     "description": "The Te Reo Māori home page, reached via the language switcher, still empty because no content has been added to it yet."
   },
   {
     "id": "languages-pages-root",
-    "file": "tutorials/languages-translations-03-pages-root.png",
+    "file": "website/setup/languages-translations-03-pages-root.png",
     "step": "languagesPagesRoot",
-    "pages": ["tutorials/languages-translations.md"],
+    "pages": ["website/setup/languages-translations.md"],
     "description": "The Pages explorer at the root level, showing a separate Home page for each enabled language."
   },
   {
     "id": "languages-maori-about-chooser",
-    "file": "tutorials/languages-translations-04-add-child-chooser.png",
+    "file": "website/setup/languages-translations-04-add-child-chooser.png",
     "step": "languagesMaoriAboutChooser",
-    "pages": ["tutorials/languages-translations.md"],
+    "pages": ["website/setup/languages-translations.md"],
     "description": "The page type chooser shown after clicking Add child page under the Te Reo Māori Home."
   },
   {
     "id": "languages-maori-about-content-slug",
-    "file": "tutorials/languages-translations-05-about-content-slug.png",
+    "file": "website/setup/languages-translations-05-about-content-slug.png",
     "step": "languagesMaoriAboutContentSlug",
-    "pages": ["tutorials/languages-translations.md"],
+    "pages": ["website/setup/languages-translations.md"],
     "description": "The new Māori About page's Promote tab, with its title and content already filled in and its slug corrected to match the English About page's web address."
   },
   {
     "id": "languages-maori-about-published",
-    "file": "tutorials/languages-translations-06-about-published.png",
+    "file": "website/setup/languages-translations-06-about-published.png",
     "step": "languagesMaoriAboutPublished",
-    "pages": ["tutorials/languages-translations.md"],
+    "pages": ["website/setup/languages-translations.md"],
     "description": "The confirmation message after publishing the Māori About page."
   },
   {
     "id": "languages-switch-round-trip",
-    "file": "tutorials/languages-translations-07-switch-round-trip.png",
+    "file": "website/setup/languages-translations-07-switch-round-trip.png",
     "step": "languagesSwitchRoundTrip",
-    "pages": ["tutorials/languages-translations.md"],
+    "pages": ["website/setup/languages-translations.md"],
     "description": "The Māori About page, reached directly from the English About page by clicking the language switcher, proving the two matching web addresses line up."
   },
   {
     "id": "memberships-option-form-empty",
-    "file": "tutorials/memberships-01-option-form-empty.png",
+    "file": "website/setup/memberships-01-option-form-empty.png",
     "step": "membershipsOptionFormEmpty",
-    "pages": ["tutorials/memberships.md"],
+    "pages": ["website/setup/memberships.md"],
     "description": "The empty Add membership option form in the Django admin."
   },
   {
     "id": "memberships-option-saved",
-    "file": "tutorials/memberships-02-option-saved.png",
+    "file": "website/setup/memberships-02-option-saved.png",
     "step": "membershipsOptionSaved",
-    "pages": ["tutorials/memberships.md"],
+    "pages": ["website/setup/memberships.md"],
     "description": "The new Standard membership option listed after saving, in the Django admin."
   },
   {
     "id": "memberships-signup-form",
-    "file": "tutorials/memberships-03-signup-form.png",
+    "file": "website/setup/memberships-03-signup-form.png",
     "step": "membershipsSignupForm",
-    "pages": ["tutorials/memberships.md"],
+    "pages": ["website/setup/memberships.md"],
     "description": "The membership application page, showing the new membership option as a pricing card, exactly as a member sees it."
   },
   {
     "id": "memberships-signup-submitted",
-    "file": "tutorials/memberships-04-signup-submitted.png",
+    "file": "website/setup/memberships-04-signup-submitted.png",
     "step": "membershipsSignupSubmitted",
-    "pages": ["tutorials/memberships.md"],
+    "pages": ["website/setup/memberships.md"],
     "description": "The account page after applying, showing the pending-review message and the new membership's Pending status and awaiting-payment invoice."
   },
   {
     "id": "memberships-approval-pending",
-    "file": "tutorials/memberships-05-approval-pending.png",
+    "file": "website/setup/memberships-05-approval-pending.png",
     "step": "membershipsApprovalPending",
-    "pages": ["tutorials/memberships.md"],
+    "pages": ["website/setup/memberships.md"],
     "description": "The pending membership's admin record, showing Status: Pending and an empty Approved datetime field."
   },
   {
     "id": "memberships-approval-approved",
-    "file": "tutorials/memberships-06-approval-approved.png",
+    "file": "website/setup/memberships-06-approval-approved.png",
     "step": "membershipsApprovalApproved",
-    "pages": ["tutorials/memberships.md"],
+    "pages": ["website/setup/memberships.md"],
     "description": "The same admin record after filling in Approved datetime and saving, now showing Status: Active."
   },
   {
     "id": "memberships-staff-notification",
-    "file": "tutorials/memberships-07-staff-notification.png",
+    "file": "website/setup/memberships-07-staff-notification.png",
     "step": "membershipsStaffNotification",
-    "pages": ["tutorials/memberships.md"],
+    "pages": ["website/setup/memberships.md"],
     "description": "The rendered HTML content of the staff notification email sent when the application was submitted."
   },
   {
     "id": "forum-sign-in-prompt",
-    "file": "tutorials/forum-01-sign-in-prompt.png",
+    "file": "website/setup/forum-01-sign-in-prompt.png",
     "step": "forumSignInPrompt",
-    "pages": ["tutorials/forum.md"],
+    "pages": ["website/setup/forum.md"],
     "description": "The AMS sign-in page, reached by visiting the forum's own address before signing in to the website."
   },
   {
     "id": "forum-home",
-    "file": "tutorials/forum-02-home.png",
+    "file": "website/setup/forum-02-home.png",
     "step": "forumHome",
-    "pages": ["tutorials/forum.md"],
+    "pages": ["website/setup/forum.md"],
     "description": "The forum's home page, signed in as the site admin, with the Admin link visible in the sidebar."
   },
   {
     "id": "forum-categories",
-    "file": "tutorials/forum-03-categories.png",
+    "file": "website/setup/forum-03-categories.png",
     "step": "forumCategories",
-    "pages": ["tutorials/forum.md"],
+    "pages": ["website/setup/forum.md"],
     "description": "The forum's Categories page, showing the three starter categories: General, Site Feedback, and Staff."
   },
   {
     "id": "forum-new-category-form",
-    "file": "tutorials/forum-04-new-category-form.png",
+    "file": "website/setup/forum-04-new-category-form.png",
     "step": "forumNewCategoryForm",
-    "pages": ["tutorials/forum.md"],
+    "pages": ["website/setup/forum.md"],
     "description": "The empty New category form, not submitted."
   },
   {
     "id": "forum-membership-required",
-    "file": "tutorials/forum-05-membership-required.png",
+    "file": "website/setup/forum-05-membership-required.png",
     "step": "forumMembershipRequired",
-    "pages": ["tutorials/forum.md"],
+    "pages": ["website/setup/forum.md"],
     "description": "A member's account page, showing the \"you must have an active membership\" message after trying to visit the forum without one."
   },
   {
     "id": "events-location-form-empty",
-    "file": "tutorials/events-01-location-form-empty.png",
+    "file": "website/setup/events-01-location-form-empty.png",
     "step": "eventsLocationFormEmpty",
-    "pages": ["tutorials/events.md"],
+    "pages": ["website/setup/events.md"],
     "description": "The empty Add location form."
   },
   {
     "id": "events-location-saved",
-    "file": "tutorials/events-02-location-saved.png",
+    "file": "website/setup/events-02-location-saved.png",
     "step": "eventsLocationSaved",
-    "pages": ["tutorials/events.md"],
+    "pages": ["website/setup/events.md"],
     "description": "The new location listed after saving."
   },
   {
     "id": "events-event-form-empty",
-    "file": "tutorials/events-03-event-form-empty.png",
+    "file": "website/setup/events-03-event-form-empty.png",
     "step": "eventsEventFormEmpty",
-    "pages": ["tutorials/events.md"],
+    "pages": ["website/setup/events.md"],
     "description": "The empty Add event form."
   },
   {
     "id": "events-event-saved",
-    "file": "tutorials/events-04-event-saved.png",
+    "file": "website/setup/events-04-event-saved.png",
     "step": "eventsEventSaved",
-    "pages": ["tutorials/events.md"],
+    "pages": ["website/setup/events.md"],
     "description": "The new event listed after saving, showing Published: False."
   },
   {
     "id": "events-event-published",
-    "file": "tutorials/events-05-event-published.png",
+    "file": "website/setup/events-05-event-published.png",
     "step": "eventsEventPublished",
-    "pages": ["tutorials/events.md"],
+    "pages": ["website/setup/events.md"],
     "description": "The event's admin record after checking Published and saving."
   },
   {
     "id": "events-event-live",
-    "file": "tutorials/events-06-event-live.png",
+    "file": "website/setup/events-06-event-live.png",
     "step": "eventsEventLive",
-    "pages": ["tutorials/events.md"],
+    "pages": ["website/setup/events.md"],
     "description": "The public events page, showing the published event in Upcoming Events and on the map."
   },
   {
     "id": "events-event-detail",
-    "file": "tutorials/events-07-event-detail.png",
+    "file": "website/setup/events-07-event-detail.png",
     "step": "eventsEventDetail",
-    "pages": ["tutorials/events.md"],
+    "pages": ["website/setup/events.md"],
     "description": "The event's own public page, showing its details and the Register to attend event button."
   },
   {
     "id": "resources-form-empty",
-    "file": "tutorials/resources-01-form-empty.png",
+    "file": "website/setup/resources-01-form-empty.png",
     "step": "resourcesFormEmpty",
-    "pages": ["tutorials/resources.md"],
+    "pages": ["website/setup/resources.md"],
     "description": "The empty Add resource form."
   },
   {
     "id": "resources-form-saved",
-    "file": "tutorials/resources-02-form-saved.png",
+    "file": "website/setup/resources-02-form-saved.png",
     "step": "resourcesFormSaved",
-    "pages": ["tutorials/resources.md"],
+    "pages": ["website/setup/resources.md"],
     "description": "The new resource listed after saving, showing Published: False."
   },
   {
     "id": "resources-published",
-    "file": "tutorials/resources-03-published.png",
+    "file": "website/setup/resources-03-published.png",
     "step": "resourcesPublished",
-    "pages": ["tutorials/resources.md"],
+    "pages": ["website/setup/resources.md"],
     "description": "The resource's admin record after checking Published and saving."
   },
   {
     "id": "resources-live",
-    "file": "tutorials/resources-04-live.png",
+    "file": "website/setup/resources-04-live.png",
     "step": "resourcesLive",
-    "pages": ["tutorials/resources.md"],
+    "pages": ["website/setup/resources.md"],
     "description": "The public resources page, showing the published resource listed."
   },
   {
     "id": "resources-detail",
-    "file": "tutorials/resources-05-detail.png",
+    "file": "website/setup/resources-05-detail.png",
     "step": "resourcesDetail",
-    "pages": ["tutorials/resources.md"],
+    "pages": ["website/setup/resources.md"],
     "description": "The resource's own public page, showing its description, component, and author."
   },
   {
     "id": "inviting-form-empty",
-    "file": "tutorials/inviting-01-form-empty.png",
+    "file": "website/setup/inviting-01-form-empty.png",
     "step": "invitingFormEmpty",
-    "pages": ["tutorials/inviting-your-team.md"],
+    "pages": ["website/setup/inviting-your-team.md"],
     "description": "The empty Add user form in the Django admin."
   },
   {
     "id": "inviting-user-created",
-    "file": "tutorials/inviting-02-user-created.png",
+    "file": "website/setup/inviting-02-user-created.png",
     "step": "invitingUserCreated",
-    "pages": ["tutorials/inviting-your-team.md"],
+    "pages": ["website/setup/inviting-your-team.md"],
     "description": "The new user's Change user page, reached automatically after saving the Add user form."
   },
   {
     "id": "inviting-permissions-saved",
-    "file": "tutorials/inviting-03-permissions-saved.png",
+    "file": "website/setup/inviting-03-permissions-saved.png",
     "step": "invitingPermissionsSaved",
-    "pages": ["tutorials/inviting-your-team.md"],
+    "pages": ["website/setup/inviting-your-team.md"],
     "description": "The Permissions fieldset after ticking Staff status and adding Editors under Groups, then saving."
   },
   {
     "id": "inviting-confirmation-email",
-    "file": "tutorials/inviting-04-confirmation-email.png",
+    "file": "website/setup/inviting-04-confirmation-email.png",
     "step": "invitingConfirmationEmail",
-    "pages": ["tutorials/inviting-your-team.md"],
+    "pages": ["website/setup/inviting-your-team.md"],
     "description": "The confirmation email a new team member receives before they can sign in."
   },
   {
     "id": "inviting-staff-links",
-    "file": "tutorials/inviting-05-staff-links.png",
+    "file": "website/setup/inviting-05-staff-links.png",
     "step": "invitingStaffLinks",
-    "pages": ["tutorials/inviting-your-team.md"],
+    "pages": ["website/setup/inviting-your-team.md"],
     "description": "The new team member's own account page, showing the Staff links they now have access to."
   }
 ]

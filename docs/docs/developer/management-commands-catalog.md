@@ -30,8 +30,8 @@ Each of these is normally invoked by `sample_data` above, not run directly — l
 - `create_sample_profile_questions` — creates sample membership profile questions.
 - `create_sample_membership_options` — creates sample membership options/pricing.
 - `create_sample_cms_content` — creates sample CMS pages (About, Team, Members Only, an articles index and articles), homepage StreamField content demonstrating every block type, and main/footer navigation menus, for each configured language site.
-- `create_sample_events` — creates sample regions, locations, series, entities, and a spread of past/future events with sessions, for the [events module](../admin/events.md).
-- `create_sample_resources` — creates sample resource categories, tags, and resources, for the [resources module](../admin/resources.md).
+- `create_sample_events` — creates sample regions, locations, series, entities, and a spread of past/future events with sessions, for the [events module](../website/reference/events.md).
+- `create_sample_resources` — creates sample resource categories, tags, and resources, for the [resources module](../website/reference/resources.md).
 - `create_sample_terms` — creates sample `Term`/`TermVersion` records. Not called by `sample_data` — run standalone if terms/conditions data is needed.
 
 ## `ensure_wagtail_root`

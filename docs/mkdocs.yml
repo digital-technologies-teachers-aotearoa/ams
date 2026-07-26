@@ -42,32 +42,35 @@ nav:
       - getting-started/working-with-designers.md
       - getting-started/settings-glossary.md
       - getting-started/glossary.md
-  - Building your website:
-      - tutorials/index.md
-      - tutorials/orientation.md
-      - tutorials/branding-theme.md
-      - tutorials/first-pages.md
-      - tutorials/navigation-menus.md
-      - tutorials/languages-translations.md
-      - tutorials/memberships.md
-      - tutorials/forum.md
-      - tutorials/events.md
-      - tutorials/resources.md
-      - tutorials/inviting-your-team.md
-      - tutorials/launch-checklist.md
-  - Website administrator guide:
-      - admin/index.md
-      - admin/cms.md
-      - admin/events.md
-      - admin/resources.md
-      - admin/forum.md
-      - admin/xero-billing.md
-      - admin/theme-customization.md
-  - Provider guide:
-      - provider/index.md
-      - provider/provisioning-runbook.md
-      - provider/client-communication-templates.md
-  - Developer documentation:
+  - Your website:
+      - website/index.md
+      - Setup guide:
+          - website/setup/index.md
+          - website/setup/orientation.md
+          - website/setup/branding-theme.md
+          - website/setup/first-pages.md
+          - website/setup/navigation-menus.md
+          - website/setup/languages-translations.md
+          - website/setup/memberships.md
+          - website/setup/forum.md
+          - website/setup/events.md
+          - website/setup/resources.md
+          - website/setup/inviting-your-team.md
+          - website/setup/launch-checklist.md
+      - Feature reference:
+          - website/reference/index.md
+          - website/reference/cms.md
+          - website/reference/events.md
+          - website/reference/resources.md
+          - website/reference/forum.md
+          - website/reference/xero-billing.md
+          - website/reference/theme-customization.md
+  - Hosting AMS:
+      - hosting/index.md
+      - hosting/provisioning-runbook.md
+      - hosting/client-communication-templates.md
+  - Developing AMS:
+      - developer/index.md
       - developer/contributing.md
       - developer/docs-conventions.md
       - developer/feature-flags.md

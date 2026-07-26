@@ -8,8 +8,8 @@ You'll know your way around the forum your provider has set up for you, understa
 
 ## Before you start
 
-Whether your site has a forum at all is a decision from onboarding — see [question 5 of the decision questionnaire](../getting-started/decision-questionnaire.md#5-optional-features).
-If you have one, your provider has already set it up and connected it to your AMS site — see the [accounts checklist](../getting-started/accounts-checklist.md) and the [forum admin guide](../admin/forum.md) if you're not sure that's happened yet.
+Whether your site has a forum at all is a decision from onboarding — see [question 5 of the decision questionnaire](../../getting-started/decision-questionnaire.md#5-optional-features).
+If you have one, your provider has already set it up and connected it to your AMS site — see the [accounts checklist](../../getting-started/accounts-checklist.md) and the [forum admin guide](../reference/forum.md) if you're not sure that's happened yet.
 Only members with an active membership can actually use it once they're signed in — see [Tutorial 6: Memberships](memberships.md) if you haven't set memberships up yet.
 
 ## Steps
@@ -17,23 +17,23 @@ Only members with an active membership can actually use it once they're signed i
 1. Visit your forum's own address — a separate address your provider gives you, often something like `forum.yourassociation.org`.
     If you're not already signed in to your website, visiting it sends you to sign in there first, the same as any other page that needs you to be signed in.
 
-    ![The AMS sign-in page, reached by visiting the forum before signing in](../images/tutorials/forum-01-sign-in-prompt.png)
+    ![The AMS sign-in page, reached by visiting the forum before signing in](../../images/website/setup/forum-01-sign-in-prompt.png)
 
 2. Sign in with your usual account.
-    You're carried straight through into the forum — no separate forum password to remember, ever (see [SSO](../getting-started/glossary.md#sso)).
+    You're carried straight through into the forum — no separate forum password to remember, ever (see [SSO](../../getting-started/glossary.md#sso)).
     Because you're the site admin, you're automatically a forum admin too, shown here by the **Admin** link in the sidebar.
 
-    ![The forum, signed in as the site admin, with the Admin link visible in the sidebar](../images/tutorials/forum-02-home.png)
+    ![The forum, signed in as the site admin, with the Admin link visible in the sidebar](../../images/website/setup/forum-02-home.png)
 
 3. Look at **Categories** in the sidebar (or click **All categories**).
     You're starting with three: **General**, for anything that doesn't fit anywhere else; **Site Feedback**, for feedback about the forum itself; and **Staff**, a private category only admins and moderators can see.
     Starting minimal like this, then growing the category list once members tell you what they actually want, works better than guessing a big structure up front.
 
-    ![The starter categories: General, Site Feedback, and Staff](../images/tutorials/forum-03-categories.png)
+    ![The starter categories: General, Site Feedback, and Staff](../../images/website/setup/forum-03-categories.png)
 
 4. When you're ready to add more, click **+ New category** and fill in a name.
 
-    ![The empty New category form](../images/tutorials/forum-04-new-category-form.png)
+    ![The empty New category form](../../images/website/setup/forum-04-new-category-form.png)
 
 ## How members experience the forum
 
@@ -42,13 +42,13 @@ The only difference is what they can see: a private category like **Staff** stay
 
 If someone without one tries, they're sent back to their account page with a message explaining why, instead of into the forum:
 
-![A member's account page, showing the "you must have an active membership" message after trying to visit the forum without one](../images/tutorials/forum-05-membership-required.png)
+![A member's account page, showing the "you must have an active membership" message after trying to visit the forum without one](../../images/website/setup/forum-05-membership-required.png)
 
 ## Admins are synced automatically
 
 Anyone who's a superuser on your AMS site becomes a forum admin the moment they sign in — and loses forum admin the moment they stop being one, even if someone made them an admin by hand directly in the forum.
 Regular staff access doesn't carry over this way; only superusers do.
-See [Admin sync](../admin/forum.md#admin-sync) for the full detail.
+See [Admin sync](../reference/forum.md#admin-sync) for the full detail.
 
 ## Let members find the forum
 

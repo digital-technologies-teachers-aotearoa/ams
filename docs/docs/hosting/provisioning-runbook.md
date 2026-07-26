@@ -118,7 +118,7 @@ Cheap to run (see the [costs sheet](../getting-started/costs-sheet.md)'s UAT for
 
 1. Stand up a self-hosted Discourse instance at a UAT forum subdomain (e.g. `forum-uat.<domain>`) — see [developer/forum.md](../developer/forum.md) for self-hosting links.
 2. Because you install it yourself, your own account is the first one created on the instance — you're already an admin, with nothing to request from the client.
-3. Configure Discourse's site settings as documented in [admin/forum.md](../admin/forum.md) (the same settings block used for production, below) and set `DISCOURSE_REDIRECT_DOMAIN` / `DISCOURSE_CONNECT_SECRET` on the UAT app.
+3. Configure Discourse's site settings as documented in [website/reference/forum.md](../website/reference/forum.md) (the same settings block used for production, below) and set `DISCOURSE_REDIRECT_DOMAIN` / `DISCOURSE_CONNECT_SECRET` on the UAT app.
 4. Confirm SSO works against the UAT site.
 5. Keep this instance patched going forward — treat it as an ongoing maintenance task for the life of the client's site, not a one-off setup step.
 
@@ -129,13 +129,13 @@ There's no "instance the provider stands up first" here at all: the client creat
 
 1. Once the client has signed up (accounts checklist) and added you as an admin, sign in to their forum.
    Discourse's bootstrap mode made the client's own signup an admin automatically, since theirs was the first account on a brand-new instance — that's why they needed to add you rather than the other way round.
-2. Configure Discourse's site settings exactly as documented in [admin/forum.md](../admin/forum.md): `enable_discourse_connect`, `discourse_connect_url` (`<website domain>/forum/sso`), `discourse_connect_secret`, `logout_redirect`, and the accompanying `invite_only` / `login_required` / `allow_new_registrations` / `auth_overrides_*` block — including `bootstrap_mode_min_users: '0'`, which turns bootstrap mode off going forward so no later signup can self-promote to admin the way the client's did in step 1.
+2. Configure Discourse's site settings exactly as documented in [website/reference/forum.md](../website/reference/forum.md): `enable_discourse_connect`, `discourse_connect_url` (`<website domain>/forum/sso`), `discourse_connect_secret`, `logout_redirect`, and the accompanying `invite_only` / `login_required` / `allow_new_registrations` / `auth_overrides_*` block — including `bootstrap_mode_min_users: '0'`, which turns bootstrap mode off going forward so no later signup can self-promote to admin the way the client's did in step 1.
 3. Point the client's real forum subdomain (e.g. `forum.<domain>`) at the hosted instance, replacing Discourse's temporary one: in the Discourse admin dashboard, **Change Domain Name** → enter the subdomain; add the **CNAME** record it requires (target given in Discourse's welcome email) via the client's DNS (Cloudflare access from the accounts checklist).
    Custom domains need a paid plan (Pro/Business/Enterprise), so do this once the client has moved off any free trial.
 4. Set `DISCOURSE_REDIRECT_DOMAIN=https://forum.<domain>` and `DISCOURSE_CONNECT_SECRET` (matching step 2's value) on the production app — a different subdomain and secret from UAT's.
 5. Confirm SSO works: sign in to the main site, then visit the forum — you should already be signed in, with no separate forum password.
 6. Once the client's subscription is active (and the non-profit discount applied, if requested), remove their temporary personal admin account.
-   From here, AMS is the source of truth for forum admin — see [admin/forum.md#admin-sync](../admin/forum.md#admin-sync): superusers get forum admin, everyone else has it revoked, on every SSO login.
+   From here, AMS is the source of truth for forum admin — see [website/reference/forum.md#admin-sync](../website/reference/forum.md#admin-sync): superusers get forum admin, everyone else has it revoked, on every SSO login.
 
 ## 7. Xero connection
 
@@ -155,7 +155,7 @@ Flagged as a follow-up (see this task's completion notes) rather than resolved h
 
 ## 8. Production cutover and DNS
 
-1. Confirm the client has signed off on UAT testing (the [Building your website](../tutorials/index.md) tutorial series covers what they check).
+1. Confirm the client has signed off on UAT testing (the [Building your website](../website/setup/index.md) tutorial series covers what they check).
 2. Add the client's domain to the production app's domain list and wait for DigitalOcean's managed TLS certificate to issue.
 3. In Cloudflare (Domain DNS access from the accounts checklist), add the DNS record pointing the client's domain at the production app's DigitalOcean-assigned hostname.
 4. Confirm the Postmark DKIM record is fully verified (§3) *before* cutting over — otherwise the client's first transactional emails (sign-up confirmations) fail silently right when new members are signing up.
