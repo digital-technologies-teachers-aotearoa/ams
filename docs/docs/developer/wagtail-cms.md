@@ -259,3 +259,8 @@ When developing CMS features:
 
 - [Wagtail Settings](https://docs.wagtail.org/en/stable/reference/contrib/settings.html)
 - [Wagtail Sites](https://docs.wagtail.org/en/stable/reference/pages/model_reference.html#site)
+
+### Client-facing documentation
+
+- [Admin guide: CMS](../admin/cms.md) — the same page types and concepts, explained for non-technical website admins.
+- [Building your website](../tutorials/index.md) — the guided tutorial series that walks a client through using this system for the first time.

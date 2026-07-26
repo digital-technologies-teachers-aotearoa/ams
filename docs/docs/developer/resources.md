@@ -2,6 +2,8 @@
 
 The resources module is an optional feature that allows your association to publish downloadable resources on the website. Resources are managed via the Django admin and browsed publicly. File downloads are served through private, authenticated URLs — files are never exposed via public hotlinks.
 
+For the client-facing view of this feature, see the [admin guide: Resources](../admin/resources.md).
+
 ## Configuration
 
 | | |
