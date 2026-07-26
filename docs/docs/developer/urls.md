@@ -5,9 +5,9 @@ Therefore specific URLs namespaces are reserved for static pages.
 
 - `/billing/*` - Billing application
 - `/users/*` - Users application
-- `/users/membership/*` - Membership application
+- `/users/memberships/*` - Membership application
     - This is placed within the `users` namespace to allow the CMS to have a `membership` page.
-- `/forums/*` - Forum application
+- `/forum/*` - Forum application
 
 !!! example "Alternative approach"
 

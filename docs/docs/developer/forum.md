@@ -1,5 +1,7 @@
 # Forum
 
+For AMS's own Discourse SSO integration — the site settings that connect a Discourse instance to AMS as its authentication provider — see the [admin guide: Forum](../admin/forum.md).
+
 ## Local development
 
 The following links may be useful when developing with Discourse locally:

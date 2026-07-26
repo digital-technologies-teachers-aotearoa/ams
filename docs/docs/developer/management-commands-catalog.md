@@ -41,3 +41,14 @@ Runs essential deployment-time actions in sequence to bring the application up-t
 
 - Behavior: Executes `migrate` (non-interactive) then `setup_cms`.
 - Arguments: none.
+
+## `check_settings_glossary`
+
+Verifies every client-decidable `AMS_*` setting in `config/settings/base.py` has exactly one entry in the [settings glossary](../getting-started/settings-glossary.md), and vice versa, and that none of them are duplicated in [Deployment](deployment.md)'s environment variable table. Fails loudly (non-zero exit) if the glossary has drifted from the code. Runs in CI on every PR — see [Documentation conventions](docs-conventions.md#settings-glossary-anti-drift-check).
+
+- Arguments: none.
+- Example:
+
+  ```bash
+  python manage.py check_settings_glossary
+  ```

@@ -1,6 +1,7 @@
 # Feature Flags
 
 AMS uses environment-variable-based feature flags to toggle optional modules per deployment.
+For what each flag means to a client filling in the decision questionnaire, see the [settings glossary](../getting-started/settings-glossary.md); this page covers the implementation.
 
 ## Available Flags
 
