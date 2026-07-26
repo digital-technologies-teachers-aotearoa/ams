@@ -1,0 +1,7 @@
+{% extends "wagtailusers/users/create.html" %}
+
+{% load wagtailadmin_tags %}
+
+{% block extra_fields %}
+  <li>{% formattedfield form.username %}</li>
+{% endblock extra_fields %}

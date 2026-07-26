@@ -130,7 +130,7 @@ THIRD_PARTY_APPS = [
     "wagtail.contrib.settings",
     "wagtail.embeds",
     "wagtail.sites",
-    "wagtail.users",
+    "ams.users.wagtail_apps.AmsWagtailUsersAppConfig",  # Used instead of wagtail.users
     "wagtail.snippets",
     "wagtail.documents",
     "wagtail.images",

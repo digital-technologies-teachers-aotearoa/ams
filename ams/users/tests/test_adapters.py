@@ -3,7 +3,10 @@ from unittest.mock import patch
 
 import pytest
 from allauth.account.adapter import DefaultAccountAdapter
+from allauth.core import context as allauth_context
 from django.contrib.messages import INFO
+from django.contrib.sites.models import Site
+from django.core import mail
 from django.test import RequestFactory
 
 from ams.users.adapters import AccountAdapter
@@ -197,6 +200,35 @@ class TestAccountAdapter:
             None,
             "",
         )
+
+    def test_send_mail_includes_current_site_in_context(
+        self,
+        account_adapter,
+        request_factory,
+        user,
+    ):
+        """Regression test: AccountAdapter.send_mail overrides
+        DefaultAccountAdapter.send_mail without calling super(), which
+        skipped the base implementation's `current_site` context-building
+        step. This left every allauth transactional email
+        (confirmation, password reset, password-changed, account-already-
+        exists) rendering a blank site name/domain.
+        """
+        request = request_factory.get("/")
+
+        with allauth_context.request_context(request):
+            account_adapter.send_mail(
+                "account/email/password_changed",
+                user.email,
+                {"user": user},
+            )
+
+        assert len(mail.outbox) == 1
+        sent_email = mail.outbox[0]
+        current_site = Site.objects.get_current()
+
+        assert current_site.name in sent_email.body
+        assert current_site.name in sent_email.alternatives[0][0]
 
 
 class TestSocialAccountAdapter:
