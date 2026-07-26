@@ -4,8 +4,8 @@ Upon a push to the `main` branch, a Docker image is built and stored on [GitHub 
 By running this image, AMS can be deployed on any platform that supports Docker containers — for example [DigitalOcean](https://www.digitalocean.com/) App Platform, or a self-managed system such as [Kubernetes](https://kubernetes.io/).
 This page describes what any deployment needs, independent of platform.
 
-If you're the provider standing up a new client instance on the project's recommended stack (DigitalOcean, Postmark, Cloudflare), see the [Provisioning runbook](../hosting/provisioning-runbook.md) instead — it's deliberately opinionated about that stack and cross-links back here for the generic parts rather than repeating them.
-For the AMS project's own development site (used by contributors, not client instances), see [AMS project development site](project-dev-site.md).
+For a worked example of applying this to one concrete stack, see [Worked example: DigitalOcean + Postmark + Cloudflare](provisioning-runbook.md) — it follows the requirements below using DigitalOcean App Platform, Postmark, and Cloudflare, adding the platform-specific steps (App Platform sizing, Spaces buckets, DNS) on top of what's documented here.
+For the AMS project's own development site (used by contributors, not client instances), see [AMS project development site](../developer/project-dev-site.md).
 
 ## Container architecture
 
@@ -50,7 +50,7 @@ For high-traffic deployments, consider:
 The following environment variables are available, with some required for running AMS.
 
 The client-decidable `AMS_*` settings — `AMS_ENABLED_LANGUAGES`, `AMS_EVENTS_ENABLED`, `AMS_RESOURCES_ENABLED`, `AMS_NOTIFY_STAFF_ORGANISATION_EVENTS`, `AMS_NOTIFY_STAFF_MEMBERSHIP_EVENTS`, and `AMS_REQUIRE_FREE_MEMBERSHIP_APPROVAL` — are documented once, in plain language, in the [settings glossary](../getting-started/settings-glossary.md), rather than repeated here.
-An automated check (see [Documentation conventions](docs-conventions.md#settings-glossary-anti-drift-check)) fails the build if any of them end up duplicated in this table, so the two pages can't drift apart.
+An automated check (see [Documentation conventions](../developer/docs-conventions.md#settings-glossary-anti-drift-check)) fails the build if any of them end up duplicated in this table, so the two pages can't drift apart.
 
 | Variable | Requirement | Example Value | Description |
 |---|---|---|---|
@@ -73,7 +73,7 @@ An automated check (see [Documentation conventions](docs-conventions.md#settings
 | `MAILTRAP_SANDBOX_ID` | ⚪ Optional | `123456` | The Mailtrap sandbox/test inbox ID (live sending is used if unset) |
 | `AMS_BILLING_SERVICE_CLASS` | ⚪ Optional | `ams.billing.providers.xero.XeroBillingService` | The provider to use for billing. Defaults to Xero — see [Hard requirements](#hard-requirements-today) below for why this makes Xero a de facto requirement today. |
 | `AMS_BILLING_EMAIL_WHITELIST_REGEX` | ⚪ Optional | `@domain.com` | Allowed emails to send billing emails to (sends all emails when unset) |
-| `XERO_CLIENT_ID` | 🔴 Required (see note below) | `redacted-client-id` | OAuth2 client ID from your Xero Custom Connection — see [Billing integration](billing.md) |
+| `XERO_CLIENT_ID` | 🔴 Required (see note below) | `redacted-client-id` | OAuth2 client ID from your Xero Custom Connection — see [Billing integration](../developer/billing.md) |
 | `XERO_CLIENT_SECRET` | 🔴 Required (see note below) | `redacted-client-secret` | OAuth2 client secret from your Xero Custom Connection |
 | `XERO_TENANT_ID` | 🔴 Required (see note below) | `redacted-tenant-id` | Xero organisation/tenant ID |
 | `XERO_WEBHOOK_KEY` | 🔴 Required (see note below) | `redacted-webhook-key` | Webhook signing key for validating Xero webhook requests |
@@ -139,7 +139,7 @@ During the deployment, there is a Django management command `deploy_steps` that 
 
 AMS has no persistent background worker process — there's no task queue to run.
 The one piece of scheduled work today is Xero invoice syncing: `python manage.py fetch_invoice_updates` should be run periodically (every 15 minutes in the provider's own stack) as a fallback for any Xero webhook that doesn't arrive.
-Run it however your platform schedules one-off commands (a cron job, or a platform feature like DigitalOcean App Platform's scheduled jobs — see the [Provisioning runbook](../hosting/provisioning-runbook.md#2-server-setup-digitalocean-app-platform) for that specific setup) — it only applies if Xero billing is enabled.
+Run it however your platform schedules one-off commands (a cron job, or a platform feature like DigitalOcean App Platform's scheduled jobs — see the [worked example](provisioning-runbook.md#2-server-setup-digitalocean-app-platform) for that specific setup) — it only applies if Xero billing is enabled.
 
 ## Email service providers
 

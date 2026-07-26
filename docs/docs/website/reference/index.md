@@ -6,7 +6,7 @@ This section is a **standing reference**, not a guided path — see [Setup guide
 Come back here whenever you need to look up a detail the setup guide didn't cover in full, or need a refresher on something you set up a while ago.
 
 Most pages in this section assume the same non-technical background as the setup guide.
-Two are the exception, because the feature itself is technical: [Forum](forum.md)'s setup section quotes raw Discourse configuration values, and [Xero billing](xero-billing.md) is a one-time integration setup normally handled by your provider. Both still explain what each step is for in plain language.
+One is the exception, because the feature itself is technical: [Forum](forum.md)'s setup section quotes raw Discourse configuration values. It still explains what each step is for in plain language.
 
 ## Pages in this section
 
@@ -14,5 +14,6 @@ Two are the exception, because the feature itself is technical: [Forum](forum.md
 - [Events](events.md) — the optional events feature, if your association chose to enable it.
 - [Resources](resources.md) — the optional resources (downloadable file) feature, if your association chose to enable it.
 - [Forum](forum.md) — how the connected Discourse forum is configured and kept in sync with your site's memberships.
-- [Xero billing](xero-billing.md) — connecting Xero as your billing provider, if your association chose to enable it.
 - [Theme customization](theme-customization.md) — every colour and font field in Theme Settings, in full.
+
+Xero billing setup lives with the rest of the provisioning documentation: see [Xero billing](../../hosting/xero-billing.md) in Hosting AMS — it's a one-time integration usually handled by your provider, but you may still need to look something up.

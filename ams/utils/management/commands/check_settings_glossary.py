@@ -56,7 +56,7 @@ class Command(management.base.BaseCommand):
         "Verify every AMS_* client-decidable setting in config/settings/base.py "
         "has exactly one entry in docs/docs/getting-started/settings-glossary.md, "
         "and vice versa, so the glossary cannot silently drift from the code. "
-        "Also verifies docs/docs/developer/deployment.md doesn't duplicate any of "
+        "Also verifies docs/docs/hosting/deployment.md doesn't duplicate any of "
         "those settings in its own environment variable table."
     )
 
@@ -73,7 +73,7 @@ class Command(management.base.BaseCommand):
             / "settings-glossary.md"
         )
         deployment_path = (
-            Path(settings.BASE_DIR) / "docs" / "docs" / "developer" / "deployment.md"
+            Path(settings.BASE_DIR) / "docs" / "docs" / "hosting" / "deployment.md"
         )
 
         code_vars = find_ams_env_vars(base_settings_path.read_text())

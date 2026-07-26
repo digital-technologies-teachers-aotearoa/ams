@@ -63,11 +63,12 @@ nav:
           - website/reference/events.md
           - website/reference/resources.md
           - website/reference/forum.md
-          - website/reference/xero-billing.md
           - website/reference/theme-customization.md
   - Hosting AMS:
       - hosting/index.md
+      - hosting/deployment.md
       - hosting/provisioning-runbook.md
+      - hosting/xero-billing.md
       - hosting/client-communication-templates.md
   - Developing AMS:
       - developer/index.md
@@ -81,7 +82,6 @@ nav:
       - developer/icons.md
       - developer/urls.md
       - developer/permission-caching.md
-      - developer/deployment.md
       - developer/project-dev-site.md
       - developer/wagtail-cms.md
       - developer/theme-system.md
