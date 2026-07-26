@@ -8,6 +8,7 @@ from allauth.mfa import app_settings as mfa_app_settings
 from allauth.mfa.adapter import DefaultMFAAdapter
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from django.conf import settings
+from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
 from django.utils import translation
 
@@ -57,6 +58,19 @@ class AccountAdapter(DefaultAccountAdapter):
 
     def send_mail(self, template_prefix, email, context):
         """Override to send HTML emails using MJML templates."""
+        # Replicate DefaultAccountAdapter.send_mail's own context-building step,
+        # which this override bypasses by not calling super() in the mapped-
+        # template branch below — without it, templates referencing
+        # current_site.domain/current_site.name render blank.
+        request = allauth_context.request
+        ctx = {
+            "request": request,
+            "email": email,
+            "current_site": get_current_site(request),
+        }
+        ctx.update(context)
+        context = ctx
+
         user = context.get("user")
         language = getattr(user, "language", None) or settings.LANGUAGE_CODE
 

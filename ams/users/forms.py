@@ -26,6 +26,8 @@ from django.forms import Textarea
 from django.forms import TextInput
 from django.utils.translation import get_language
 from django.utils.translation import gettext_lazy as _
+from wagtail.users.forms import UserCreationForm as WagtailUserCreationFormBase
+from wagtail.users.forms import UserEditForm as WagtailUserEditFormBase
 
 from ams.users.models import ProfileField
 from ams.users.models import ProfileFieldResponse
@@ -53,6 +55,31 @@ class UserAdminCreationForm(admin_forms.AdminUserCreationForm):
         error_messages = {
             "email": {"unique": _("This email has already been taken.")},
         }
+
+
+class WagtailUserCreationForm(WagtailUserCreationFormBase):
+    """
+    Form for creating a user via the Wagtail CMS admin (`/cms/users/new/`).
+
+    Wagtail's base form only includes `User.USERNAME_FIELD` in its field set,
+    which for this project is `email` — so AMS's own separate `username`
+    field (used by the forum, and required by `UserRedirectView`'s
+    `reverse("users:detail", kwargs={"username": ...})`) is added explicitly
+    here. Without it, users created through the CMS form are left with a
+    blank `username` and get a `NoReverseMatch` on their first sign-in.
+    """
+
+    class Meta(WagtailUserCreationFormBase.Meta):
+        fields = WagtailUserCreationFormBase.Meta.fields | {"username"}
+
+
+class WagtailUserEditForm(WagtailUserEditFormBase):
+    """Form for editing a user via the Wagtail CMS admin. See
+    WagtailUserCreationForm for why `username` is added explicitly.
+    """
+
+    class Meta(WagtailUserEditFormBase.Meta):
+        fields = WagtailUserEditFormBase.Meta.fields | {"username"}
 
 
 class UserSignupForm(SignupForm):

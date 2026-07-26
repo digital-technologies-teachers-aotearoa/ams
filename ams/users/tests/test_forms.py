@@ -17,6 +17,8 @@ from ams.organisations.tests.factories import OrganisationMemberFactory
 from ams.users.forms import UserAdminCreationForm
 from ams.users.forms import UserSignupForm
 from ams.users.forms import UserUpdateForm
+from ams.users.forms import WagtailUserCreationForm
+from ams.users.forms import WagtailUserEditForm
 from ams.users.models import User
 
 
@@ -50,6 +52,56 @@ class TestUserAdminCreationForm:
         assert len(form.errors) == 1
         assert "email" in form.errors
         assert form.errors["email"][0] == _("This email has already been taken.")
+
+
+class TestWagtailUserCreationForm:
+    """
+    Regression tests for the Wagtail CMS user-creation form leaving
+    `username` blank (see ams.users.forms.WagtailUserCreationForm docstring).
+    """
+
+    def test_meta_fields_include_username(self):
+        assert "username" in WagtailUserCreationForm.Meta.fields
+
+    @pytest.mark.django_db
+    def test_saved_user_has_username(self):
+        form = WagtailUserCreationForm(
+            {
+                "email": "wagtailcreated@example.com",
+                "first_name": "Wagtail",
+                "last_name": "Created",
+                "username": "wagtailcreated",
+                "password1": "a-very-strong-password-123",
+                "password2": "a-very-strong-password-123",
+                "groups": [],
+            },
+        )
+
+        assert form.is_valid(), form.errors
+        user = form.save()
+
+        assert user.username == "wagtailcreated"
+
+    @pytest.mark.django_db
+    def test_missing_username_is_invalid(self):
+        form = WagtailUserCreationForm(
+            {
+                "email": "nousername@example.com",
+                "first_name": "No",
+                "last_name": "Username",
+                "password1": "a-very-strong-password-123",
+                "password2": "a-very-strong-password-123",
+                "groups": [],
+            },
+        )
+
+        assert not form.is_valid()
+        assert "username" in form.errors
+
+
+class TestWagtailUserEditForm:
+    def test_meta_fields_include_username(self):
+        assert "username" in WagtailUserEditForm.Meta.fields
 
 
 class TestUserSignupForm:

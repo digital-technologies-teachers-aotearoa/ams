@@ -214,7 +214,7 @@ Clear membership status information and automated renewal reminders ensure conti
 
 **Built for NZ/AU:** Native Xero integration for seamless accounting, multi-currency support for regional and international members, and te reo Māori language support for New Zealand associations committed to bilingual service.
 
-**Modern Stack:** Built on Django 4, Wagtail 5, PostgreSQL, and containerized with Docker. Benefit from mature, well-supported technologies with extensive documentation and active communities. Future-proof architecture with clear upgrade paths.
+**Modern Stack:** Built on Django, Wagtail, PostgreSQL, and containerized with Docker. Benefit from mature, well-supported technologies with extensive documentation and active communities. Future-proof architecture with clear upgrade paths.
 
 **Active Development:** Developed and maintained by DTTA for their own operational needs, ensuring continued evolution based on real-world association management requirements. Regular updates, bug fixes, and new features driven by practical experience.
 
