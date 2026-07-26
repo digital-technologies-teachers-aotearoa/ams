@@ -1,13 +1,12 @@
 # Developing AMS
 
-This section covers contributing to and deploying the AMS codebase itself.
+This section covers contributing to the AMS codebase itself; for deploying it, see [Hosting AMS](../hosting/index.md).
 
 ## Where to start
 
 1. [Contributing](contributing.md) — local development setup (Dev Containers, common commands).
 2. [Documentation conventions](docs-conventions.md) — if you're changing UI these docs cover, or writing docs yourself.
-3. [Deployment](deployment.md) — deploying the AMS Docker image on any platform.
-4. Then the per-topic pages below, as your work needs them.
+3. Then the per-topic pages below, as your work needs them.
 
 ## App map
 

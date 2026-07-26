@@ -16,7 +16,7 @@ There are several key settings that need to be set to ensure the forum works as 
 These need to be set by the administrator account for Discourse, and can be set on the site settings page.
 
 !!! warning "Replace `discourse_connect_secret`"
-    `changeme` below is a placeholder, not a value to copy verbatim. Generate your own secret and set it here, then set the exact same value as AMS's `DISCOURSE_CONNECT_SECRET` environment variable (see [deployment: environment variables](../../developer/deployment.md#environment-variables)) — if the two don't match, SSO login fails.
+    `changeme` below is a placeholder, not a value to copy verbatim. Generate your own secret and set it here, then set the exact same value as AMS's `DISCOURSE_CONNECT_SECRET` environment variable (see [deployment: environment variables](../../hosting/deployment.md#environment-variables)) — if the two don't match, SSO login fails.
 
 ```yaml
 # The following settings set up single sign on

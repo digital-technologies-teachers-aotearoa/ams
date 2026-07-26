@@ -1,10 +1,11 @@
-# Provisioning runbook
+# Worked example: DigitalOcean + Postmark + Cloudflare
 
 **Who this page is for:** the provider standing up a new client instance.
 Technical audience; terse runbook register — see [Documentation conventions](../developer/docs-conventions.md#style-rules-for-client-facing-pages).
 
-This runbook is deliberately opinionated about the provider's actual stack: DigitalOcean App Platform, Postmark, Discourse, Xero.
-For platform-agnostic deployment concepts (container requirements, the full environment variable reference, `deploy_steps`) that apply to any AMS installation, see [Deployment](../developer/deployment.md) — this page covers only the DigitalOcean-specific and questionnaire-driven parts, cross-linking there for everything generic rather than duplicating it.
+This is a worked example: it applies the platform-agnostic requirements in [Deployment](deployment.md) to one concrete stack — DigitalOcean App Platform, Postmark, Discourse, Xero — the provider's actual choices for every client instance today.
+Follow it directly if you're using the same stack; if not, use [Deployment](deployment.md) as the platform-agnostic checklist and substitute your own services at each step.
+This page covers only the DigitalOcean-specific and questionnaire-driven parts, cross-linking to [Deployment](deployment.md) for everything generic rather than duplicating it.
 
 Follow the phases below in order.
 Each one assumes the previous phase is complete.
@@ -44,13 +45,13 @@ Clone `dtta-website`'s structure for the new client's own repo, then per environ
 2. Add each environment's database — see §5 for why UAT's differs from production's.
 3. Add the `django` web component from the [`ams-django` GHCR image](https://github.com/digital-technologies-teachers-aotearoa/ams/pkgs/container/ams-django), pinned to a specific released tag/digest — not a floating `latest` — so the client's site doesn't move underneath them on an unrelated AMS release.
    `http_port: 5000`, `run_command: /start-web.sh`, instance size `apps-s-1vcpu-0.5gb` (512MB) to start.
-   This component runs gunicorn only — there's no separate worker process to size or split out — see [Deployment](../developer/deployment.md#container-resources) for sizing up to `apps-s-1vcpu-1gb` when traffic justifies it.
+   This component runs gunicorn only — there's no separate worker process to size or split out — see [Deployment](deployment.md#container-resources) for sizing up to `apps-s-1vcpu-1gb` when traffic justifies it.
 4. Add a `job-deploy` **PRE_DEPLOY** job on each environment: `run_command: python /app/manage.py deploy_steps`, instance size `apps-s-1vcpu-1gb-fixed` (extra headroom, since migrations can spike memory; runs once per deploy then stops).
 5. If the client chose Xero billing (questionnaire Q5), add a `fetch-invoice-updates` **SCHEDULED** job on each environment, same image: `run_command: python /app/manage.py fetch_invoice_updates`, cron `*/15 * * * *` — this is the fallback for any webhook Xero fails to deliver (see §7).
 6. Set ingress: route `/` to the `django` component.
 7. Create two Spaces buckets per environment (public and private media) in the region chosen at questionnaire Q6.
    DigitalOcean Spaces endpoints follow `https://<region>.digitaloceanspaces.com`, e.g. `https://syd1.digitaloceanspaces.com` for Sydney — match the region to Q6's answer.
-   See [Deployment](../developer/deployment.md#requirements) for the full set of `DJANGO_MEDIA_PUBLIC_*` / `DJANGO_MEDIA_PRIVATE_*` variables each bucket needs.
+   See [Deployment](deployment.md#requirements) for the full set of `DJANGO_MEDIA_PUBLIC_*` / `DJANGO_MEDIA_PRIVATE_*` variables each bucket needs.
 8. Don't attach the client's real domain to the production app yet — that's the cutover phase (§8).
    Use DigitalOcean's assigned `*.ondigitalocean.app` hostname for both environments until then.
 
@@ -76,7 +77,7 @@ Set `DJANGO_EMAIL_ESP=postmark` and `POSTMARK_SERVER_TOKEN` on the app (§2) onc
 ## 4. Environment settings
 
 The table below maps every [decision questionnaire](../getting-started/decision-questionnaire.md) answer to where it's actually configured.
-Everything else — secrets, database credentials, storage keys, observability (Sentry, Logtail) — isn't a client decision, so it isn't repeated here: see [Deployment](../developer/deployment.md#environment-variables) for the full environment variable reference.
+Everything else — secrets, database credentials, storage keys, observability (Sentry, Logtail) — isn't a client decision, so it isn't repeated here: see [Deployment](deployment.md#environment-variables) for the full environment variable reference.
 
 | Questionnaire answer | Decides | Where it's configured |
 | --- | --- | --- |
