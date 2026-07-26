@@ -11,7 +11,7 @@ Sets up the CMS for multi-language path-based sites. Ensures the root page exist
 
 ## `sample_data`
 
-Seeds a non-production database with realistic sample content for development: migrates the database, reloads initial Wagtail data, creates sample admin and user accounts, sample membership options, and runs `setup_cms` to ensure CMS pages and sites are ready. Intended for local dev; guarded from running in deployed environments.
+Seeds a non-production database with realistic sample content for development: migrates the database, then runs (in order) `create_sample_admin`, `create_sample_users`, `create_sample_profile_questions`, `create_sample_membership_options`, `setup_cms`, `create_sample_cms_content`, `create_sample_events`, and `create_sample_resources`, and finally sets `AssociationSettings` for every site. Each sub-command below can also be run standalone once the database is migrated. Intended for local dev; guarded from running in deployed environments.
 
 - Arguments: none.
 - Safety: Errors if `settings.DEPLOYED` is true.
@@ -20,6 +20,26 @@ Seeds a non-production database with realistic sample content for development: m
   ```bash
   python manage.py sample_data
   ```
+
+### Sample data sub-commands
+
+Each of these is normally invoked by `sample_data` above, not run directly — listed here so they're not undocumented. None take arguments.
+
+- `create_sample_admin` — creates (or promotes) a superuser at `settings.SAMPLE_DATA_ADMIN_EMAIL`/`SAMPLE_DATA_ADMIN_PASSWORD` (see `.envs/.local/django.ini`), with a verified allauth email address.
+- `create_sample_users` — creates a set of sample non-admin user accounts.
+- `create_sample_profile_questions` — creates sample membership profile questions.
+- `create_sample_membership_options` — creates sample membership options/pricing.
+- `create_sample_cms_content` — creates sample CMS pages (About, Team, Members Only, an articles index and articles), homepage StreamField content demonstrating every block type, and main/footer navigation menus, for each configured language site.
+- `create_sample_events` — creates sample regions, locations, series, entities, and a spread of past/future events with sessions, for the [events module](../admin/events.md).
+- `create_sample_resources` — creates sample resource categories, tags, and resources, for the [resources module](../admin/resources.md).
+- `create_sample_terms` — creates sample `Term`/`TermVersion` records. Not called by `sample_data` — run standalone if terms/conditions data is needed.
+
+## `ensure_wagtail_root`
+
+Recreates Wagtail's default `Locale`, root `Page`, and root `Collection` if missing, along with the `access_admin` permission grants on the Moderators/Editors groups. Needed because `manage.py flush` truncates data without replaying the data migrations that normally create these rows, which would otherwise break `setup_cms` and prevent sign-in to `/cms/` on a flushed-and-recovered dev database.
+
+- Arguments: none.
+- Notes: Idempotent — checks for each row/grant before creating it.
 
 ## `modify_site_hostname_constraint`
 
@@ -41,6 +61,17 @@ Runs essential deployment-time actions in sequence to bring the application up-t
 
 - Behavior: Executes `migrate` (non-interactive) then `setup_cms`.
 - Arguments: none.
+
+## `fetch_invoice_updates`
+
+Fetches and applies the latest Xero invoice data for any local `Invoice` marked `update_needed=True`, as a fallback for missed Xero webhooks. Only acts when `XeroBillingService` is configured — a no-op under mock billing, and an error if no billing service is configured. See [Billing integration](billing.md#fetch_invoice_updates) for full behaviour (batch size, scheduling).
+
+- Arguments: none.
+- Example:
+
+  ```bash
+  python manage.py fetch_invoice_updates
+  ```
 
 ## `check_settings_glossary`
 
