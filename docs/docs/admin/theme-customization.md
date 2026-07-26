@@ -135,7 +135,7 @@ Colors must be in hexadecimal format:
 ### Need to Undo Changes?
 
 Theme settings are automatically saved with revision history, however a website administrator or developer is required to restore a previous version.
-You can also export settings as make changes, which is a great way to keep a backup in case a reset is needed.
+You can also export your settings before making changes, which is a great way to keep a backup in case a reset is needed.
 
 ## Getting Help
 
