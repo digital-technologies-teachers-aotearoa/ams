@@ -183,7 +183,6 @@ The open-source codebase allows for extension and modification to meet specific 
 - PostgreSQL database with Django ORM
 - Docker and Docker Compose for consistent deployment
 - Wagtail CMS for content management
-- RESTful API patterns for integration
 - Comprehensive test suite with pytest
 - CI/CD ready architecture
 - Extensive developer documentation
@@ -193,7 +192,7 @@ The open-source codebase allows for extension and modification to meet specific 
 Members benefit from a unified, self-service platform.
 Update your profile, manage organization memberships, track membership expiry dates, and access association content all in one place.
 Single sign-on provides seamless access to the community forum.
-Clear membership status information and automated renewal reminders ensure continuous participation.
+Clear membership status information keeps members informed of where they stand.
 
 **Member Benefits:**
 
@@ -212,7 +211,7 @@ Clear membership status information and automated renewal reminders ensure conti
 
 **All-in-One:** Eliminate the complexity of integrating multiple separate systems for membership, billing, content, and community. Single platform, single database, unified user experience. Reduce vendor management overhead and integration maintenance.
 
-**Built for NZ/AU:** Native Xero integration for seamless accounting, multi-currency support for regional and international members, and te reo Māori language support for New Zealand associations committed to bilingual service.
+**Built for NZ/AU:** Native Xero integration for seamless accounting, configurable currency, and Te Reo Māori language support for New Zealand associations committed to bilingual service.
 
 **Modern Stack:** Built on Django, Wagtail, PostgreSQL, and containerized with Docker. Benefit from mature, well-supported technologies with extensive documentation and active communities. Future-proof architecture with clear upgrade paths.
 

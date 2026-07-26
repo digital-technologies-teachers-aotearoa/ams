@@ -6,7 +6,7 @@ Every setting below is something you decide during onboarding — it is not a te
 The provider sets these for you, based on your answers to the [decision questionnaire](decision-questionnaire.md).
 This page exists so you can see, in plain language, what each one actually does before you answer.
 
-This list is checked automatically against the AMS codebase, so it cannot silently go out of date — see [Documentation conventions](../developer/docs-conventions.md#settings-glossary-anti-drift-check).
+This list is checked automatically against the AMS codebase, so a setting can't be added or removed without this page being updated to match — see [Documentation conventions](../developer/docs-conventions.md#settings-glossary-anti-drift-check).
 
 ## `AMS_ENABLED_LANGUAGES`
 
