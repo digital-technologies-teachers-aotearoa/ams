@@ -67,6 +67,9 @@ You should already be signed in to the [CMS](../getting-started/glossary.md#cms)
 Repeat steps 6–8 for any other core pages your site needs, such as an "Our story" page.
 Every content page follows the same pattern: add a child page, choose **Content page**, give it a title and some content, then publish it.
 
+A handful of short words — `admin`, `cms`, `forum`, and a few others — are reserved for the website's own use, and can't be used as a page's web address (its slug, normally set automatically from the title) when the page sits directly under Home — a page titled "Our story" is fine; one titled "Forum" directly under Home isn't.
+See the [CMS admin guide's Reserved URL Patterns](../admin/cms.md#reserved-url-patterns) for the main ones — you'll only hit this if you try to create one of those pages, and the CMS tells you clearly if you do.
+
 ## Save draft vs. Publish
 
 These two buttons do different things, and it's worth knowing the difference:
