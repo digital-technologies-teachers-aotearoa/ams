@@ -19,7 +19,7 @@ Set the env var in your environment configuration and restart the container. See
 
 ### ResourceCategory and ResourceTag
 
-A two-level, admin-managed taxonomy. Administrators define categories (e.g. "Year Level", "Curriculum Area") and tags within each category (e.g. "Year 9", "Digital Technologies"). Tags have an optional `abbreviation` and `css_class` for display customisation.
+A two-level, admin-managed taxonomy. Administrators define categories (e.g. "Year Level", "Curriculum Area") and tags within each category (e.g. "Year 9", "Digital Technologies"). Tags have an optional `abbreviation` and `color` for display customisation.
 
 - `(category, slug)` is unique — two categories can have tags with the same name without conflict.
 - `order` controls display order within a category.
@@ -35,9 +35,10 @@ A two-level, admin-managed taxonomy. Administrators define categories (e.g. "Yea
 | `author_users` | `M2M(User)` | At least one author required |
 | `author_entities` | `M2M(Entity)` | At least one author required |
 | `tags` | `M2M(ResourceTag)` | Optional taxonomy tags |
-| `search_vector` | `SearchVectorField` | Maintained by Postgres trigger; not editable |
+| `search_vector_en` | `SearchVectorField` | Maintained by Postgres trigger; not editable |
+| `search_vector_mi` | `SearchVectorField` | Maintained by Postgres trigger; not editable |
 
-`search_vector` is updated by a Postgres trigger on `INSERT OR UPDATE`. Weights: `name` = A, `description` and component names = B, author and tag names = C. The trigger is defined in migrations `0002`, `0003`, and `0005` — no application-level signals are used.
+`name` and `description` are translated fields (via `django-modeltranslation`), backed by `name_en`/`name_mi` and `description_en`/`description_mi` columns. `search_vector_en` and `search_vector_mi` are each updated by a Postgres trigger on `INSERT OR UPDATE OF name_en, description_en, name_mi, description_mi`. Weights: `name` = A, `description` and component names = B, tag names/abbreviations and author names = C. `search_vector_en` indexes the English columns with the `english` text-search config; `search_vector_mi` indexes the Māori columns with the `simple` config, falling back to the English value for any field left blank in Māori. The trigger functions are defined in migration `0016` (a single combined `search_vector` column, populated by migrations `0002`, `0003`, and `0005`, was split into these two per-language columns) — no application-level signals are used.
 
 ### ResourceComponent
 
@@ -67,15 +68,15 @@ Never expose `component_file.url` directly in templates — always use the `comp
 
 ## Full-Text Search
 
-Search is powered by Postgres native full-text search with no application-level signals.
+Search is powered by Postgres native full-text search with no application-level signals, scoped to the active UI language.
 
-**`search_vector` maintenance:** A Postgres trigger updates the column on every `INSERT OR UPDATE` of `name` or `description`. Related content (component names, author names, tag names) is handled by additional triggers added in later migrations.
+**Search vector maintenance:** see [Models: Resource](#resource) above for how `search_vector_en`/`search_vector_mi` are kept current. Related content (component names, author names, tag names/abbreviations) is handled by additional triggers on those related tables, all defined alongside the resource triggers in migration `0016`.
 
 **`ResourceSearchView`** accepts a `q` query parameter and optional `tag` parameters:
 
-- If `q` is given, filters by `search_vector @@ query` OR tag name contains `q`, annotates `SearchRank`, and orders by `-rank`.
+- If `q` is given, picks `search_vector_en` (config `english`) or `search_vector_mi` (config `simple`) based on `django.utils.translation.get_language()` (defaulting to English for any other language), filters on that column with `@@`, annotates `SearchRank`, and orders by `-rank`.
 - `SearchQuery` uses `search_type="websearch"`, supporting quoted phrases, `-excluded` terms, and `OR`.
-- Tag filtering applies OR semantics within a category and AND semantics across categories.
+- Tag filtering applies OR semantics within a category and AND semantics across categories, and is ANDed with the `q` filter when both are given.
 
 ## Admin Integration
 
