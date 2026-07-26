@@ -20,7 +20,7 @@ Automated email notifications keep members informed at each stage, while adminis
 - Membership status tracking with activity history
 - Bulk operations for membership administration
 
-<!-- [Screenshot: Membership management interface with active/pending members list] -->
+<!-- TODO screenshot: Membership management interface with active/pending members list -->
 
 ### 💳 Integrated Billing
 
@@ -39,7 +39,7 @@ Configurable pricing allows for special pricing for different membership categor
 - Flexible pricing with support for tiered rates
 - Rate limiting and error handling for reliable API communication
 
-<!-- [Screenshot: Xero invoice generation and payment tracking] -->
+<!-- TODO screenshot: Xero invoice generation and payment tracking -->
 
 ### 📄 Content Management System
 
@@ -60,7 +60,7 @@ The preview and workflow features allow content to be drafted, reviewed, and sch
 - Image management with automatic resizing and optimization
 - Hierarchical page structure with customizable navigation
 
-<!-- [Screenshot: Wagtail CMS page editor with StreamField blocks and multi-language tabs] -->
+<!-- TODO screenshot: Wagtail CMS page editor with StreamField blocks and multi-language tabs -->
 
 ### 💬 Community Forum
 
@@ -79,7 +79,7 @@ Active members gain forum access, while lapsed memberships result in automatic a
 - Member profile synchronization
 - Seamless transition between website and forum
 
-<!-- [Screenshot: Discourse forum SSO login flow] -->
+<!-- TODO screenshot: Discourse forum SSO login flow -->
 
 ### 📅 Events
 
@@ -96,7 +96,7 @@ Administrators manage events through the Django admin interface with support for
 - Registration link support
 - Featured events highlighting
 
-<!-- [Screenshot: Events listing page with upcoming events] -->
+<!-- TODO screenshot: Events listing page with upcoming events -->
 
 ### 📚 Resources
 
@@ -113,7 +113,7 @@ Administrators manage resources through the Django admin interface, with support
 - Admin-managed taxonomy with categories and tags for faceted filtering
 - Multiple component types auto-detected: PDF, document, spreadsheet, slideshow, video, audio, and more
 
-<!-- [Screenshot: Resources listing page with search and tag filters] -->
+<!-- TODO screenshot: Resources listing page with search and tag filters -->
 
 ### 🎨 Customization and Branding
 
@@ -135,7 +135,7 @@ Form-based configuration for membership types and pricing enable operational cha
 - Multi-language content and interface text
 - Responsive design for mobile, tablet, and desktop
 
-<!-- [Screenshot: Theme customization panel with brand colors and logo upload] -->
+<!-- TODO screenshot: Theme customization panel with brand colors and logo upload -->
 
 ### 🌏 Multi-Language Support (in progress)
 
@@ -221,3 +221,4 @@ Clear membership status information keeps members informed of where they stand.
 <style>
 .md-sidebar--primary { display: none;}
 </style>
+
