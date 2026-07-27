@@ -277,14 +277,14 @@
     "file": "website/setup/languages-translations-01-switcher-open.png",
     "step": "languagesSwitcherOpen",
     "pages": ["website/setup/languages-translations.md"],
-    "description": "The public site's language switcher open, as seen by a signed-out visitor, listing Te Reo Māori and English."
+    "description": "The public site's language switcher open, as seen by a signed-out visitor, listing Te Reo M\u0101ori and English."
   },
   {
     "id": "languages-maori-home-empty",
     "file": "website/setup/languages-translations-02-maori-home-empty.png",
     "step": "languagesMaoriHomeEmpty",
     "pages": ["website/setup/languages-translations.md"],
-    "description": "The Te Reo Māori home page, reached via the language switcher, still empty because no content has been added to it yet."
+    "description": "The Te Reo M\u0101ori home page, reached via the language switcher, still empty because no content has been added to it yet."
   },
   {
     "id": "languages-pages-root",
@@ -298,28 +298,28 @@
     "file": "website/setup/languages-translations-04-add-child-chooser.png",
     "step": "languagesMaoriAboutChooser",
     "pages": ["website/setup/languages-translations.md"],
-    "description": "The page type chooser shown after clicking Add child page under the Te Reo Māori Home."
+    "description": "The page type chooser shown after clicking Add child page under the Te Reo M\u0101ori Home."
   },
   {
     "id": "languages-maori-about-content-slug",
     "file": "website/setup/languages-translations-05-about-content-slug.png",
     "step": "languagesMaoriAboutContentSlug",
     "pages": ["website/setup/languages-translations.md"],
-    "description": "The new Māori About page's Promote tab, with its title and content already filled in and its slug corrected to match the English About page's web address."
+    "description": "The new M\u0101ori About page's Promote tab, with its title and content already filled in and its slug corrected to match the English About page's web address."
   },
   {
     "id": "languages-maori-about-published",
     "file": "website/setup/languages-translations-06-about-published.png",
     "step": "languagesMaoriAboutPublished",
     "pages": ["website/setup/languages-translations.md"],
-    "description": "The confirmation message after publishing the Māori About page."
+    "description": "The confirmation message after publishing the M\u0101ori About page."
   },
   {
     "id": "languages-switch-round-trip",
     "file": "website/setup/languages-translations-07-switch-round-trip.png",
     "step": "languagesSwitchRoundTrip",
     "pages": ["website/setup/languages-translations.md"],
-    "description": "The Māori About page, reached directly from the English About page by clicking the language switcher, proving the two matching web addresses line up."
+    "description": "The M\u0101ori About page, reached directly from the English About page by clicking the language switcher, proving the two matching web addresses line up."
   },
   {
     "id": "memberships-option-form-empty",
@@ -523,5 +523,54 @@
     "step": "invitingStaffLinks",
     "pages": ["website/setup/inviting-your-team.md"],
     "description": "The new team member's own account page, showing the Staff links they now have access to."
+  },
+  {
+    "id": "marketing-membership-management",
+    "file": "features/features-01-membership-management.png",
+    "step": "marketingMembershipManagement",
+    "pages": ["features.md"],
+    "description": "The individual membership application form, cropped to the title, three pricing options, start date field, and submit button. Requires seed-marketing.sh, not seed.sh -- see docs-conventions.md's marketing screenshots section."
+  },
+  {
+    "id": "marketing-integrated-billing",
+    "file": "features/features-02-integrated-billing.png",
+    "step": "marketingIntegratedBilling",
+    "pages": ["features.md"],
+    "description": "The account page's memberships table, cropped to the table itself, showing a past paid membership, a current paid membership, and a future membership awaiting payment. Requires seed-marketing.sh."
+  },
+  {
+    "id": "marketing-content-management-system",
+    "file": "features/features-03-content-management-system.png",
+    "step": "marketingContentManagementSystem",
+    "pages": ["features.md"],
+    "description": "The About page's editor, populated with real About-page content (Title, Lead paragraph, Paragraph blocks) rather than example content, scrolled past the Visibility/Is structure only fields. Requires seed-marketing.sh."
+  },
+  {
+    "id": "marketing-community-forum",
+    "file": "features/features-04-community-forum.png",
+    "step": "marketingCommunityForum",
+    "pages": ["features.md"],
+    "description": "The Discourse homepage, signed in via SSO (this Discourse instance requires it, no signed-out view is possible), showing several topics with replies from multiple demo accounts. Requires seed-marketing.sh and its Discourse fixture script -- see the permanent-content note in docs-conventions.md."
+  },
+  {
+    "id": "marketing-events",
+    "file": "features/features-05-events.png",
+    "step": "marketingEvents",
+    "pages": ["features.md"],
+    "description": "The public events page's own main content, signed out and cropped to exclude the header/breadcrumbs/footer, showing multiple events and map pins spread across several NZ regions. Requires seed-marketing.sh."
+  },
+  {
+    "id": "marketing-resources",
+    "file": "features/features-06-resources.png",
+    "step": "marketingResources",
+    "pages": ["features.md"],
+    "description": "The public resources page's own main content, signed out and cropped to the first 4 resource cards, excluding the header/breadcrumbs/footer. Requires seed-marketing.sh."
+  },
+  {
+    "id": "marketing-customization-and-branding",
+    "file": "features/features-07-customization-and-branding.png",
+    "step": "marketingCustomizationAndBranding",
+    "pages": ["features.md"],
+    "description": "Three navbar crops stacked into one composite image, each a different fictional association with its own menu items, theme, and Theme Settings configuration: the first has a wordmark logo coloured to match its navbar; the second has an emoji in its name, renamed About/Events links, no Forum link, and no language picker; the third has a gradient background, an SVG logo, no Resources link, a Forum link renamed to Community. Requires seed-marketing.sh."
   }
 ]
