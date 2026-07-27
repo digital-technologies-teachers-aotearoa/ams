@@ -65,7 +65,7 @@ class Command(management.base.BaseCommand):
             "TechCorp NZ",
             "Kiwi Foundation",
             "Pacific Innovations",
-            "Southern Cross Media",
+            "Coastal Media Group",
             "Green Solutions Ltd",
         ]
         entities = {}
@@ -79,7 +79,7 @@ class Command(management.base.BaseCommand):
         tc = entities["TechCorp NZ"]
         kf = entities["Kiwi Foundation"]
         pi = entities["Pacific Innovations"]
-        sc = entities["Southern Cross Media"]
+        sc = entities["Coastal Media Group"]
         gs = entities["Green Solutions Ltd"]
 
         resource_data = [

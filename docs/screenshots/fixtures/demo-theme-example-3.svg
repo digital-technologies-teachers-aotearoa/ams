@@ -1,0 +1,25 @@
+<svg width="100%" viewBox="0 0 680 120" role="img" xmlns="http://www.w3.org/2000/svg" style="">
+<title style="fill:rgb(0, 0, 0);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">Sunrise Wellness logo</title>
+<desc style="fill:rgb(0, 0, 0);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">A navbar logo showing a stylized rising sun made of concentric arcs in warm orange and coral tones, next to the wordmark "Sunrise Wellness" in two-tone type.</desc>
+<defs>
+<linearGradient id="sunGrad" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0%" stop-color="#F5A85C"/>
+<stop offset="100%" stop-color="#E8734A"/>
+</linearGradient>
+<clipPath id="sunClip">
+<rect x="150" y="20" width="60" height="30" rx="0"/>
+</clipPath>
+</defs>
+
+<g transform="translate(150,60)" style="fill:rgb(0, 0, 0);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
+<circle cx="30" cy="0" r="30" fill="url(#sunGrad)" clip-path="url(#sunClip)" style="stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+<path d="M4 8 A26 26 0 0 1 56 8" fill="none" stroke="#F0955A" stroke-width="2.5" opacity="0.55" style="fill:none;stroke:rgb(240, 149, 90);color:rgb(11, 11, 11);stroke-width:2.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:0.55;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+<path d="M-6 18 A36 36 0 0 1 66 18" fill="none" stroke="#F0955A" stroke-width="2.5" opacity="0.3" style="fill:none;stroke:rgb(240, 149, 90);color:rgb(11, 11, 11);stroke-width:2.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:0.3;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+<line x1="30" y1="-40" x2="30" y2="-30" stroke="#E8734A" stroke-width="3" stroke-linecap="round" style="fill:rgb(0, 0, 0);stroke:rgb(232, 115, 74);color:rgb(11, 11, 11);stroke-width:3px;stroke-linecap:round;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+<line x1="4" y1="-28" x2="11" y2="-20" stroke="#E8734A" stroke-width="3" stroke-linecap="round" style="fill:rgb(0, 0, 0);stroke:rgb(232, 115, 74);color:rgb(11, 11, 11);stroke-width:3px;stroke-linecap:round;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+<line x1="56" y1="-28" x2="49" y2="-20" stroke="#E8734A" stroke-width="3" stroke-linecap="round" style="fill:rgb(0, 0, 0);stroke:rgb(232, 115, 74);color:rgb(11, 11, 11);stroke-width:3px;stroke-linecap:round;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+</g>
+
+<text x="235" y="52" font-family="var(--font-sans)" font-size="30" font-weight="500" fill="#3A6B5C" style="fill:rgb(58, 107, 92);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, sans-serif;font-size:30px;font-weight:500;text-anchor:start;dominant-baseline:auto">Sunrise</text>
+<text x="235" y="80" font-family="var(--font-sans)" font-size="30" font-weight="400" fill="#8A8578" letter-spacing="1" style="fill:rgb(138, 133, 120);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, sans-serif;font-size:30px;font-weight:400;text-anchor:start;dominant-baseline:auto">Wellness</text>
+</svg>

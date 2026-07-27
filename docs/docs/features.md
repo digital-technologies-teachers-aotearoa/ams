@@ -20,7 +20,7 @@ Automated email notifications keep members informed at each stage, while adminis
 - Membership status tracking with activity history
 - Bulk operations for membership administration
 
-<!-- TODO screenshot: Membership management interface with active/pending members list -->
+![The membership application form, showing three pricing options and a start date field](images/features/features-01-membership-management.png)
 
 ### 💳 Integrated Billing
 
@@ -39,7 +39,7 @@ Configurable pricing allows for special pricing for different membership categor
 - Flexible pricing with support for tiered rates
 - Rate limiting and error handling for reliable API communication
 
-<!-- TODO screenshot: Xero invoice generation and payment tracking -->
+![A member's memberships table showing a past paid membership, a current paid membership, and a future membership awaiting payment](images/features/features-02-integrated-billing.png)
 
 ### 📄 Content Management System
 
@@ -60,7 +60,7 @@ The preview and workflow features allow content to be drafted, reviewed, and sch
 - Image management with automatic resizing and optimization
 - Hierarchical page structure with customizable navigation
 
-<!-- TODO screenshot: Wagtail CMS page editor with StreamField blocks and multi-language tabs -->
+![The About page editor, showing real page content built from Title, Lead paragraph, and Paragraph blocks](images/features/features-03-content-management-system.png)
 
 ### 💬 Community Forum
 
@@ -79,7 +79,7 @@ Active members gain forum access, while lapsed memberships result in automatic a
 - Member profile synchronization
 - Seamless transition between website and forum
 
-<!-- TODO screenshot: Discourse forum SSO login flow -->
+![The Discourse community homepage, showing several active topics and replies](images/features/features-04-community-forum.png)
 
 ### 📅 Events
 
@@ -96,7 +96,7 @@ Administrators manage events through the Django admin interface with support for
 - Registration link support
 - Featured events highlighting
 
-<!-- TODO screenshot: Events listing page with upcoming events -->
+![The public events page, showing multiple upcoming events with pins spread across the map](images/features/features-05-events.png)
 
 ### 📚 Resources
 
@@ -113,7 +113,7 @@ Administrators manage resources through the Django admin interface, with support
 - Admin-managed taxonomy with categories and tags for faceted filtering
 - Multiple component types auto-detected: PDF, document, spreadsheet, slideshow, video, audio, and more
 
-<!-- TODO screenshot: Resources listing page with search and tag filters -->
+![The public resources page, showing many published resources listed](images/features/features-06-resources.png)
 
 ### 🎨 Customization and Branding
 
@@ -135,7 +135,7 @@ Form-based configuration for membership types and pricing enable operational cha
 - Multi-language content and interface text
 - Responsive design for mobile, tablet, and desktop
 
-<!-- TODO screenshot: Theme customization panel with brand colors and logo upload -->
+![Three navbars for three different associations, each with a radically different colour scheme, font, and logo, stacked for comparison](images/features/features-07-customization-and-branding.png)
 
 ### 🌏 Multi-Language Support (in progress)
 
