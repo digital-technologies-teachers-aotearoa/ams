@@ -56,7 +56,7 @@ Migrating or changing your everyday email is a separate service, out of scope fo
 Which of these do you want switched on for launch?
 Each can also be switched on later if you're not sure yet.
 
-1. **Forum** — a discussion area for members, powered by Discourse (see the [forum admin guide](../website/reference/forum.md)).
+1. **Forum** — a discussion area for members, powered by Discourse (see [Tutorial 7: Forum](../website/setup/forum.md) for what it looks like once it's set up).
    Has its own separate subscription cost — see the [costs sheet](costs-sheet.md).
 2. **Events** — publish and manage events on your site.
    See [`AMS_EVENTS_ENABLED`](settings-glossary.md#ams_events_enabled).
