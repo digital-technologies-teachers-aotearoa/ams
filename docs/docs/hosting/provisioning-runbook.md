@@ -171,4 +171,4 @@ Flagged as a follow-up (see this task's completion notes) rather than resolved h
 - Forum SSO login works, if enabled (Q5).
 - A test Xero invoice syncs, if enabled (Q5).
 - The `fetch-invoice-updates` scheduled job has run at least once without error, if Xero is enabled.
-- DigitalOcean's managed database backups are enabled (automatic on App Platform's managed Postgres, but confirm the retention window).
+- DigitalOcean's managed database backups are enabled (automatic on App Platform's managed Postgres, but confirm the retention window) — see [Backup & restore](backup-restore.md) for what's backed up, what isn't (notably UAT's Dev Database and both Spaces buckets), and how to restore.
