@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from .models import Account
@@ -85,6 +86,11 @@ class InvoiceAdmin(admin.ModelAdmin):
         ),
     )
 
+    def save_model(self, request, obj, form, change):
+        if "update_needed" in form.changed_data and obj.update_needed:
+            obj.update_requested_at = timezone.now()
+        super().save_model(request, obj, form, change)
+
     @admin.action(description=_("Mark selected invoices for update"))
     def mark_update_needed(self, request, queryset):
-        queryset.update(update_needed=True)
+        queryset.update(update_needed=True, update_requested_at=timezone.now())

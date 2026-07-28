@@ -11,11 +11,13 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
+from django.db.models import Q
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
+from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 
 from ams.billing.models import Invoice
@@ -29,7 +31,6 @@ logger = logging.getLogger(__name__)
 INVOICE_FETCH_UPDATE_LIMIT = 25
 
 
-@transaction.atomic
 def fetch_updated_invoice_details(
     *,
     raise_exception: bool = False,
@@ -80,12 +81,16 @@ def fetch_updated_invoice_details(
         return result
 
     query_start = time.perf_counter()
-    invoices = (
-        Invoice.objects.select_for_update(no_key=True)
-        .filter(update_needed=True, billing_service_invoice_id__isnull=False)
-        .order_by("id")[:INVOICE_FETCH_UPDATE_LIMIT]
-    )
-    invoice_list = list(invoices)
+    # Claim the invoices in a short transaction. The row locks must be released
+    # before the Xero API call below - holding them across network I/O blocks
+    # concurrent writers until their statement timeout fires.
+    with transaction.atomic():
+        invoice_list = list(
+            Invoice.objects.select_for_update(no_key=True)
+            .filter(update_needed=True, billing_service_invoice_id__isnull=False)
+            .order_by("id")[:INVOICE_FETCH_UPDATE_LIMIT],
+        )
+    claims = [(invoice.pk, invoice.update_requested_at) for invoice in invoice_list]
     query_duration_ms = (time.perf_counter() - query_start) * 1000
 
     if not invoice_list:
@@ -114,6 +119,14 @@ def fetch_updated_invoice_details(
         api_start = time.perf_counter()
         billing_service.update_invoices(billing_service_invoice_ids)
         api_duration_ms = (time.perf_counter() - api_start) * 1000
+
+        # Only clear the flag where the claim is still the one we took. An
+        # invoice re-marked while the API call was in flight has a newer
+        # update_requested_at and stays marked for the next cycle.
+        claim_filter = Q()
+        for pk, requested_at in claims:
+            claim_filter |= Q(pk=pk, update_requested_at=requested_at)
+        Invoice.objects.filter(claim_filter).update(update_needed=False)
 
         result["updated_count"] = len(invoice_list)
         result["invoice_numbers"] = [inv.invoice_number for inv in invoice_list]
@@ -216,7 +229,7 @@ def process_invoice_update_events(
     if invoice_ids_to_update:
         invoice_update_count = Invoice.objects.filter(
             billing_service_invoice_id__in=invoice_ids_to_update,
-        ).update(update_needed=True)
+        ).update(update_needed=True, update_requested_at=timezone.now())
 
         logger.info(
             "%sMarked %d invoice(s) for update from %d event(s): xero_ids=%s",

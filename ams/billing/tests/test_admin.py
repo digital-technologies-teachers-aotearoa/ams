@@ -30,3 +30,23 @@ class TestInvoiceAdmin:
         assert invoice_1.update_needed is True
         assert invoice_2.update_needed is True
         assert invoice_3.update_needed is False
+        assert invoice_1.update_requested_at is not None
+        assert invoice_2.update_requested_at is not None
+        assert invoice_3.update_requested_at is None
+
+    def test_change_form_marking_stamps_update_requested_at(self, admin_client):
+        invoice = InvoiceFactory(update_needed=False)
+
+        url = reverse("admin:billing_invoice_change", args=[invoice.pk])
+        response = admin_client.post(
+            url,
+            {
+                "update_needed": "on",
+                "billing_service_invoice_id": invoice.billing_service_invoice_id,
+            },
+        )
+
+        assert response.status_code == HTTPStatus.FOUND
+        invoice.refresh_from_db()
+        assert invoice.update_needed is True
+        assert invoice.update_requested_at is not None
