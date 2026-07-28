@@ -95,7 +95,10 @@ You can tell the two cases apart by the subject line: an application that needs 
 
 Organisations apply for membership in a similar way, from their own organisation page, with a number of seats instead of a single person.
 The same staff notification setting applies, and a pending organisation application is approved the same way, in **Membership: Organisation** instead of **Membership: Individual**.
+For seat allocation, invitations, removing a member, and deactivating an organisation, see [Feature reference: Memberships & organisations](../reference/memberships.md).
 
 ## What's next
+
+For the full picture of membership statuses, staff notification triggers, and organisation seats and invitations, see [Feature reference: Memberships & organisations](../reference/memberships.md).
 
 The next tutorial covers [the forum](forum.md) — setting up Discourse for launch, and how member accounts and sign-in work there.

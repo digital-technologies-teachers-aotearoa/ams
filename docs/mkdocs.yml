@@ -62,10 +62,11 @@ nav:
           - website/reference/index.md
           - website/reference/cms.md
           - website/reference/events.md
-          - website/reference/resources.md
           - website/reference/forum.md
-          - website/reference/theme-customization.md
+          - website/reference/memberships.md
+          - website/reference/resources.md
           - website/reference/terms.md
+          - website/reference/theme-customization.md
   - Hosting AMS:
       - hosting/index.md
       - hosting/deployment.md
