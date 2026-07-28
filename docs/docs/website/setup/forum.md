@@ -1,4 +1,4 @@
-# Tutorial 7: Forum
+# Tutorial 8: Forum
 
 **Who this page is for:** client website admins — the volunteers who will load content and run the day-to-day site, generally with no prior web-admin experience.
 

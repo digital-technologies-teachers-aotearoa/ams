@@ -1,4 +1,4 @@
-// Forum (tutorial 7). Discourse itself is not reset by seed.sh -- it has its
+// Forum (tutorial 8). Discourse itself is not reset by seed.sh -- it has its
 // own database, entirely separate from Django's, so category/topic content
 // created here would persist (and, if steps posted anything, accumulate)
 // across every future run of this suite forever. Every forum step below is

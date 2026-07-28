@@ -109,7 +109,7 @@ Each column is its own menu, under **Settings > Flat menus**, and needs its own 
     ![A footer menu item linking to an external website, with custom link text](../../images/website/setup/navigation-menus-12-footer-external-item.png)
 
     **Linking to your forum is the one exception to the rule above:** type `/forum/` into **Link to a custom URL** instead of a full web address, with no `https://` in front.
-    That's a shortcut built into your own site that signs a visitor in and sends them straight into the forum — see [Tutorial 7: Forum](forum.md#let-members-find-the-forum) for why it's worth using instead of your forum's own address.
+    That's a shortcut built into your own site that signs a visitor in and sends them straight into the forum — see [Tutorial 8: Forum](forum.md#let-members-find-the-forum) for why it's worth using instead of your forum's own address.
 
 5. Click **Save**.
 

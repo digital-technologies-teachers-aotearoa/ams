@@ -1,4 +1,4 @@
-# Tutorial 10: Inviting your team
+# Tutorial 11: Inviting your team
 
 **Who this page is for:** client website admins — the volunteers who will load content and run the day-to-day site, generally with no prior web-admin experience.
 
@@ -46,7 +46,7 @@ Once they've confirmed their email and signed in, they'll land on their own acco
 | --- | --- | --- |
 | Editor | Add to **Editors** under Groups | Add and edit pages in the CMS, but not publish them — someone with Moderator access (or you) needs to publish their work. |
 | Moderator | Add to **Moderators** under Groups | Add, edit, and publish pages in the CMS — the level most people loading day-to-day content need. |
-| Website Admin | Tick **Staff status** | Access to the Django admin, where memberships ([Tutorial 6](memberships.md)), events ([Tutorial 8](events.md)), and resources ([Tutorial 9](resources.md)) are managed — most people helping with day-to-day site work will need this too, alongside Editor or Moderator. |
+| Website Admin | Tick **Staff status** | Access to the Django admin, where memberships ([Tutorial 6](memberships.md)), events ([Tutorial 9](events.md)), and resources ([Tutorial 10](resources.md)) are managed — most people helping with day-to-day site work will need this too, alongside Editor or Moderator. |
 | Full administrator | Tick **Superuser status** (as well as **Staff status**, to actually reach the Django admin) | Every permission everywhere, automatically, including ones added after this page was written — reserve this for people who should have the same full access you do. |
 
 A **Group** and **Staff status** are independent, and cover different areas: a Group controls CMS access, Staff status controls Django admin access.

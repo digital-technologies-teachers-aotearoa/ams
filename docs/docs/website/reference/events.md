@@ -26,4 +26,4 @@ Events appear publicly at `/events/` and include pages for upcoming events, past
 You can add links to events pages via the Wagtail CMS menu system (Main Menu or Flat Menus).
 Menu items pointing to `/events/` URLs cannot be added while the events module is disabled.
 
-See [Tutorial 8: Events](../setup/events.md) for a step-by-step walkthrough of adding a location and an event.
+See [Tutorial 9: Events](../setup/events.md) for a step-by-step walkthrough of adding a location and an event.

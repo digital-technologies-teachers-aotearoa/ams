@@ -24,6 +24,7 @@ import { steps as firstPagesSteps } from "./steps/first-pages.mjs";
 import { steps as navigationMenusSteps } from "./steps/navigation-menus.mjs";
 import { steps as languagesTranslationsSteps } from "./steps/languages-translations.mjs";
 import { steps as membershipsSteps } from "./steps/memberships.mjs";
+import { steps as profileFieldsSteps } from "./steps/profile-fields.mjs";
 import { steps as forumSteps } from "./steps/forum.mjs";
 import { steps as eventsSteps } from "./steps/events.mjs";
 import { steps as resourcesSteps } from "./steps/resources.mjs";
@@ -41,6 +42,7 @@ const steps = {
   ...navigationMenusSteps,
   ...languagesTranslationsSteps,
   ...membershipsSteps,
+  ...profileFieldsSteps,
   ...forumSteps,
   ...eventsSteps,
   ...resourcesSteps,
