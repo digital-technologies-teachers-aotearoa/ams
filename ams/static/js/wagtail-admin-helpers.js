@@ -29,11 +29,21 @@ function insertBanner(message) {
 }
 
 function hidePagePrivacyControls() {
-  // Find the (public) visibility section.
+  // Wagtail pre-renders one wrapper per privacy state (visible-to-all,
+  // private, etc.) inside a shared container, and toggles which wrapper is
+  // hidden based on the page's current setting. Inserting the notice inside
+  // just the "visible-to-all" wrapper hides it the moment a page is actually
+  // set private — exactly when it matters — so instead find the shared
+  // container two levels up and insert the notice there, before every state
+  // wrapper, so it always shows.
   const publicSection = document.querySelector(
     'section[aria-labelledby="status-sidebar-visible-to-all"]'
   );
   if (!publicSection) return;
+
+  const stateWrapper = publicSection.parentNode;
+  const privacyContainer = stateWrapper && stateWrapper.parentNode;
+  if (!privacyContainer) return;
 
   // Create the message element.
   const notice = document.createElement('div');
@@ -41,11 +51,7 @@ function hidePagePrivacyControls() {
     "ℹ️ The privacy value should be set to 'Visible to all', as additional AMS permission checks are performed after this. Only change if you understand the implications.";
   notice.className = 'ams-privacy-banner';
 
-  // Insert the notice as a sibling directly before the section.
-  const parent = publicSection.parentNode;
-  if (parent) {
-    parent.insertBefore(notice, publicSection);
-  }
+  privacyContainer.insertBefore(notice, privacyContainer.firstChild);
 }
 
 function addThemeSettingsImportExport() {
@@ -96,8 +102,11 @@ function exportThemeSettings() {
     return;
   }
 
-  // Collect all text inputs and textareas with IDs within the form
-  const inputs = form.querySelectorAll('input[type="text"][id], textarea[id]');
+  // Collect all text inputs, textareas, dropdowns, and the (hidden) image
+  // chooser field, all with IDs, within the form.
+  const inputs = form.querySelectorAll(
+    'input[type="text"][id], textarea[id], select[id], input[type="hidden"][id]'
+  );
 
   inputs.forEach((input) => {
     if (input.id) {
@@ -146,23 +155,35 @@ function importThemeSettings(event) {
 
       // Apply settings to matching inputs within the form
       let appliedCount = 0;
+      let importedSeparatorImage = false;
       for (const [id, value] of Object.entries(settings)) {
         const input = document.getElementById(id);
         if (
           input &&
           form.contains(input) &&
-          ((input.tagName === 'INPUT' && input.type === 'text') ||
-            input.tagName === 'TEXTAREA')
+          ((input.tagName === 'INPUT' &&
+            (input.type === 'text' || input.type === 'hidden')) ||
+            input.tagName === 'TEXTAREA' ||
+            input.tagName === 'SELECT')
         ) {
           input.value = value;
           // Trigger change and input events
           input.dispatchEvent(new Event('input', { bubbles: true }));
           input.dispatchEvent(new Event('change', { bubbles: true }));
           appliedCount++;
+          if (id === 'id_separator_image' && value) {
+            importedSeparatorImage = true;
+          }
         }
       }
 
-      alert(`Successfully imported ${appliedCount} setting(s).`);
+      let message = `Successfully imported ${appliedCount} setting(s).`;
+      if (importedSeparatorImage) {
+        message +=
+          " The separator image was applied, but its preview won't refresh" +
+          ' until you save and reload the page.';
+      }
+      alert(message);
     } catch (error) {
       alert(`Error importing settings: ${error.message}`);
     }

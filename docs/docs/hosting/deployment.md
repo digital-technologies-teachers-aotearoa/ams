@@ -94,7 +94,7 @@ An automated check (see [Documentation conventions](../developer/docs-convention
 | `DJANGO_MEDIA_PRIVATE_SECRET_KEY` | 🔴 Required | `DSGF987DGF9D8` | Secret key used for updating the private media storage |
 | `DJANGO_MEDIA_PRIVATE_REGION_NAME` | ⚪ Optional | `us-east-1` | Name of the region to use for private media storage |
 | `DJANGO_MEDIA_PRIVATE_CUSTOM_DOMAIN` | ⚪ Optional | `https://private-media.ams.com` | Custom URL to use when connecting to private media storage, including scheme |
-| `DJANGO_WAGTAIL_AMS_ADMIN_HELPERS` | ⚪ Optional | `True` | Shows helper text within the Wagtail CMS admin |
+| `DJANGO_WAGTAIL_AMS_ADMIN_HELPERS` | ⚪ Optional | `True` | Adds client-admin helper UI to the Wagtail CMS: upload-privacy banners, the page-visibility notice, the homepage welcome panel, and the [Theme Settings Export/Import buttons](../website/reference/theme-customization.md#save-and-reuse-your-theme). Set to `False` to remove all of these — including Export/Import — with no other effect. |
 | `DJANGO_LOG_LEVEL` | ⚪ Optional | `INFO` | Python logging level for production (`DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`). Defaults to `INFO` (or `DEBUG` if `DJANGO_DEBUG=True`). Also sets the default for `SENTRY_LOG_LEVEL` when that variable is not explicitly set. |
 | `SENTRY_DSN` | 🔴 Required | `https://123@456.ingest.de.sentry.io/789` | The DSN value for Sentry observability |
 | `SENTRY_LOG_LEVEL` | ⚪ Optional | `40` | The level to log at (default `20`) |
