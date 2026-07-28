@@ -22,7 +22,8 @@ Work through this list with your team before telling your provider you're ready 
 5. If you enabled the forum, check members can reach it and sign in automatically — see [Forum](forum.md).
 6. If you enabled events, check they show what you expect — see [Events](events.md).
 7. If you enabled resources, check they show what you expect — see [Resources](resources.md).
-8. Add anything else you find, wrong or missing, to one shared list with your team, rather than sending separate emails — your provider works through this list with you before launch.
+8. If you need a privacy policy, terms of service, or similar, publish it now, so it's live before members start signing up — see [Terms & policies](../reference/terms.md).
+9. Add anything else you find, wrong or missing, to one shared list with your team, rather than sending separate emails — your provider works through this list with you before launch.
 
 ## Going live
 
