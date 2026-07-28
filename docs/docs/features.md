@@ -1,11 +1,11 @@
 # Features
 
-## Core Capabilities
+## Core capabilities
 
-### 🎯 Membership Management
+### 🎯 Membership management
 
-AMS provides comprehensive membership management for both individual and organization-based memberships. Configure multiple membership types with different pricing tiers and renewal cycles.
-Organizations can manage their allocated seats, inviting and removing members as needed.
+AMS provides comprehensive membership management for both individual and organisation-based memberships. Configure multiple membership types with different pricing tiers and renewal cycles.
+Organisations can manage their allocated seats, inviting and removing members as needed.
 Custom profile fields allow you to collect association-specific information without requiring code changes.
 
 The platform aims to handle the complete membership lifecycle.
@@ -13,20 +13,20 @@ Automated email notifications keep members informed at each stage, while adminis
 
 **Key Features:**
 
-- Individual and organization membership models with seat allocation
+- Individual and organisation membership models with seat allocation
 - Flexible membership types with configurable pricing and benefits
 - Custom profile fields for association-specific data collection
-- Member self-service for profile updates and organization management
+- Member self-service for profile updates and organisation management
 - Membership status tracking with activity history
 - Bulk operations for membership administration
 
 ![The membership application form, showing three pricing options and a start date field](images/features/features-01-membership-management.png)
 
-### 💳 Integrated Billing
+### 💳 Integrated billing
 
 Native integration with Xero accounting software streamlines all billing operations.
 When a member applies, AMS automatically creates invoices in Xero, eliminating manual data entry and ensuring financial records remain accurate.
-Real-time synchronization keeps payment status current in both systems.
+Real-time synchronisation keeps payment status current in both systems.
 
 The Xero integration provides secure, granular access without requiring shared passwords.
 Configurable pricing allows for special pricing for different membership categories.
@@ -35,13 +35,13 @@ Configurable pricing allows for special pricing for different membership categor
 
 - Custom connection Xero integration for secure, automated invoice generation
 - Automatic invoice creation for applications and transactions
-- Real-time payment status synchronization between AMS and Xero
+- Real-time payment status synchronisation between AMS and Xero
 - Flexible pricing with support for tiered rates
 - Rate limiting and error handling for reliable API communication
 
 ![A member's memberships table showing a past paid membership, a current paid membership, and a future membership awaiting payment](images/features/features-02-integrated-billing.png)
 
-### 📄 Content Management System
+### 📄 Content management system
 
 Built on Wagtail, AMS provides a powerful yet user-friendly content management system that empowers non-technical staff to create and publish rich content.
 The StreamField architecture allows editors to build pages using reusable content blocks, maintaining consistency while providing creative flexibility.
@@ -57,17 +57,17 @@ The preview and workflow features allow content to be drafted, reviewed, and sch
 - Full support for English and Te Reo Māori
 - Draft, preview, and publish workflow with revision history
 - Scheduled publishing for time-sensitive content
-- Image management with automatic resizing and optimization
-- Hierarchical page structure with customizable navigation
+- Image management with automatic resizing and optimisation
+- Hierarchical page structure with customisable navigation
 
 ![The About page editor, showing real page content built from Title, Lead paragraph, and Paragraph blocks](images/features/features-03-content-management-system.png)
 
-### 💬 Community Forum
+### 💬 Community forum
 
 Seamless integration with Discourse forum platform provides a dedicated space for member discussions, peer support, and community building.
 Single sign-on (SSO) via OAuth2 means members use the same credentials across both AMS and the forum, eliminating the friction of separate accounts.
 
-Access control is automatically synchronized with membership status.
+Access control is automatically synchronised with membership status.
 Active members gain forum access, while lapsed memberships result in automatic access deactivation.
 
 **Key Features:**
@@ -76,7 +76,7 @@ Active members gain forum access, while lapsed memberships result in automatic a
 - Automatic access control based on active membership status
 - Unified user credentials across AMS and forum
 - Consistent branding and navigation between platforms
-- Member profile synchronization
+- Member profile synchronisation
 - Seamless transition between website and forum
 
 ![The Discourse community homepage, showing several active topics and replies](images/features/features-04-community-forum.png)
@@ -115,20 +115,20 @@ Administrators manage resources through the Django admin interface, with support
 
 ![The public resources page, showing many published resources listed](images/features/features-06-resources.png)
 
-### 🎨 Customization and Branding
+### 🎨 Customisation and branding
 
-AMS provides extensive customization options without requiring code modifications, including enabling or disabling parts of the website such as the events module.
-Upload your association's logo, configure brand colors, and customize the visual theme to match your organization's identity.
+AMS provides extensive customisation options without requiring code modifications, including enabling or disabling parts of the website such as the events module.
+Upload your association's logo, configure brand colours, and customise the visual theme to match your organisation's identity.
 The Bootstrap based design ensures responsive, modern styling across all devices.
 
 Custom profile fields allow you to collect and display information specific to your association's context.
-Whether you need to track certifications, specializations, employment details, or any other member attributes, custom fields can be configured through the admin interface.
+Whether you need to track certifications, specialisations, employment details, or any other member attributes, custom fields can be configured through the admin interface.
 Form-based configuration for membership types and pricing enable operational changes without developer involvement.
 
 **Key Features:**
 
-- Logo upload and branding customization
-- Theme color configuration with live preview
+- Logo upload and branding customisation
+- Theme colour configuration with live preview
 - Bootstrap and CSS variables for advanced styling
 - Custom profile fields with various field types (text, choice, date, etc.)
 - Configurable membership types and pricing
@@ -137,25 +137,25 @@ Form-based configuration for membership types and pricing enable operational cha
 
 ![Three navbars for three different associations, each with a radically different colour scheme, font, and logo, stacked for comparison](images/features/features-07-customization-and-branding.png)
 
-### 🌏 Multi-Language Support (in progress)
+### 🌏 Multi-language support (in progress)
 
 AMS provides comprehensive multi-language capabilities, with full support for both English and Te Reo Māori.
 Path-based routing allows content to be served in different languages (e.g., `/en/membership` vs `/mi/membership`), while the Wagtail CMS enables translation of all page content.
-Interface text, system emails, and form labels are managed through Django's translation system, allowing for complete localization.
+Interface text, system emails, and form labels are managed through Django's translation system, allowing for complete localisation.
 
 **Key Features:**
 
 - English and Te Reo Māori interface support
 - Path-based multi-language content routing
 - Translatable CMS pages with language-specific content
-- Localized system emails and notifications
+- Localised system emails and notifications
 - Translatable form labels and help text
 - Language switcher for member convenience
 - Fallback language configuration
 
-## Who is AMS For?
+## Who is AMS for?
 
-### Association Administrators and Operations Staff
+### Association administrators and operations staff
 
 If you manage the day-to-day operations of a membership association, AMS streamlines your work.
 Automated billing eliminates manual invoice creation and payment tracking.
@@ -170,11 +170,11 @@ The intuitive CMS allows you to publish content without technical assistance.
 - Streamline member onboarding and renewals
 - Maintain accurate records across systems
 
-### IT Teams and Developers
+### IT teams and developers
 
 Built on proven, well-documented technologies, AMS provides a solid foundation for technical teams.
 The Django framework, PostgreSQL database, and Docker-based deployment ensure reliability and scalability.
-Comprehensive documentation covers installation, configuration, and customization.
+Comprehensive documentation covers installation, configuration, and customisation.
 The open-source codebase allows for extension and modification to meet specific requirements.
 
 **Technical Benefits:**
@@ -187,10 +187,10 @@ The open-source codebase allows for extension and modification to meet specific 
 - CI/CD ready architecture
 - Extensive developer documentation
 
-### Association Members
+### Association members
 
 Members benefit from a unified, self-service platform.
-Update your profile, manage organization memberships, track membership expiry dates, and access association content all in one place.
+Update your profile, manage organisation memberships, track membership expiry dates, and access association content all in one place.
 Single sign-on provides seamless access to the community forum.
 Clear membership status information keeps members informed of where they stand.
 
@@ -203,7 +203,7 @@ Clear membership status information keeps members informed of where they stand.
 - Mobile-friendly interface for on-the-go access
 - Multi-language content options
 
-## Why Choose AMS?
+## Why choose AMS?
 
 **Open Source:** Full transparency, no vendor lock-in, and community-driven development. Review the code, understand how it works, and modify it to suit your needs. Benefit from community contributions and share improvements back to the ecosystem.
 
@@ -213,7 +213,7 @@ Clear membership status information keeps members informed of where they stand.
 
 **Built for NZ/AU:** Native Xero integration for seamless accounting, configurable currency, and Te Reo Māori language support for New Zealand associations committed to bilingual service.
 
-**Modern Stack:** Built on Django, Wagtail, PostgreSQL, and containerized with Docker. Benefit from mature, well-supported technologies with extensive documentation and active communities. Future-proof architecture with clear upgrade paths.
+**Modern Stack:** Built on Django, Wagtail, PostgreSQL, and containerised with Docker. Benefit from mature, well-supported technologies with extensive documentation and active communities. Future-proof architecture with clear upgrade paths.
 
 **Active Development:** Developed and maintained by DTTA for their own operational needs, ensuring continued evolution based on real-world association management requirements. Regular updates, bug fixes, and new features driven by practical experience.
 

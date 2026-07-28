@@ -18,7 +18,7 @@ The website your client's members and visitors use has to be built inside AMS it
 Two separate layers make up an AMS website's appearance:
 
 1. **Sitewide theme** — brand colours, fonts, and (optionally) custom CSS, set once for the whole site rather than chosen per page.
-   See [theme customization](../website/reference/theme-customization.md) for what a non-developer can change, and [the theme system](../developer/theme-system.md) for the technical detail.
+   See [theme customisation](../website/reference/theme-customisation.md) for what a non-developer can change, and [the theme system](../developer/theme-system.md) for the technical detail.
 2. **Page content and structure** — built from a fixed set of content blocks in the [CMS](glossary.md#cms): headings, paragraphs, images, image grids and carousels, multi-column layouts, full-width banner sections, video embeds, and contact forms.
    Your client's provider, or a trained content editor, assembles these per page — there's no way to hand over a finished visual layout and have it reproduced exactly; it gets translated into the nearest combination of these blocks and the sitewide theme.
 

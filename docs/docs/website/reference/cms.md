@@ -44,7 +44,7 @@ Uploaded images are public — anyone can view them, even without an account —
 Uploaded documents are private: only members with an active membership can view them.
 The CMS reminds you of this on the Images and Documents pages.
 
-## Reserved URL Patterns
+## Reserved URL patterns
 
 A page directly under Home can't use certain words as its web address (its slug, normally set automatically from the page's title) — these are already used by other parts of the website. The main ones are:
 

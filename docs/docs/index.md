@@ -2,7 +2,7 @@
 
 ## What is Association Management Software?
 
-AMS is a comprehensive, open-source platform designed specifically for membership associations, professional bodies, clubs, and community organizations.
+AMS is a comprehensive, open-source platform designed specifically for membership associations, professional bodies, clubs, and community organisations.
 Built with Django and Wagtail CMS, AMS provides everything you need to manage your association in one integrated system.
 
 Developed by the Digital Technologies Teachers Aotearoa (DTTA) to meet their own operational needs, AMS brings together membership management, integrated billing, content publishing, and community engagement in a single, cohesive platform.

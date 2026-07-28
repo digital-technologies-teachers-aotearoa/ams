@@ -1,14 +1,14 @@
-# Permission Caching
+# Permission caching
 
-This document explains the caching strategies implemented for the `user_has_active_membership` function to optimize performance.
+This document explains the caching strategies implemented for the `user_has_active_membership` function to optimise performance.
 
 ## Overview
 
 The `user_has_active_membership` function is likely to be called frequently across many page requests. Without caching, each call would execute database queries to check membership status, which can impact performance.
 
-## Available Caching Strategies
+## Available caching strategies
 
-### 1. Django Cache Framework (Default)
+### 1. Django cache framework (default)
 
 **Function**: `user_has_active_membership(user)`
 
@@ -31,7 +31,7 @@ The `user_has_active_membership` function is likely to be called frequently acro
 - When you need caching across multiple requests
 - When data can be slightly stale (up to 5 minutes)
 
-### 2. Request-Level Caching
+### 2. Request-level caching
 
 **Function**: `user_has_active_membership_request_cached(user)`
 
@@ -53,7 +53,7 @@ The `user_has_active_membership` function is likely to be called frequently acro
 - Development environments
 - When the same permission is checked multiple times per request
 
-## Cache Invalidation
+## Cache invalidation
 
 Cache is automatically invalidated when:
 
@@ -65,7 +65,7 @@ This is handled by Django signals in `ams.utils.cache_signals`.
 
 ## Configuration
 
-### Django Cache Backend
+### Django cache backend
 
 Ensure your Django settings include a cache configuration:
 
@@ -79,7 +79,7 @@ CACHES = {
 }
 ```
 
-### Cache Timeout Adjustment
+### Cache timeout adjustment
 
 To change the cache duration, modify the timeout value in `permissions.py`:
 
@@ -88,7 +88,7 @@ To change the cache duration, modify the timeout value in `permissions.py`:
 cache.set(cache_key, has_active, 600)
 ```
 
-## Performance Comparison
+## Performance comparison
 
 | Strategy | First Call | Subsequent Calls | Data Freshness | Complexity |
 |----------|------------|------------------|----------------|------------|
@@ -96,7 +96,7 @@ cache.set(cache_key, has_active, 600)
 | Django Cache | DB Query | Cache Hit | Up to 5 min stale | Medium |
 | Request Cache | DB Query | Memory Hit | Always Fresh | Low |
 
-## Usage Examples
+## Usage examples
 
 ```python
 from ams.utils.permissions import user_has_active_membership, user_has_active_membership_request_cached
@@ -120,7 +120,7 @@ To monitor cache performance, you can check:
 - Database query counts in Django Debug Toolbar
 - Response times for permission-heavy pages
 
-## Best Practices
+## Best practices
 
 1. **Use the default cached version** in production environments
 2. **Monitor cache hit ratios** to ensure caching is effective

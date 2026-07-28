@@ -61,7 +61,7 @@ You should already be signed in to the [CMS](../../getting-started/glossary.md#c
 ## Every other colour and font
 
 Every other field on this page — navbar and footer colours, body text, buttons, and the rest of the font settings — works exactly the same way as the two you just changed: enter a value, then click **Save**.
-The [theme customization reference](../reference/theme-customization.md) covers every field, along with accessibility guidance for choosing colours with enough contrast.
+The [theme customisation reference](../reference/theme-customisation.md) covers every field, along with accessibility guidance for choosing colours with enough contrast.
 
 ## What's next
 

@@ -1,5 +1,7 @@
 # Forum
 
+**Who this page is for:** client website admins — the volunteers who run the day-to-day site once it's launched.
+
 Discourse is used as the forum platform, due to it's mature ecosystem, flexible features, and that it's open source.
 The Discourse forum can either be self or cloud hosted.
 

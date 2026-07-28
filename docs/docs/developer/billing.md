@@ -1,4 +1,6 @@
-# Billing Integration
+# Billing integration
+
+**Who this page is for:** developers, and the provider setting up a client's Xero connection.
 
 AMS uses a pluggable billing service architecture that allows integration with various billing providers. Currently, Xero is the supported billing provider using the Custom Connection flow.
 
@@ -12,22 +14,22 @@ The billing system handles:
 - Generating invoices for memberships and services
 - Sending invoice emails
 - Tracking invoice payment status via webhooks
-- Synchronizing invoice data between AMS and the billing provider
+- Synchronising invoice data between AMS and the billing provider
 
-## Xero Integration
+## Xero integration
 
-### Custom Connection Flow
+### Custom Connection flow
 
-AMS uses Xero's **Custom Connection** authentication flow, which is designed for single-organization integrations. This approach:
+AMS uses Xero's **Custom Connection** authentication flow, which is designed for single-organisation integrations. This approach:
 
 - Uses OAuth2 client credentials grant type
-- Connects to a single pre-authorized Xero organization
+- Connects to a single pre-authorised Xero organisation
 - Requires no interactive user authentication
 - Is ideal for backend integrations like AMS
 
 **Important:** Before configuring AMS, you must set up a Custom Connection in the Xero Developer Portal following the steps below.
 
-### Setting Up a Xero Custom Connection
+### Setting up a Xero Custom Connection
 
 1. **Create the Custom Connection** in [Xero My Apps](https://developer.xero.com/app/manage):
     - Click "New App"
@@ -38,40 +40,40 @@ AMS uses Xero's **Custom Connection** authentication flow, which is designed for
     - ✅ `accounting.contacts` - For creating and managing customer contacts
     - ✅ `accounting.transactions` - For creating, retrieving, and managing invoices
 
-3. **Select the Authorizing User:**
-    - Choose the user who will authorize the connection
-    - They will receive an email with a link to authorize
+3. **Select the Authorising User:**
+    - Choose the user who will authorise the connection
+    - They will receive an email with a link to authorise
 
-4. **Authorize the Connection:**
+4. **Authorise the Connection:**
     - The selected user clicks the link in their email
     - They consent to the requested scopes
-    - They select the Xero organization to connect
-    - **Note:** The organization must have purchased a [Custom Connection subscription](https://connect.xero.com/custom) (the Xero Demo Company can be used for free during development)
+    - They select the Xero organisation to connect
+    - **Note:** The organisation must have purchased a [Custom Connection subscription](https://connect.xero.com/custom) (the Xero Demo Company can be used for free during development)
 
 5. **Retrieve Credentials:**
-    - Once authorized, return to the app details page
+    - Once authorised, return to the app details page
     - Copy the **Client ID**
     - Generate and copy the **Client Secret** (keep this secure!)
-    - Note your **Tenant ID** (organization ID) from the connection details
+    - Note your **Tenant ID** (organisation ID) from the connection details
 
 ### Configuration
 
 Configure the following environment variables for Xero integration:
 
-#### Required Variables
+#### Required variables
 
 | Variable | Description | Example |
 |----------|-------------|---------|
 | `AMS_BILLING_SERVICE_CLASS` | The billing service provider class | `ams.billing.providers.xero.XeroBillingService` |
 | `XERO_CLIENT_ID` | OAuth2 client ID from your Custom Connection | `91E5715B1199038080D6D0296EBC1648` |
 | `XERO_CLIENT_SECRET` | OAuth2 client secret from your Custom Connection | `your-secret-here` |
-| `XERO_TENANT_ID` | Xero organization/tenant ID | `a3a4dbaf-3495-a808-ed7a-7b964388f53` |
+| `XERO_TENANT_ID` | Xero organisation/tenant ID | `a3a4dbaf-3495-a808-ed7a-7b964388f53` |
 | `XERO_WEBHOOK_KEY` | Webhook signing key for validating webhook requests | `your-webhook-key` |
 | `XERO_ACCOUNT_CODE` | Default account code for invoice line items | `200` |
 | `XERO_AMOUNT_TYPE` | Tax calculation type | `INCLUSIVE` or `EXCLUSIVE` |
 | `XERO_CURRENCY_CODE` | Currency code for invoices | `NZD`, `AUD`, `USD`, etc. |
 
-#### Optional Variables
+#### Optional variables
 
 | Variable | Description | Example | Default |
 |----------|-------------|---------|---------|
@@ -82,11 +84,11 @@ Configure the following environment variables for Xero integration:
 !!! warning "Security Warning"
     Setting `XERO_DEBUG=True` will log all HTTP requests and responses, including sensitive credentials and bearer tokens. Only enable this for debugging specific API issues in isolated development environments. Never enable in production.
 
-### Deployment Configuration
+### Deployment configuration
 
 When deploying AMS with Xero integration, configure these environment variables in your deployment platform.
 
-#### Required Environment Variables
+#### Required environment variables
 
 These variables must be set for production deployments:
 
@@ -108,7 +110,7 @@ XERO_AMOUNT_TYPE=INCLUSIVE
 XERO_CURRENCY_CODE=NZD
 ```
 
-#### Optional Environment Variables
+#### Optional environment variables
 
 ```bash
 # Email Configuration
@@ -119,7 +121,7 @@ AMS_BILLING_EMAIL_WHITELIST_REGEX=  # Leave empty for production
 XERO_DEBUG=False
 ```
 
-#### Security Best Practices
+#### Security best practices
 
 1. **Never commit credentials to version control**
 2. **Use secret management** provided by your platform
@@ -127,14 +129,14 @@ XERO_DEBUG=False
 4. **Restrict access** to production credentials
 5. **Use different Xero apps** for development, staging, and production environments
 
-### Webhook Configuration
+### Webhook configuration
 
 AMS receives webhook notifications from Xero when invoice status changes (e.g., paid, voided).
 The webhook endpoint uses HMAC-SHA256 signature verification:
 
 **Webhook Endpoint:** `https://your-domain.com/billing/xero/webhooks/`
 
-#### Setting Up Webhooks in Xero
+#### Setting up webhooks in Xero
 
 1. Navigate to your Xero app in the Developer Portal
 2. Go to the **Webhooks** section: `https://developer.xero.com/app/manage/app/YOUR_APP_ID/webhooks`
@@ -143,7 +145,7 @@ The webhook endpoint uses HMAC-SHA256 signature verification:
     - Xero will generate a **Webhook Key** - save this as `XERO_WEBHOOK_KEY`
 4. Save the configuration
 
-#### Webhook Events Handled
+#### Webhook events handled
 
 Currently, AMS processes these Xero webhook events:
 
@@ -166,7 +168,7 @@ Currently, AMS processes these Xero webhook events:
 6. Invoice details fetched from Xero API
 7. Local database updated with latest payment status
 
-#### Testing Webhooks
+#### Testing webhooks
 
 **Local Development:**
 
@@ -198,7 +200,7 @@ Trigger webhook events by making changes in Xero:
 
 ### Architecture
 
-#### Service Class Hierarchy
+#### Service class hierarchy
 
 ```
 BillingService (ABC)
@@ -234,7 +236,7 @@ class Invoice(Model):
     # Amount fields, dates, etc.
 ```
 
-#### Key Service Methods
+#### Key service methods
 
 **Contact Management:**
 
@@ -268,20 +270,20 @@ def get_invoice_url(invoice: Invoice) -> str | None:
     """Get customer-facing online invoice URL."""
 ```
 
-### Rate Limiting
+### Rate limiting
 
 Xero enforces API rate limits to prevent abuse and ensure service stability. Understanding and handling these limits is crucial for reliable operation.
 
-#### Xero Rate Limit Details
+#### Xero rate limit details
 
-- **Rate Limit:** 60 requests per minute per organization
+- **Rate Limit:** 60 requests per minute per organisation
 - **Limit Window:** Rolling 60-second window
 - **Headers:** Xero returns rate limit information in response headers:
     - `X-Rate-Limit-Limit`: Maximum requests allowed (60)
     - `X-Rate-Limit-Remaining`: Requests remaining in current window
     - `X-Rate-Limit-Problem`: Returned when limit is exceeded
 
-#### AMS Rate Limit Handling
+#### AMS rate limit handling
 
 The integration uses a fail-fast approach with the `@handle_rate_limit()` decorator:
 
@@ -294,14 +296,14 @@ def _create_xero_invoice(self, ...):
     pass
 ```
 
-**Behavior:**
+**Behaviour:**
 
 1. API calls are wrapped with rate limit detection
 2. When rate limits are exceeded (HTTP 429), `XeroRateLimitError` is raised
 3. The error includes `retry_after` seconds when available from Xero's response
 4. **No automatic retry** - operations fail immediately to prevent cascading delays
 
-#### Handling Rate Limit Errors
+#### Handling rate limit errors
 
 **During Webhook Processing:**
 
@@ -334,7 +336,7 @@ for member in members:
 3. **Queue-based Processing:** Use a task queue (e.g., Celery) with rate limiting
 4. **Monitor Remaining Requests:** Check `X-Rate-Limit-Remaining` header to throttle proactively
 
-#### Rate Limit Monitoring
+#### Rate limit monitoring
 
 Log rate limit errors to track API usage patterns:
 
@@ -355,7 +357,7 @@ Configure Sentry or your monitoring system to alert on rate limit errors for pro
 
 ### Testing
 
-#### Unit Tests
+#### Unit tests
 
 Run billing tests:
 
@@ -369,7 +371,7 @@ Key test files:
 - `test_account_model.py` - Account model tests
 - `test_fetch_invoice_updates_command.py` - Management command tests
 
-#### Mock Service for Testing
+#### Mock service for testing
 
 For testing without connecting to Xero, use `MockXeroBillingService`:
 
@@ -385,7 +387,7 @@ The mock service:
 - Useful for unit testing and CI/CD pipelines
 - Creates predictable invoice IDs and numbers
 
-### Management Commands
+### Management commands
 
 #### fetch_invoice_updates
 
@@ -402,7 +404,7 @@ python manage.py fetch_invoice_updates
 - Updates local database with current information
 - Marks invoices as no longer needing updates
 
-**Behavior:**
+**Behaviour:**
 
 - Processes up to 30 invoices per run (to avoid rate limits)
 - Only works with `XeroBillingService` (skips mock services)
@@ -418,24 +420,24 @@ python manage.py fetch_invoice_updates
 
 ### Troubleshooting
 
-#### Authentication Issues
+#### Authentication issues
 
 **Symptom:** "Invalid credentials" or "Unauthorized" errors
 
 **Possible Causes:**
 
 - Incorrect `XERO_CLIENT_ID` or `XERO_CLIENT_SECRET`
-- Custom Connection not authorized or authorization expired
+- Custom Connection not authorised or authorisation expired
 - Incorrect `XERO_TENANT_ID`
 
 **Solutions:**
 
 1. Verify credentials in Xero Developer Portal match environment variables
-2. Check Custom Connection is still authorized (hasn't been revoked)
-3. Confirm `XERO_TENANT_ID` matches the connected organization
+2. Check Custom Connection is still authorised (hasn't been revoked)
+3. Confirm `XERO_TENANT_ID` matches the connected organisation
 4. Try regenerating client secret and updating `XERO_CLIENT_SECRET`
 
-#### Webhook Verification Failures
+#### Webhook verification failures
 
 **Symptom:** Webhooks return 401 Unauthorized
 
@@ -451,7 +453,7 @@ python manage.py fetch_invoice_updates
 2. Check Xero's webhook delivery logs for signature details
 3. Test webhook signature locally
 
-#### Rate Limit Errors
+#### Rate limit errors
 
 **Symptom:** `XeroRateLimitError` raised during operations
 
@@ -463,19 +465,19 @@ python manage.py fetch_invoice_updates
 2. **Short-term:** Reduce concurrent operations or add delays between requests
 3. **Long-term:** Implement queueing system with rate limiting
 
-#### Invoice Creation Failures
+#### Invoice creation failures
 
 **Symptom:** Invoice creation fails or returns errors
 
 **Possible Causes:**
 
 1. Account missing associated `XeroContact`
-2. Invalid `XERO_ACCOUNT_CODE` for the organization
+2. Invalid `XERO_ACCOUNT_CODE` for the organisation
 3. Unsupported `XERO_CURRENCY_CODE`
 4. Missing `accounting.transactions` scope
 5. Invalid line item data
 
-#### Contact Creation or Update Failures
+#### Contact creation or update failures
 
 **Symptom:** Contact operations fail
 
@@ -485,7 +487,7 @@ python manage.py fetch_invoice_updates
 - Duplicate contact name (shouldn't happen with UUID prefix)
 - Invalid email address format
 
-#### Invoice Status Not Updating
+#### Invoice status not updating
 
 **Symptom:** Invoice paid in Xero but still shows as unpaid in AMS
 
@@ -495,7 +497,7 @@ python manage.py fetch_invoice_updates
 2. `fetch_invoice_updates` command not running
 3. `update_needed` flag not being set
 
-#### Email Invoices Not Sending
+#### Email invoices not sending
 
 **Symptom:** Invoices created but emails not received
 
@@ -506,7 +508,7 @@ python manage.py fetch_invoice_updates
 3. Invalid contact email address
 4. `AMS_BILLING_EMAIL_WHITELIST_REGEX` filtering recipient
 
-#### Getting Help
+#### Getting help
 
 If issues persist:
 
@@ -516,12 +518,12 @@ If issues persist:
 4. **Check Django Logs:** Review application logs for detailed error messages
 5. **Consult Xero Documentation:** [developer.xero.com](https://developer.xero.com)
 6. **Contact Support:** Reach out to your AMS implementation team with:
-    - Error messages (sanitize any credentials)
+    - Error messages (sanitise any credentials)
     - Steps to reproduce
     - Django and Xero API logs
     - Environment details (development/staging/production)
 
-### Further Reading
+### Further reading
 
 - [Xero Custom Connections Documentation](https://developer.xero.com/documentation/guides/oauth2/custom-connections/)
 - [Xero API Scopes](https://developer.xero.com/documentation/guides/oauth2/scopes/)

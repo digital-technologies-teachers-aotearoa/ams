@@ -1,15 +1,17 @@
 # Resources
 
+**Who this page is for:** client website admins — the volunteers who run the day-to-day site once it's launched.
+
 The resources module is an optional feature that allows your association to publish downloadable resources on the website.
 
-## Enabling Resources
+## Enabling resources
 
 Whether resources are switched on is a decision made during onboarding — see [question 5 of the decision questionnaire](../../getting-started/decision-questionnaire.md#5-optional-features) and the [`AMS_RESOURCES_ENABLED`](../../getting-started/settings-glossary.md#ams_resources_enabled) settings glossary entry.
 
 This isn't something you configure yourself: your provider switches it on when your site is set up (see [provisioning runbook: environment settings](../../hosting/provisioning-runbook.md#4-environment-settings)).
 If you don't see **Resources** in the Django admin, ask your provider to turn it on. For the technical detail of what the flag does, see [feature flags: `AMS_RESOURCES_ENABLED`](../../developer/feature-flags.md#ams_resources_enabled).
 
-## Managing Resources
+## Managing resources
 
 Once enabled, resources are managed via the Django admin interface. To create a resource:
 
@@ -21,7 +23,7 @@ Once enabled, resources are managed via the Django admin interface. To create a 
 
 Resources appear publicly at `/resources/` and include a listing page, detail pages, and a search page.
 
-## Resource Components
+## Resource components
 
 Each resource has one or more components representing its actual content. Each component must have exactly one of the following:
 
@@ -31,7 +33,7 @@ Each resource has one or more components representing its actual content. Each c
 
 The component type (PDF, document, video, etc.) is set automatically when the component is saved — you do not need to select it manually.
 
-## File Uploads
+## File uploads
 
 Uploaded files are stored privately and are never accessible via public URLs. Members access files through download links on the resource detail page. Each download link generates a short-lived authenticated URL — the file itself remains protected.
 
@@ -48,7 +50,7 @@ The **Visibility** field controls both whether a resource is listed at all, and 
 
 Most associations only need **Public** and **Members only** — the two middle options exist for the less common case of wanting a resource visible to everyone, but its actual content restricted.
 
-## Taxonomy: Categories and Tags
+## Taxonomy: categories and tags
 
 Resources can be tagged with a two-level taxonomy that you define:
 
@@ -58,7 +60,7 @@ Resources can be tagged with a two-level taxonomy that you define:
 
 Tags appear as grouped filter facets on the search page, allowing users to filter results by category.
 
-## Adding Resources to Menus
+## Adding resources to menus
 
 You can add links to resources pages via the Wagtail CMS menu system (Main Menu or Flat Menus).
 Menu items pointing to `/resources/` URLs cannot be added while the resources module is disabled.
