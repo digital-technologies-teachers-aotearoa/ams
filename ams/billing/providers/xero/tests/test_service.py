@@ -499,7 +499,8 @@ class TestXeroBillingServiceInvoiceManagement:
         assert invoice_user.paid == Decimal("50.0")
         assert invoice_user.due == Decimal("50.0")
         assert invoice_user.paid_date is not None
-        assert invoice_user.update_needed is False
+        # The caller owns the flag - the service must leave it alone.
+        assert invoice_user.update_needed is True
 
 
 class TestXeroBillingServiceAuthentication:

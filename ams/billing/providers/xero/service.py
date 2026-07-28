@@ -536,8 +536,10 @@ class XeroBillingService(BillingService):
         """Update local invoice records with latest data from Xero.
 
         Fetches current invoice details from Xero and updates the corresponding
-        local Invoice records with amounts, dates, and payment status. Marks
-        invoices as no longer needing updates.
+        local Invoice records with amounts, dates, and payment status.
+
+        The caller owns the update_needed flag - it must only be cleared for
+        invoices whose claim is still current, which this method cannot know.
 
         Args:
             billing_service_invoice_ids: List of Xero invoice IDs to update.
@@ -559,7 +561,6 @@ class XeroBillingService(BillingService):
             invoice.paid = accounting_invoice.amount_paid
             invoice.due = accounting_invoice.amount_due
             invoice.paid_date = accounting_invoice.fully_paid_on_date
-            invoice.update_needed = False
             invoices_to_update.append(invoice)
 
         if invoices_to_update:
@@ -572,7 +573,6 @@ class XeroBillingService(BillingService):
                     "paid",
                     "due",
                     "paid_date",
-                    "update_needed",
                 ],
             )
 

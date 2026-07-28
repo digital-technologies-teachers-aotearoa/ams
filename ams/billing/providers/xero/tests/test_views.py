@@ -12,8 +12,10 @@ from unittest.mock import patch
 
 import pytest
 from django.core.exceptions import PermissionDenied
+from django.db import transaction
 from django.http import Http404
 from django.test import RequestFactory
+from django.utils import timezone
 
 from ams.billing.models import Invoice
 from ams.billing.providers.mock.service import MockBillingService
@@ -113,6 +115,7 @@ class TestProcessInvoiceUpdateEvents:
         # Verify invoice was marked for update
         invoice_user.refresh_from_db()
         assert invoice_user.update_needed is True
+        assert invoice_user.update_requested_at is not None
         assert result is True
 
     def test_process_multiple_invoice_events(self, xero_settings, invoice_user):
@@ -358,6 +361,98 @@ class TestFetchUpdatedInvoiceDetails:
 
             with pytest.raises(ValueError):  # noqa: PT011
                 fetch_updated_invoice_details(raise_exception=True)
+
+    def test_fetch_clears_update_needed(self, xero_settings, invoice_user):
+        """A successful fetch clears the flag on the claimed invoices."""
+        invoice_user.billing_service_invoice_id = "test-invoice"
+        invoice_user.update_needed = True
+        invoice_user.update_requested_at = timezone.now()
+        invoice_user.save()
+
+        with patch(
+            "ams.billing.providers.xero.views.get_billing_service",
+        ) as mock_get_service:
+            mock_get_service.return_value = Mock(spec=XeroBillingService)
+
+            fetch_updated_invoice_details()
+
+        invoice_user.refresh_from_db()
+        assert invoice_user.update_needed is False
+
+    def test_fetch_preserves_remark_during_api_call(self, xero_settings, invoice_user):
+        """An invoice re-marked while the API call is in flight stays marked."""
+        invoice_user.billing_service_invoice_id = "test-invoice"
+        invoice_user.update_needed = True
+        invoice_user.update_requested_at = timezone.now()
+        invoice_user.save()
+
+        def remark_invoice(billing_service_invoice_ids):
+            Invoice.objects.filter(pk=invoice_user.pk).update(
+                update_needed=True,
+                update_requested_at=timezone.now(),
+            )
+
+        with patch(
+            "ams.billing.providers.xero.views.get_billing_service",
+        ) as mock_get_service:
+            mock_service = Mock(spec=XeroBillingService)
+            mock_service.update_invoices.side_effect = remark_invoice
+            mock_get_service.return_value = mock_service
+
+            fetch_updated_invoice_details()
+
+        invoice_user.refresh_from_db()
+        assert invoice_user.update_needed is True
+
+    def test_fetch_clears_invoices_never_marked_with_a_timestamp(
+        self,
+        xero_settings,
+        invoice_user,
+    ):
+        """Rows marked before update_requested_at existed are still cleared."""
+        invoice_user.billing_service_invoice_id = "test-invoice"
+        invoice_user.update_needed = True
+        invoice_user.update_requested_at = None
+        invoice_user.save()
+
+        with patch(
+            "ams.billing.providers.xero.views.get_billing_service",
+        ) as mock_get_service:
+            mock_get_service.return_value = Mock(spec=XeroBillingService)
+
+            fetch_updated_invoice_details()
+
+        invoice_user.refresh_from_db()
+        assert invoice_user.update_needed is False
+
+    @pytest.mark.django_db(transaction=True)
+    def test_fetch_does_not_lock_during_api_call(self, xero_settings):
+        """Row locks must not be held while the Xero API call is in flight.
+
+        Holding them blocks concurrent writers (the admin's "mark for update"
+        action) until the database statement timeout kills their query.
+        """
+        InvoiceFactory(
+            billing_service_invoice_id="test-invoice",
+            update_needed=True,
+        )
+
+        # Assert after the call, not inside the side effect: exceptions raised
+        # in the side effect are swallowed by the broad except in the view.
+        captured: dict[str, bool] = {}
+
+        with patch(
+            "ams.billing.providers.xero.views.get_billing_service",
+        ) as mock_get_service:
+            mock_service = Mock(spec=XeroBillingService)
+            mock_service.update_invoices.side_effect = lambda ids: captured.update(
+                in_atomic=transaction.get_connection().in_atomic_block,
+            )
+            mock_get_service.return_value = mock_service
+
+            fetch_updated_invoice_details()
+
+        assert captured["in_atomic"] is False
 
 
 class TestXeroWebhooks:

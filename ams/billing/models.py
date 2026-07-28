@@ -4,6 +4,7 @@ from django.db.models import BooleanField
 from django.db.models import CharField
 from django.db.models import CheckConstraint
 from django.db.models import DateField
+from django.db.models import DateTimeField
 from django.db.models import DecimalField
 from django.db.models import ForeignKey
 from django.db.models import Index
@@ -59,6 +60,10 @@ class Invoice(Model):
     due = DecimalField(max_digits=10, decimal_places=2)
     billing_service_invoice_id = CharField(max_length=255, unique=True)
     update_needed = BooleanField(default=False)
+    # Stamped whenever update_needed is set to True. The fetch job snapshots this
+    # when it claims an invoice and only clears update_needed if it is unchanged,
+    # so a mark arriving during the fetch's API call is not lost.
+    update_requested_at = DateTimeField(null=True, blank=True, editable=False)
     individual_membership = ForeignKey(
         "memberships.IndividualMembership",
         on_delete=CASCADE,
