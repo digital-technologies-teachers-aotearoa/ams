@@ -1,4 +1,4 @@
-// Events (tutorial 8). AMS_EVENTS_ENABLED is already True in this dev
+// Events (tutorial 9). AMS_EVENTS_ENABLED is already True in this dev
 // environment's .envs/.local/django.ini, so no runtime settings change is
 // needed to capture these steps -- unlike a real client, where it's an
 // operator-set env var (see the tutorial's own "Before you start").

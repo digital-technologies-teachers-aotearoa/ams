@@ -101,4 +101,4 @@ For seat allocation, invitations, removing a member, and deactivating an organis
 
 For the full picture of membership statuses, staff notification triggers, and organisation seats and invitations, see [Feature reference: Memberships & organisations](../reference/memberships.md).
 
-The next tutorial covers [the forum](forum.md) — setting up Discourse for launch, and how member accounts and sign-in work there.
+The next tutorial covers [custom profile fields](profile-fields.md) — collecting extra information from your members on their profile.

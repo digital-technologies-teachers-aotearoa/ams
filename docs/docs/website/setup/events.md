@@ -1,4 +1,4 @@
-# Tutorial 8: Events
+# Tutorial 9: Events
 
 **Who this page is for:** client website admins — the volunteers who will load content and run the day-to-day site, generally with no prior web-admin experience.
 

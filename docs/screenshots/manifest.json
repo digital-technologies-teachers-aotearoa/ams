@@ -371,6 +371,55 @@
     "description": "The rendered HTML content of the staff notification email sent when the application was submitted."
   },
   {
+    "id": "profile-fields-group-form-empty",
+    "file": "website/setup/profile-fields-01-group-form-empty.png",
+    "step": "profileFieldsGroupFormEmpty",
+    "pages": ["website/setup/profile-fields.md"],
+    "description": "The empty Add profile field group form in the Django admin."
+  },
+  {
+    "id": "profile-fields-group-saved",
+    "file": "website/setup/profile-fields-02-group-saved.png",
+    "step": "profileFieldsGroupSaved",
+    "pages": ["website/setup/profile-fields.md"],
+    "description": "The new Teaching details group listed after saving, in the Django admin."
+  },
+  {
+    "id": "profile-fields-field-form-empty",
+    "file": "website/setup/profile-fields-03-field-form-empty.png",
+    "step": "profileFieldsFieldFormEmpty",
+    "pages": ["website/setup/profile-fields.md"],
+    "description": "The empty Add profile field form in the Django admin."
+  },
+  {
+    "id": "profile-fields-field-saved",
+    "file": "website/setup/profile-fields-04-field-saved.png",
+    "step": "profileFieldsFieldSaved",
+    "pages": ["website/setup/profile-fields.md"],
+    "description": "The new teaching_subject field listed after saving, in the Django admin."
+  },
+  {
+    "id": "profile-fields-account-nudge",
+    "file": "website/setup/profile-fields-05-account-nudge.png",
+    "step": "profileFieldsAccountNudge",
+    "pages": ["website/setup/profile-fields.md"],
+    "description": "The account page's profile-completion nudge, showing 1 profile field remaining and a Complete your profile link."
+  },
+  {
+    "id": "profile-fields-update-form",
+    "file": "website/setup/profile-fields-06-update-form.png",
+    "step": "profileFieldsUpdateForm",
+    "pages": ["website/setup/profile-fields.md"],
+    "description": "The account update form, scrolled to the new Teaching details group, showing its Recommended and Required for membership badges."
+  },
+  {
+    "id": "profile-fields-account-complete",
+    "file": "website/setup/profile-fields-07-account-complete.png",
+    "step": "profileFieldsAccountComplete",
+    "pages": ["website/setup/profile-fields.md"],
+    "description": "The account page after answering the field and saving, with the profile-completion nudge no longer showing."
+  },
+  {
     "id": "forum-sign-in-prompt",
     "file": "website/setup/forum-01-sign-in-prompt.png",
     "step": "forumSignInPrompt",

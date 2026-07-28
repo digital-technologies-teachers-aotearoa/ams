@@ -1,4 +1,4 @@
-// Inviting your team (tutorial 10). New team member accounts are created in
+// Inviting your team (tutorial 11). New team member accounts are created in
 // the Django admin, not the CMS -- Wagtail's own /cms/users/new/ form was
 // tried first and rejected after live testing: its fields are derived from
 // User.USERNAME_FIELD ("email" in this project) union a fixed standard set

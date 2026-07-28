@@ -207,7 +207,7 @@ Established by T13 (`website/setup/orientation.md`), binding on every later page
   It's still one manifest entry; the page just embeds it twice.
 - **Forward-chaining stubs:** each tutorial task creates a minimal stub for the *next* tutorial in the series (same pattern T01/T05 used for forward references), so its own "What's next" link resolves under the strict build.
   The next task then replaces that stub in place, same filename, rather than renaming the file or re-editing the nav.
-- **Series index:** `website/setup/index.md` keeps a numbered list of all eleven tutorials.
+- **Series index:** `website/setup/index.md` keeps a numbered list of all twelve tutorials.
   Only the tutorials that exist so far are links; the rest stay as plain text until their task lands.
 
 ## Diagrams
@@ -279,7 +279,7 @@ A PR that changes UI covered by these docs is not done until:
 The screenshot suite lives in `docs/screenshots/`.
 It captures against Chromium only, since a single deterministic renderer is what matters for byte-stable images, not cross-browser coverage.
 
-**File layout:** `run.mjs` is the entrypoint only — it merges every tutorial's `steps` object and runs `main()`'s capture loop, nothing more. Shared constants live in `shared/config.mjs`; Playwright helpers used by two or more tutorials live in `shared/browser-helpers.mjs`; the one bit of state one tutorial's steps set for a later tutorial's steps to read (`aboutPageId`/`contactPageId`) lives in `shared/shared-state.mjs`. Each tutorial's own capture steps, plus any constants or helpers only that tutorial needs, live in their own `steps/<tutorial>.mjs` — `docs-conventions-examples.mjs`, `orientation.mjs`, `branding-theme.mjs`, `first-pages.mjs`, `navigation-menus.mjs` (covers both the Main menu and footer parts of tutorial 4), `languages-translations.mjs`, `memberships.mjs`, `forum.mjs`, `events.mjs`, `resources.mjs`, `inviting-your-team.mjs`, `features-marketing.mjs` (`features.md`'s marketing screenshots — see "Marketing screenshots" above for the different seed script this one needs).
+**File layout:** `run.mjs` is the entrypoint only — it merges every tutorial's `steps` object and runs `main()`'s capture loop, nothing more. Shared constants live in `shared/config.mjs`; Playwright helpers used by two or more tutorials live in `shared/browser-helpers.mjs`; the one bit of state one tutorial's steps set for a later tutorial's steps to read (`aboutPageId`/`contactPageId`) lives in `shared/shared-state.mjs`. Each tutorial's own capture steps, plus any constants or helpers only that tutorial needs, live in their own `steps/<tutorial>.mjs` — `docs-conventions-examples.mjs`, `orientation.mjs`, `branding-theme.mjs`, `first-pages.mjs`, `navigation-menus.mjs` (covers both the Main menu and footer parts of tutorial 4), `languages-translations.mjs`, `memberships.mjs`, `profile-fields.mjs`, `forum.mjs`, `events.mjs`, `resources.mjs`, `inviting-your-team.mjs`, `features-marketing.mjs` (`features.md`'s marketing screenshots — see "Marketing screenshots" above for the different seed script this one needs).
 
 **Prerequisites:**
 
