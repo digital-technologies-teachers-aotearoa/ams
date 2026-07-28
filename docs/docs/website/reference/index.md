@@ -17,5 +17,6 @@ One is the exception, because the feature itself is technical: [Forum](forum.md)
 - [Theme customization](theme-customization.md) — every colour and font field in Theme Settings, in full.
 - [Terms & policies](terms.md) — publishing a privacy policy, terms of service, or similar, and what happens to members who haven't accepted the latest version.
 - [Memberships & organisations](memberships.md) — membership statuses and how they change, staff notification emails, and organisation seats, invitations and deactivation.
+- [Questions members ask](member-questions.md) — short answers to forward when a member asks you something directly: renewing, cancelling, the forum, a forgotten password.
 
 Xero billing setup lives with the rest of the provisioning documentation: see [Xero billing](../../hosting/xero-billing.md) in Hosting AMS — it's a one-time integration usually handled by your provider, but you may still need to look something up.
