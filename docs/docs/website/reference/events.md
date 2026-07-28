@@ -4,13 +4,11 @@ The events module is an optional feature that allows your association to publish
 
 ## Enabling Events
 
-Events are disabled by default. To enable them, set the following environment variable in your environment configuration:
+Whether events are switched on is a decision made during onboarding — see [question 5 of the decision questionnaire](../../getting-started/decision-questionnaire.md#5-optional-features) and the [`AMS_EVENTS_ENABLED`](../../getting-started/settings-glossary.md#ams_events_enabled) settings glossary entry.
 
-```ini
-AMS_EVENTS_ENABLED=True
-```
-
-A deployment or container restart is required after changing this setting.
+This isn't something you configure yourself: your provider switches it on when your site is set up (see [provisioning runbook: environment settings](../../hosting/provisioning-runbook.md#4-environment-settings)).
+If you don't see **Events** in the Django admin, ask your provider to turn it on.
+For the technical detail of what the flag does, see [feature flags: `AMS_EVENTS_ENABLED`](../../developer/feature-flags.md#ams_events_enabled).
 
 ## Managing Events
 

@@ -4,13 +4,10 @@ The resources module is an optional feature that allows your association to publ
 
 ## Enabling Resources
 
-Resources are disabled by default. To enable them, set the following environment variable in your environment configuration:
+Whether resources are switched on is a decision made during onboarding — see [question 5 of the decision questionnaire](../../getting-started/decision-questionnaire.md#5-optional-features) and the [`AMS_RESOURCES_ENABLED`](../../getting-started/settings-glossary.md#ams_resources_enabled) settings glossary entry.
 
-```ini
-AMS_RESOURCES_ENABLED=True
-```
-
-A deployment or container restart is required after changing this setting.
+This isn't something you configure yourself: your provider switches it on when your site is set up (see [provisioning runbook: environment settings](../../hosting/provisioning-runbook.md#4-environment-settings)).
+If you don't see **Resources** in the Django admin, ask your provider to turn it on. For the technical detail of what the flag does, see [feature flags: `AMS_RESOURCES_ENABLED`](../../developer/feature-flags.md#ams_resources_enabled).
 
 ## Managing Resources
 
@@ -18,8 +15,9 @@ Once enabled, resources are managed via the Django admin interface. To create a 
 
 1. Go to **Resources → Resources** in the admin.
 2. Set the **name**, **description**, and at least one author (user or entity).
-3. Add one or more **components** (see below).
-4. Check **Published** when the resource is ready to appear on the website.
+3. Set **Visibility** (see [Who can see a resource](#who-can-see-a-resource) below).
+4. Add one or more **components** (see below).
+5. Check **Published** when the resource is ready to appear on the website.
 
 Resources appear publicly at `/resources/` and include a listing page, detail pages, and a search page.
 
@@ -36,6 +34,19 @@ The component type (PDF, document, video, etc.) is set automatically when the co
 ## File Uploads
 
 Uploaded files are stored privately and are never accessible via public URLs. Members access files through download links on the resource detail page. Each download link generates a short-lived authenticated URL — the file itself remains protected.
+
+## Who can see a resource
+
+The **Visibility** field controls both whether a resource is listed at all, and whether its components can actually be opened or downloaded:
+
+| Visibility | Who can see it listed | Who can open its components |
+| --- | --- | --- |
+| Public | Everyone | Everyone |
+| Account required to access | Everyone | Anyone signed in |
+| Membership required to access | Everyone | Members only |
+| Members only | Members only | Members only |
+
+Most associations only need **Public** and **Members only** — the two middle options exist for the less common case of wanting a resource visible to everyone, but its actual content restricted.
 
 ## Taxonomy: Categories and Tags
 
