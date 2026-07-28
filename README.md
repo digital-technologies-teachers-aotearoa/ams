@@ -28,15 +28,13 @@ Developed with New Zealand associations in mind, AMS includes native support for
 
 AMS consolidates essential association management functions into a single platform, eliminating the need to integrate and maintain multiple separate systems. Members access everything through one unified portal with single sign-on authentication across all services.
 
-<!-- [Screenshot: Membership application form with custom profile fields] -->
-
 ### Membership Management
 
 - **Individual and Organization Memberships:** Support for both individual members and organization-based memberships with seat allocation and management
 - **Flexible Membership Types:** Configure multiple membership tiers with different pricing and renewal cycles
 - **Member Self-Service:** Members can update their profiles, manage organization seats, and track their membership status independently
 
-<!-- [Screenshot: Organization membership management with seat allocation] -->
+![The membership application form, showing three pricing options and a start date field](docs/docs/images/features/features-01-membership-management.png)
 
 ### Integrated Billing
 
@@ -44,7 +42,7 @@ AMS consolidates essential association management functions into a single platfo
 - **Automated Invoicing:** Automatic invoice creation for membership applications
 - **Payment Tracking:** Real-time synchronization between AMS and Xero for accurate financial records
 
-<!-- [Screenshot: Xero invoice integration showing automatic billing] -->
+![A member's memberships table showing a past paid membership, a current paid membership, and a future membership awaiting payment](docs/docs/images/features/features-02-integrated-billing.png)
 
 ### Content Management System
 
@@ -52,7 +50,7 @@ AMS consolidates essential association management functions into a single platfo
 - **Multi-Language Support:** Path-based multi-language routing with full support for English and Te Reo Māori
 - **Preview and Workflow:** Draft, preview, and publish content with editorial workflow controls
 
-<!-- [Screenshot: Wagtail CMS page editor with multi-language content] -->
+![The About page editor, showing real page content built from Title, Lead paragraph, and Paragraph blocks](docs/docs/images/features/features-03-content-management-system.png)
 
 ### Community Forum
 
@@ -60,7 +58,7 @@ AMS consolidates essential association management functions into a single platfo
 - **Single Sign-On:** Members use the same credentials across AMS and the forum with OAuth2 SSO
 - **Membership-Based Access:** Automatic access control based on active membership status
 
-<!-- [Screenshot: Forum integration with SSO login] -->
+![The Discourse community homepage, showing several active topics and replies](docs/docs/images/features/features-04-community-forum.png)
 
 ### Events (Optional module)
 
@@ -68,7 +66,7 @@ AMS consolidates essential association management functions into a single platfo
 - **Event Management:** Manage events, series, locations, and regions via the Django admin
 - **Series and Regions:** Group related events into series and organise locations by region
 
-<!-- [Screenshot: Events listing page with upcoming events] -->
+![The public events page, showing multiple upcoming events with pins spread across the map](docs/docs/images/features/features-05-events.png)
 
 ### Resources (Optional module)
 
@@ -76,7 +74,7 @@ AMS consolidates essential association management functions into a single platfo
 - **Private File Storage:** Files are served via authenticated URLs — never publicly hotlinkable
 - **Taxonomy:** Admin-managed categories and tags for faceted filtering across the resource library
 
-<!-- [Screenshot: Resources listing page with search and tag filters] -->
+![The public resources page, showing many published resources listed](docs/docs/images/features/features-06-resources.png)
 
 ### Customization and Branding
 
@@ -84,7 +82,7 @@ AMS consolidates essential association management functions into a single platfo
 - **Custom Profile Fields:** Add association-specific fields to member profiles without code changes
 - **Bootstrap-Based Styling:** Modern, responsive design built on Bootstrap 5 with CSS variable customization
 
-<!-- [Screenshot: Admin panel showing association branding customization] -->
+![Three navbars for three different associations, each with a radically different colour scheme, font, and logo, stacked for comparison](docs/docs/images/features/features-07-customization-and-branding.png)
 
 ## Why Choose AMS?
 
