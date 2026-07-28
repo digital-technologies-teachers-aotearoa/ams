@@ -65,6 +65,7 @@ nav:
           - website/reference/resources.md
           - website/reference/forum.md
           - website/reference/theme-customization.md
+          - website/reference/terms.md
   - Hosting AMS:
       - hosting/index.md
       - hosting/deployment.md

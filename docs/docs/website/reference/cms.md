@@ -66,6 +66,6 @@ When creating menus within the CMS, you may want to link to a page that is not c
 You can use the following URLs within the 'External URL' field on a menu item to link to the following pages:
 
 - Discourse forum = `/forum/` - This will automatically redirect visitors to the forum with proper authentication. See [Tutorial 7: Forum, "Let members find the forum"](../setup/forum.md#let-members-find-the-forum) for why this is the recommended way to link to your forum.
-- Terms and Conditions = `/terms/` - This displays all current terms and policies.
+- Terms and Conditions = `/terms/` - This displays all current terms and policies. See [Terms & policies](terms.md) for how to create and publish them.
 
 See [Tutorial 4: Navigation & menus](../setup/navigation-menus.md) for a full walkthrough of adding pages and links to your menus.

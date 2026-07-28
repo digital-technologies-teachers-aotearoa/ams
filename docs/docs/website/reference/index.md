@@ -15,5 +15,6 @@ One is the exception, because the feature itself is technical: [Forum](forum.md)
 - [Resources](resources.md) — the optional resources (downloadable file) feature, if your association chose to enable it.
 - [Forum](forum.md) — how the connected Discourse forum is configured and kept in sync with your site's memberships.
 - [Theme customization](theme-customization.md) — every colour and font field in Theme Settings, in full.
+- [Terms & policies](terms.md) — publishing a privacy policy, terms of service, or similar, and what happens to members who haven't accepted the latest version.
 
 Xero billing setup lives with the rest of the provisioning documentation: see [Xero billing](../../hosting/xero-billing.md) in Hosting AMS — it's a one-time integration usually handled by your provider, but you may still need to look something up.
