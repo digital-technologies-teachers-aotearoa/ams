@@ -1,4 +1,6 @@
-# Xero Billing Setup Guide
+# Xero billing setup guide
+
+**Who this page is for:** the provider, setting up Xero as a client's billing provider.
 
 This guide walks you through setting up Xero as the billing provider for your AMS installation. This is a one-time setup process that must be completed before deploying the AMS website.
 
@@ -10,19 +12,19 @@ AMS integrates with Xero to handle:
 - Generating invoices for memberships and services
 - Sending invoice emails to customers
 - Tracking invoice payment status automatically via webhooks
-- Synchronizing invoice data between AMS and Xero
+- Synchronising invoice data between AMS and Xero
 
 ## Prerequisites
 
 Before you begin, ensure you have:
 
-- **Xero account** with administrator access to your organization
+- **Xero account** with administrator access to your organisation
 - **Xero Custom Connection subscription** - See [Xero's Custom Connection documentation](https://connect.xero.com/custom) for details
     - **Note:** The Xero Demo Company can be used for free during testing and development
 - **Access to the Xero Developer Portal** at [https://developer.xero.com/](https://developer.xero.com/)
 - **The domain name** where your AMS website will be hosted (for webhook configuration)
 
-## Step 1: Create a Custom Connection in Xero
+## Step 1: create a Custom Connection in Xero
 
 1. Navigate to [Xero My Apps](https://developer.xero.com/app/manage) in the Xero Developer Portal
 2. Click **"New App"** button
@@ -32,7 +34,7 @@ Before you begin, ensure you have:
     - **Company or application URL:** This is not used as part of the integration, just a reference of the website. Enter your domain here.
 4. Click **"Create app"**
 
-## Step 2: Configure App Scopes
+## Step 2: configure app scopes
 
 After creating the app, you'll need to select which permissions (scopes) the integration requires:
 
@@ -42,23 +44,23 @@ After creating the app, you'll need to select which permissions (scopes) the int
     - ✅ **`accounting.transactions`** - Required for creating, retrieving, and managing invoices
 3. Click **"Save"** to apply the scope changes
 
-## Step 3: Authorize the Connection
+## Step 3: authorise the connection
 
-1. In the **"Select the authorizing user"** section, choose the Xero user who will authorize the connection
-    - This user must have the appropriate permissions in your Xero organization
-2. The selected user will receive an email with an authorization link
+1. In the **"Select the authorizing user"** section, choose the Xero user who will authorise the connection
+    - This user must have the appropriate permissions in your Xero organisation
+2. The selected user will receive an email with an authorisation link
 3. Have them:
     - Click the link in the email
     - Review and consent to the requested scopes
-    - Select the Xero organization to connect to AMS
-    - Complete the authorization
+    - Select the Xero organisation to connect to AMS
+    - Complete the authorisation
 
 !!! note "Custom Connection Subscription"
-    Your organization must have an active [Custom Connection subscription](https://connect.xero.com/custom) to use this integration in production. For testing and development, you can use the Xero Demo Company for free.
+    Your organisation must have an active [Custom Connection subscription](https://connect.xero.com/custom) to use this integration in production. For testing and development, you can use the Xero Demo Company for free.
 
-## Step 4: Retrieve API Credentials
+## Step 4: retrieve API credentials
 
-Once the connection is authorized, you need to collect several pieces of information to provide to your deployment team.
+Once the connection is authorised, you need to collect several pieces of information to provide to your deployment team.
 
 ### Client ID and Client Secret
 
@@ -71,7 +73,7 @@ Once the connection is authorized, you need to collect several pieces of informa
     !!! warning "Important"
         The client secret is only shown once. Store it securely - you won't be able to see it again. If you lose it, you'll need to generate a new one.
 
-## Step 5: Configure Webhooks
+## Step 5: configure webhooks
 
 Webhooks allow Xero to notify AMS when invoice status changes (e.g., when an invoice is paid).
 
@@ -90,26 +92,26 @@ Webhooks allow Xero to notify AMS when invoice status changes (e.g., when an inv
 6. Copy this webhook key and store it securely
 7. Click **"Save"**
 
-## Step 6: Collect Required Values
+## Step 6: collect required values
 
-### Tenant ID (Organization ID)
+### Tenant ID (organisation ID)
 
 1. Within your app on the Xero Developer Portal, select "Connection management"
 2. The Tenant ID will be listed here - this is your `XERO_TENANT_ID`
 
-### Account Code
+### Account code
 
 The Account Code determines which account in your Xero Chart of Accounts will be used for invoice line items.
 
-1. Log into your Xero organization
+1. Log into your Xero organisation
 2. Navigate to **Accounting** → **Chart of Accounts**
 3. Identify the account you want to use for membership fees and services
     - Common choices include revenue accounts like "Sales" (often code `200`) or "Membership Income"
 4. Note the **Code** column value for that account - this is your `XERO_ACCOUNT_CODE`
 
-### Currency and Tax Settings
+### Currency and tax settings
 
-Based on your organization's location and Xero setup, determine:
+Based on your organisation's location and Xero setup, determine:
 
 - **Currency Code:** The 3-letter ISO currency code (e.g., `NZD`, `AUD`, `USD`, `GBP`, `EUR`)
     - This is your `XERO_CURRENCY_CODE`
@@ -118,24 +120,24 @@ Based on your organization's location and Xero setup, determine:
     - `EXCLUSIVE` - Tax is added on top of line item amounts
     - This is your `XERO_AMOUNT_TYPE`
 
-## Step 7: Prepare Credentials for Deployment
+## Step 7: prepare credentials for deployment
 
 Once you've collected all the required information, you need to provide it to your deployment team or system administrator. Prepare a secure document containing:
 
-### Required Credentials
+### Required credentials
 
 | Variable Name | Description | Your Value |
 |---------------|-------------|------------|
 | `AMS_BILLING_SERVICE_CLASS ` | Required to use Xero billing | `ams.billing.providers.xero.XeroBillingService` |
 | `XERO_CLIENT_ID` | OAuth2 Client ID from Step 4 | |
 | `XERO_CLIENT_SECRET` | OAuth2 Client Secret from Step 4 | |
-| `XERO_TENANT_ID` | Organization/Tenant ID from Step 4 | |
+| `XERO_TENANT_ID` | Organisation/Tenant ID from Step 4 | |
 | `XERO_WEBHOOK_KEY` | Webhook signing key from Step 5 | |
 | `XERO_ACCOUNT_CODE` | Chart of Accounts code from Step 4 | |
 | `XERO_AMOUNT_TYPE` | Either `INCLUSIVE` or `EXCLUSIVE` | |
 | `XERO_CURRENCY_CODE` | 3-letter currency code (e.g., `NZD`) | |
 
-### Optional Configuration
+### Optional configuration
 
 | Variable Name | Description | Recommended Value |
 |---------------|-------------|-------------------|
@@ -143,7 +145,7 @@ Once you've collected all the required information, you need to provide it to yo
 | `AMS_BILLING_EMAIL_WHITELIST_REGEX` | Filter invoice email recipients (for testing) | Leave empty for production |
 
 !!! danger "Security Warning"
-    These credentials provide access to your Xero organization's financial data. Handle them with extreme care:
+    These credentials provide access to your Xero organisation's financial data. Handle them with extreme care:
 
     - Use a secure method to transmit credentials (encrypted email, password manager, secure portal)
     - Never commit credentials to version control
@@ -153,19 +155,19 @@ Once you've collected all the required information, you need to provide it to yo
 
 ## Testing with Xero Demo Company
 
-For development and testing purposes, you can use the Xero Demo Company instead of a production organization:
+For development and testing purposes, you can use the Xero Demo Company instead of a production organisation:
 
-1. When authorizing the Custom Connection in Step 3, select the **"Demo Company"** instead of your production organization
+1. When authorising the Custom Connection in Step 3, select the **"Demo Company"** instead of your production organisation
 2. The Demo Company is free and comes with sample data
 3. Set `XERO_EMAIL_INVOICES=False` in your environment variables when using the Demo Company to prevent sending test emails
 4. You can create and manage test invoices without affecting real financial data
 
 !!! warning "Demo Company Limitations"
     - Demo Company data may be reset periodically
-    - Some features may behave differently than in production organizations
+    - Some features may behave differently than in production organisations
     - Always perform final testing in a production-like environment before going live
 
-## Verifying the Integration
+## Verifying the integration
 
 After your deployment team has configured AMS with the credentials:
 
@@ -181,12 +183,12 @@ After your deployment team has configured AMS with the credentials:
 ### "Invalid credentials" or "Unauthorized" errors
 
 - Double-check that `XERO_CLIENT_ID` and `XERO_CLIENT_SECRET` are correct
-- Ensure the Custom Connection is still authorized
-- Verify the user who authorized the connection still has appropriate permissions
+- Ensure the Custom Connection is still authorised
+- Verify the user who authorised the connection still has appropriate permissions
 
 ### Invoices not appearing in Xero
 
-- Verify `XERO_TENANT_ID` matches your organization
+- Verify `XERO_TENANT_ID` matches your organisation
 - Check that the scopes `accounting.contacts` and `accounting.transactions` are enabled
 - Review application logs for API errors
 
@@ -211,7 +213,7 @@ If you encounter rate limiting errors (too many API requests):
 - If issues persist, contact your developer team to review API usage patterns
 - Consider spreading bulk operations (like importing many members) over time
 
-## Next Steps
+## Next steps
 
 Once the Xero integration is configured and verified:
 

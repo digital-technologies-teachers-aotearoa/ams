@@ -54,7 +54,7 @@ Each resource has one or more components representing its actual content. Exactl
 
 `clean()` enforces the single-data-field constraint and prevents a component from referencing its own parent resource.
 
-## Private File Storage
+## Private file storage
 
 `component_file` uses `PrivateMediaStorage` (`config/storage_backends.py`), which is an S3 backend with `querystring_auth=True` and a private ACL. Files are never publicly accessible.
 
@@ -66,7 +66,7 @@ Downloads are routed exclusively through `ResourceComponentDownloadView`:
 
 Never expose `component_file.url` directly in templates — always use the `component_download` URL name.
 
-## Full-Text Search
+## Full-text search
 
 Search is powered by Postgres native full-text search with no application-level signals, scoped to the active UI language.
 
@@ -78,7 +78,7 @@ Search is powered by Postgres native full-text search with no application-level 
 - `SearchQuery` uses `search_type="websearch"`, supporting quoted phrases, `-excluded` terms, and `OR`.
 - Tag filtering applies OR semantics within a category and AND semantics across categories, and is ANDed with the `q` filter when both are given.
 
-## Admin Integration
+## Admin integration
 
 - `ResourceAdmin` — fieldsets for General, Ownership, and Visibility; `filter_horizontal` for author M2Ms and tags; `ResourceComponentInline` for managing components inline.
 - `ResourceCategoryAdmin` — inline `ResourceTagInline` for managing tags within a category.

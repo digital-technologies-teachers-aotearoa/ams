@@ -37,9 +37,9 @@ The following URLs should then be available:
 
 Additionally, the database will be available on `localhost:5432`.
 
-## Local Development Guide
+## Local development guide
 
-### Common Commands
+### Common commands
 
 - Start the server:
 
@@ -92,24 +92,24 @@ Additionally, the database will be available on `localhost:5432`.
     mypy ams
     ```
 
-### Justfile Shortcuts
+### Justfile shortcuts
 
 The repository includes a `justfile` with common tasks.
 This is useful for starting or stopping the containers from the host machine.
 
-### Database & Migrations
+### Database & migrations
 
 ```bash
 python manage.py makemigrations
 python manage.py migrate
 ```
 
-### Environment Settings
+### Environment settings
 
 - Environment values are loaded from `.envs/.local/` files.
 - Django settings files live in `config/settings/` (`local.py`, `production.py`, `test.py`).
 
-#### Optional Private Settings
+#### Optional private settings
 
 For optional features like billing integrations, you can create a `django-private.ini` file in `.envs/.local/`:
 
@@ -132,7 +132,7 @@ The `django-private.ini` file supports the following optional settings:
 - **Xero Integration** (if using Xero as billing provider):
     - `XERO_CLIENT_ID` - Your Xero OAuth2 client ID
     - `XERO_CLIENT_SECRET` - Your Xero OAuth2 client secret
-    - `XERO_TENANT_ID` - Your Xero tenant/organization ID
+    - `XERO_TENANT_ID` - Your Xero tenant/organisation ID
     - `XERO_WEBHOOK_KEY` - Webhook signing key for Xero webhooks
     - `XERO_ACCOUNT_CODE` - Default account code for invoices (e.g., `"200"`)
     - `XERO_AMOUNT_TYPE` - Tax amount type: `"INCLUSIVE"` or `"EXCLUSIVE"`
@@ -143,7 +143,7 @@ The `django-private.ini` file supports the following optional settings:
 
 **Note:** The `django-private.ini` file is gitignored and should never be committed to version control as it contains sensitive credentials.
 
-### Coding Conventions
+### Coding conventions
 
 - Keep changes focused; update docs for new features.
 - Write tests for new functionality and ensure coverage.

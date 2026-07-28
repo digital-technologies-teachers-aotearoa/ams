@@ -1,4 +1,4 @@
-# Email Templates
+# Email templates
 
 This project uses MJML for creating responsive, email-client-compatible HTML emails.
 This document describes how the AMS project uses MJML for email templates, including the shared component system, build pipeline, and best practices.
@@ -27,9 +27,9 @@ This architecture provides:
 - **Developer-friendly**: Cleaner syntax than raw HTML email markup
 - **Django integration**: Templates support Django template tags for dynamic content
 
-## Build Pipeline
+## Build pipeline
 
-### How It Works
+### How it works
 
 1. **Source files**: Email templates are written as `.mjml` files in various app directories
 2. **Compilation**: The Gulp build process compiles `.mjml` files to `.html` files
@@ -37,7 +37,7 @@ This architecture provides:
 4. **Django integration**: Compiled HTML files are loaded by Django's email system
 5. **Git ignored**: Compiled `.html` files are ignored by Git (only `.mjml` source files are tracked)
 
-### Build Commands
+### Build commands
 
 Compile all MJML templates:
 
@@ -57,13 +57,13 @@ Build all assets including MJML:
 docker compose exec node npx gulp build
 ```
 
-### Files Excluded from Compilation
+### Files excluded from compilation
 
 Any MJML file starting with an underscore (`_*.mjml`) is excluded from compilation. These are include files used by other templates.
 
-## Using Shared Includes
+## Using shared includes
 
-### Head Attributes
+### Head attributes
 
 Include shared MJML attributes in your email template's `<mj-head>` section:
 
@@ -82,7 +82,7 @@ Include shared MJML attributes in your email template's `<mj-head>` section:
 </mjml>
 ```
 
-### Head Styles (Optional)
+### Head styles (optional)
 
 If you need the shared CSS styles:
 
@@ -95,7 +95,7 @@ If you need the shared CSS styles:
 </mj-head>
 ```
 
-### Standard Footer
+### Standard footer
 
 For simple emails with a generic footer message:
 
@@ -110,7 +110,7 @@ For simple emails with a generic footer message:
 
 **Custom Footers**: Many templates use custom footers with specific messaging (e.g., "You're receiving this because you are a staff member") or include action URLs. In these cases, don't use the shared footer—write a custom one instead.
 
-### Staff Footer
+### Staff footer
 
 For staff notification emails:
 
@@ -125,11 +125,11 @@ For staff notification emails:
 
 This footer includes a message indicating the recipient is receiving the email because they are a staff member.
 
-## Using mj-class for Consistent Styling
+## Using mj-class for consistent styling
 
 The shared `_head_attributes.mjml` file includes `_head_styles.mjml`, which defines reusable `mj-class` declarations. Using these classes ensures consistent styling across all email templates and reduces code verbosity.
 
-### Example: Using mj-class
+### Example: using mj-class
 
 **Before (inline styles):**
 
@@ -157,7 +157,7 @@ The shared `_head_attributes.mjml` file includes `_head_styles.mjml`, which defi
 </mj-section>
 ```
 
-### When NOT to Use mj-class
+### When not to use mj-class
 
 Some styles cannot use `mj-class` and must remain inline:
 
@@ -179,9 +179,9 @@ Some styles cannot use `mj-class` and must remain inline:
 </mj-table>
 ```
 
-## Django Template Integration
+## Django template integration
 
-### Template Tags
+### Template tags
 
 MJML templates support Django template tags:
 
@@ -209,7 +209,7 @@ Use Django template variables:
 <mj-button href="{{ action_url }}">Click Here</mj-button>
 ```
 
-### Conditional Content
+### Conditional content
 
 Use Django conditionals:
 
@@ -234,13 +234,13 @@ Use Django conditionals:
 <mj-raw>{% endif %}</mj-raw>
 ```
 
-## Creating a New Email Template
+## Creating a new email template
 
-### Step 1: Choose Location
+### Step 1: choose location
 
 Place your template in the appropriate app directory.
 
-### Step 2: Create MJML File
+### Step 2: create MJML file
 
 Create a `.mjml` file with this basic structure:
 
@@ -280,7 +280,7 @@ Create a `.mjml` file with this basic structure:
 
 **Remember**: Adjust the include paths based on your template's location.
 
-### Step 3: Compile
+### Step 3: compile
 
 Compile the MJML to HTML (if it hasn't occurred automatically):
 
@@ -288,7 +288,7 @@ Compile the MJML to HTML (if it hasn't occurred automatically):
 docker compose exec node npx gulp mjml
 ```
 
-### Step 4: Update .gitignore (if needed)
+### Step 4: update .gitignore (if needed)
 
 If you created a template in a new directory, add the compiled HTML pattern to `.gitignore`:
 
@@ -297,25 +297,25 @@ If you created a template in a new directory, add the compiled HTML pattern to `
 ams/templates/new_app/emails/*.html
 ```
 
-### Step 5: Send Email in Django
+### Step 5: send email in Django
 
 Use the HTML template in your Django email code when calling `send_templated_email()` from `ams.utils.email`.
 
-## Best Practices
+## Best practices
 
-### 1. Use Shared Includes
+### 1. Use shared includes
 
 Always use the shared `_head_attributes.mjml` include for consistent styling across all emails.
 
-### 2. Follow the Color Palette
+### 2. Follow the colour palette
 
-Use the defined color palette to maintain visual consistency.
+Use the defined colour palette to maintain visual consistency.
 
-### 3. Make Text Translatable
+### 3. Make text translatable
 
 Wrap all user-facing text in `{% trans %}` or `{% blocktrans %}` tags.
 
-### 4. Test in Multiple Email Clients
+### 4. Test in multiple email clients
 
 MJML handles most cross-client compatibility, but always test major emails in:
 
@@ -324,24 +324,24 @@ MJML handles most cross-client compatibility, but always test major emails in:
 - Apple Mail
 - Mobile clients
 
-### 5. Keep Content Focused
+### 5. Keep content focused
 
 - Use clear, concise subject lines
 - Put the most important information first
-- Use headers and sections to organize content
+- Use headers and sections to organise content
 - Include clear calls-to-action with buttons
 
-### 6. Custom Footers When Needed
+### 6. Custom footers when needed
 
 Don't force-fit the generic footer if your email needs specific footer content (like URLs, specific disclaimers, or context-specific messages).
 
-### 7. Preview Text
+### 7. Preview text
 
 Always include a `<mj-preview>` tag with a meaningful preview (shown in email client previews).
 
 ## Troubleshooting
 
-### Template Not Compiling
+### Template not compiling
 
 **Problem**: MJML file isn't generating HTML output
 
@@ -352,7 +352,7 @@ Always include a `<mj-preview>` tag with a meaningful preview (shown in email cl
 3. Check the terminal for MJML compilation errors
 4. Validate your MJML syntax at [MJML Playground](https://mjml.io/try-it-live)
 
-### Include Path Errors
+### Include path errors
 
 **Problem**: "File not found" errors for includes
 
@@ -362,7 +362,7 @@ Always include a `<mj-preview>` tag with a meaningful preview (shown in email cl
 2. Remember: `../../_email_includes/` for nested dirs, `../_email_includes/` for top-level
 3. Ensure `_email_includes/` directory exists
 
-### Styles Not Applying
+### Styles not applying
 
 **Problem**: Email doesn't look right
 
@@ -372,7 +372,7 @@ Always include a `<mj-preview>` tag with a meaningful preview (shown in email cl
 2. Check that the HTML file was regenerated after MJML changes
 3. Clear email client cache (some clients cache heavily)
 
-### Django Tags Not Rendering
+### Django tags not rendering
 
 **Problem**: `{% trans %}` tags showing as literal text
 

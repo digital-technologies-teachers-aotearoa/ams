@@ -1,9 +1,9 @@
-# Feature Flags
+# Feature flags
 
 AMS uses environment-variable-based feature flags to toggle optional modules per deployment.
 For what each flag means to a client filling in the decision questionnaire, see the [settings glossary](../getting-started/settings-glossary.md); this page covers the implementation.
 
-## Available Flags
+## Available flags
 
 ### `AMS_EVENTS_ENABLED`
 
@@ -75,7 +75,7 @@ already reads `settings.LANGUAGES` dynamically, so no other code needs to
 change to support a new language. As with other settings-based flags, this
 requires an app restart to take effect.
 
-## Future Considerations
+## Future considerations
 
 The current env-var approach is well-suited for flags that are set once per deployment and rarely change. If requirements evolve, consider these alternatives:
 

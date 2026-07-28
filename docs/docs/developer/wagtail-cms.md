@@ -4,30 +4,30 @@ This guide covers the Wagtail CMS implementation in AMS, including architecture 
 
 ## Overview
 
-AMS uses [Wagtail](https://wagtail.org/), a Django-based content management system, to provide flexible page management and content editing capabilities. The implementation supports multiple independent language sites sharing the same domain through path-based routing—a customization that deviates from Wagtail's default behavior to meet the project's internationalization requirements.
+AMS uses [Wagtail](https://wagtail.org/), a Django-based content management system, to provide flexible page management and content editing capabilities. The implementation supports multiple independent language sites sharing the same domain through path-based routing—a customisation that deviates from Wagtail's default behaviour to meet the project's internationalisation requirements.
 
 ## Architecture
 
-### Page Models
+### Page models
 
 The CMS defines two primary page types that form the foundation of the content hierarchy:
 
 #### HomePage
 
-The root page for each language site, serving as the entry point to that language's content tree. Uses Wagtail's StreamField to provide flexible, customizable layouts without requiring template changes.
+The root page for each language site, serving as the entry point to that language's content tree. Uses Wagtail's StreamField to provide flexible, customisable layouts without requiring template changes.
 
 #### ContentPage
 
 The standard page type for site content, supporting:
 
-- Nested hierarchies for organizing content into sections
+- Nested hierarchies for organising content into sections
 - Visibility controls (public or members-only access)
 - Rich content composition through StreamField blocks
 - Automatic slug validation to prevent conflicts with application URLs
 
 Both page types leverage custom StreamField blocks for headings, paragraphs, images, image grids, image carousels, embeds, and multi-column layouts, providing content editors with powerful layout tools.
 
-### Site Settings
+### Site settings
 
 Wagtail's settings framework is extended with two models for site-specific configuration:
 
@@ -46,19 +46,19 @@ Manages association-specific branding and identity:
 
 Settings are accessible in templates through Wagtail's context processor: `{{ settings.cms.AssociationSettings.association_short_name }}`.
 
-## Multi-Language Support
+## Multi-language support
 
-### The Problem Space
+### The problem space
 
 AMS required an unique approach for a multi language website, beyond the features of Wagtail.
 
 - **Shared across all languages:** User accounts and authentication, membership records and billing, media library (images, documents), and static assets (CSS, JavaScript).
 - **Language specific:** Page content and hierarchy, navigation menus, and settings (name, logo, social links, etc).
 
-Wagtail's built-in internationalization system ties translations to shared page trees, which prevents fully divergent content structures and per-language customization.
+Wagtail's built-in internationalisation system ties translations to shared page trees, which prevents fully divergent content structures and per-language customisation.
 A custom solution was required, that paired along with standard Django pages.
 
-### Solution Design
+### Solution design
 
 The implementation uses path-based routing with these core principles:
 
@@ -67,7 +67,7 @@ The implementation uses path-based routing with these core principles:
 - **Language-based resolution**: Sites are identified by `SiteSettings.language` rather than hostname
 - **URL path differentiation**: Language is indicated through URL prefixes (e.g., `/en/about/`, `/mi/about/`)
 
-#### Alternative Approaches Considered
+#### Alternative approaches considered
 
 ##### Subdomain-based routing
 
@@ -85,12 +85,12 @@ Would work with Wagtail's default constraints but requires:
 Uses Wagtail's built-in translation system but:
 
 - Ties all languages to a shared page tree structure
-- Limits ability to have different content organization per language
-- Restricts per-language customization of settings and branding
+- Limits ability to have different content organisation per language
+- Restricts per-language customisation of settings and branding
 
-### Implementation Details
+### Implementation details
 
-#### Database Constraint Removal
+#### Database constraint removal
 
 The solution requires removing Wagtail's `(hostname, port)` unique constraint to allow multiple sites on the same domain. The `modify_site_hostname_constraint` management command provides safe, reversible constraint management.
 
@@ -105,7 +105,7 @@ The solution requires removing Wagtail's `(hostname, port)` unique constraint to
 
 The command will not restore the constraint if doing so would violate uniqueness, instead prompting the developer to resolve duplicates first. This prevents accidental database errors.
 
-#### Path-Based Site Middleware
+#### Path-based site middleware
 
 The `PathBasedSiteMiddleware` component (in `ams/utils/middleware/site_by_path.py`) implements the routing logic.
 
@@ -125,7 +125,7 @@ This middleware must be placed:
 
 Incorrect ordering will prevent proper site resolution.
 
-#### Automated Site Setup
+#### Automated site setup
 
 The `setup_cms` management command automates the multi-language site configuration.
 
@@ -143,9 +143,9 @@ The `setup_cms` management command automates the multi-language site configurati
 
 The command is idempotent—it can be run repeatedly without creating duplicates or errors. It's automatically invoked during `deploy_steps` and when generating sample data, ensuring environments are always correctly configured.
 
-### Request Flow Example
+### Request flow example
 
-Understanding how a request is processed helps clarify the system's behavior:
+Understanding how a request is processed helps clarify the system's behaviour:
 
 1. User navigates to `/en/about/`
 2. Django's `LocaleMiddleware` extracts `'en'` from the URL and sets `request.LANGUAGE_CODE = 'en'`
@@ -156,9 +156,9 @@ Understanding how a request is processed helps clarify the system's behavior:
 
 The same URL structure (`/mi/about/`) would resolve to the Māori site's `/about/` page, demonstrating complete content independence.
 
-## Content Structure
+## Content structure
 
-### Page Hierarchy
+### Page hierarchy
 
 The page tree structure separates languages at the root level:
 
@@ -168,9 +168,9 @@ The page tree structure separates languages at the root level:
     - Māori HomePage (depth=2, locale='mi')
         - Māori ContentPages (depth=3+)
 
-Each language site can develop its own structure independently. The English site might have sections like "Resources" and "Events", while the Māori site could organize content differently to suit cultural and linguistic contexts.
+Each language site can develop its own structure independently. The English site might have sections like "Resources" and "Events", while the Māori site could organise content differently to suit cultural and linguistic contexts.
 
-### Visibility Controls
+### Visibility controls
 
 ContentPage includes a visibility field controlling access:
 
@@ -179,17 +179,17 @@ ContentPage includes a visibility field controlling access:
 
 When a user without an active membership attempts to access a members-only page, they receive an HTTP 403 Forbidden response.
 
-### URL Validation
+### URL validation
 
 To prevent content pages from conflicting with Django application URLs (like `/users/`, `/billing/`, `/forum/`), ContentPage validates slugs during save. This validation only applies to direct children of HomePage—the top level where conflicts would occur. Nested pages can use any slug without restriction.
 
-## Development Workflow
+## Development workflow
 
 Running `python manage.py sample_data` can be useful to setup a basic website configuration for local development.
 
-## Technical Considerations
+## Technical considerations
 
-### Site Identification Strategy
+### Site identification strategy
 
 With the hostname constraint removed, sites are identified through a three-tier system:
 
@@ -199,7 +199,7 @@ With the hostname constraint removed, sites are identified through a three-tier 
 
 All three must be configured correctly for each site.
 
-### Default Site Role
+### Default site role
 
 One site must be designated as `is_default_site=True` (conventionally English). This site serves as:
 
@@ -207,7 +207,7 @@ One site must be designated as `is_default_site=True` (conventionally English). 
 - Default for admin interface when no site context exists
 - Initial site for new deployments
 
-### Constraint Management Commands
+### Constraint management commands
 
 The hostname constraint can be inspected and modified:
 
@@ -226,26 +226,26 @@ The restore operation performs validation and will fail with a clear error if du
 
 ## Testing
 
-### Middleware Test Coverage
+### Middleware test coverage
 
 The `PathBasedSiteMiddleware` includes comprehensive tests in `ams/utils/tests/test_site_by_path_middleware.py`:
 
 - Language code extraction from URL paths
 - Site resolution based on language
-- Fallback behavior to default site
+- Fallback behaviour to default site
 - Handling of invalid language codes
 - Processing of paths without language prefixes
 
-### Testing Best Practices
+### Testing best practices
 
 When developing CMS features:
 
 - Test with both English and Māori sites to verify content isolation
 - Verify that site settings are properly scoped
 - Ensure navigation and URLs work correctly for each language
-- Test fallback behavior when expected site doesn't exist
+- Test fallback behaviour when expected site doesn't exist
 
-## Related Resources
+## Related resources
 
 ### Code locations
 

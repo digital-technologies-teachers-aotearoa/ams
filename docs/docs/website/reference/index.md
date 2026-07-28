@@ -14,7 +14,7 @@ One is the exception, because the feature itself is technical: [Forum](forum.md)
 - [Events](events.md) — the optional events feature, if your association chose to enable it.
 - [Resources](resources.md) — the optional resources (downloadable file) feature, if your association chose to enable it.
 - [Forum](forum.md) — how the connected Discourse forum is configured and kept in sync with your site's memberships.
-- [Theme customization](theme-customization.md) — every colour and font field in Theme Settings, in full.
+- [Theme customisation](theme-customisation.md) — every colour and font field in Theme Settings, in full.
 - [Terms & policies](terms.md) — publishing a privacy policy, terms of service, or similar, and what happens to members who haven't accepted the latest version.
 - [Memberships & organisations](memberships.md) — membership statuses and how they change, staff notification emails, and organisation seats, invitations and deactivation.
 - [Questions members ask](member-questions.md) — short answers to forward when a member asks you something directly: renewing, cancelling, the forum, a forgotten password.

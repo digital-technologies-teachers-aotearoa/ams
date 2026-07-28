@@ -1,11 +1,11 @@
 # Theming
 
-This document provides technical details about the AMS theme customization system for developers.
-For the client-facing view of every field this system exposes, see the [admin guide: Theme customization](../website/reference/theme-customization.md).
+This document provides technical details about the AMS theme customisation system for developers.
+For the client-facing view of every field this system exposes, see the [admin guide: Theme customisation](../website/reference/theme-customisation.md).
 
-## Architecture Overview
+## Architecture overview
 
-The theme system allows runtime customization of Bootstrap 5.3 CSS variables through Django/Wagtail admin without code deployments. It consists of:
+The theme system allows runtime customisation of Bootstrap 5.3 CSS variables through Django/Wagtail admin without code deployments. It consists of:
 
 1. **Database Model**: `ThemeSettings` (Wagtail site setting)
 2. **Template Tag**: Renders theme CSS on demand
@@ -16,9 +16,9 @@ The theme system allows runtime customization of Bootstrap 5.3 CSS variables thr
 !!! note "Dark mode has no visitor-facing toggle"
     Dark mode colour fields are live in the model and rendered into CSS under `[data-bs-theme="dark"]`, but there is no switch for site visitors to pick between them. The mode is chosen site-wide by an admin field (`base_colour_mode`), which sets `data-bs-theme` on every page.
 
-## Database Schema
+## Database schema
 
-### ThemeSettings Model
+### ThemeSettings model
 
 Located in `ams/cms/models/theme.py`:
 
@@ -48,10 +48,10 @@ class ThemeSettings(BaseSiteSetting):
 
 - Inherits from `BaseSiteSetting` for per-site configuration
 - `cache_version` field auto-increments on save for cache invalidation
-- All color fields validated as hex codes via `ColorField`
+- All colour fields validated as hex codes via `ColorField`
 - Automatically creates revision snapshots on each save
 
-### ThemeSettingsRevision Model
+### ThemeSettingsRevision model
 
 Stores complete version history:
 
@@ -65,11 +65,11 @@ class ThemeSettingsRevision(models.Model):
 
 Enables audit trail and potential rollback functionality.
 
-## Caching Strategy
+## Caching strategy
 
-### Two-Tier Cache Architecture
+### Two-tier cache architecture
 
-The system uses an optimized two-tier caching approach to minimize database queries:
+The system uses an optimised two-tier caching approach to minimise database queries:
 
 ```text
 ┌─────────────────────────────────────────┐
@@ -99,7 +99,7 @@ The system uses an optimized two-tier caching approach to minimize database quer
                   Return CSS to template
 ```
 
-### Cache Keys
+### Cache keys
 
 Two types of cache keys are used:
 
@@ -113,7 +113,7 @@ Two types of cache keys are used:
    - Size: ~2-5 KB
    - Purpose: Complete rendered CSS for immediate use
 
-### Cache Flow
+### Cache flow
 
 **First Request (Cache Miss):**
 
@@ -136,7 +136,7 @@ Two types of cache keys are used:
 3. Old CSS cache becomes stale (different version)
 4. Next request detects version change, re-renders and caches
 
-### Performance Characteristics
+### Performance characteristics
 
 | Metric | Value |
 |--------|-------|
@@ -148,7 +148,7 @@ Two types of cache keys are used:
 | Cache invalidation delay | Immediate |
 | Memory per site | ~5-10 KB |
 
-## Template Tag
+## Template tag
 
 Located in `ams/cms/templatetags/cms_tags.py`:
 
@@ -201,11 +201,11 @@ def theme_css(context):
 {% theme_css %}
 ```
 
-## Signal Handlers
+## Signal handlers
 
 Located in `ams/cms/signals.py`:
 
-### Post-Save Signal
+### Post-save signal
 
 ```python
 @receiver(post_save, sender=ThemeSettings)
@@ -221,7 +221,7 @@ def clear_theme_cache_on_save(sender, instance, **kwargs):
     cache.set(version_key, instance.cache_version, None)
 ```
 
-### Post-Delete Signal
+### Post-delete signal
 
 ```python
 @receiver(post_delete, sender=ThemeSettings)
@@ -233,9 +233,9 @@ def clear_theme_cache_on_delete(sender, instance, **kwargs):
     cache.delete(version_key)
 ```
 
-## Template Integration
+## Template integration
 
-### Base Template
+### Base template
 
 In `ams/templates/includes/head.html`:
 
@@ -251,7 +251,7 @@ In `ams/templates/includes/head.html`:
 
 The `theme_css` template tag is called explicitly where needed. It automatically retrieves the request from the template context.
 
-### Generated CSS Structure
+### Generated CSS structure
 
 The `templatetags/theme_css.html` template generates:
 
@@ -282,13 +282,13 @@ The `templatetags/theme_css.html` template generates:
 </style>
 ```
 
-## Template Tags
+## Template tags
 
 Located in `config/templatetags/theme.py`:
 
-### hex_to_rgb Filter
+### hex_to_rgb filter
 
-Converts hex colors to RGB format for CSS rgb() values:
+Converts hex colours to RGB format for CSS rgb() values:
 
 ```python
 @register.filter
@@ -303,7 +303,7 @@ def hex_to_rgb(hex_color):
 
 Usage in template: `{{ theme.primary_color|hex_to_rgb }}`
 
-## Admin Interface
+## Admin interface
 
 The Wagtail admin interface is automatically generated from the model's `panels` attribute:
 
@@ -323,13 +323,13 @@ class ThemeSettings(BaseSiteSetting):
 
 **Features:**
 
-- Color pickers for all color fields
-- Organized into collapsible sections
+- Colour pickers for all colour fields
+- Organised into collapsible sections
 - Help text for each field
 - Live preview (with page refresh)
 - Revision history tracking
 
-## Migration Path
+## Migration path
 
 The theme system was introduced in migration `0022_themesettings.py`. Key points:
 
@@ -338,9 +338,9 @@ The theme system was introduced in migration `0022_themesettings.py`. Key points
 - OneToOne relationship with Site
 - No data migration needed (auto-creates on first access)
 
-## API Usage
+## API usage
 
-### Programmatic Access
+### Programmatic access
 
 ```python
 from wagtail.models import Site
@@ -359,7 +359,7 @@ theme.primary_color = "#ff0000"
 theme.save()  # Auto-increments cache_version, creates revision
 ```
 
-### Cache Management
+### Cache management
 
 ```python
 from django.core.cache import cache
@@ -380,9 +380,9 @@ css = cache.get(f"theme_css_v{version}_site{site_id}")
 Key test areas (see `ams/cms/tests/test_theme.py`):
 
 1. **Model Tests**: Creation, saving, validation, revisions
-2. **CSS Generation Tests**: Template rendering, color conversion
+2. **CSS Generation Tests**: Template rendering, colour conversion
 3. **Signal Tests**: Cache clearing on save/delete
-4. **Template Tag Tests**: Caching behavior, performance, edge cases
+4. **Template Tag Tests**: Caching behaviour, performance, edge cases
 
 Example test:
 
@@ -406,14 +406,14 @@ def test_template_tag_uses_two_tier_cache(site, rf):
         assert mock.call_count == 0  # No DB query!
 ```
 
-## Performance Optimization Tips
+## Performance optimisation tips
 
-### For Development
+### For development
 
 - Use local memory cache (default) for simplicity
 - Cache will reset on server restart (no persistence needed)
 
-### For Production
+### For production
 
 **Recommended cache backend: Redis**
 
@@ -459,16 +459,16 @@ class ThemeCacheMetricsMiddleware:
         return self.get_response(request)
 ```
 
-## Security Considerations
+## Security considerations
 
-1. **Custom CSS Sanitization**: The `custom_css` field allows arbitrary CSS - consider adding CSP headers
-2. **Color Validation**: Enforced at form level via `ColorField`
+1. **Custom CSS Sanitisation**: The `custom_css` field allows arbitrary CSS - consider adding CSP headers
+2. **Colour Validation**: Enforced at form level via `ColorField`
 3. **XSS Prevention**: All template variables use `|safe` only after rendering from trusted DB source
 4. **Permission Control**: Only staff with Wagtail admin access can modify
 
-## Extending the System
+## Extending the system
 
-### Adding New Color Variables
+### Adding new colour variables
 
 1. Add field to model:
 ```python
@@ -492,7 +492,7 @@ panels = [
 
 4. Create migration: `python manage.py makemigrations`
 
-### Adding New Template Tags
+### Adding new template tags
 
 ```python
 @register.filter
@@ -504,7 +504,7 @@ def lighten_color(hex_color, percent):
 
 ## Troubleshooting
 
-### Cache Not Clearing
+### Cache not clearing
 
 Check signal connection:
 ```python
@@ -516,7 +516,7 @@ receivers = post_save._live_receivers(ThemeSettings)
 print(f"Connected receivers: {len(receivers)}")
 ```
 
-### Performance Degradation
+### Performance degradation
 
 Check cache backend:
 ```python
@@ -533,7 +533,7 @@ cache.get("test")
 print(f"Cache round-trip: {(time.time() - start) * 1000:.2f}ms")
 ```
 
-### Multi-site Issues
+### Multi-site issues
 
 Verify site detection:
 ```python
