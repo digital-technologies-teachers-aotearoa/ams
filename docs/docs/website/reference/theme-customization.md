@@ -114,6 +114,32 @@ The Custom CSS field allows you to add arbitrary CSS code that will be applied t
 
 Changes apply immediately but can cause unexpected behavior if not tested thoroughly.
 
+## Save and reuse your theme
+
+Every field on this page — every colour, every dropdown (colour mode, sign in/sign up button style, separator type and width), the separator image, and the Custom CSS and Custom HTML boxes — can be saved to a file on your computer and loaded back in later.
+This is useful for keeping a backup before you experiment, and for copying a finished theme from your [staging/UAT](../../getting-started/glossary.md#uat) site to your [production](../../getting-started/glossary.md#production) site.
+
+### Export your theme
+
+1. Open **Theme Settings** (see Quick Start above).
+2. Click **Export Settings**, next to the **Save** button at the bottom of the page.
+3. Your browser downloads a file named `theme-settings-<today's date>.json`.
+   Keep it somewhere you'll find again, such as alongside your organisation's other records.
+
+### Import a theme
+
+1. Open **Theme Settings** on the site you want to update.
+2. Click **Import Settings**, next to the **Export Settings** button.
+3. Choose a file you exported earlier.
+4. Confirm the warning that this will overwrite your current settings.
+5. Wait for the "Successfully imported…" message, then check that the colour and font fields have updated.
+6. Click **Save** to apply the imported theme.
+   Importing only fills in the fields on the page — it doesn't save them for you.
+
+### Copying a theme between sites
+
+If your provider has set you up with a [staging/UAT](../../getting-started/glossary.md#uat) site as well as a production site, exporting from one and importing into the other is the easiest way to copy a finished theme across: build and check it on UAT, export, then import into production once you're happy with it.
+
 ## Troubleshooting
 
 ### Changes Not Appearing
@@ -135,7 +161,7 @@ Colors must be in hexadecimal format:
 ### Need to Undo Changes?
 
 Theme settings are automatically saved with revision history, however a website administrator or developer is required to restore a previous version.
-You can also export your settings before making changes, which is a great way to keep a backup in case a reset is needed.
+See [Save and reuse your theme](#save-and-reuse-your-theme) below for a way to get back to a known-good state yourself, without developer involvement — as long as you exported a copy first.
 
 ## Getting Help
 

@@ -23,6 +23,7 @@ Pages in the CMS come in a few types:
 - **Home page** — the top-level page for each enabled language. Your provider creates this for you; it starts empty. See [Tutorial 3: Your first pages](../setup/first-pages.md) for how to add content to it.
 - **Content page** — the type used for everything else: About, Contact, and any other page you create. Each content page can be:
     - **Public** or **Members only** — a members-only page is hidden from visitors without an active membership.
+      Set this with the page's own **Public**/**Members only** field, not Wagtail's separate **Visibility** control in the page status panel — leave that at **Visible to all**, and the page editor reminds you of this whenever you're editing a page.
     - **Structure only** — a page that redirects straight to its first child page, rather than showing its own content. Useful for a parent page that exists only to group other pages in the menu.
 - **Article** — an optional page type for blog-style posts with a publication date, summary, and cover image, listed on an articles index page. Not covered by the tutorial series.
 
@@ -38,6 +39,10 @@ Content pages and Home pages share most blocks (Heading, Paragraph, Lead paragra
 
 Uploaded images and documents are shared across every page and every language, rather than belonging to one page.
 Find them under **Images** and **Documents** in the CMS sidebar — a block that needs an image or a file (an Image block, a document link inside a Paragraph block, and so on) lets you upload a new one or choose an existing one from this shared library.
+
+Uploaded images are public — anyone can view them, even without an account — so don't upload anything private as an image.
+Uploaded documents are private: only members with an active membership can view them.
+The CMS reminds you of this on the Images and Documents pages.
 
 ## Reserved URL Patterns
 
