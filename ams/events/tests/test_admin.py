@@ -1,9 +1,12 @@
+from decimal import Decimal
 from http import HTTPStatus
 
 import pytest
+from django.contrib.admin.utils import flatten_fieldsets
 from django.urls import reverse
 
 from ams.entities.tests.factories import EntityFactory
+from ams.events.admin import LocationAdminForm
 from ams.events.models import Event
 from ams.events.tests.factories import EventFactory
 from ams.events.tests.factories import LocationFactory
@@ -118,3 +121,109 @@ class TestDuplicateEvents:
         assert event.published is True
         assert event.sessions.count() == 1
         assert event.sessions.first().name == "Session 1"
+
+
+def _location_change_url(location):
+    return reverse("admin:events_location_change", args=[location.pk])
+
+
+def _location_post_data(location, **overrides):
+    data = {
+        "name_en": location.name,
+        "name_mi": "",
+        "room": location.room,
+        "street_address": location.street_address,
+        "suburb": location.suburb,
+        "city": location.city,
+        "region": location.region_id or "",
+        "description_en": "",
+        "description_mi": "",
+        "coordinates_0": "" if location.latitude is None else location.latitude,
+        "coordinates_1": "" if location.longitude is None else location.longitude,
+    }
+    data.update(overrides)
+    return data
+
+
+class TestLocationAdmin:
+    def test_change_form_renders_map_picker(self, admin_client):
+        location = LocationFactory()
+
+        response = admin_client.get(_location_change_url(location))
+
+        assert response.status_code == HTTPStatus.OK
+        assert 'id="leaflet-picker-map"' in response.content.decode()
+        assert "coordinates" in flatten_fieldsets(
+            response.context["adminform"].fieldsets,
+        )
+
+    def test_change_form_prefills_existing_coordinates(self, admin_client):
+        location = LocationFactory(
+            latitude=Decimal("-41.286460"),
+            longitude=Decimal("174.776236"),
+        )
+
+        response = admin_client.get(_location_change_url(location))
+
+        content = response.content.decode()
+        assert 'value="-41.286460"' in content
+        assert 'value="174.776236"' in content
+
+    def test_save_persists_picked_coordinates(self, admin_client):
+        location = LocationFactory(latitude=None, longitude=None)
+        data = _location_post_data(
+            location,
+            coordinates_0="-43.532",
+            coordinates_1="172.636",
+        )
+
+        response = admin_client.post(_location_change_url(location), data)
+
+        assert response.status_code == HTTPStatus.FOUND
+        location.refresh_from_db()
+        assert location.latitude == Decimal("-43.532")
+        assert location.longitude == Decimal("172.636")
+
+    def test_save_with_blank_coordinates_clears_them(self, admin_client):
+        location = LocationFactory(
+            latitude=Decimal("-41.286460"),
+            longitude=Decimal("174.776236"),
+        )
+        data = _location_post_data(
+            location,
+            coordinates_0="",
+            coordinates_1="",
+        )
+
+        response = admin_client.post(_location_change_url(location), data)
+
+        assert response.status_code == HTTPStatus.FOUND
+        location.refresh_from_db()
+        assert location.latitude is None
+        assert location.longitude is None
+
+    def test_save_leaves_coordinates_alone_when_field_absent(self):
+        location = LocationFactory(
+            latitude=Decimal("-41.28"),
+            longitude=Decimal("174.77"),
+        )
+        data = {
+            "name": location.name,
+            "room": location.room,
+            "street_address": location.street_address,
+            "suburb": location.suburb,
+            "city": location.city,
+            "region": location.region_id or "",
+            "description": "",
+            "coordinates_0": "0",
+            "coordinates_1": "0",
+        }
+        form = LocationAdminForm(data=data, instance=location)
+
+        assert form.is_valid(), form.errors
+        del form.cleaned_data["coordinates"]
+        form.save()
+
+        location.refresh_from_db()
+        assert location.latitude == Decimal("-41.28")
+        assert location.longitude == Decimal("174.77")
