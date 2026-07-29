@@ -68,6 +68,7 @@ class LocationAdminForm(forms.ModelForm):
             "suburb",
             "city",
             "region",
+            "coordinates",
             "description",
         ]
 
@@ -81,9 +82,10 @@ class LocationAdminForm(forms.ModelForm):
 
     def save(self, commit=True):  # noqa: FBT002
         instance = super().save(commit=False)
-        coords = self.cleaned_data.get("coordinates") or [None, None]
-        instance.latitude = coords[0]
-        instance.longitude = coords[1]
+        if "coordinates" in self.cleaned_data:
+            coords = self.cleaned_data["coordinates"]
+            instance.latitude = coords[0]
+            instance.longitude = coords[1]
         if commit:
             instance.save()
             self.save_m2m()
