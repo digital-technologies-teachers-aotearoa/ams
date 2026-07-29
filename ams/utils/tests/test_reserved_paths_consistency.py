@@ -16,6 +16,19 @@ def test_reserved_paths_extracted_from_urls():
         assert path in reserved_paths, f"Expected '{path}' to be in reserved paths"
 
 
+def test_reserved_paths_only_top_level_app_mounts():
+    """Internal routes nested inside an included app's own urls.py (e.g.
+    Wagtail admin's "search", allauth's "login") must not leak into the
+    reserved set -- only each app's own top-level mount prefix should."""
+    reserved_paths = get_reserved_paths_set()
+    internal_only_paths = {"search", "settings", "history", "login", "logout"}
+    for path in internal_only_paths:
+        assert path not in reserved_paths, (
+            f"'{path}' should not be reserved -- it is only an internal "
+            "route of an included app, not a top-level mount prefix"
+        )
+
+
 def test_reserved_paths_functions():
     paths_list = get_reserved_paths_list()
     paths_set = get_reserved_paths_set()

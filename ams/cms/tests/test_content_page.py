@@ -209,6 +209,35 @@ class TestContentPageSlugValidation:
                 "ValidationError should not be raised for non-reserved slugs",
             )
 
+    def test_internal_app_route_slug_allowed(self):
+        """Slugs that only collide with an app's internal routes (e.g. Wagtail
+        admin's "search", allauth's "login") are not reserved -- only each
+        app's own top-level mount prefix is."""
+        homepage = HomePage.objects.first()
+        if not homepage:
+            root = Page.get_first_root_node()
+            homepage = HomePage(
+                title="Home",
+                slug="home",
+            )
+            root.add_child(instance=homepage)
+            homepage.save()
+
+        content_page = ContentPage(
+            title="Search Page",
+            slug="search",  # only reserved if recursion leaks internal routes
+        )
+        homepage.add_child(instance=content_page)
+
+        try:
+            content_page.clean()
+        except ValidationError:
+            pytest.fail(
+                "ValidationError should not be raised for a slug that only "
+                "collides with an app's internal route, not its top-level "
+                "mount prefix",
+            )
+
 
 @pytest.mark.django_db
 class TestContentPageStructureOnly:
