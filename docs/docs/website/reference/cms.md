@@ -46,7 +46,7 @@ The CMS reminds you of this on the Images and Documents pages.
 
 ## Reserved URL patterns
 
-A page directly under Home can't use certain words as its web address (its slug, normally set automatically from the page's title) — these are already used by other parts of the website. The main ones are:
+A page directly under Home can't use certain words as its web address (its slug, normally set automatically from the page's title) — these are already used by other parts of the website. This is the complete list:
 
 - `/admin/` - Django admin
 - `/accounts/` - User authentication (sign in, sign up, password reset)
@@ -59,8 +59,9 @@ A page directly under Home can't use certain words as its web address (its slug,
 - `/resources/` - Resources application (only reserved if the resources feature is enabled)
 - `/terms/` - Terms and conditions
 - `/users/` - User and membership management
+- `/_util/` - An internal Wagtail check used for password-protected pages
 
-There are a few dozen more, less obvious ones (shorter technical words already used somewhere inside the site) — rather than list every one, the CMS checks for you automatically and shows a clear error if a page's slug collides with one, so you'll only need this list if you want to understand why an error appeared.
+Each is the web address of a whole part of the website, not just an occasional word — so page titles like "Search" or "Settings" are unaffected. Either way, you don't need to remember this list: the CMS checks for you automatically and shows a clear error if a page's slug collides with one, so you'll only need it if you want to understand why an error appeared.
 
 See [Tutorial 3: Your first pages, "Create more pages the same way"](../setup/first-pages.md#create-more-pages-the-same-way) for where this comes up in practice.
 Pages nested more deeply (for example, a page under About) are not affected by this restriction — only direct children of Home are checked.

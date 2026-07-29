@@ -30,7 +30,11 @@ def get_reserved_paths():  # noqa: C901
     Extract reserved path prefixes from the URL configuration.
 
     Returns a list of path prefixes that are reserved for Django applications
-    and should not be used as locale codes or CMS page slugs.
+    and should not be used as locale codes or CMS page slugs. Only the first
+    path segment of each top-level application mount is reserved (e.g.
+    "billing" for `path("billing/", include(...))`) — an application's own
+    internal routes are not descended into, so having a view at, say,
+    `billing/history/` does not also reserve the top-level slug "history".
     """
     reserved = set()
 
@@ -39,17 +43,26 @@ def get_reserved_paths():  # noqa: C901
         resolver = get_resolver()
 
         def extract_paths(patterns):
-            """Recursively extract path prefixes from URL patterns."""
+            """Extract one prefix per top-level application mount."""
             for pattern in patterns:
+                route = None
                 if hasattr(pattern, "pattern") and hasattr(pattern.pattern, "_route"):
                     route = pattern.pattern._route  # noqa: SLF001
-                    # Extract the first segment (e.g., "billing/" -> "billing")
-                    if route and route != "":
-                        first_segment = route.split("/")[0]
-                        if first_segment:
-                            reserved.add(first_segment)
 
-                # Also check nested patterns (e.g., from i18n_patterns)
+                if route:
+                    # Extract the first segment (e.g., "billing/" -> "billing")
+                    first_segment = route.split("/")[0]
+                    if first_segment:
+                        reserved.add(first_segment)
+                    # This pattern already reserves a literal top-level
+                    # segment; don't descend into the included app's own
+                    # URL patterns.
+                    continue
+
+                # No literal route segment consumed here — e.g. an
+                # i18n_patterns locale prefix, or an empty mount point such
+                # as `path("", include(...))` — so descend to find the
+                # actual top-level app prefixes it wraps.
                 if hasattr(pattern, "url_patterns"):
                     extract_paths(pattern.url_patterns)
 
