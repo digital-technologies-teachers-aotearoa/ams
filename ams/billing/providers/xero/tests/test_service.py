@@ -12,6 +12,9 @@ from xero_python.exceptions import AccountingBadRequestException
 from ams.billing.providers.xero.models import XeroContact
 from ams.billing.providers.xero.service import MockXeroBillingService
 from ams.billing.providers.xero.service import XeroBillingService
+from ams.billing.tests.factories import InvoiceFactory
+from ams.memberships.models import MembershipStatus
+from ams.memberships.tests.factories import IndividualMembershipFactory
 
 pytestmark = pytest.mark.django_db
 
@@ -501,6 +504,52 @@ class TestXeroBillingServiceInvoiceManagement:
         assert invoice_user.paid_date is not None
         # The caller owns the flag - the service must leave it alone.
         assert invoice_user.update_needed is True
+
+    @patch("ams.billing.providers.xero.service.AccountingApi")
+    def test_update_invoices_activates_pending_individual_membership(
+        self,
+        mock_accounting_api_class,
+        xero_service,
+        account_user,
+        xero_settings,
+    ):
+        """Marking an invoice paid via the Xero poll approves its membership."""
+        membership = IndividualMembershipFactory(pending=True)
+        assert membership.status() == MembershipStatus.PENDING
+
+        invoice = InvoiceFactory(
+            account=account_user,
+            billing_service_invoice_id="test-invoice-456",
+            individual_membership=membership,
+            paid_date=None,
+        )
+
+        xero_invoice = XeroInvoiceModel(
+            invoice_id="test-invoice-456",
+            invoice_number="INV-002",
+            date="2024-01-15",
+            due_date="2024-02-15",
+            total=100.0,
+            amount_due=0.0,
+            amount_paid=100.0,
+            fully_paid_on_date="2024-01-20",
+        )
+        response = Mock()
+        response.invoices = [xero_invoice]
+
+        mock_api = Mock()
+        mock_api.get_invoices.return_value = response
+        mock_accounting_api_class.return_value = mock_api
+
+        with patch.object(xero_service, "_get_authentication_token"):
+            xero_service.update_invoices(["test-invoice-456"])
+
+        invoice.refresh_from_db()
+        assert invoice.paid_date is not None
+
+        membership.refresh_from_db()
+        assert membership.approved_datetime is not None
+        assert membership.status() == MembershipStatus.ACTIVE
 
 
 class TestXeroBillingServiceAuthentication:
