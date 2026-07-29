@@ -253,10 +253,34 @@ BILLING_EMAIL_WHITELIST_REGEX = env("AMS_BILLING_EMAIL_WHITELIST_REGEX", default
 
 # Xero Billing Settings
 # ------------------------------------------------------------------------------
-XERO_CLIENT_ID = env("XERO_CLIENT_ID")
-XERO_CLIENT_SECRET = env("XERO_CLIENT_SECRET")
-XERO_TENANT_ID = env("XERO_TENANT_ID")
-XERO_WEBHOOK_KEY = env("XERO_WEBHOOK_KEY")
-XERO_ACCOUNT_CODE = env("XERO_ACCOUNT_CODE")
-XERO_AMOUNT_TYPE = env("XERO_AMOUNT_TYPE")
-XERO_CURRENCY_CODE = env("XERO_CURRENCY_CODE")
+# Only required when AMS_BILLING_SERVICE_CLASS resolves to a Xero-backed
+# billing service. MockXeroBillingService is included alongside the real one
+# because it subclasses XeroBillingService and inherits its __init__ (builds
+# the OAuth2 client from XERO_CLIENT_ID/XERO_CLIENT_SECRET) and create_invoice()
+# (reads XERO_ACCOUNT_CODE/XERO_AMOUNT_TYPE/XERO_CURRENCY_CODE) unchanged.
+# The `else` branch still defines every XERO_* name (as None) rather than
+# leaving them unset: ams/billing/urls.py wires the Xero webhook endpoint
+# unconditionally, and its view reads settings.XERO_TENANT_ID/XERO_WEBHOOK_KEY
+# regardless of which billing service is configured — an unset attribute
+# would turn any request to that public endpoint into an AttributeError/500
+# on a non-Xero deployment, instead of the intended "no signature matches".
+_xero_billing_service_classes = {
+    "ams.billing.providers.xero.XeroBillingService",
+    "ams.billing.providers.xero.MockXeroBillingService",
+}
+if BILLING_SERVICE_CLASS in _xero_billing_service_classes:
+    XERO_CLIENT_ID = env("XERO_CLIENT_ID")
+    XERO_CLIENT_SECRET = env("XERO_CLIENT_SECRET")
+    XERO_TENANT_ID = env("XERO_TENANT_ID")
+    XERO_WEBHOOK_KEY = env("XERO_WEBHOOK_KEY")
+    XERO_ACCOUNT_CODE = env("XERO_ACCOUNT_CODE")
+    XERO_AMOUNT_TYPE = env("XERO_AMOUNT_TYPE")
+    XERO_CURRENCY_CODE = env("XERO_CURRENCY_CODE")
+else:
+    XERO_CLIENT_ID = None
+    XERO_CLIENT_SECRET = None
+    XERO_TENANT_ID = None
+    XERO_WEBHOOK_KEY = None
+    XERO_ACCOUNT_CODE = None
+    XERO_AMOUNT_TYPE = None
+    XERO_CURRENCY_CODE = None
