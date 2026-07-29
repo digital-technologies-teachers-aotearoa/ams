@@ -51,6 +51,7 @@ Once they've confirmed their email and signed in, they'll land on their own acco
 
 A **Group** and **Staff status** are independent, and cover different areas: a Group controls CMS access, Staff status controls Django admin access.
 Someone can have either, both, or neither.
+See [Feature reference: Users & permissions](../reference/users.md) for a higher-level summary of what each control is for, including the CMS's own simpler way to edit a user's name or username.
 
 ## Changing permissions for someone who already has an account
 

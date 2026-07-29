@@ -35,8 +35,8 @@ If you don't have these yet, ask your provider before continuing.
     ![Your account page again](../../images/website/setup/orientation-02-your-account.png)
 
 5. Scroll down to **Staff links** again, and this time click **Website Admin**.
-    This opens the Django admin: a more technical screen, mainly used by your provider for setup and troubleshooting.
-    You probably won't need it for everyday content work — the rest of this tutorial series uses the CMS.
+    This opens the Django admin: a more technical screen, also used day-to-day for things the CMS doesn't cover, like approving memberships, managing events and resources, and inviting new team members — later tutorials in this series come back to it for those.
+    Most everyday content work still happens in the CMS, which the rest of this tutorial covers first.
 
     ![The Django admin](../../images/website/setup/orientation-04-django-admin.png)
 
@@ -49,7 +49,7 @@ This tutorial series is mostly about the second one.
 | --- | --- | --- | --- |
 | Public site | Your website's normal address | What visitors and members see and use | Everyone |
 | CMS (Wagtail) | `/cms/`, via the **Wagtail CMS** button | Editing pages, images, documents, and menus — your main work area | Content loaders, editors, the site admin |
-| Django admin | `/admin/`, via the **Website Admin** button | Technical records such as memberships, billing, and user accounts — used occasionally, mostly for setup | The site admin, your provider |
+| Django admin | `/admin/`, via the **Website Admin** button | Day-to-day operational work such as approving memberships, managing events and resources, and inviting new team members, as well as technical records like billing | The site admin, your provider |
 | [Forum](../../getting-started/glossary.md#forum) | A separate address your provider gives you | Member discussions, powered by a connected product called Discourse | Members, forum moderators |
 
 Signing in to the public site also signs you in to the forum automatically, through [single sign-on](../../getting-started/glossary.md#sso) — you never need a separate forum password.
