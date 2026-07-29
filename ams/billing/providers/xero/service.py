@@ -550,7 +550,6 @@ class XeroBillingService(BillingService):
             billing_service_invoice_ids,
         )
 
-        invoices_to_update = []
         for accounting_invoice in invoices:
             invoice = Invoice.objects.get(
                 billing_service_invoice_id=accounting_invoice.invoice_id,
@@ -561,12 +560,12 @@ class XeroBillingService(BillingService):
             invoice.paid = accounting_invoice.amount_paid
             invoice.due = accounting_invoice.amount_due
             invoice.paid_date = accounting_invoice.fully_paid_on_date
-            invoices_to_update.append(invoice)
-
-        if invoices_to_update:
-            Invoice.objects.bulk_update(
-                invoices_to_update,
-                fields=[
+            # save() per-invoice (not bulk_update) so post_save fires and
+            # approve_memberships_on_invoice_payment can activate the
+            # linked membership. update_fields excludes update_needed /
+            # update_requested_at, which the caller owns exclusively.
+            invoice.save(
+                update_fields=[
                     "amount",
                     "issue_date",
                     "due_date",
