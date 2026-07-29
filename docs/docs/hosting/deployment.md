@@ -73,15 +73,15 @@ An automated check (see [Documentation conventions](../developer/docs-convention
 | `POSTMARK_SERVER_TOKEN` | 🔴 Required if `DJANGO_EMAIL_ESP=postmark` | `redacted-server-token` | The server token for Postmark |
 | `MAILTRAP_API_TOKEN` | 🔴 Required if `DJANGO_EMAIL_ESP=mailtrap` | `redacted-api-token` | The API token for Mailtrap |
 | `MAILTRAP_SANDBOX_ID` | ⚪ Optional | `123456` | The Mailtrap sandbox/test inbox ID (live sending is used if unset) |
-| `AMS_BILLING_SERVICE_CLASS` | ⚪ Optional | `ams.billing.providers.xero.XeroBillingService` | The provider to use for billing. Defaults to Xero — see [Hard requirements](#hard-requirements-today) below for why this makes Xero a de facto requirement today. |
+| `AMS_BILLING_SERVICE_CLASS` | ⚪ Optional | `ams.billing.providers.xero.XeroBillingService` | The provider to use for billing. Defaults to Xero, which is why the `XERO_*` variables below are required by default — set this to a non-Xero service class (e.g. `ams.billing.providers.mock.MockBillingService`) to skip them entirely. |
 | `AMS_BILLING_EMAIL_WHITELIST_REGEX` | ⚪ Optional | `@domain.com` | Allowed emails to send billing emails to (sends all emails when unset) |
-| `XERO_CLIENT_ID` | 🔴 Required (see note below) | `redacted-client-id` | OAuth2 client ID from your Xero Custom Connection — see [Billing integration](../developer/billing.md) |
-| `XERO_CLIENT_SECRET` | 🔴 Required (see note below) | `redacted-client-secret` | OAuth2 client secret from your Xero Custom Connection |
-| `XERO_TENANT_ID` | 🔴 Required (see note below) | `redacted-tenant-id` | Xero organisation/tenant ID |
-| `XERO_WEBHOOK_KEY` | 🔴 Required (see note below) | `redacted-webhook-key` | Webhook signing key for validating Xero webhook requests |
-| `XERO_ACCOUNT_CODE` | 🔴 Required (see note below) | `200` | Default account code for invoice line items |
-| `XERO_AMOUNT_TYPE` | 🔴 Required (see note below) | `INCLUSIVE` | Tax calculation type: `INCLUSIVE` or `EXCLUSIVE` |
-| `XERO_CURRENCY_CODE` | 🔴 Required (see note below) | `NZD` | Currency code for invoices |
+| `XERO_CLIENT_ID` | 🔴 Required if `AMS_BILLING_SERVICE_CLASS` is Xero-backed (see note below) | `redacted-client-id` | OAuth2 client ID from your Xero Custom Connection — see [Billing integration](../developer/billing.md) |
+| `XERO_CLIENT_SECRET` | 🔴 Required if `AMS_BILLING_SERVICE_CLASS` is Xero-backed (see note below) | `redacted-client-secret` | OAuth2 client secret from your Xero Custom Connection |
+| `XERO_TENANT_ID` | 🔴 Required if `AMS_BILLING_SERVICE_CLASS` is Xero-backed (see note below) | `redacted-tenant-id` | Xero organisation/tenant ID |
+| `XERO_WEBHOOK_KEY` | 🔴 Required if `AMS_BILLING_SERVICE_CLASS` is Xero-backed (see note below) | `redacted-webhook-key` | Webhook signing key for validating Xero webhook requests |
+| `XERO_ACCOUNT_CODE` | 🔴 Required if `AMS_BILLING_SERVICE_CLASS` is Xero-backed (see note below) | `200` | Default account code for invoice line items |
+| `XERO_AMOUNT_TYPE` | 🔴 Required if `AMS_BILLING_SERVICE_CLASS` is Xero-backed (see note below) | `INCLUSIVE` | Tax calculation type: `INCLUSIVE` or `EXCLUSIVE` |
+| `XERO_CURRENCY_CODE` | 🔴 Required if `AMS_BILLING_SERVICE_CLASS` is Xero-backed (see note below) | `NZD` | Currency code for invoices |
 | `DISCOURSE_REDIRECT_DOMAIN` | ⚪ Optional | `https://forum.ams.com` | The domain of the forum to send users to. Only needed if the forum is enabled — leave unset otherwise. |
 | `DISCOURSE_CONNECT_SECRET` | ⚪ Optional | `redacted-secret` | The secret used in SSO Discourse communication. Only needed if the forum is enabled — leave unset otherwise. |
 | `DJANGO_MEDIA_PUBLIC_BUCKET_NAME` | 🔴 Required | `public-media` | The name of the bucket used for public media storage |
@@ -126,9 +126,8 @@ AMS is designed so opinionated stack choices belong in the provider's own runboo
       `config/settings/production.py` currently points this at [Better Stack](https://betterstack.com/)'s own Sentry-compatible error tracking, per its own comment (`# Better Stack (uses Sentry SDK)`).
     - Log ingestion (`LOGTAIL_SOURCE_TOKEN`, `LOGTAIL_INGESTING_HOST`) uses Better Stack's own Logtail SDK (the `logtail-python` package) directly, so this one is specific to Better Stack rather than a portable protocol.
     - In practice, one Better Stack account covers both today — but the two settings are separate integration points, not inherently tied to the same vendor.
-- **Xero** (`XERO_CLIENT_ID`, `XERO_CLIENT_SECRET`, `XERO_TENANT_ID`, `XERO_WEBHOOK_KEY`, `XERO_ACCOUNT_CODE`, `XERO_AMOUNT_TYPE`, `XERO_CURRENCY_CODE`) — this one is a known gap, not an intentional design choice: `AMS_BILLING_SERVICE_CLASS` (which selects the billing provider) has a default, but the seven `XERO_*` variables above it are read unconditionally in `config/settings/production.py`, with no default and no check of which billing service class is actually configured.
-  This mirrors how `DJANGO_EMAIL_ESP` used to make Mailgun a hard requirement, before it became a pluggable choice — the same fix (gating `XERO_*` behind `AMS_BILLING_SERVICE_CLASS`, the way `DJANGO_EMAIL_ESP` gates `MAILGUN_*`/`POSTMARK_*`/`MAILTRAP_*`) hasn't landed yet for billing.
-  Transactional email is no longer an example of a hard requirement: as of commit `0438752`, `DJANGO_EMAIL_ESP` makes it a pluggable choice of `mailgun`/`postmark`/`mailtrap` instead.
+- **Xero** (`XERO_CLIENT_ID`, `XERO_CLIENT_SECRET`, `XERO_TENANT_ID`, `XERO_WEBHOOK_KEY`, `XERO_ACCOUNT_CODE`, `XERO_AMOUNT_TYPE`, `XERO_CURRENCY_CODE`) is only a hard requirement while `AMS_BILLING_SERVICE_CLASS` resolves to a Xero-backed service — `ams.billing.providers.xero.XeroBillingService` (the default) or `ams.billing.providers.xero.MockXeroBillingService`. `config/settings/production.py` reads the seven `XERO_*` variables with no default only inside that check, mirroring how `DJANGO_EMAIL_ESP` gates `MAILGUN_*`/`POSTMARK_*`/`MAILTRAP_*`. Set `AMS_BILLING_SERVICE_CLASS` to a non-Xero service class (e.g. `ams.billing.providers.mock.MockBillingService`) to deploy without any `XERO_*` variable set.
+  Transactional email is no longer an example of a hard requirement either: as of commit `0438752`, `DJANGO_EMAIL_ESP` makes it a pluggable choice of `mailgun`/`postmark`/`mailtrap` instead.
 
 ## Deployment steps
 
