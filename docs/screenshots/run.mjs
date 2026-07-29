@@ -52,7 +52,7 @@ const steps = {
 
 // Optional argv filter (`node run.mjs [prefix...]`, or `npm run
 // docs:screenshots -- <prefix...>`) so working on one tutorial doesn't
-// require rewriting and re-diffing all ~65 images every time -- restricts
+// require rewriting and re-diffing every image every time -- restricts
 // the run to manifest entries whose `step` or `id` starts with one of the
 // given prefixes, e.g. `events` for every `events*` step. No args runs
 // the full manifest, unchanged from before this option existed.

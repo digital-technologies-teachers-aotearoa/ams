@@ -9,7 +9,7 @@ Organisations can manage their allocated seats, inviting and removing members as
 Custom profile fields allow you to collect association-specific information without requiring code changes.
 
 The platform aims to handle the complete membership lifecycle.
-Automated email notifications keep members informed at each stage, while administrators benefit from dashboard views showing membership statistics, pending applications, and upcoming renewals.
+Automated email notifications keep administrators informed at each stage, while dashboard views show membership statistics and pending applications at a glance.
 
 **Key Features:**
 
