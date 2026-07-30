@@ -51,7 +51,9 @@ class ResourceHomeView(generic.TemplateView):
         qs = Resource.objects.filter(published=True)
         if not user_has_active_membership(self.request.user):
             qs = qs.exclude(visibility=Resource.Visibility.MEMBERS_ONLY)
-        context["resources"] = qs.prefetch_related(*_RESOURCE_LIST_PREFETCHES)[:10]
+        context["resources"] = qs.order_by("-datetime_added").prefetch_related(
+            *_RESOURCE_LIST_PREFETCHES,
+        )[:10]
         context["resource_count"] = qs.count()
         context["component_count"] = ResourceComponent.objects.filter(
             resource__in=qs,
@@ -108,13 +110,18 @@ class ResourceSearchView(generic.TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         q = self.request.GET.get("q", "").strip()
-        tag_slugs = self.request.GET.getlist("tag")
+        tag_pks = []
+        for raw_pk in self.request.GET.getlist("tag"):
+            try:
+                tag_pks.append(int(raw_pk))
+            except ValueError:
+                continue
 
         context["q"] = q
         context["form"] = ResourceSearchForm(initial={"q": q})
-        context["selected_tag_slugs"] = set(tag_slugs)
+        context["selected_tag_pks"] = set(tag_pks)
 
-        if not q and not tag_slugs:
+        if not q and not tag_pks:
             context["results"] = Resource.objects.none()
             return context
 
@@ -134,19 +141,19 @@ class ResourceSearchView(generic.TemplateView):
                 .order_by("-rank")
             )
 
-        if tag_slugs:
+        if tag_pks:
             selected_tags = ResourceTag.objects.filter(
-                slug__in=tag_slugs,
+                pk__in=tag_pks,
             ).select_related("category")
             if not selected_tags:
                 context["results"] = Resource.objects.none()
                 return context
             tags_by_category = defaultdict(list)
             for tag in selected_tags:
-                tags_by_category[tag.category_id].append(tag.slug)
+                tags_by_category[tag.category_id].append(tag.pk)
             # OR within a category, AND across categories
-            for category_tag_slugs in tags_by_category.values():
-                qs = qs.filter(tags__slug__in=category_tag_slugs)
+            for category_tag_pks in tags_by_category.values():
+                qs = qs.filter(tags__pk__in=category_tag_pks)
             qs = qs.distinct()
 
         context["results"] = qs.prefetch_related(

@@ -21,7 +21,7 @@ class CategoryTagFilters(LayoutObject):
             self.TEMPLATE,
             {
                 "form": form,
-                "selected_tag_slugs": context.get("selected_tag_slugs", set()),
+                "selected_tag_pks": context.get("selected_tag_pks", set()),
             },
         )
 
@@ -43,7 +43,10 @@ class ResourceSearchForm(forms.Form):
             self.helper.form_show_labels = False
             self.helper.layout = Layout(
                 Div(
-                    Field("q", wrapper_class="flex-grow-1 mb-0"),
+                    Field(
+                        "q",
+                        wrapper_class="flex-grow-1 resource-search-field-inline",
+                    ),
                     Submit("", _("Search"), css_class="btn btn-primary"),
                     css_class="d-flex gap-2 align-items-start",
                 ),

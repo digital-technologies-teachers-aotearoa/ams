@@ -1,5 +1,5 @@
 {% if not no_link %}
-  <a href="{% url 'resources:search' %}?tag={{ tag.slug }}"
+  <a href="{% url 'resources:search' %}?tag={{ tag.pk }}"
      class="text-decoration-none">
   {% endif %}
   <span class="badge {% if not tag.color %}text-bg-light border{% endif %}"
