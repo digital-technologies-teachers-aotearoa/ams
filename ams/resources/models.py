@@ -110,6 +110,7 @@ class Resource(models.Model):
     # names are language-neutral and indexed in both vectors.
     search_vector_en = SearchVectorField(null=True, editable=False)
     search_vector_mi = SearchVectorField(null=True, editable=False)
+    view_count = models.PositiveIntegerField(default=0, editable=False)
     author_users = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         related_name="resources",
@@ -229,6 +230,7 @@ class ResourceComponent(models.Model):
     datetime_added = models.DateTimeField(auto_now_add=True)
     datetime_updated = models.DateTimeField(auto_now=True)
     uuid = models.UUIDField(default=uuid4, editable=False)
+    view_count = models.PositiveIntegerField(default=0, editable=False)
 
     def __str__(self):
         return self.name
@@ -268,3 +270,47 @@ class ResourceComponent(models.Model):
 
     def icon_name(self):
         return file_types.COMPONENT_TYPE_DATA[self.component_type]["icon"]
+
+
+class ResourceView(models.Model):
+    resource = models.ForeignKey(
+        Resource,
+        on_delete=models.CASCADE,
+        related_name="views",
+    )
+    datetime_viewed = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        indexes = [models.Index(fields=["resource", "datetime_viewed"])]
+
+    def __str__(self):
+        return f"{self.resource} viewed {self.datetime_viewed}"
+
+
+class ResourceComponentView(models.Model):
+    component = models.ForeignKey(
+        ResourceComponent,
+        on_delete=models.CASCADE,
+        related_name="views",
+    )
+    datetime_viewed = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        indexes = [models.Index(fields=["component", "datetime_viewed"])]
+
+    def __str__(self):
+        return f"{self.component} viewed {self.datetime_viewed}"
+
+
+def record_resource_view(resource):
+    ResourceView.objects.create(resource=resource)
+    Resource.objects.filter(pk=resource.pk).update(
+        view_count=models.F("view_count") + 1,
+    )
+
+
+def record_component_view(component):
+    ResourceComponentView.objects.create(component=component)
+    ResourceComponent.objects.filter(pk=component.pk).update(
+        view_count=models.F("view_count") + 1,
+    )

@@ -1,10 +1,15 @@
+from datetime import timedelta
 from http import HTTPStatus
 from unittest.mock import patch
 
 import pytest
+from django.db.models import F
+from django.utils import timezone
 
 from ams.entities.tests.factories import EntityFactory
 from ams.resources.models import Resource
+from ams.resources.models import ResourceComponentView
+from ams.resources.models import ResourceView
 from ams.resources.tests.factories import ResourceCategoryFactory
 from ams.resources.tests.factories import ResourceComponentFactory
 from ams.resources.tests.factories import ResourceFactory
@@ -85,6 +90,37 @@ class TestResourceDetailView:
         assert response.status_code == HTTPStatus.MOVED_PERMANENTLY
         assert resource.get_absolute_url() in response.url
 
+    def test_redirect_without_slug_records_no_view(self, client):
+        resource = ResourceFactory(published=True)
+        client.get(f"/en/resources/resource/{resource.pk}/")
+        assert ResourceView.objects.count() == 0
+
+    def test_records_exactly_one_view(self, client):
+        resource = ResourceFactory(published=True)
+        client.get(resource.get_absolute_url())
+        assert ResourceView.objects.filter(resource=resource).count() == 1
+        resource.refresh_from_db()
+        assert resource.view_count == 1
+
+    def test_visiting_twice_records_two_views(self, client):
+        resource = ResourceFactory(published=True)
+        client.get(resource.get_absolute_url())
+        client.get(resource.get_absolute_url())
+        expected_view_count = 2
+        assert (
+            ResourceView.objects.filter(resource=resource).count()
+            == expected_view_count
+        )
+        resource.refresh_from_db()
+        assert resource.view_count == expected_view_count
+
+    def test_view_does_not_bump_datetime_updated(self, client):
+        resource = ResourceFactory(published=True)
+        original_datetime_updated = resource.datetime_updated
+        client.get(resource.get_absolute_url())
+        resource.refresh_from_db()
+        assert resource.datetime_updated == original_datetime_updated
+
     def test_unpublished_returns_404(self, client):
         resource = ResourceFactory(published=False)
         response = client.get(resource.get_absolute_url(), follow=True)
@@ -107,7 +143,7 @@ class TestResourceDetailView:
         assert list(response.context["components_of"]) == []
 
 
-class TestResourceComponentDownloadView:
+class TestResourceComponentAccessView:
     def test_nonexistent_component_returns_404(self, client):
         response = client.get("/en/resources/component/99999/download/")
         assert response.status_code == HTTPStatus.NOT_FOUND
@@ -120,26 +156,40 @@ class TestResourceComponentDownloadView:
         )
         response = client.get(f"/en/resources/component/{component.pk}/download/")
         assert response.status_code == HTTPStatus.NOT_FOUND
+        assert ResourceComponentView.objects.count() == 0
 
-    def test_url_component_returns_404(self, client):
+    def test_url_component_redirects_and_records_one_view(self, client):
         resource = ResourceFactory(published=True)
         component = ResourceComponentFactory(
             resource=resource,
             component_url="https://example.com/",
         )
         response = client.get(f"/en/resources/component/{component.pk}/download/")
-        assert response.status_code == HTTPStatus.NOT_FOUND
+        assert response.status_code == HTTPStatus.FOUND
+        assert response.url == "https://example.com/"
+        assert ResourceComponentView.objects.filter(component=component).count() == 1
+        component.refresh_from_db()
+        assert component.view_count == 1
 
     def test_post_returns_405(self, client):
         response = client.post("/en/resources/component/1/download/")
         assert response.status_code == HTTPStatus.METHOD_NOT_ALLOWED
 
-    def test_recursive_component_returns_404(self, client):
+    def test_recursive_component_redirects_to_child_resource_and_records_view(
+        self,
+        client,
+    ):
         parent = ResourceFactory(published=True)
         child = ResourceFactory(published=True)
-        component = ResourceComponentFactory(resource=parent, component_resource=child)
+        component = ResourceComponentFactory(
+            resource=parent,
+            component_url="",
+            component_resource=child,
+        )
         response = client.get(f"/en/resources/component/{component.pk}/download/")
-        assert response.status_code == HTTPStatus.NOT_FOUND
+        assert response.status_code == HTTPStatus.FOUND
+        assert response.url == child.get_absolute_url()
+        assert ResourceComponentView.objects.filter(component=component).count() == 1
 
     def test_file_component_redirects_to_file_url(self, client, file_storage):
         resource = ResourceFactory(published=True)
@@ -147,6 +197,27 @@ class TestResourceComponentDownloadView:
         response = client.get(f"/en/resources/component/{component.pk}/download/")
         assert response.status_code == HTTPStatus.FOUND
         assert "test.pdf" in response.url
+        assert ResourceComponentView.objects.filter(component=component).count() == 1
+
+    def test_component_access_url_name_works(self, client, file_storage):
+        resource = ResourceFactory(published=True)
+        component = ResourceComponentFactory(resource=resource, with_file=True)
+        response = client.get(f"/en/resources/component/{component.pk}/access/")
+        assert response.status_code == HTTPStatus.FOUND
+
+    def test_permission_denied_records_no_view(self, client, file_storage):
+        resource = ResourceFactory(
+            published=True,
+            visibility=Resource.Visibility.MEMBERS_ONLY,
+        )
+        component = ResourceComponentFactory(resource=resource, with_file=True)
+        with patch(
+            "ams.resources.views.user_has_active_membership",
+            return_value=False,
+        ):
+            response = client.get(f"/en/resources/component/{component.pk}/download/")
+        assert response.status_code == HTTPStatus.FORBIDDEN
+        assert ResourceComponentView.objects.count() == 0
 
 
 class TestResourceSearchView:
@@ -516,6 +587,7 @@ class TestResourceVisibilityDetail:
         with patch(_MEMBERSHIP_PATCH, return_value=False):
             response = client.get(resource.get_absolute_url())
         assert response.status_code == HTTPStatus.FORBIDDEN
+        assert ResourceView.objects.count() == 0
 
     def test_members_only_detail_denied_to_non_member(self, client):
         user = UserFactory()
@@ -652,3 +724,122 @@ class TestResourceVisibilityListing:
         results = list(response.context["results"])
         assert r1 in results
         assert r2 in results
+
+
+def _record_view(resource, *, days_ago=0):
+    view = ResourceView.objects.create(resource=resource)
+    if days_ago:
+        ResourceView.objects.filter(pk=view.pk).update(
+            datetime_viewed=timezone.now() - timedelta(days=days_ago),
+        )
+    Resource.objects.filter(pk=resource.pk).update(view_count=F("view_count") + 1)
+
+
+class TestResourceHomeMostViewed:
+    def test_section_absent_with_zero_views(self, client):
+        ResourceFactory(published=True)
+        response = client.get("/en/resources/")
+        assert "Most viewed" not in response.content.decode()
+
+    def test_month_and_all_time_present_when_recently_viewed(self, client):
+        resource = ResourceFactory(published=True)
+        _record_view(resource)
+        response = client.get("/en/resources/")
+        assert resource in list(response.context["most_viewed_month"])
+        assert resource in list(response.context["most_viewed_all_time"])
+        assert "Most viewed" in response.content.decode()
+
+    def test_month_excludes_views_older_than_window(self, client):
+        resource = ResourceFactory(published=True)
+        _record_view(resource, days_ago=31)
+        response = client.get("/en/resources/")
+        assert resource not in list(response.context["most_viewed_month"])
+        assert resource in list(response.context["most_viewed_all_time"])
+
+    def test_month_pill_hidden_when_only_all_time_has_content(self, client):
+        resource = ResourceFactory(published=True)
+        _record_view(resource, days_ago=31)
+        response = client.get("/en/resources/")
+        content = response.content.decode()
+        assert "This month" not in content
+        assert "All time" in content
+
+    def test_ordered_by_recent_views_descending(self, client):
+        low = ResourceFactory(published=True)
+        high = ResourceFactory(published=True)
+        _record_view(low)
+        _record_view(high)
+        _record_view(high)
+        response = client.get("/en/resources/")
+        results = list(response.context["most_viewed_month"])
+        assert results.index(high) < results.index(low)
+
+    def test_ordered_by_all_time_view_count_descending(self, client):
+        low = ResourceFactory(published=True)
+        high = ResourceFactory(published=True)
+        _record_view(low, days_ago=60)
+        _record_view(high, days_ago=60)
+        _record_view(high, days_ago=60)
+        response = client.get("/en/resources/")
+        results = list(response.context["most_viewed_all_time"])
+        assert results.index(high) < results.index(low)
+
+    def test_excludes_members_only_from_anonymous(self, client):
+        hidden = ResourceFactory(
+            published=True,
+            visibility=Resource.Visibility.MEMBERS_ONLY,
+        )
+        _record_view(hidden)
+        with patch(_MEMBERSHIP_PATCH, return_value=False):
+            response = client.get("/en/resources/")
+        assert hidden not in list(response.context["most_viewed_month"])
+        assert hidden not in list(response.context["most_viewed_all_time"])
+
+    def test_includes_members_only_for_members(self, client):
+        resource = ResourceFactory(
+            published=True,
+            visibility=Resource.Visibility.MEMBERS_ONLY,
+        )
+        _record_view(resource)
+        with patch(_MEMBERSHIP_PATCH, return_value=True):
+            response = client.get("/en/resources/")
+        assert resource in list(response.context["most_viewed_month"])
+
+    def test_multi_component_resource_view_count_not_inflated(self, client):
+        resource = ResourceFactory(published=True)
+        ResourceComponentFactory(resource=resource)
+        ResourceComponentFactory(resource=resource)
+        _record_view(resource)
+        _record_view(resource)
+        _record_view(resource)
+        response = client.get("/en/resources/")
+        results = list(response.context["most_viewed_month"])
+        assert results.count(resource) == 1
+        annotated = next(r for r in results if r == resource)
+        expected_recent_views = 3
+        assert annotated.recent_views == expected_recent_views
+
+    def test_home_page_query_count(self, client, django_assert_max_num_queries):
+        # Several resources, each with multiple components/tags/authors, and
+        # views spread across them, so a per-row query (an N+1) shows up as
+        # extra queries rather than being indistinguishable from a single
+        # prefetch — a 1-resource fixture can't tell the two apart.
+        category = ResourceCategoryFactory()
+        tag = ResourceTagFactory(category=category)
+        entity = EntityFactory()
+        user = UserFactory()
+        for _ in range(6):
+            resource = ResourceFactory(published=True)
+            resource.tags.add(tag)
+            resource.author_entities.add(entity)
+            resource.author_users.add(user)
+            ResourceComponentFactory(resource=resource)
+            ResourceComponentFactory(resource=resource)
+            _record_view(resource)
+            _record_view(resource)
+        # Measured baseline is 48 with this fixture (site/locale middleware
+        # overhead plus three sliced resource lists x four prefetches each).
+        # Ceiling gives headroom for minor variance while still catching a
+        # new N+1 (which would add roughly one query per resource per list).
+        with django_assert_max_num_queries(55):
+            client.get("/en/resources/")

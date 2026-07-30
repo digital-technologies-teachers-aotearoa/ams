@@ -62,7 +62,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: AMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-30 08:14+1200\n"
+"POT-Creation-Date: 2026-07-30 14:21+1200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Te Reo Māori\n"
@@ -390,7 +390,7 @@ msgid "Currently only registration via URL is available."
 msgstr ""
 
 #: ams/events/admin.py:227 ams/memberships/admin.py:64
-#: ams/resources/admin.py:103
+#: ams/resources/admin.py:105
 msgid "Visibility"
 msgstr ""
 
@@ -1243,16 +1243,20 @@ msgstr ""
 msgid "Only one of the following fields must be filled for each component."
 msgstr ""
 
-#: ams/resources/admin.py:93
+#: ams/resources/admin.py:95
 msgid "Ownership"
 msgstr ""
 
-#: ams/resources/admin.py:96
+#: ams/resources/admin.py:98
 msgid "Resources can be owned by both users and entities."
 msgstr ""
 
-#: ams/resources/admin.py:101
+#: ams/resources/admin.py:103
 msgid "Tags"
+msgstr ""
+
+#: ams/resources/admin.py:110
+msgid "Statistics"
 msgstr ""
 
 # -----------------------------------------------------------------
@@ -1303,8 +1307,8 @@ msgstr ""
 msgid "Resource"
 msgstr ""
 
-#: ams/resources/forms.py:31 ams/resources/forms.py:47
-#: ams/resources/forms.py:55 ams/utils/breadcrumbs.py:125
+#: ams/resources/forms.py:31 ams/resources/forms.py:50
+#: ams/resources/forms.py:58 ams/utils/breadcrumbs.py:125
 msgid "Search"
 msgstr ""
 
@@ -1340,40 +1344,40 @@ msgid ""
 msgstr ""
 
 #. Translators: Short badge label — requires an account to access
-#: ams/resources/models.py:152
+#: ams/resources/models.py:153
 msgid "Login required"
 msgstr ""
 
 #. Translators: Short badge label — active membership required to access
-#: ams/resources/models.py:154
+#: ams/resources/models.py:155
 msgid "Membership required"
 msgstr ""
 
 #. Translators: Short badge label — resource is only visible to members
-#: ams/resources/models.py:156
+#: ams/resources/models.py:157
 msgid "Membership required to view"
 msgstr ""
 
-#: ams/resources/models.py:165
+#: ams/resources/models.py:166
 msgid "Anyone can view, login required to access"
 msgstr ""
 
-#: ams/resources/models.py:170
+#: ams/resources/models.py:171
 msgid "Anyone can view, membership required to access"
 msgstr ""
 
 #. Translators: Resource badge tooltip — hidden entirely from non-members
-#: ams/resources/models.py:173
+#: ams/resources/models.py:174
 msgid "Only members can view or access"
 msgstr ""
 
-#: ams/resources/models.py:252
+#: ams/resources/models.py:254
 msgid ""
 "Resource components must have exactly one type of data (file, URL, or "
 "another resource)."
 msgstr ""
 
-#: ams/resources/models.py:261
+#: ams/resources/models.py:263
 msgid "Cannot set a resource to be a component of itself."
 msgstr ""
 
@@ -2605,7 +2609,7 @@ msgid "View"
 msgstr ""
 
 #: ams/templates/mfa/index.html:110
-#: ams/templates/resources/resource_detail.html:43
+#: ams/templates/resources/resource_detail.html:47
 msgid "Download"
 msgstr ""
 
@@ -3080,66 +3084,62 @@ msgstr ""
 # [MEDIUM PRIORITY] RESOURCES (USER-FACING)
 # Shown to all users when browsing and downloading resources.
 # -----------------------------------------------------------------
-#: ams/templates/resources/_resource_authors.html:13
+#: ams/templates/resources/_resource_authors.html:15
 msgid "People"
 msgstr ""
 
 #: ams/templates/resources/_search_tips.html:4
-msgid "Enter search terms, select filters, or use both — then click search."
+msgid "Enter search terms, select filters, or use both, then click search."
 msgstr ""
 
-#: ams/templates/resources/_search_tips.html:13
+#: ams/templates/resources/_search_tips.html:11
 msgid "Search tips"
 msgstr ""
 
-#: ams/templates/resources/_search_tips.html:21
+#: ams/templates/resources/_search_tips.html:18
 msgid "Type this"
 msgstr ""
 
-#: ams/templates/resources/_search_tips.html:22
+#: ams/templates/resources/_search_tips.html:19
 msgid "To get"
 msgstr ""
 
-#: ams/templates/resources/_search_tips.html:28
+#: ams/templates/resources/_search_tips.html:27
 msgid "Resources containing both words"
 msgstr ""
 
-#: ams/templates/resources/_search_tips.html:32
+#: ams/templates/resources/_search_tips.html:33
 msgid "That exact phrase"
 msgstr ""
 
-#: ams/templates/resources/_search_tips.html:36
+#: ams/templates/resources/_search_tips.html:39
 msgid "Either word"
 msgstr ""
 
-#: ams/templates/resources/_search_tips.html:40
+#: ams/templates/resources/_search_tips.html:46
 msgid "Contains \"safety\", excludes \"draft\""
 msgstr ""
 
-#: ams/templates/resources/_search_tips.html:45
+#: ams/templates/resources/_search_tips.html:51
 msgid "What is searched"
 msgstr ""
 
-#: ams/templates/resources/_search_tips.html:47
+#: ams/templates/resources/_search_tips.html:53
 msgid "Resource name (highest weight)"
 msgstr ""
 
-#: ams/templates/resources/_search_tips.html:48
+#: ams/templates/resources/_search_tips.html:54
 msgid "Description and component names"
 msgstr ""
 
-#: ams/templates/resources/_search_tips.html:49
+#: ams/templates/resources/_search_tips.html:55
 msgid "Tag names, abbreviations, and author names (lowest weight)"
 msgstr ""
 
-#: ams/templates/resources/_search_tips.html:53
+#: ams/templates/resources/_search_tips.html:58
 msgid ""
-"In English, searches match word variants — \"plans\" finds \"planning\". In "
+"In English, searches match word variants: \"plans\" finds \"planning\". In "
 "Te Reo Māori, words must match exactly as typed."
-msgstr ""
-
-#: ams/templates/resources/_search_tips.html:56
-msgid "Try an example"
 msgstr ""
 
 #: ams/templates/resources/category_tag_filters.html:10
@@ -3172,7 +3172,7 @@ msgstr[1] ""
 
 #. Translators: A "component" is a file or sub-item bundled within a resource (e.g. a PDF within a larger document package). Singular/plural pair.
 #: ams/templates/resources/home.html:28
-#: ams/templates/resources/resource_card.html:28
+#: ams/templates/resources/resource_card.html:29
 #, python-format
 msgid "%(count)s component"
 msgid_plural "%(count)s components"
@@ -3191,14 +3191,35 @@ msgstr ""
 msgid "Check back later for new resources"
 msgstr ""
 
+#: ams/templates/resources/home.html:43
+msgid "Most viewed"
+msgstr ""
+
+#: ams/templates/resources/home.html:54
+msgid "This month"
+msgstr ""
+
+#: ams/templates/resources/home.html:65
+msgid "All time"
+msgstr ""
+
 #: ams/templates/resources/resource_card.html:14
-#: ams/templates/resources/resource_detail.html:71
+#: ams/templates/resources/resource_detail.html:75
 msgid "Authors"
 msgstr ""
 
 #: ams/templates/resources/resource_card.html:19
 msgid "Person"
 msgstr ""
+
+#: ams/templates/resources/resource_card.html:26
+#: ams/templates/resources/resource_detail.html:34
+#: ams/templates/resources/resource_detail.html:87
+#, python-format
+msgid "%(count)s view"
+msgid_plural "%(count)s views"
+msgstr[0] ""
+msgstr[1] ""
 
 #: ams/templates/resources/resource_detail.html:12
 msgid "Edit resource"
@@ -3208,24 +3229,24 @@ msgstr ""
 msgid "Components"
 msgstr ""
 
-#: ams/templates/resources/resource_detail.html:48
+#: ams/templates/resources/resource_detail.html:52
 msgid "Open"
 msgstr ""
 
-#: ams/templates/resources/resource_detail.html:51
+#: ams/templates/resources/resource_detail.html:55
 msgid "View resource"
 msgstr ""
 
-#: ams/templates/resources/resource_detail.html:60
+#: ams/templates/resources/resource_detail.html:64
 msgid "Also a component of"
 msgstr ""
 
-#: ams/templates/resources/resource_detail.html:77
+#: ams/templates/resources/resource_detail.html:81
 #, python-format
 msgid "Added %(date)s"
 msgstr ""
 
-#: ams/templates/resources/resource_detail.html:80
+#: ams/templates/resources/resource_detail.html:84
 #, python-format
 msgid "Updated %(date)s"
 msgstr ""

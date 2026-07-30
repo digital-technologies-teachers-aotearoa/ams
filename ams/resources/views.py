@@ -1,11 +1,15 @@
 from collections import defaultdict
+from datetime import timedelta
 
 from django.contrib.postgres.search import SearchQuery
 from django.contrib.postgres.search import SearchRank
 from django.core.exceptions import PermissionDenied
+from django.db.models import Count
 from django.db.models import F
+from django.db.models import Q
 from django.http import Http404
 from django.http import HttpResponseRedirect
+from django.utils import timezone
 from django.utils.translation import get_language
 from django.views import generic
 
@@ -13,6 +17,8 @@ from ams.resources.forms import ResourceSearchForm
 from ams.resources.models import Resource
 from ams.resources.models import ResourceComponent
 from ams.resources.models import ResourceTag
+from ams.resources.models import record_component_view
+from ams.resources.models import record_resource_view
 from ams.utils.mixins import RedirectToCosmeticURLMixin
 from ams.utils.permissions import user_has_active_membership
 
@@ -32,6 +38,9 @@ def _user_can_access(user, resource):
 
 
 _RESOURCE_LIST_PREFETCHES = ("components", "author_users", "author_entities", "tags")
+
+MOST_VIEWED_LIMIT = 5
+MOST_VIEWED_WINDOW_DAYS = 30
 
 # Maps the active language to its per-language search vector column and the
 # Postgres text-search config used to build it. Defaults to English for any
@@ -58,6 +67,24 @@ class ResourceHomeView(generic.TemplateView):
         context["component_count"] = ResourceComponent.objects.filter(
             resource__in=qs,
         ).count()
+
+        recent_cutoff = timezone.now() - timedelta(days=MOST_VIEWED_WINDOW_DAYS)
+        context["most_viewed_month"] = (
+            qs.annotate(
+                recent_views=Count(
+                    "views",
+                    filter=Q(views__datetime_viewed__gte=recent_cutoff),
+                ),
+            )
+            .filter(recent_views__gt=0)
+            .order_by("-recent_views")
+            .prefetch_related(*_RESOURCE_LIST_PREFETCHES)[:MOST_VIEWED_LIMIT]
+        )
+        context["most_viewed_all_time"] = (
+            qs.filter(view_count__gt=0)
+            .order_by("-view_count")
+            .prefetch_related(*_RESOURCE_LIST_PREFETCHES)[:MOST_VIEWED_LIMIT]
+        )
         return context
 
 
@@ -84,24 +111,38 @@ class ResourceDetailView(RedirectToCosmeticURLMixin, generic.DetailView):
             resource__published=True,
         ).select_related("resource")
         context["can_access"] = _user_can_access(self.request.user, self.object)
+        record_resource_view(self.object)
         return context
 
 
-class ResourceComponentDownloadView(generic.View):
+class ResourceComponentAccessView(generic.View):
     def get(self, request, pk):
-        # Validates component exists, belongs to a published resource, and has a file.
         component = (
-            ResourceComponent.objects.select_related("resource").filter(pk=pk).first()
+            ResourceComponent.objects.select_related(
+                "resource",
+                "component_resource",
+            )
+            .filter(pk=pk)
+            .first()
         )
         if component is None:
             raise Http404
         if not component.resource.published:
             raise Http404
-        if not component.component_file:
-            raise Http404
         if not _user_can_access(request.user, component.resource):
             raise PermissionDenied
-        return HttpResponseRedirect(component.component_file.url)
+
+        if component.component_file:
+            target = component.component_file.url
+        elif component.component_url:
+            target = component.component_url
+        elif component.component_resource:
+            target = component.component_resource.get_absolute_url()
+        else:
+            raise Http404
+
+        record_component_view(component)
+        return HttpResponseRedirect(target)
 
 
 class ResourceSearchView(generic.TemplateView):

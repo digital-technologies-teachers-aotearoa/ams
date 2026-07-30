@@ -38,5 +38,54 @@
         <p class="text-muted">{% trans "Check back later for new resources" %}</p>
       </div>
     {% endif %}
+    {% if most_viewed_month or most_viewed_all_time %}
+      <h2 class="resource-section-heading">{% trans "Most viewed" %}</h2>
+      <ul class="nav nav-pills mb-3" role="tablist">
+        {% if most_viewed_month %}
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active"
+                    id="most-viewed-month-tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#most-viewed-month"
+                    type="button"
+                    role="tab"
+                    aria-controls="most-viewed-month"
+                    aria-selected="true">{% trans "This month" %}</button>
+          </li>
+        {% endif %}
+        <li class="nav-item" role="presentation">
+          <button class="nav-link{% if not most_viewed_month %} active{% endif %}"
+                  id="most-viewed-all-time-tab"
+                  data-bs-toggle="tab"
+                  data-bs-target="#most-viewed-all-time"
+                  type="button"
+                  role="tab"
+                  aria-controls="most-viewed-all-time"
+                  aria-selected="{% if not most_viewed_month %}true{% else %}false{% endif %}">
+            {% trans "All time" %}
+          </button>
+        </li>
+      </ul>
+      <div class="tab-content">
+        {% if most_viewed_month %}
+          <div class="tab-pane fade show active"
+               id="most-viewed-month"
+               role="tabpanel"
+               aria-labelledby="most-viewed-month-tab">
+            {% for resource in most_viewed_month %}
+              {% include "resources/resource_card.html" %}
+            {% endfor %}
+          </div>
+        {% endif %}
+        <div class="tab-pane fade{% if not most_viewed_month %} show active{% endif %}"
+             id="most-viewed-all-time"
+             role="tabpanel"
+             aria-labelledby="most-viewed-all-time-tab">
+          {% for resource in most_viewed_all_time %}
+            {% include "resources/resource_card.html" %}
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
   </div>
 {% endblock content_container %}

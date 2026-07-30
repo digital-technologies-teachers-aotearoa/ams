@@ -83,10 +83,12 @@ class ResourceAdmin(ResourcesFeatureFlagMixin, TabbedTranslationAdmin):
         "datetime_updated",
         "published",
         "visibility",
+        "view_count",
     )
     list_filter = ("published",)
     search_fields = ("name",)
     filter_horizontal = ("author_entities", "author_users", "tags")
+    readonly_fields = ("view_count",)
     fieldsets = (
         (None, {"fields": ("name", "description")}),
         (
@@ -105,6 +107,7 @@ class ResourceAdmin(ResourcesFeatureFlagMixin, TabbedTranslationAdmin):
                 "fields": ("published", "visibility"),
             },
         ),
+        (_("Statistics"), {"fields": ("view_count",)}),
     )
 
 
