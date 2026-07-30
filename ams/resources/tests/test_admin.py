@@ -5,6 +5,7 @@ from django.urls import reverse
 
 from ams.entities.models import Entity
 from ams.resources.admin import ResourceAdmin
+from ams.resources.admin import ResourceCategoryAdmin
 from ams.resources.admin import ResourceForm
 from ams.resources.models import Resource
 from ams.resources.tests.factories import ResourceCategoryFactory
@@ -124,6 +125,23 @@ class TestResourceAdminViewCount:
         assert resource.view_count == original_view_count
 
 
+class TestResourceAdminThumbnail:
+    def test_thumbnail_in_fieldsets(self):
+        fieldset_fields = {
+            field
+            for _, options in ResourceAdmin.fieldsets
+            for field in options["fields"]
+        }
+        assert "thumbnail" in fieldset_fields
+
+    def test_thumbnail_rendered_on_change_form(self, admin_client):
+        resource = ResourceFactory()
+        url = reverse("admin:resources_resource_change", args=[resource.pk])
+        response = admin_client.get(url)
+        assert response.status_code == HTTPStatus.OK
+        assert b"thumbnail" in response.content
+
+
 class TestResourceCategoryAdmin:
     def test_category_admin_accessible(self, admin_client):
         ResourceCategoryFactory(name="Test Category")
@@ -140,3 +158,25 @@ class TestResourceCategoryAdmin:
         expected_response_code = 200
         assert response.status_code == expected_response_code
         assert b"Level 1" in response.content
+
+    def test_gradient_colours_and_tag_style_in_fieldsets(self):
+        fieldset_fields = {
+            field
+            for _, options in ResourceCategoryAdmin.fieldsets
+            for field in options["fields"]
+        }
+        assert "gradient_start_colour" in fieldset_fields
+        assert "gradient_end_colour" in fieldset_fields
+        assert "tag_style" in fieldset_fields
+
+    def test_gradient_colours_and_tag_style_rendered_on_change_form(
+        self,
+        admin_client,
+    ):
+        category = ResourceCategoryFactory(name="Year Level")
+        url = reverse("admin:resources_resourcecategory_change", args=[category.pk])
+        response = admin_client.get(url)
+        assert response.status_code == HTTPStatus.OK
+        assert b"gradient_start_colour" in response.content
+        assert b"gradient_end_colour" in response.content
+        assert b"tag_style" in response.content

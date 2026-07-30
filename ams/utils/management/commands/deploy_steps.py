@@ -15,3 +15,5 @@ class Command(management.base.BaseCommand):
         management.call_command("migrate", interactive=False)
 
         management.call_command("setup_cms")
+
+        management.call_command("setup_resource_languages")

@@ -37,8 +37,14 @@ def _user_can_access(user, resource):
     return user_has_active_membership(user)
 
 
-_RESOURCE_LIST_PREFETCHES = ("components", "author_users", "author_entities", "tags")
+_RESOURCE_LIST_PREFETCHES = (
+    "components",
+    "author_users",
+    "author_entities",
+    "tags__category__tags",
+)
 
+LATEST_LIMIT = 5
 MOST_VIEWED_LIMIT = 5
 MOST_VIEWED_WINDOW_DAYS = 30
 
@@ -62,7 +68,7 @@ class ResourceHomeView(generic.TemplateView):
             qs = qs.exclude(visibility=Resource.Visibility.MEMBERS_ONLY)
         context["resources"] = qs.order_by("-datetime_added").prefetch_related(
             *_RESOURCE_LIST_PREFETCHES,
-        )[:10]
+        )[:LATEST_LIMIT]
         context["resource_count"] = qs.count()
         context["component_count"] = ResourceComponent.objects.filter(
             resource__in=qs,
@@ -197,8 +203,5 @@ class ResourceSearchView(generic.TemplateView):
                 qs = qs.filter(tags__pk__in=category_tag_pks)
             qs = qs.distinct()
 
-        context["results"] = qs.prefetch_related(
-            *_RESOURCE_LIST_PREFETCHES,
-            "tags__category",
-        )
+        context["results"] = qs.prefetch_related(*_RESOURCE_LIST_PREFETCHES)
         return context

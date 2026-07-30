@@ -9,19 +9,55 @@ from django.contrib.postgres.search import SearchVectorField
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
+from imagekit.models import ImageSpecField
+from imagekit.processors import ResizeToFill
+from imagekit.processors import ResizeToFit
 from tinymce.models import HTMLField
 
 from ams.resources import file_types
+from ams.resources.utils import resource_thumbnail_path
 from ams.resources.utils import resource_upload_path
+from ams.users.models import get_public_media_storage
 from ams.utils.colours import contrast_colour
+from ams.utils.colours import darken
+from ams.utils.colours import interpolate_colour
 from config.storage_backends import PrivateMediaStorage
 
 
 class ResourceCategory(models.Model):
+    class TagStyle(models.TextChoices):
+        SOLID = "solid", _("Solid — filled badge")
+        OUTLINE = "outline", _("Outline — bordered badge")
+        SOFT = "soft", _("Soft — tinted background")
+
     name = models.CharField(max_length=200)
     slug = AutoSlugField(populate_from="_slug_source")
     order = models.PositiveIntegerField(default=0)
+    gradient_start_colour = ColorField(
+        blank=True,
+        default="",
+        verbose_name=_("gradient start colour"),
+        help_text=_(
+            "Colour for the first tag (by order). Leave blank to disable "
+            "automatic colouring for this category's tags.",
+        ),
+    )
+    gradient_end_colour = ColorField(
+        blank=True,
+        default="",
+        verbose_name=_("gradient end colour"),
+        help_text=_(
+            "Colour for the last tag (by order). Leave blank to use the start "
+            "colour for every tag.",
+        ),
+    )
+    tag_style = models.CharField(
+        max_length=10,
+        choices=TagStyle.choices,
+        default=TagStyle.SOFT,
+    )
 
     class Meta:
         ordering = ["order", "name"]
@@ -33,6 +69,22 @@ class ResourceCategory(models.Model):
     def _slug_source(self):
         return self.name_en or self.name
 
+    @cached_property
+    def _derived_tag_colours(self) -> dict[int, str]:
+        if not self.gradient_start_colour:
+            return {}
+        end_colour = self.gradient_end_colour or self.gradient_start_colour
+        tags = list(self.tags.all())
+        total = len(tags)
+        return {
+            tag.pk: interpolate_colour(
+                self.gradient_start_colour,
+                end_colour,
+                i / max(total - 1, 1),
+            )
+            for i, tag in enumerate(tags)
+        }
+
 
 class ResourceTag(models.Model):
     category = models.ForeignKey(
@@ -43,7 +95,14 @@ class ResourceTag(models.Model):
     name = models.CharField(max_length=200)
     slug = AutoSlugField(populate_from="_slug_source")
     abbreviation = models.CharField(max_length=20, blank=True)
-    color = ColorField(blank=True, default="")
+    color = ColorField(
+        blank=True,
+        default="",
+        help_text=_(
+            "Optional. Overrides the colour automatically derived from the "
+            "category's gradient.",
+        ),
+    )
     order = models.PositiveIntegerField(default=0)
 
     class Meta:
@@ -57,8 +116,34 @@ class ResourceTag(models.Model):
         return self.name_en or self.name
 
     @property
+    def effective_colour(self) -> str:
+        if self.color:
+            return self.color
+        return self.category._derived_tag_colours.get(self.pk, "")  # noqa: SLF001
+
+    @property
     def text_color(self) -> str:
-        return contrast_colour(self.color)
+        return contrast_colour(self.effective_colour)
+
+    @property
+    def style_attrs(self) -> str:
+        colour = self.effective_colour
+        if not colour:
+            return ""
+        style = self.category.tag_style
+        if style == ResourceCategory.TagStyle.OUTLINE:
+            return (
+                f"background-color: transparent; color: {colour}; "
+                f"border: 1px solid {colour};"
+            )
+        if style == ResourceCategory.TagStyle.SOFT:
+            r = int(colour[1:3], 16)
+            g = int(colour[3:5], 16)
+            b = int(colour[5:7], 16)
+            return (
+                f"background-color: rgba({r}, {g}, {b}, 0.15); color: {darken(colour)};"
+            )
+        return f"background-color: {colour}; color: {contrast_colour(colour)};"
 
 
 class Resource(models.Model):
@@ -111,6 +196,25 @@ class Resource(models.Model):
     search_vector_en = SearchVectorField(null=True, editable=False)
     search_vector_mi = SearchVectorField(null=True, editable=False)
     view_count = models.PositiveIntegerField(default=0, editable=False)
+    thumbnail = models.ImageField(
+        _("thumbnail"),
+        upload_to=resource_thumbnail_path,
+        storage=get_public_media_storage,
+        blank=True,
+        help_text=_("Optional image shown on the resource card and detail page."),
+    )
+    thumbnail_card = ImageSpecField(
+        source="thumbnail",
+        processors=[ResizeToFill(200, 200)],
+        format="JPEG",
+        options={"quality": 80},
+    )
+    thumbnail_detail = ImageSpecField(
+        source="thumbnail",
+        processors=[ResizeToFit(800, 600)],
+        format="JPEG",
+        options={"quality": 85},
+    )
     author_users = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         related_name="resources",

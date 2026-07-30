@@ -28,6 +28,11 @@ class ResourceFactory(factory.django.DjangoModelFactory[Resource]):
     description = factory.Faker("paragraph")
     published = True
 
+    class Params:
+        with_thumbnail = factory.Trait(
+            thumbnail=factory.django.ImageField(filename="thumbnail.jpg"),
+        )
+
     class Meta:
         model = Resource
 

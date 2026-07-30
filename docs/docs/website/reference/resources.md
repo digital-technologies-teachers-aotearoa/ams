@@ -60,10 +60,25 @@ Resources can be tagged with a two-level taxonomy that you define:
 
 Tags appear as grouped filter facets on the search page, allowing users to filter results by category.
 
+A **Language** category is created automatically, with English and Te Reo Māori — tag a resource with the language(s) it's available in, and visitors can filter by language the same way as any other tag. You can rename or add to these tags freely.
+
 ## View counts
 
 Every resource and component tracks how many times it has been viewed — shown publicly on the resource card, the resource detail page, and next to each component.
 Viewing an unpublished or members-only resource you can't access is never counted.
+
+## Thumbnails
+
+You can add an optional thumbnail image to a resource from the **name**/**description** section of the resource form. It's shown as a small square on the resource card and larger on the resource's own page. Resources without a thumbnail display without an image — nothing looks broken.
+
+## Tag colours
+
+There are two ways to colour the tags in a category:
+
+- **Colour each tag by hand.** Set a **Colour** on the individual tag — this always takes priority. Use this when tags need specific, unrelated colours (e.g. matching an existing colour-coded framework or your brand palette), or when a category has tags that shouldn't look part of a sequence.
+- **Colour a whole category automatically, as a gradient.** Set a **gradient start colour** (and optionally a **gradient end colour**) and a **style** (solid, outline, or soft) on the category. Every tag without its own colour is then shaded along that gradient, in the tags' display order — the first tag gets the start colour, the last gets the end colour, and the rest fade between them. Leave the end colour blank to give every tag in the category one flat colour instead. This suits categories with a natural order, like year levels or ascending reference numbers, where the colour should visually communicate progression.
+
+You can mix both within one category: a few tags with their own hand-picked colour, the rest automatically gradient-shaded.
 
 ## Adding resources to menus
 
