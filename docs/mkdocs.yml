@@ -61,6 +61,7 @@ nav:
           - website/setup/launch-checklist.md
       - Feature reference:
           - website/reference/index.md
+          - website/reference/articles.md
           - website/reference/cms.md
           - website/reference/events.md
           - website/reference/forum.md

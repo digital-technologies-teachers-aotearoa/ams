@@ -574,6 +574,97 @@
     "description": "The new team member's own account page, showing the Staff links they now have access to."
   },
   {
+    "id": "articles-add-index-chooser",
+    "file": "website/reference/articles-01-add-index-chooser.png",
+    "step": "articlesAddIndexChooser",
+    "pages": ["website/reference/articles.md"],
+    "description": "The page-type chooser shown after clicking Add child page under Home, showing Articles index page as an option."
+  },
+  {
+    "id": "articles-index-published",
+    "file": "website/reference/articles-02-index-published.png",
+    "step": "articlesIndexPublished",
+    "pages": ["website/reference/articles.md"],
+    "description": "Home's child pages after publishing the new Articles index page."
+  },
+  {
+    "id": "articles-article-form-empty",
+    "file": "website/reference/articles-03-article-form-empty.png",
+    "step": "articlesArticleFormEmpty",
+    "pages": ["website/reference/articles.md"],
+    "description": "The empty Add article page form, reached from the Articles item in the CMS sidebar."
+  },
+  {
+    "id": "articles-article-form-filled",
+    "file": "website/reference/articles-04-article-form-filled.png",
+    "step": "articlesArticleFormFilled",
+    "pages": ["website/reference/articles.md"],
+    "description": "A new article with its title, cover image, author, summary, and body filled in, saved as a draft."
+  },
+  {
+    "id": "articles-article-published",
+    "file": "website/reference/articles-05-article-published.png",
+    "step": "articlesArticlePublished",
+    "pages": ["website/reference/articles.md"],
+    "description": "The Articles index page's children after publishing the new article."
+  },
+  {
+    "id": "articles-listing-live",
+    "file": "website/reference/articles-06-listing-live.png",
+    "step": "articlesListingLive",
+    "pages": ["website/reference/articles.md"],
+    "description": "The public articles listing page, showing the published article as a card."
+  },
+  {
+    "id": "articles-detail-live",
+    "file": "website/reference/articles-07-detail-live.png",
+    "step": "articlesDetailLive",
+    "pages": ["website/reference/articles.md"],
+    "description": "The article's own public page, showing its full body, date, and author."
+  },
+  {
+    "id": "articles-recent-block-added",
+    "file": "website/reference/articles-08-recent-block-added.png",
+    "step": "articlesRecentBlockAdded",
+    "pages": ["website/reference/articles.md"],
+    "description": "The Recent Articles block added to the home page's Body, showing its article count field."
+  },
+  {
+    "id": "articles-recent-block-live",
+    "file": "website/reference/articles-09-recent-block-live.png",
+    "step": "articlesRecentBlockLive",
+    "pages": ["website/reference/articles.md"],
+    "description": "The Recent Articles block live on the public home page, showing the published article as a card."
+  },
+  {
+    "id": "terms-version-form-filled",
+    "file": "website/reference/terms-01-version-form-filled.png",
+    "step": "termsVersionFormFilled",
+    "pages": ["website/reference/terms.md"],
+    "description": "The Add Term Version form, filled in with a Term, version label, activation date, and content."
+  },
+  {
+    "id": "terms-versions-list",
+    "file": "website/reference/terms-02-versions-list.png",
+    "step": "termsVersionsList",
+    "pages": ["website/reference/terms.md"],
+    "description": "The Term Versions snippet list, showing the new version's Term, Version, Is active, and Date active columns."
+  },
+  {
+    "id": "terms-public-page",
+    "file": "website/reference/terms-03-public-page.png",
+    "step": "termsPublicPage",
+    "pages": ["website/reference/terms.md"],
+    "description": "The public terms page, showing the current version of the Privacy Policy."
+  },
+  {
+    "id": "terms-accept-interstitial",
+    "file": "website/reference/terms-04-accept-interstitial.png",
+    "step": "termsAcceptInterstitial",
+    "pages": ["website/reference/terms.md"],
+    "description": "The pending-terms screen a signed-in member sees on their account page once a new term version is active."
+  },
+  {
     "id": "marketing-membership-management",
     "file": "features/features-01-membership-management.png",
     "step": "marketingMembershipManagement",
