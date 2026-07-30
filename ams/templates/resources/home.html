@@ -14,6 +14,9 @@
   </div>
   <p class="lead">{% trans "Browse and download resources." %}</p>
   {% crispy form %}
+  <p class="mt-1 mb-2 text-end">
+    <small><a href="{% url 'resources:search' %}">{% trans "Advanced search" %}</a></small>
+  </p>
 {% endblock page_heading %}
 
 {% block content_container %}
@@ -24,6 +27,7 @@
       {# Translators: A "component" is a file or sub-item bundled within a resource (e.g. a PDF within a larger document package). Singular/plural pair. #}
       <span>{% icon "paperclip" %} {% blocktrans count count=component_count %}{{ count }} component{% plural %}{{ count }} components{% endblocktrans %}</span>
     </div>
+    <h2 class="resource-section-heading">{% trans "Latest resources" %}</h2>
     {% if resources %}
       {% for resource in resources %}
         {% include "resources/resource_card.html" %}

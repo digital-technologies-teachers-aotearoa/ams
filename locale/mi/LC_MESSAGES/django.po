@@ -62,7 +62,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: AMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-04 20:37+1200\n"
+"POT-Creation-Date: 2026-07-30 08:14+1200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Te Reo Māori\n"
@@ -76,11 +76,11 @@ msgstr ""
 # [LOW PRIORITY] BILLING ADMIN
 # Only visible to staff in the admin backend. Translate if time permits.
 # -----------------------------------------------------------------
-#: ams/billing/admin.py:50
+#: ams/billing/admin.py:51
 msgid "Billing Integration"
 msgstr ""
 
-#: ams/billing/admin.py:57
+#: ams/billing/admin.py:58
 msgid ""
 "Enabling 'Update needed' will force the invoice to update in the next update "
 "cycle."
@@ -88,7 +88,7 @@ msgstr ""
 
 #. Translators: Column header — link to the billing invoice
 #. Translators: Column header — link to the billing invoice for this membership
-#: ams/billing/admin.py:63 ams/organisations/tables.py:198
+#: ams/billing/admin.py:64 ams/organisations/tables.py:198
 #: ams/templates/billing/emails/mock_invoice.html:5
 #: ams/templates/billing/emails/mock_invoice.html:58
 #: ams/templates/billing/emails/mock_invoice.html:93
@@ -98,11 +98,11 @@ msgstr ""
 msgid "Invoice"
 msgstr ""
 
-#: ams/billing/admin.py:77
+#: ams/billing/admin.py:78
 msgid "Related models"
 msgstr ""
 
-#: ams/billing/admin.py:88
+#: ams/billing/admin.py:94
 msgid "Mark selected invoices for update"
 msgstr ""
 
@@ -124,7 +124,7 @@ msgstr ""
 
 #. Translators: Column header — the member's full name
 #: ams/cms/forms.py:9 ams/cms/models/settings.py:115
-#: ams/organisations/tables.py:20
+#: ams/organisations/tables.py:20 ams/terms/models.py:48
 msgid "Name"
 msgstr ""
 
@@ -757,8 +757,8 @@ msgstr ""
 
 #. Translators: Column header — organisation the user was invited to join
 #. Translators: Column header — the name of the organisation the user belongs to
-#: ams/memberships/models.py:43 ams/users/tables.py:83 ams/users/tables.py:115
-#: ams/utils/breadcrumbs.py:185
+#: ams/memberships/models.py:43 ams/templates/resources/resource_card.html:16
+#: ams/users/tables.py:83 ams/users/tables.py:115 ams/utils/breadcrumbs.py:185
 msgid "Organisation"
 msgstr ""
 
@@ -1340,40 +1340,40 @@ msgid ""
 msgstr ""
 
 #. Translators: Short badge label — requires an account to access
-#: ams/resources/models.py:143
+#: ams/resources/models.py:152
 msgid "Login required"
 msgstr ""
 
 #. Translators: Short badge label — active membership required to access
-#: ams/resources/models.py:145
+#: ams/resources/models.py:154
 msgid "Membership required"
 msgstr ""
 
 #. Translators: Short badge label — resource is only visible to members
-#: ams/resources/models.py:147
+#: ams/resources/models.py:156
 msgid "Membership required to view"
 msgstr ""
 
-#: ams/resources/models.py:156
+#: ams/resources/models.py:165
 msgid "Anyone can view, login required to access"
 msgstr ""
 
-#: ams/resources/models.py:161
+#: ams/resources/models.py:170
 msgid "Anyone can view, membership required to access"
 msgstr ""
 
 #. Translators: Resource badge tooltip — hidden entirely from non-members
-#: ams/resources/models.py:164
+#: ams/resources/models.py:173
 msgid "Only members can view or access"
 msgstr ""
 
-#: ams/resources/models.py:243
+#: ams/resources/models.py:252
 msgid ""
 "Resource components must have exactly one type of data (file, URL, or "
 "another resource)."
 msgstr ""
 
-#: ams/resources/models.py:252
+#: ams/resources/models.py:261
 msgid "Cannot set a resource to be a component of itself."
 msgstr ""
 
@@ -3084,6 +3084,68 @@ msgstr ""
 msgid "People"
 msgstr ""
 
+#: ams/templates/resources/_search_tips.html:4
+msgid "Enter search terms, select filters, or use both — then click search."
+msgstr ""
+
+#: ams/templates/resources/_search_tips.html:13
+msgid "Search tips"
+msgstr ""
+
+#: ams/templates/resources/_search_tips.html:21
+msgid "Type this"
+msgstr ""
+
+#: ams/templates/resources/_search_tips.html:22
+msgid "To get"
+msgstr ""
+
+#: ams/templates/resources/_search_tips.html:28
+msgid "Resources containing both words"
+msgstr ""
+
+#: ams/templates/resources/_search_tips.html:32
+msgid "That exact phrase"
+msgstr ""
+
+#: ams/templates/resources/_search_tips.html:36
+msgid "Either word"
+msgstr ""
+
+#: ams/templates/resources/_search_tips.html:40
+msgid "Contains \"safety\", excludes \"draft\""
+msgstr ""
+
+#: ams/templates/resources/_search_tips.html:45
+msgid "What is searched"
+msgstr ""
+
+#: ams/templates/resources/_search_tips.html:47
+msgid "Resource name (highest weight)"
+msgstr ""
+
+#: ams/templates/resources/_search_tips.html:48
+msgid "Description and component names"
+msgstr ""
+
+#: ams/templates/resources/_search_tips.html:49
+msgid "Tag names, abbreviations, and author names (lowest weight)"
+msgstr ""
+
+#: ams/templates/resources/_search_tips.html:53
+msgid ""
+"In English, searches match word variants — \"plans\" finds \"planning\". In "
+"Te Reo Māori, words must match exactly as typed."
+msgstr ""
+
+#: ams/templates/resources/_search_tips.html:56
+msgid "Try an example"
+msgstr ""
+
+#: ams/templates/resources/category_tag_filters.html:10
+msgid "Select all tags in this category"
+msgstr ""
+
 #: ams/templates/resources/home.html:8 ams/utils/breadcrumbs.py:117
 msgid "Resources"
 msgstr ""
@@ -3096,8 +3158,12 @@ msgstr ""
 msgid "Browse and download resources."
 msgstr ""
 
+#: ams/templates/resources/home.html:18
+msgid "Advanced search"
+msgstr ""
+
 #. Translators: Count of downloadable resources. Singular/plural pair — provide both msgstr[0] (one resource) and msgstr[1] (many resources).
-#: ams/templates/resources/home.html:23
+#: ams/templates/resources/home.html:26
 #, python-format
 msgid "%(count)s resource"
 msgid_plural "%(count)s resources"
@@ -3105,20 +3171,33 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. Translators: A "component" is a file or sub-item bundled within a resource (e.g. a PDF within a larger document package). Singular/plural pair.
-#: ams/templates/resources/home.html:25
-#: ams/templates/resources/resource_card.html:33
+#: ams/templates/resources/home.html:28
+#: ams/templates/resources/resource_card.html:28
 #, python-format
 msgid "%(count)s component"
 msgid_plural "%(count)s components"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ams/templates/resources/home.html:33
+#: ams/templates/resources/home.html:30
+msgid "Latest resources"
+msgstr ""
+
+#: ams/templates/resources/home.html:37
 msgid "No resources available yet"
 msgstr ""
 
-#: ams/templates/resources/home.html:34
+#: ams/templates/resources/home.html:38
 msgid "Check back later for new resources"
+msgstr ""
+
+#: ams/templates/resources/resource_card.html:14
+#: ams/templates/resources/resource_detail.html:71
+msgid "Authors"
+msgstr ""
+
+#: ams/templates/resources/resource_card.html:19
+msgid "Person"
 msgstr ""
 
 #: ams/templates/resources/resource_detail.html:12
@@ -3141,10 +3220,6 @@ msgstr ""
 msgid "Also a component of"
 msgstr ""
 
-#: ams/templates/resources/resource_detail.html:71
-msgid "Authors"
-msgstr ""
-
 #: ams/templates/resources/resource_detail.html:77
 #, python-format
 msgid "Added %(date)s"
@@ -3159,29 +3234,29 @@ msgstr ""
 msgid "Search resources"
 msgstr ""
 
-#: ams/templates/resources/search.html:26
+#: ams/templates/resources/search.html:27
 #, python-format
 msgid "Results for <strong>%(q)s</strong>"
 msgstr ""
 
-#: ams/templates/resources/search.html:28
+#: ams/templates/resources/search.html:29
 msgid "Filtered results"
 msgstr ""
 
-#: ams/templates/resources/search.html:38
+#: ams/templates/resources/search.html:39
 #, python-format
 msgid "No results found for <strong>%(q)s</strong>"
 msgstr ""
 
-#: ams/templates/resources/search.html:40
+#: ams/templates/resources/search.html:41
 msgid "No results found"
 msgstr ""
 
-#: ams/templates/resources/search.html:43
+#: ams/templates/resources/search.html:44
 msgid "Try different keywords or filters."
 msgstr ""
 
-#: ams/templates/resources/search.html:48
+#: ams/templates/resources/search.html:50
 msgid "Enter a search term or select filters to find resources."
 msgstr ""
 
@@ -3437,15 +3512,15 @@ msgstr ""
 # [LOW PRIORITY] TERMS ADMIN
 # Only visible to staff managing terms and conditions in the backend.
 # -----------------------------------------------------------------
-#: ams/terms/admin.py:40 ams/terms/models.py:136
+#: ams/terms/admin.py:40 ams/terms/models.py:149
 msgid "Version Info"
 msgstr ""
 
-#: ams/terms/admin.py:46 ams/terms/models.py:143
+#: ams/terms/admin.py:46 ams/terms/models.py:156
 msgid "Activation"
 msgstr ""
 
-#: ams/terms/admin.py:52
+#: ams/terms/admin.py:52 ams/terms/models.py:158
 msgid "Content"
 msgstr ""
 
@@ -3473,53 +3548,53 @@ msgstr ""
 msgid "I Accept"
 msgstr ""
 
-#: ams/terms/models.py:20
+#: ams/terms/models.py:31
 msgid "Unique identifier (e.g., 'privacy-policy', 'terms-of-service')"
 msgstr ""
 
-#: ams/terms/models.py:24
+#: ams/terms/models.py:35
 msgid "Human-readable name displayed to users"
 msgstr ""
 
-#: ams/terms/models.py:28
+#: ams/terms/models.py:39
 msgid "Internal description for administrators"
 msgstr ""
 
-#: ams/terms/models.py:46
+#: ams/terms/models.py:59
 msgid "Term"
 msgstr ""
 
-#: ams/terms/models.py:47
+#: ams/terms/models.py:60
 msgid "Terms"
 msgstr ""
 
-#: ams/terms/models.py:71
+#: ams/terms/models.py:84
 msgid ""
 "Version identifier (e.g., '1.0', '2.1', '2024-01-15'). This is for reference "
 "only - the 'latest' version is determined by the most recent activation "
 "date, not this version number."
 msgstr ""
 
-#: ams/terms/models.py:77
+#: ams/terms/models.py:90
 msgid "The full legal text users must accept"
 msgstr ""
 
-#: ams/terms/models.py:91
+#: ams/terms/models.py:104
 msgid "Summary of changes from previous version (for internal use)"
 msgstr ""
 
-#: ams/terms/models.py:106
+#: ams/terms/models.py:119
 msgid "Draft versions should be inactive. Activate when ready to enforce."
 msgstr ""
 
-#: ams/terms/models.py:111
+#: ams/terms/models.py:124
 msgid ""
 "Version becomes enforceable from this date/time. The version with the most "
 "recent activation date is considered the 'latest' version that users must "
 "accept, regardless of version number."
 msgstr ""
 
-#: ams/terms/models.py:124
+#: ams/terms/models.py:137
 msgid ""
 "<p><strong>Important:</strong> Users always see the version with the most "
 "recent <strong>activation date</strong>, not the highest version number.</"
@@ -3527,31 +3602,31 @@ msgid ""
 "instead of version '2.0' with an older Effective Date.</p>"
 msgstr ""
 
-#: ams/terms/models.py:156
+#: ams/terms/models.py:171
 msgid "Term Version"
 msgstr ""
 
-#: ams/terms/models.py:157
+#: ams/terms/models.py:172
 msgid "Term Versions"
 msgstr ""
 
-#: ams/terms/models.py:193
+#: ams/terms/models.py:208
 msgid "IP address from which acceptance was recorded"
 msgstr ""
 
-#: ams/terms/models.py:196
+#: ams/terms/models.py:211
 msgid "Browser user agent string"
 msgstr ""
 
-#: ams/terms/models.py:201
+#: ams/terms/models.py:216
 msgid "Source of acceptance (e.g., 'web', 'api', 'sso')"
 msgstr ""
 
-#: ams/terms/models.py:206
+#: ams/terms/models.py:221
 msgid "Term Acceptance"
 msgstr ""
 
-#: ams/terms/models.py:207
+#: ams/terms/models.py:222
 msgid "Term Acceptances"
 msgstr ""
 
@@ -3607,7 +3682,7 @@ msgstr ""
 msgid "Last Name"
 msgstr ""
 
-#: ams/users/admin.py:233 ams/users/forms.py:80 ams/users/forms.py:84
+#: ams/users/admin.py:233 ams/users/forms.py:107 ams/users/forms.py:111
 msgid "Username"
 msgstr "Ingoa kaiwhakamahi"
 
@@ -3675,48 +3750,48 @@ msgstr ""
 # [HIGH PRIORITY] USER ACCOUNT FORMS
 # Shown when users update their profile, name, and account details.
 # -----------------------------------------------------------------
-#: ams/users/forms.py:54 ams/users/tests/test_forms.py:52
+#: ams/users/forms.py:56 ams/users/tests/test_forms.py:54
 msgid "This email has already been taken."
 msgstr ""
 
-#: ams/users/forms.py:66 ams/users/forms.py:69
+#: ams/users/forms.py:93 ams/users/forms.py:96
 msgid "First name"
 msgstr "Ingoa tuatahi"
 
-#: ams/users/forms.py:73 ams/users/forms.py:76
+#: ams/users/forms.py:100 ams/users/forms.py:103
 msgid "Last name"
 msgstr "Ingoa whānau"
 
-#: ams/users/forms.py:82
+#: ams/users/forms.py:109
 msgid "This is used in the community forum."
 msgstr "Ka whakamahia tēnei i te papa kōrero ā-hapori"
 
-#: ams/users/forms.py:88
+#: ams/users/forms.py:115
 msgid "Preferred language"
 msgstr "Te reo e hiahiatia ana"
 
-#: ams/users/forms.py:106 ams/users/forms.py:157
+#: ams/users/forms.py:133 ams/users/forms.py:184
 msgid "No preference"
 msgstr ""
 
-#: ams/users/forms.py:135
+#: ams/users/forms.py:162
 msgid "Profile picture"
 msgstr ""
 
-#: ams/users/forms.py:138
+#: ams/users/forms.py:165
 msgid ""
 "Upload a profile picture (JPEG, PNG, GIF, or WEBP). Maximum file size: 5MB."
 msgstr ""
 
-#: ams/users/forms.py:324
+#: ams/users/forms.py:351
 msgid "Personal Information"
 msgstr ""
 
-#: ams/users/forms.py:356
+#: ams/users/forms.py:383
 msgid "Update Profile"
 msgstr ""
 
-#: ams/users/forms.py:386
+#: ams/users/forms.py:413
 #, python-format
 msgid "File size must be no more than 5MB. Your file is %(size).1fMB."
 msgstr ""
@@ -4068,35 +4143,35 @@ msgstr ""
 msgid "Required for membership"
 msgstr ""
 
-#: ams/utils/i18n_auth_hints.py:11
+#: ams/utils/i18n_auth_hints.py:13
 #, python-format
 msgid "Already have an account? Then please %(link)ssign in%(end_link)s."
 msgstr "He pūkete kē tāu? %(link)sMe takiuru mai%(end_link)s"
 
-#: ams/utils/i18n_auth_hints.py:12
+#: ams/utils/i18n_auth_hints.py:14
 msgid "Password"
 msgstr "Kupuhuna"
 
-#: ams/utils/i18n_auth_hints.py:13
+#: ams/utils/i18n_auth_hints.py:15
 msgid "Password (again)"
 msgstr "Kupuhuna (anō)"
 
-#: ams/utils/i18n_auth_hints.py:14
+#: ams/utils/i18n_auth_hints.py:16
 msgid "Your password can’t be too similar to your other personal information."
 msgstr "Me kaua tō kupuhuna e ōrite ki ētahi atu o ō pitopito whaiaro"
 
-#: ams/utils/i18n_auth_hints.py:16
+#: ams/utils/i18n_auth_hints.py:18
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
 msgstr[0] "Me neke atu i te waru ngā pūtohu"
 msgstr[1] "Me neke atu i te waru ngā pūtohu"
 
-#: ams/utils/i18n_auth_hints.py:20
+#: ams/utils/i18n_auth_hints.py:22
 msgid "Your password can’t be a commonly used password."
 msgstr "Me kaua e rite tonu tō whakamahi i tō kupuhuna"
 
-#: ams/utils/i18n_auth_hints.py:21
+#: ams/utils/i18n_auth_hints.py:23
 msgid "Your password can’t be entirely numeric."
 msgstr "Me kaua tō kupuhuna e whai nama noa iho"
 

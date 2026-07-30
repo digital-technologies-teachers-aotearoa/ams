@@ -8,20 +8,15 @@
           <a href="{{ resource.get_absolute_url }}"
              class="stretched-link text-decoration-none text-body">{{ resource.name }}</a>
         </h4>
-        <div class="resource-card__meta mb-2">
-          {% with authors=resource.author_entities.all %}
-            {% if authors %}
-              {% for entity in authors %}
-                {{ entity.name }}
-                {% if not forloop.last %},{% endif %}
+        <div class="resource-card__meta resource-card__authors mb-2">
+          {% with entities=resource.author_entities.all users=resource.author_users.all %}
+            {% if entities or users %}
+              <span class="visually-hidden">{% trans "Authors" %}:</span>
+              {% for entity in entities %}
+                <span class="resource-card__author" title="{% trans 'Organisation' %}">{% icon "building" %}{{ entity.name }}</span>
               {% endfor %}
-            {% endif %}
-          {% endwith %}
-          {% with users=resource.author_users.all %}
-            {% if users %}
               {% for user in users %}
-                {{ user.get_full_name|default:user.email }}
-                {% if not forloop.last %},{% endif %}
+                <span class="resource-card__author" title="{% trans 'Person' %}">{% icon "person" %}{{ user.get_full_name|default:user.email }}</span>
               {% endfor %}
             {% endif %}
           {% endwith %}

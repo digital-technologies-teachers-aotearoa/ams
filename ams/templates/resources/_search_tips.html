@@ -1,0 +1,61 @@
+{% load i18n icon %}
+
+<p class="resource-search-hint text-muted small mb-2">
+  {% trans "Enter search terms, select filters, or use both, then click search." %}
+</p>
+<button type="button"
+        class="btn btn-link btn-sm p-0 text-decoration-none resource-search-tips-toggle"
+        data-bs-toggle="collapse"
+        data-bs-target="#{{ panel_id }}"
+        aria-expanded="{% if expanded %}true{% else %}false{% endif %}"
+        aria-controls="{{ panel_id }}">{% icon "question-circle" %} {% trans "Search tips" %}</button>
+<div class="collapse{% if expanded %} show{% endif %} mt-2"
+     id="{{ panel_id }}">
+  <div class="resource-search-tips card card-body small">
+    <table class="table table-sm mb-3">
+      <thead>
+        <tr>
+          <th>{% trans "Type this" %}</th>
+          <th>{% trans "To get" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <code>safety plan</code>
+          </td>
+          <td>{% trans "Resources containing both words" %}</td>
+        </tr>
+        <tr>
+          <td>
+            <code>"safety plan"</code>
+          </td>
+          <td>{% trans "That exact phrase" %}</td>
+        </tr>
+        <tr>
+          <td>
+            <code>safety OR hazard</code>
+          </td>
+          <td>{% trans "Either word" %}</td>
+        </tr>
+        <tr>
+          <td>
+            <code>safety -draft</code>
+          </td>
+          <td>
+            {% blocktrans %}Contains "safety", excludes "draft"{% endblocktrans %}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="fw-semibold mb-1">{% trans "What is searched" %}</p>
+    <ul class="mb-3">
+      <li>{% trans "Resource name (highest weight)" %}</li>
+      <li>{% trans "Description and component names" %}</li>
+      <li>{% trans "Tag names, abbreviations, and author names (lowest weight)" %}</li>
+    </ul>
+    <p class="mb-3">
+      {% blocktrans %}In English, searches match word variants: "plans" finds "planning". In Te Reo Māori, words must match exactly as typed.{% endblocktrans %}
+    </p>
+  </div>
+</div>

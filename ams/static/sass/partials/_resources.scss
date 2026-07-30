@@ -27,10 +27,33 @@ $resources-brand-colour: #0976a9;
     color: #6c757d;
   }
 
+  &__authors {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.15rem 0.65rem;
+  }
+
+  &__author svg {
+    width: 0.85em;
+    height: 0.85em;
+    opacity: 0.7;
+    margin-right: 0.2em;
+  }
+
   &__details {
     font-size: 0.85rem;
     color: #6c757d;
   }
+}
+
+// ---------------------------------------------------------------------------
+// Inline search field (home page) — crispy's field.html always renders the
+// wrapper with mb-3 ahead of wrapper_class, so a plain mb-0 there loses:
+// both are !important utilities and mb-3 comes later in Bootstrap's compiled
+// CSS. Override it here instead, since this partial loads after Bootstrap.
+// ---------------------------------------------------------------------------
+.resource-search-field-inline {
+  margin-bottom: 0 !important;
 }
 
 // ---------------------------------------------------------------------------
@@ -69,6 +92,38 @@ $resources-brand-colour: #0976a9;
 .resource-component-icon svg {
   width: 2rem;
   height: 2rem;
+}
+
+// ---------------------------------------------------------------------------
+// Search guidance (inline hint + collapsible tips panel)
+// ---------------------------------------------------------------------------
+.resource-search-tips-toggle svg {
+  width: 0.9em;
+  height: 0.9em;
+}
+
+.resource-search-tips code {
+  color: $resources-brand-colour;
+}
+
+// ---------------------------------------------------------------------------
+// Category select-all toggle button
+// ---------------------------------------------------------------------------
+.resource-tag-category-toggle {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  display: block;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--bs-primary) !important;
+  }
+
+  &[aria-pressed='true'] {
+    color: var(--bs-primary) !important;
+  }
 }
 
 // ---------------------------------------------------------------------------
