@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-30 14:21+1200\n"
+"POT-Creation-Date: 2026-07-30 19:13+1200\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -664,7 +664,7 @@ msgstr ""
 
 #. Translators: Column header — organisation the user was invited to join
 #. Translators: Column header — the name of the organisation the user belongs to
-#: ams/memberships/models.py:43 ams/templates/resources/resource_card.html:16
+#: ams/memberships/models.py:43 ams/templates/resources/resource_card.html:24
 #: ams/users/tables.py:83 ams/users/tables.py:115 ams/utils/breadcrumbs.py:185
 msgid "Organisation"
 msgstr ""
@@ -1145,6 +1145,20 @@ msgstr ""
 msgid "Statistics"
 msgstr ""
 
+#: ams/resources/admin.py:128
+msgid "Tag colours"
+msgstr ""
+
+#: ams/resources/admin.py:131
+msgid ""
+"Tags without their own colour are coloured automatically, spread along a "
+"gradient from the start to the end colour in the tags' display order. Set an "
+"end colour to fade between two colours (e.g. light to dark, or yellow to "
+"red); leave it blank to use one flat colour for every tag. Leave the start "
+"colour blank to disable automatic colouring entirely for tags that should "
+"always be coloured by hand (see the Colour field on each tag)."
+msgstr ""
+
 #: ams/resources/file_types.py:23
 msgid "Other"
 msgstr ""
@@ -1198,26 +1212,64 @@ msgstr ""
 msgid "Search resources..."
 msgstr ""
 
-#: ams/resources/models.py:66
+#: ams/resources/models.py:31
+msgid "Solid — filled badge"
+msgstr ""
+
+#: ams/resources/models.py:32
+msgid "Outline — bordered badge"
+msgstr ""
+
+#: ams/resources/models.py:33
+msgid "Soft — tinted background"
+msgstr ""
+
+#: ams/resources/models.py:41
+msgid "gradient start colour"
+msgstr ""
+
+#: ams/resources/models.py:43
+msgid ""
+"Colour for the first tag (by order). Leave blank to disable automatic "
+"colouring for this category's tags."
+msgstr ""
+
+#: ams/resources/models.py:50
+msgid "gradient end colour"
+msgstr ""
+
+#: ams/resources/models.py:52
+msgid ""
+"Colour for the last tag (by order). Leave blank to use the start colour for "
+"every tag."
+msgstr ""
+
+#: ams/resources/models.py:102
+msgid ""
+"Optional. Overrides the colour automatically derived from the category's "
+"gradient."
+msgstr ""
+
+#: ams/resources/models.py:152
 msgid "Public - visible and accessable by everyone"
 msgstr ""
 
-#: ams/resources/models.py:70
+#: ams/resources/models.py:156
 msgid ""
 "Account required to access - anyone can view, logged-in users can access"
 msgstr ""
 
-#: ams/resources/models.py:77
+#: ams/resources/models.py:163
 msgid ""
 "Membership required to access - anyone can view, only members can access "
 "files"
 msgstr ""
 
-#: ams/resources/models.py:81
+#: ams/resources/models.py:167
 msgid "Members only - only members can view or access"
 msgstr ""
 
-#: ams/resources/models.py:91
+#: ams/resources/models.py:177
 msgid ""
 "Controls who can view and access this resource. Public: no restrictions. "
 "Account required to access: anyone can browse, logged-in users can access. "
@@ -1225,41 +1277,49 @@ msgid ""
 "Members only: only members can view or access."
 msgstr ""
 
+#: ams/resources/models.py:201
+msgid "thumbnail"
+msgstr ""
+
+#: ams/resources/models.py:205
+msgid "Optional image shown on the resource card and detail page."
+msgstr ""
+
 #. Translators: Short badge label — requires an account to access
-#: ams/resources/models.py:153
+#: ams/resources/models.py:258
 msgid "Login required"
 msgstr ""
 
 #. Translators: Short badge label — active membership required to access
-#: ams/resources/models.py:155
+#: ams/resources/models.py:260
 msgid "Membership required"
 msgstr ""
 
 #. Translators: Short badge label — resource is only visible to members
-#: ams/resources/models.py:157
+#: ams/resources/models.py:262
 msgid "Membership required to view"
 msgstr ""
 
-#: ams/resources/models.py:166
+#: ams/resources/models.py:271
 msgid "Anyone can view, login required to access"
 msgstr ""
 
-#: ams/resources/models.py:171
+#: ams/resources/models.py:276
 msgid "Anyone can view, membership required to access"
 msgstr ""
 
 #. Translators: Resource badge tooltip — hidden entirely from non-members
-#: ams/resources/models.py:174
+#: ams/resources/models.py:279
 msgid "Only members can view or access"
 msgstr ""
 
-#: ams/resources/models.py:254
+#: ams/resources/models.py:359
 msgid ""
 "Resource components must have exactly one type of data (file, URL, or "
 "another resource)."
 msgstr ""
 
-#: ams/resources/models.py:263
+#: ams/resources/models.py:368
 msgid "Cannot set a resource to be a component of itself."
 msgstr ""
 
@@ -2449,7 +2509,7 @@ msgid "View"
 msgstr ""
 
 #: ams/templates/mfa/index.html:110
-#: ams/templates/resources/resource_detail.html:47
+#: ams/templates/resources/resource_detail.html:46
 msgid "Download"
 msgstr ""
 
@@ -3000,7 +3060,7 @@ msgstr[1] ""
 
 #. Translators: A "component" is a file or sub-item bundled within a resource (e.g. a PDF within a larger document package). Singular/plural pair.
 #: ams/templates/resources/home.html:28
-#: ams/templates/resources/resource_card.html:29
+#: ams/templates/resources/resource_card.html:37
 #, python-format
 msgid "%(count)s component"
 msgid_plural "%(count)s components"
@@ -3019,11 +3079,11 @@ msgstr ""
 msgid "Check back later for new resources"
 msgstr ""
 
-#: ams/templates/resources/home.html:43
+#: ams/templates/resources/home.html:42
 msgid "Most viewed"
 msgstr ""
 
-#: ams/templates/resources/home.html:54
+#: ams/templates/resources/home.html:53
 msgid "This month"
 msgstr ""
 
@@ -3031,18 +3091,18 @@ msgstr ""
 msgid "All time"
 msgstr ""
 
-#: ams/templates/resources/resource_card.html:14
-#: ams/templates/resources/resource_detail.html:75
+#: ams/templates/resources/resource_card.html:22
+#: ams/templates/resources/resource_detail.html:80
 msgid "Authors"
 msgstr ""
 
-#: ams/templates/resources/resource_card.html:19
+#: ams/templates/resources/resource_card.html:27
 msgid "Person"
 msgstr ""
 
-#: ams/templates/resources/resource_card.html:26
-#: ams/templates/resources/resource_detail.html:34
-#: ams/templates/resources/resource_detail.html:87
+#: ams/templates/resources/resource_card.html:34
+#: ams/templates/resources/resource_detail.html:33
+#: ams/templates/resources/resource_detail.html:92
 #, python-format
 msgid "%(count)s view"
 msgid_plural "%(count)s views"
@@ -3057,24 +3117,24 @@ msgstr ""
 msgid "Components"
 msgstr ""
 
-#: ams/templates/resources/resource_detail.html:52
+#: ams/templates/resources/resource_detail.html:51
 msgid "Open"
 msgstr ""
 
-#: ams/templates/resources/resource_detail.html:55
+#: ams/templates/resources/resource_detail.html:54
 msgid "View resource"
 msgstr ""
 
-#: ams/templates/resources/resource_detail.html:64
+#: ams/templates/resources/resource_detail.html:63
 msgid "Also a component of"
 msgstr ""
 
-#: ams/templates/resources/resource_detail.html:81
+#: ams/templates/resources/resource_detail.html:86
 #, python-format
 msgid "Added %(date)s"
 msgstr ""
 
-#: ams/templates/resources/resource_detail.html:84
+#: ams/templates/resources/resource_detail.html:89
 #, python-format
 msgid "Updated %(date)s"
 msgstr ""

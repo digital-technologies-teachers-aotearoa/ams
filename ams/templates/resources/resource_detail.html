@@ -69,6 +69,12 @@
     {% endif %}
   </div>
   <div class="col-12 col-lg-4">
+    {% if resource.thumbnail %}
+      <img src="{{ resource.thumbnail_detail.url }}"
+           alt=""
+           loading="lazy"
+           class="resource-detail__thumbnail img-fluid rounded mb-3" />
+    {% endif %}
     <div class="card mb-3">
       <div class="card-body">
         <h5 class="card-title">{% trans "Authors" %}</h5>

@@ -59,11 +59,11 @@ class TestResourceHomeView:
         expected_component_count = 2
         assert response.context["component_count"] == expected_component_count
 
-    def test_caps_at_10_resources(self, client):
+    def test_caps_at_latest_limit(self, client):
         ResourceFactory.create_batch(15, published=True)
         response = client.get("/en/resources/")
-        expected_component_count = 10
-        assert len(response.context["resources"]) == expected_component_count
+        expected_resource_count = 5
+        assert len(response.context["resources"]) == expected_resource_count
 
     def test_ordered_by_datetime_added_descending(self, client):
         older = ResourceFactory(published=True)
@@ -141,6 +141,51 @@ class TestResourceDetailView:
         ResourceComponentFactory(resource=unpublished_parent, component_resource=child)
         response = client.get(child.get_absolute_url())
         assert list(response.context["components_of"]) == []
+
+
+class TestResourceThumbnail:
+    def test_card_renders_thumbnail_when_set(self, client):
+        ResourceFactory(published=True, with_thumbnail=True)
+        response = client.get("/en/resources/")
+        assert b"resource-card__thumbnail" in response.content
+
+    def test_card_has_no_thumbnail_markup_when_unset(self, client):
+        ResourceFactory(published=True)
+        response = client.get("/en/resources/")
+        assert b"resource-card__thumbnail" not in response.content
+
+    def test_detail_renders_thumbnail_when_set(self, client):
+        resource = ResourceFactory(published=True, with_thumbnail=True)
+        response = client.get(resource.get_absolute_url())
+        assert resource.thumbnail_detail.url.encode() in response.content
+
+    def test_thumbnail_url_is_not_signed(self, client):
+        resource = ResourceFactory(published=True, with_thumbnail=True)
+        assert "X-Amz-" not in resource.thumbnail.url
+
+
+class TestResourceTagAutomaticColouring:
+    def test_card_renders_derived_colour_for_tag_without_own_colour(self, client):
+        category = ResourceCategoryFactory(
+            gradient_start_colour="#3a86ff",
+            gradient_end_colour="#ff006e",
+        )
+        tag = ResourceTagFactory(category=category, color="")
+        resource = ResourceFactory(published=True)
+        resource.tags.add(tag)
+        response = client.get("/en/resources/")
+        assert tag.style_attrs.encode() in response.content
+
+    def test_card_falls_back_to_plain_badge_without_gradient_start_colour(
+        self,
+        client,
+    ):
+        category = ResourceCategoryFactory(gradient_start_colour="")
+        tag = ResourceTagFactory(category=category, color="")
+        resource = ResourceFactory(published=True)
+        resource.tags.add(tag)
+        response = client.get("/en/resources/")
+        assert b"text-bg-light border" in response.content
 
 
 class TestResourceComponentAccessView:
@@ -824,22 +869,34 @@ class TestResourceHomeMostViewed:
         # views spread across them, so a per-row query (an N+1) shows up as
         # extra queries rather than being indistinguishable from a single
         # prefetch — a 1-resource fixture can't tell the two apart.
-        category = ResourceCategoryFactory()
-        tag = ResourceTagFactory(category=category)
+        # gradient_start_colour is set on both categories so tags exercise
+        # effective_colour's derived (not overridden) path — the one that
+        # walks category.tags.all() via _derived_tag_colours — and having
+        # two categories with several tags each is what would expose a
+        # per-category N+1 if tags__category__tags weren't sharing one
+        # ResourceCategory instance across sibling tags.
+        category_a = ResourceCategoryFactory(gradient_start_colour="#3a86ff")
+        category_b = ResourceCategoryFactory(gradient_start_colour="#ff006e")
+        tags_a = ResourceTagFactory.create_batch(3, category=category_a, color="")
+        tags_b = ResourceTagFactory.create_batch(3, category=category_b, color="")
         entity = EntityFactory()
         user = UserFactory()
-        for _ in range(6):
+        for i in range(6):
             resource = ResourceFactory(published=True)
-            resource.tags.add(tag)
+            resource.tags.add(tags_a[i % 3], tags_b[i % 3])
             resource.author_entities.add(entity)
             resource.author_users.add(user)
             ResourceComponentFactory(resource=resource)
             ResourceComponentFactory(resource=resource)
             _record_view(resource)
             _record_view(resource)
-        # Measured baseline is 48 with this fixture (site/locale middleware
-        # overhead plus three sliced resource lists x four prefetches each).
-        # Ceiling gives headroom for minor variance while still catching a
-        # new N+1 (which would add roughly one query per resource per list).
-        with django_assert_max_num_queries(55):
+        # Measured baseline is 38-54 with this fixture depending on how warm
+        # Django's process-level caches (e.g. ContentType) already are from
+        # earlier tests in the run (site/locale middleware overhead plus
+        # three sliced resource lists x four prefetches each, the last of
+        # which is tags__category__tags so effective_colour's per-category
+        # cached_property doesn't hit the DB per tag). Ceiling gives headroom
+        # for that variance while still catching a new N+1 (which would add
+        # roughly one query per resource per list).
+        with django_assert_max_num_queries(62):
             client.get("/en/resources/")

@@ -2,6 +2,6 @@
   <a href="{% url 'resources:search' %}?tag={{ tag.pk }}"
      class="text-decoration-none">
   {% endif %}
-  <span class="badge {% if not tag.color %}text-bg-light border{% endif %}"
-        {% if tag.color %}style="background-color: {{ tag.color }}; color: {{ tag.text_color }};"{% endif %}>{{ tag.abbreviation|default:tag.name }}</span>
+  <span class="badge {% if not tag.effective_colour %}text-bg-light border{% endif %}"
+        {% if tag.effective_colour %}style="{{ tag.style_attrs }}"{% endif %}>{{ tag.abbreviation|default:tag.name }}</span>
   {% if not no_link %}</a>{% endif %}

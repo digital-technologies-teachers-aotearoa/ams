@@ -2,10 +2,13 @@
 
 """Module for the custom Django create_sample_resources command."""
 
+from io import BytesIO
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core import management
 from django.core.files.base import ContentFile
+from PIL import Image
 
 from ams.entities.models import Entity
 from ams.resources import file_types
@@ -36,6 +39,25 @@ PLACEHOLDER_PDF = (
 PLACEHOLDER_DOCX = b"Placeholder document content."
 PLACEHOLDER_CSV = b"name,value\nRow 1,100\nRow 2,200\n"
 
+# Thumbnails are skipped for one in every four resources (~75% coverage) so
+# sample data also exercises the card/detail layout with no thumbnail.
+THUMBNAIL_SKIP_MODULUS = 4
+THUMBNAIL_COLOURS = [
+    "#0976a9",
+    "#2e7d32",
+    "#6a1b9a",
+    "#e65100",
+    "#00695c",
+    "#b71c1c",
+]
+# Alternating 16:9 and 4:3 source images, so sample data exercises both the
+# card's cropped square (ResizeToFill) and the detail page's uncropped
+# (ResizeToFit) rendering with more than one aspect ratio.
+THUMBNAIL_DIMENSIONS = [
+    (640, 360),  # 16:9
+    (640, 480),  # 4:3
+]
+
 
 class Command(management.base.BaseCommand):
     """Required command class for the custom Django create_sample_resources command."""
@@ -48,9 +70,11 @@ class Command(management.base.BaseCommand):
         users = self._get_users()
         entities = self._get_entities()
         resources = self._create_resources(users, entities)
+        self._add_thumbnails(resources)
         self._create_all_components(resources)
         taxonomy = self._create_taxonomy()
         self._apply_tags(resources, taxonomy)
+        self._apply_gradient_demo_tags(resources, taxonomy)
         self.stdout.write("✅ Sample resources created.")
 
     def _get_users(self):
@@ -506,6 +530,27 @@ class Command(management.base.BaseCommand):
 
         self.stdout.write(f"✅ Created/updated {len(resources)} resources.")
         return resources
+
+    def _add_thumbnails(self, resources):
+        thumbnail_count = 0
+        for i, resource in enumerate(resources.values()):
+            if i % THUMBNAIL_SKIP_MODULUS == THUMBNAIL_SKIP_MODULUS - 1:
+                continue
+            if resource.thumbnail:
+                continue
+            colour = THUMBNAIL_COLOURS[i % len(THUMBNAIL_COLOURS)]
+            width, height = THUMBNAIL_DIMENSIONS[i % len(THUMBNAIL_DIMENSIONS)]
+            image = Image.new("RGB", (width, height), color=colour)
+            buffer = BytesIO()
+            image.save(buffer, format="JPEG")
+            resource.thumbnail.save(
+                f"{resource.slug}.jpg",
+                ContentFile(buffer.getvalue()),
+                save=True,
+            )
+            thumbnail_count += 1
+
+        self.stdout.write(f"✅ Added thumbnails to {thumbnail_count} resources.")
 
     def _add_component(
         self,
@@ -1123,9 +1168,13 @@ class Command(management.base.BaseCommand):
     def _create_taxonomy(self):
         """Create sample categories and tags. Returns a flat dict of tag_name → tag."""
         taxonomy_data = [
+            # Manual colours, soft badges — every tag independently coloured,
+            # unrelated to its neighbours (e.g. matching an external
+            # colour-coded framework).
             {
                 "name": "Topic",
                 "order": 1,
+                "tag_style": ResourceCategory.TagStyle.SOFT,
                 "tags": [
                     {"name": "Governance", "order": 1, "color": "#1e3a5f"},
                     {"name": "Training & Development", "order": 2, "color": "#2e7d32"},
@@ -1138,9 +1187,13 @@ class Command(management.base.BaseCommand):
                     {"name": "Environment", "order": 9, "color": "#33691e"},
                 ],
             },
+            # Manual colours again, but solid badges this time — shows the
+            # same "colour each tag by hand" approach rendered in a different
+            # style.
             {
                 "name": "Audience",
                 "order": 2,
+                "tag_style": ResourceCategory.TagStyle.SOLID,
                 "tags": [
                     {"name": "All Members", "order": 1, "color": "#1565c0"},
                     {"name": "Board & Leadership", "order": 2, "color": "#b71c1c"},
@@ -1149,19 +1202,60 @@ class Command(management.base.BaseCommand):
                     {"name": "Regional Chapters", "order": 5, "color": "#006064"},
                 ],
             },
+            # Automatic sequential gradient, solid badges — no per-tag colour
+            # set at all; each tag is shaded along a light-to-dark blue
+            # gradient purely from its position in the category's order.
+            {
+                "name": "Year Level",
+                "order": 3,
+                "gradient_start_colour": "#cfe8ff",
+                "gradient_end_colour": "#0a2f6b",
+                "tag_style": ResourceCategory.TagStyle.SOLID,
+                "tags": [{"name": f"Year {i}", "order": i} for i in range(14)],
+            },
+            # Automatic sequential gradient again, but outline badges and a
+            # green-to-red range — shows a gradient doesn't have to be a
+            # single hue, and pairs with a different tag_style.
+            {
+                "name": "Priority",
+                "order": 4,
+                "gradient_start_colour": "#2e7d32",
+                "gradient_end_colour": "#b71c1c",
+                "tag_style": ResourceCategory.TagStyle.OUTLINE,
+                "tags": [
+                    {"name": "Low", "order": 1},
+                    {"name": "Medium", "order": 2},
+                    {"name": "High", "order": 3},
+                    {"name": "Critical", "order": 4},
+                ],
+            },
         ]
 
         tags = {}
         for cat_data in taxonomy_data:
             category, _ = ResourceCategory.objects.update_or_create(
                 name=cat_data["name"],
-                defaults={"order": cat_data["order"]},
+                defaults={
+                    "order": cat_data["order"],
+                    "gradient_start_colour": cat_data.get(
+                        "gradient_start_colour",
+                        "",
+                    ),
+                    "gradient_end_colour": cat_data.get("gradient_end_colour", ""),
+                    "tag_style": cat_data.get(
+                        "tag_style",
+                        ResourceCategory.TagStyle.SOFT,
+                    ),
+                },
             )
             for tag_data in cat_data["tags"]:
                 tag, _ = ResourceTag.objects.update_or_create(
                     category=category,
                     name=tag_data["name"],
-                    defaults={"order": tag_data["order"], "color": tag_data["color"]},
+                    defaults={
+                        "order": tag_data["order"],
+                        "color": tag_data.get("color", ""),
+                    },
                 )
                 tags[tag_data["name"]] = tag
 
@@ -1246,3 +1340,39 @@ class Command(management.base.BaseCommand):
         tag("Full Library Index", "Governance", "Research", "Staff")
 
         self.stdout.write("✅ Applied tags to resources.")
+
+    def _apply_gradient_demo_tags(self, resources, tags):
+        """Layer Year Level / Priority tags onto some already-tagged resources.
+
+        Uses `.add()`, not `.set()`, so the Topic/Audience tags applied in
+        `_apply_tags` are kept rather than overwritten.
+        """
+        r = resources
+        t = tags
+
+        def add_tags(resource_name, *tag_names):
+            resource = r.get(resource_name)
+            if resource:
+                resource.tags.add(*[t[n] for n in tag_names if n in t])
+
+        add_tags("New Member Onboarding Kit", "Year 0")
+        add_tags("Multimedia Learning Centre", "Year 5")
+        add_tags("Comprehensive Training Suite", "Year 6")
+        add_tags("Volunteer Training Materials", "Year 7")
+        add_tags("Training Video Series - Module 1", "Year 8")
+        add_tags("Introduction to Data Analysis", "Year 9")
+        add_tags("Workshop Materials Pack", "Year 10")
+        add_tags("Diversity & Inclusion Resources", "Year 11")
+        add_tags("Professional Development Hub", "Year 12")
+        add_tags("Leadership Development Program", "Year 13")
+
+        add_tags("Organisation Chart", "Low")
+        add_tags("Financial Overview", "Medium")
+        add_tags("Annual Report 2024", "Medium")
+        add_tags("Policy Document PDF", "High")
+        add_tags("Board Meeting Recording", "High")
+        add_tags("Governance Framework", "High")
+        add_tags("Compliance Checklist", "Critical")
+        add_tags("Strategic Plan 2025-2030", "Critical")
+
+        self.stdout.write("✅ Applied Year Level / Priority tags to resources.")

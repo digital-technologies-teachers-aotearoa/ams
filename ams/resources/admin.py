@@ -90,7 +90,7 @@ class ResourceAdmin(ResourcesFeatureFlagMixin, TabbedTranslationAdmin):
     filter_horizontal = ("author_entities", "author_users", "tags")
     readonly_fields = ("view_count",)
     fieldsets = (
-        (None, {"fields": ("name", "description")}),
+        (None, {"fields": ("name", "description", "thumbnail")}),
         (
             _("Ownership"),
             {
@@ -122,6 +122,25 @@ class ResourceCategoryAdmin(ResourcesFeatureFlagMixin, TabbedTranslationAdmin):
     list_display = ("name", "order")
     search_fields = ("name",)
     inlines = [ResourceTagInline]
+    fieldsets = (
+        (None, {"fields": ("name", "order")}),
+        (
+            _("Tag colours"),
+            {
+                "description": _(
+                    "Tags without their own colour are coloured automatically, "
+                    "spread along a gradient from the start to the end colour "
+                    "in the tags' display order. Set an end colour to fade "
+                    "between two colours (e.g. light to dark, or yellow to "
+                    "red); leave it blank to use one flat colour for every "
+                    "tag. Leave the start colour blank to disable automatic "
+                    "colouring entirely for tags that should always be "
+                    "coloured by hand (see the Colour field on each tag).",
+                ),
+                "fields": ("gradient_start_colour", "gradient_end_colour", "tag_style"),
+            },
+        ),
+    )
 
 
 @admin.register(ResourceTag)

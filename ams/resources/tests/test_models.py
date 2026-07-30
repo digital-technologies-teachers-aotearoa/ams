@@ -2,9 +2,11 @@ from unittest.mock import patch
 
 import pytest
 from django.core.exceptions import ValidationError
+from django.core.files.storage import storages
 from django.core.files.uploadedfile import SimpleUploadedFile
 
 from ams.resources import file_types
+from ams.resources.models import Resource
 from ams.resources.models import ResourceCategory
 from ams.resources.models import ResourceComponent
 from ams.resources.models import ResourceComponentView
@@ -55,6 +57,105 @@ class TestResourceTagModel:
         assert qs.index(a) < qs.index(b)
 
 
+class TestResourceTagEffectiveColour:
+    def test_returns_own_color_when_set(self):
+        category = ResourceCategoryFactory(gradient_start_colour="#000000")
+        tag = ResourceTagFactory(category=category, color="#ff0000")
+        assert tag.effective_colour == "#ff0000"
+
+    def test_returns_derived_colour_when_no_own_color_and_gradient_set(self):
+        category = ResourceCategoryFactory(
+            gradient_start_colour="#3a86ff",
+            gradient_end_colour="#ff006e",
+        )
+        tag = ResourceTagFactory(category=category, color="")
+        assert tag.effective_colour != ""
+
+    def test_returns_empty_when_no_own_color_and_no_gradient_start(self):
+        category = ResourceCategoryFactory(gradient_start_colour="")
+        tag = ResourceTagFactory(category=category, color="")
+        assert tag.effective_colour == ""
+
+    def test_own_color_wins_over_derived(self):
+        category = ResourceCategoryFactory(
+            gradient_start_colour="#3a86ff",
+            gradient_end_colour="#ff006e",
+        )
+        overridden = ResourceTagFactory(category=category, color="#00ff00")
+        derived = ResourceTagFactory(category=category, color="")
+        assert overridden.effective_colour == "#00ff00"
+        assert derived.effective_colour != "#00ff00"
+
+    def test_first_and_last_tag_get_start_and_end_colours(self):
+        category = ResourceCategoryFactory(
+            gradient_start_colour="#000000",
+            gradient_end_colour="#ffffff",
+        )
+        first = ResourceTagFactory(category=category, color="", order=1)
+        ResourceTagFactory(category=category, color="", order=2)
+        last = ResourceTagFactory(category=category, color="", order=3)
+        assert first.effective_colour == "#000000"
+        assert last.effective_colour == "#ffffff"
+
+    def test_blank_end_colour_gives_every_tag_the_start_colour(self):
+        category = ResourceCategoryFactory(
+            gradient_start_colour="#3a86ff",
+            gradient_end_colour="",
+        )
+        tags = ResourceTagFactory.create_batch(4, category=category, color="")
+        colours = {tag.effective_colour for tag in tags}
+        assert colours == {"#3a86ff"}
+
+    def test_reordering_tags_changes_derived_colours(self):
+        category = ResourceCategoryFactory(
+            gradient_start_colour="#000000",
+            gradient_end_colour="#ffffff",
+        )
+        tag = ResourceTagFactory(category=category, color="", order=1)
+        ResourceTagFactory(category=category, color="", order=2)
+        first_position_colour = tag.effective_colour
+
+        tag.order = 99
+        tag.save()
+        del category._derived_tag_colours  # noqa: SLF001 — clear cached_property
+        last_position_colour = tag.effective_colour
+
+        assert first_position_colour != last_position_colour
+
+
+class TestResourceTagStyleAttrs:
+    def test_empty_when_no_effective_colour(self):
+        category = ResourceCategoryFactory(gradient_start_colour="")
+        tag = ResourceTagFactory(category=category, color="")
+        assert tag.style_attrs == ""
+
+    def test_solid_style_sets_background_and_contrast_text(self):
+        category = ResourceCategoryFactory(
+            gradient_start_colour="#3a86ff",
+            tag_style=ResourceCategory.TagStyle.SOLID,
+        )
+        tag = ResourceTagFactory(category=category, color="#ffffff")
+        assert "background-color: #ffffff" in tag.style_attrs
+        assert "color: #000000" in tag.style_attrs
+
+    def test_outline_style_uses_transparent_background(self):
+        category = ResourceCategoryFactory(
+            gradient_start_colour="#3a86ff",
+            tag_style=ResourceCategory.TagStyle.OUTLINE,
+        )
+        tag = ResourceTagFactory(category=category, color="#ffffff")
+        assert "background-color: transparent" in tag.style_attrs
+        assert "border: 1px solid #ffffff" in tag.style_attrs
+
+    def test_soft_style_uses_rgba_background(self):
+        category = ResourceCategoryFactory(
+            gradient_start_colour="#3a86ff",
+            tag_style=ResourceCategory.TagStyle.SOFT,
+        )
+        tag = ResourceTagFactory(category=category, color="#3a86ff")
+        assert "background-color: rgba(58, 134, 255, 0.15)" in tag.style_attrs
+
+
 class TestResourceTagsM2M:
     def test_resource_can_have_tags(self):
         resource = ResourceFactory()
@@ -96,6 +197,15 @@ class TestResourceModel:
     def test_view_count_defaults_to_zero(self):
         resource = ResourceFactory()
         assert resource.view_count == 0
+
+    def test_thumbnail_blank_by_default(self):
+        resource = ResourceFactory()
+        assert not resource.thumbnail
+
+    def test_thumbnail_uses_public_storage(self):
+        field = Resource._meta.get_field("thumbnail")  # noqa: SLF001
+        storage_instance = field.storage() if callable(field.storage) else field.storage
+        assert storage_instance == storages["default"]
 
 
 class TestRecordResourceView:

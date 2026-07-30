@@ -114,3 +114,14 @@ class TestSearchUsesTranslatedColumns:
             component_url="https://example.com/",
         )
         assert resource in _search(client, "kubernetes")
+
+    def test_language_tag_with_macron_is_indexed(self, client):
+        # Proves the premise behind treating languages as a plain tag category
+        # (setup_resource_languages) rather than a dedicated model: tag names
+        # are already weighted C in the existing search trigger, so a macron-
+        # bearing tag name needs no trigger change to be searchable.
+        category = ResourceCategoryFactory(name_en="Language")
+        tag = ResourceTag.objects.create(category=category, name_en="Te Reo Māori")
+        resource = Resource.objects.create(name_en="Karakia guide", published=True)
+        resource.tags.add(tag)
+        assert resource in _search(client, "te reo")

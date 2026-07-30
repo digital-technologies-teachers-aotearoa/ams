@@ -24,6 +24,7 @@ Resources are managed in the **Django admin**, not the CMS — see [Tutorial 1: 
     | --- | --- |
     | Name | The resource's title. |
     | Description | Shown on the resource's own page. |
+    | Thumbnail | Optional. A small image shown on the resource card and its own page — leave blank if you don't have one. |
     | Author entities / Author users | Who made this resource — an entity is an organisation or group rather than a person. At least one author, of either kind, is required. |
     | Tags | Optional. See [Categories and tags](#categories-and-tags) below. |
     | Visibility | Who can see and access this resource — see [Who can see a resource](#who-can-see-a-resource) below. Leave it as **Public** for this tutorial. |
@@ -66,6 +67,12 @@ Most associations only need **Public** and **Members only** — the two middle o
 If you have more than a handful of resources, tagging them helps members filter and find what they need.
 Set this up from **Resources**, in the Django admin: create one or more **Resource categories** (e.g. "Year Level"), then add **Resource tags** within each (e.g. "Year 9") — see the [resources admin guide](../reference/resources.md#taxonomy-categories-and-tags) for the full walkthrough.
 Tags are entirely optional and don't change anything about how a resource is added — skip this if you only have a few resources to start with.
+
+One category, **Language**, is created automatically so you can mark which language(s) a resource is available in. Rename or add to its *tags* freely, but keep the category itself — deleting it means it gets skipped, not recreated, on the next deploy.
+
+Each category also has a **gradient start colour**, an optional **gradient end colour**, and a **style** (solid, outline, or soft) — set these and every tag in that category is coloured automatically along the gradient (by the tags' display order), without picking a colour for each tag individually.
+Leave the end colour blank for one flat automatic colour instead of a gradient.
+A tag with its own colour set keeps it regardless — use that for tags that need a specific colour rather than one that fades across the category.
 
 ## Adding resources to your menu
 

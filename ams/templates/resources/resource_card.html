@@ -1,9 +1,17 @@
 {% load i18n icon %}
 
 <div class="resource-card card mb-3 w-100">
-  <div class="card-body">
-    <div class="d-flex justify-content-between align-items-start gap-2">
-      <div class="min-width-0 flex-grow-1">
+  <div class="row g-0">
+    {% if resource.thumbnail %}
+      <div class="col-2">
+        <img src="{{ resource.thumbnail_card.url }}"
+             alt=""
+             loading="lazy"
+             class="resource-card__thumbnail img-fluid h-100 object-fit-cover rounded-start" />
+      </div>
+    {% endif %}
+    <div class="{% if resource.thumbnail %}col-10{% else %}col-12{% endif %}">
+      <div class="card-body">
         <h4 class="card-title resource-card__title mb-1">
           <a href="{{ resource.get_absolute_url }}"
              class="stretched-link text-decoration-none text-body">{{ resource.name }}</a>
