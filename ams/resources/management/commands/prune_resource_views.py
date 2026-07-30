@@ -16,9 +16,9 @@ class Command(management.base.BaseCommand):
 
     help = (
         "Delete ResourceView and ResourceComponentView rows older than the "
-        "retention window (default 400 days, override with "
-        "RESOURCE_VIEW_RETENTION_DAYS). Denormalised view_count totals are "
-        "unaffected."
+        f"retention window (default {settings.RESOURCE_VIEW_RETENTION_DAYS} "
+        "days, override with RESOURCE_VIEW_RETENTION_DAYS). Denormalised "
+        "view_count totals are unaffected."
     )
 
     def add_arguments(self, parser):
