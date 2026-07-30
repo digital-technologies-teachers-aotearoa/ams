@@ -24,8 +24,13 @@ urlpatterns = [
         name="resource",
     ),
     path(
+        "component/<int:pk>/access/",
+        views.ResourceComponentAccessView.as_view(),
+        name="component_access",
+    ),
+    path(
         "component/<int:pk>/download/",
-        views.ResourceComponentDownloadView.as_view(),
+        views.ResourceComponentAccessView.as_view(),
         name="component_download",
     ),
 ]

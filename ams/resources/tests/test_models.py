@@ -7,7 +7,11 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from ams.resources import file_types
 from ams.resources.models import ResourceCategory
 from ams.resources.models import ResourceComponent
+from ams.resources.models import ResourceComponentView
 from ams.resources.models import ResourceTag
+from ams.resources.models import ResourceView
+from ams.resources.models import record_component_view
+from ams.resources.models import record_resource_view
 from ams.resources.tests.factories import ResourceCategoryFactory
 from ams.resources.tests.factories import ResourceComponentFactory
 from ams.resources.tests.factories import ResourceFactory
@@ -88,6 +92,47 @@ class TestResourceModel:
         qs = list(type(older).objects.all())
         assert qs[0] == newer
         assert qs[1] == older
+
+    def test_view_count_defaults_to_zero(self):
+        resource = ResourceFactory()
+        assert resource.view_count == 0
+
+
+class TestRecordResourceView:
+    def test_creates_a_view_row(self):
+        resource = ResourceFactory()
+        record_resource_view(resource)
+        assert ResourceView.objects.filter(resource=resource).count() == 1
+
+    def test_increments_view_count(self):
+        resource = ResourceFactory()
+        record_resource_view(resource)
+        record_resource_view(resource)
+        resource.refresh_from_db()
+        expected_view_count = 2
+        assert resource.view_count == expected_view_count
+
+    def test_does_not_bump_datetime_updated(self):
+        resource = ResourceFactory()
+        original_datetime_updated = resource.datetime_updated
+        record_resource_view(resource)
+        resource.refresh_from_db()
+        assert resource.datetime_updated == original_datetime_updated
+
+
+class TestRecordComponentView:
+    def test_creates_a_view_row(self):
+        component = ResourceComponentFactory()
+        record_component_view(component)
+        assert ResourceComponentView.objects.filter(component=component).count() == 1
+
+    def test_increments_view_count(self):
+        component = ResourceComponentFactory()
+        record_component_view(component)
+        record_component_view(component)
+        component.refresh_from_db()
+        expected_view_count = 2
+        assert component.view_count == expected_view_count
 
 
 class TestResourceComponentModel:

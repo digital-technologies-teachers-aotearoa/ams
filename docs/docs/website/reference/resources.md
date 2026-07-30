@@ -60,6 +60,11 @@ Resources can be tagged with a two-level taxonomy that you define:
 
 Tags appear as grouped filter facets on the search page, allowing users to filter results by category.
 
+## View counts
+
+Every resource and component tracks how many times it has been viewed — shown publicly on the resource card, the resource detail page, and next to each component.
+Viewing an unpublished or members-only resource you can't access is never counted.
+
 ## Adding resources to menus
 
 You can add links to resources pages via the Wagtail CMS menu system (Main Menu or Flat Menus).

@@ -28,7 +28,10 @@
                 <span class="text-muted resource-component-icon">{% icon component.icon_name %}</span>
                 <div class="flex-grow-1 min-width-0">
                   <div class="fw-semibold">{{ component.name }}</div>
-                  <small class="text-muted">{{ component.get_component_type_display }}</small>
+                  <small class="text-muted d-flex align-items-center gap-3">
+                    <span>{{ component.get_component_type_display }}</span>
+                    <span class="d-inline-flex align-items-center gap-1">{% icon "eye" %} {% blocktrans count count=component.view_count %}{{ count }} view{% plural %}{{ count }} views{% endblocktrans %}</span>
+                  </small>
                 </div>
                 {% if not can_access %}
                   <span class="badge {{ resource.visibility_badge_css_class }}"
@@ -39,15 +42,15 @@
                     {% icon "lock" %} {{ resource.visibility_badge_label }}
                   </span>
                 {% elif component.component_file %}
-                  <a href="{% url 'resources:component_download' component.pk %}"
+                  <a href="{% url 'resources:component_access' component.pk %}"
                      class="btn btn-sm btn-outline-primary">{% icon "download" %} {% trans "Download" %}</a>
                 {% elif component.component_url %}
-                  <a href="{{ component.component_url }}"
+                  <a href="{% url 'resources:component_access' component.pk %}"
                      class="btn btn-sm btn-outline-secondary"
                      target="_blank"
                      rel="noopener noreferrer">{% icon "box-arrow-up-right" %} {% trans "Open" %}</a>
                 {% elif component.component_resource %}
-                  <a href="{{ component.component_resource.get_absolute_url }}"
+                  <a href="{% url 'resources:component_access' component.pk %}"
                      class="btn btn-sm btn-outline-secondary">{% icon "folder-symlink" %} {% trans "View resource" %}</a>
                 {% endif %}
               </div>
@@ -78,6 +81,9 @@
       </div>
       <div>
         {% blocktrans with date=resource.datetime_updated|date:"j F Y" %}Updated {{ date }}{% endblocktrans %}
+      </div>
+      <div class="d-inline-flex align-items-center gap-1">
+        {% icon "eye" %} {% blocktrans count count=resource.view_count %}{{ count }} view{% plural %}{{ count }} views{% endblocktrans %}
       </div>
     </div>
   </div>

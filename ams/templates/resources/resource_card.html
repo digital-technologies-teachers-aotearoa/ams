@@ -23,6 +23,7 @@
         </div>
         <div class="resource-card__details d-flex align-items-center gap-3">
           <span>{% icon "calendar-event" %} {{ resource.datetime_added|date:"j F Y" }}</span>
+          <span class="d-inline-flex align-items-center gap-1">{% icon "eye" %} {% blocktrans count count=resource.view_count %}{{ count }} view{% plural %}{{ count }} views{% endblocktrans %}</span>
           {% with count=resource.components.all|length %}
             {% if count %}
               <span class="badge text-bg-secondary">{% blocktrans count count=count %}{{ count }} component{% plural %}{{ count }} components{% endblocktrans %}</span>
