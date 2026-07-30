@@ -53,8 +53,10 @@ Your UAT and production sites stay separate after launch (see [UAT site vs produ
 Launch is the start, not the finish — here are some ways to keep growing your site and your community once you're live:
 
 - **Add more content.** New pages, updated stories, more translated content — the CMS skills from [Your first pages](first-pages.md) and [Languages & translations](languages-translations.md) are exactly what you'll use for everyday updates.
+- **Start publishing articles.** News, updates, and announcements — always available, no provider setup needed — see [Articles](../reference/articles.md).
 - **Grow your forum categories.** If you launched with a minimal set, add more once your members tell you what they actually want — see [Forum](forum.md).
 - **Introduce new membership types or pricing as your community grows.** You don't need your final pricing model figured out before launch — see [Memberships](memberships.md).
 - **Keep your events and resources current**, adding new ones as they come up — see [Events](events.md) and [Resources](resources.md).
 - **Invite more team members** as your workload grows — see [Inviting your team](inviting-your-team.md).
+- **Add a privacy policy or terms of service if you didn't at launch** — see [Terms & policies](../reference/terms.md).
 - **Switch on a feature you skipped at launch.** The forum, events, resources, and Xero billing can each be switched on later — ask your provider when you're ready.

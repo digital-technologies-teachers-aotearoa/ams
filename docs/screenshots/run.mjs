@@ -29,6 +29,8 @@ import { steps as forumSteps } from "./steps/forum.mjs";
 import { steps as eventsSteps } from "./steps/events.mjs";
 import { steps as resourcesSteps } from "./steps/resources.mjs";
 import { steps as invitingYourTeamSteps } from "./steps/inviting-your-team.mjs";
+import { steps as articlesSteps } from "./steps/articles.mjs";
+import { steps as termsSteps } from "./steps/terms.mjs";
 import { steps as featuresMarketingSteps } from "./steps/features-marketing.mjs";
 
 // Capture steps, keyed by the "step" field in manifest.json. Tutorial tasks
@@ -47,6 +49,8 @@ const steps = {
   ...eventsSteps,
   ...resourcesSteps,
   ...invitingYourTeamSteps,
+  ...articlesSteps,
+  ...termsSteps,
   ...featuresMarketingSteps,
 };
 

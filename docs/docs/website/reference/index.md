@@ -10,6 +10,7 @@ One is the exception, because the feature itself is technical: [Forum](forum.md)
 
 ## Pages in this section
 
+- [Articles](articles.md) — blog-style posts, the articles index page, and the Recent Articles home page widget.
 - [CMS](cms.md) — the Wagtail content-management system that underlies the whole site: page types, reserved page addresses, and the special menu links your provider sets up.
 - [Events](events.md) — the optional events feature, if your association chose to enable it.
 - [Forum](forum.md) — how the connected Discourse forum is configured and kept in sync with your site's memberships.
