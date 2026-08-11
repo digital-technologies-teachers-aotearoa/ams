@@ -10,4 +10,4 @@ python-json-logger==4.1.0  # https://github.com/nhairs/python-json-logger
 
 # Django
 # ------------------------------------------------------------------------------
-django-anymail[mailgun,mailtrap,postmark]==15.0  # https://github.com/anymail/django-anymail
+django-anymail[mailgun,mailtrap,postmark]==15.1  # https://github.com/anymail/django-anymail
