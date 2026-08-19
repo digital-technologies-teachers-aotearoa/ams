@@ -4,10 +4,10 @@
 
 gunicorn==26.0.0  # https://github.com/benoitc/gunicorn
 psycopg[c]==3.3.4  # https://github.com/psycopg/psycopg
-sentry-sdk==2.66.1  # https://github.com/getsentry/sentry-python
+sentry-sdk==2.68.0  # https://github.com/getsentry/sentry-python
 logtail-python==0.4.0  # https://github.com/logtail/logtail-python
-python-json-logger==4.1.0  # https://github.com/nhairs/python-json-logger
+python-json-logger==4.2.0  # https://github.com/nhairs/python-json-logger
 
 # Django
 # ------------------------------------------------------------------------------
-django-anymail[mailgun,mailtrap,postmark]==15.0  # https://github.com/anymail/django-anymail
+django-anymail[mailgun,mailtrap,postmark]==15.1  # https://github.com/anymail/django-anymail
