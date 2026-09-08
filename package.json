@@ -11,8 +11,8 @@
   "devDependencies": {
     "@babel/core": "^7.29.7",
     "@babel/preset-env": "^7.29.7",
-    "autoprefixer": "^10.5.4",
-    "babel-jest": "^30.4.1",
+    "autoprefixer": "^10.5.5",
+    "babel-jest": "^30.5.1",
     "browser-sync": "^3.0.2",
     "gulp-concat": "^2.6.1",
     "cssnano": "^8.0.2",
@@ -24,14 +24,14 @@
     "gulp-rename": "^2.0.0",
     "gulp-sass": "^5.0.0",
     "gulp-uglify-es": "^3.0.0",
-    "jest": "^30.4.2",
-    "jest-environment-jsdom": "^30.4.1",
+    "jest": "^30.5.1",
+    "jest-environment-jsdom": "^30.5.1",
     "mjml": "^4.15.3",
     "node-sass-tilde-importer": "^1.0.2",
     "pixrem": "^5.0.0",
-    "playwright": "^1.62.0",
-    "postcss": "^8.5.25",
-    "sass": "1.102.0"
+    "playwright": "^1.63.0",
+    "postcss": "^8.5.28",
+    "sass": "1.104.0"
   },
   "engines": {
     "node": "25.2"
