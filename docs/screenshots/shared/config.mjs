@@ -41,7 +41,7 @@ export const DISCOURSE_ORIGIN = localEnv.DISCOURSE_REDIRECT_DOMAIN;
 export const MAILPIT_ORIGIN = "http://mailpit:8025";
 
 export const MEDIA_LOCALHOST_ORIGIN = "http://localhost:9000";
-export const MEDIA_CONTAINER_ORIGIN = "http://minio:9000";
+export const MEDIA_FILE_STORE_ORIGIN = "http://file-store:9000";
 
 // Same class of problem as MEDIA_LOCALHOST_ORIGIN above, for the forum
 // (T19): DISCOURSE_ORIGIN (read from DISCOURSE_REDIRECT_DOMAIN, http://
@@ -49,7 +49,7 @@ export const MEDIA_CONTAINER_ORIGIN = "http://minio:9000";
 // host machine, but the `node` container's own "localhost" is the `node`
 // container itself, where nothing listens on port 80.
 //
-// A page.route()-based proxy (the same pattern proxyMinioMedia uses) was
+// A page.route()-based proxy (the same pattern proxyFileStoreMedia uses) was
 // tried first and rejected after real testing, not by inspection: Discourse's
 // SSO flow is a multi-hop redirect chain that crosses back and forth between
 // this origin and AMS's own (localhost:3000, already reachable), and two

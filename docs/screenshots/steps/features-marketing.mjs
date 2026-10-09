@@ -29,7 +29,7 @@ import {
   login,
   getEnglishHomePageId,
   prepareForCapture,
-  proxyMinioMedia,
+  proxyFileStoreMedia,
   insertBodyBlock,
   fillBodyText,
   saveDraft,
@@ -777,8 +777,8 @@ export const steps = {
     // context has no route registered otherwise, unlike the authenticated
     // `page` (which run.mjs's own main() loop sets up), and an uploaded
     // image's URL is only reachable from inside the node container via this
-    // rewrite (see proxyMinioMedia's own comment).
-    await proxyMinioMedia(anonPage);
+    // rewrite (see proxyFileStoreMedia's own comment).
+    await proxyFileStoreMedia(anonPage);
 
     const crops = [];
     for (const theme of NAVBAR_THEMES) {

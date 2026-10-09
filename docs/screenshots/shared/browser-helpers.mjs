@@ -3,7 +3,7 @@
 // in that tutorial's own step file instead -- see that file for anything
 // not found here.
 
-import { BASE_URL, MEDIA_LOCALHOST_ORIGIN, MEDIA_CONTAINER_ORIGIN, ADMIN_EMAIL, ADMIN_PASSWORD, MAILPIT_ORIGIN, VIEWPORT } from "./config.mjs";
+import { BASE_URL, MEDIA_LOCALHOST_ORIGIN, MEDIA_FILE_STORE_ORIGIN, ADMIN_EMAIL, ADMIN_PASSWORD, MAILPIT_ORIGIN, VIEWPORT } from "./config.mjs";
 
 // django-debug-toolbar renders live query/timing stats that differ on every
 // request, which would make screenshots non-deterministic. Hide it before
@@ -133,14 +133,14 @@ export async function prepareForumCapture(page) {
 // a browser running on the host machine, but this suite's browser runs
 // inside the `node` container, where "localhost" means the node container
 // itself -- nothing listens on port 9000 there, only on the host and inside
-// the `minio` container. Without this, any page showing a real uploaded
+// the `file-store` container. Without this, any page showing a real uploaded
 // image (e.g. branding-theme's logo) would capture a broken-image icon
-// instead. Reroute those specific requests to `minio`, the docker-network
+// instead. Reroute those specific requests to `file-store`, the docker-network
 // hostname the `node` container can actually reach.
-export async function proxyMinioMedia(page) {
+export async function proxyFileStoreMedia(page) {
   await page.route(`${MEDIA_LOCALHOST_ORIGIN}/**`, async (route) => {
     const url = new URL(route.request().url());
-    const target = `${MEDIA_CONTAINER_ORIGIN}${url.pathname}${url.search}`;
+    const target = `${MEDIA_FILE_STORE_ORIGIN}${url.pathname}${url.search}`;
     const response = await route.fetch({ url: target });
     await route.fulfill({ response });
   });

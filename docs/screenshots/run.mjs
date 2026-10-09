@@ -15,7 +15,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { IMAGES_ROOT, MANIFEST_PATH, VIEWPORT, DEVICE_SCALE_FACTOR, ADMIN_EMAIL, ADMIN_PASSWORD, CHROMIUM_ARGS } from "./shared/config.mjs";
-import { prepareForCapture, proxyMinioMedia } from "./shared/browser-helpers.mjs";
+import { prepareForCapture, proxyFileStoreMedia } from "./shared/browser-helpers.mjs";
 
 import { steps as docsConventionsExamplesSteps } from "./steps/docs-conventions-examples.mjs";
 import { steps as orientationSteps } from "./steps/orientation.mjs";
@@ -109,7 +109,7 @@ async function main() {
 
     const page = await browser.newPage({ viewport: VIEWPORT, deviceScaleFactor: DEVICE_SCALE_FACTOR });
     try {
-      await proxyMinioMedia(page);
+      await proxyFileStoreMedia(page);
       const outPath = path.join(IMAGES_ROOT, entry.file);
       fs.mkdirSync(path.dirname(outPath), { recursive: true });
       // A step normally just sets up the page and lets the default
