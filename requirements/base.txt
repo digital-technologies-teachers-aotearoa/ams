@@ -28,7 +28,7 @@ django-modeltranslation==0.20.6
 
 # Wagtail
 # ------------------------------------------------------------------------------
-wagtail==7.4.2
+wagtail==8.0
 wagtailmenus==4.1
 wagtail-color-panel==1.8.1
 
