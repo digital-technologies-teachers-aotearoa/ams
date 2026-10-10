@@ -75,16 +75,18 @@
               {% endif %}
             </span>
           {% endif %}
-          <span class="ms-auto event-card__price">
-            {% if event.price.amount == 0 %}
-              <span class="text-success">{% trans "Free" %}</span>
-            {% else %}
-              {{ event.price }}
-            {% endif %}
-            {% if event.registration_type == event.RegistrationType.INVITE_ONLY %}
-              <small class="text-muted">{% trans "Invite only" %}</small>
-            {% endif %}
-          </span>
+          {% if event.price %}
+            <span class="ms-auto event-card__price">
+              {% if event.price.amount == 0 %}
+                <span class="text-success">{% trans "Free" %}</span>
+              {% else %}
+                {{ event.price }}
+              {% endif %}
+              {% if event.registration_type == event.RegistrationType.INVITE_ONLY %}
+                <small class="text-muted">{% trans "Invite only" %}</small>
+              {% endif %}
+            </span>
+          {% endif %}
         </div>
       </div>
     </div>

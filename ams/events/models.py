@@ -138,6 +138,8 @@ class Event(models.Model):
         decimal_places=2,
         default_currency="NZD",
         default=0,
+        null=True,
+        blank=True,
     )
     locations = models.ManyToManyField(
         Location,

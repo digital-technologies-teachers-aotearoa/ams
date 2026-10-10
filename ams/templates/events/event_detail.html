@@ -110,19 +110,21 @@
             </div>
           </div>
         </div>
-        <div class="col-6 col-md-3">
-          <div class="event-hero__detail-item">
-            <span class="event-hero__icon">{% icon "tag-fill" %}</span>
-            <div>
-              <small class="text-muted d-block">{% trans "Cost" %}</small>
-              {% if event.price.amount == 0 %}
-                <span class="text-success fw-semibold">{% trans "Free" %}</span>
-              {% else %}
-                {{ event.price }}
-              {% endif %}
+        {% if event.price %}
+          <div class="col-6 col-md-3">
+            <div class="event-hero__detail-item">
+              <span class="event-hero__icon">{% icon "tag-fill" %}</span>
+              <div>
+                <small class="text-muted d-block">{% trans "Cost" %}</small>
+                {% if event.price.amount == 0 %}
+                  <span class="text-success fw-semibold">{% trans "Free" %}</span>
+                {% else %}
+                  {{ event.price }}
+                {% endif %}
+              </div>
             </div>
           </div>
-        </div>
+        {% endif %}
         {% if locations %}
           <div class="col-6 col-md-3">
             <div class="event-hero__detail-item">
