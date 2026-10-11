@@ -33,6 +33,11 @@ def register_icons(icons):
     ]
 
 
+@hooks.register("menus_modify_base_menuitem_queryset")
+def load_menu_page_localization_fields(queryset, **kwargs):
+    return queryset.defer(None).select_related("link_page__locale")
+
+
 class ArticlePageListingViewSet(PageListingViewSet):
     icon = "calendar-alt"
     # Translators: Label for the Articles section in the Wagtail CMS admin menu

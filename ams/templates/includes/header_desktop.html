@@ -2,7 +2,7 @@
 
 <header>
   <!-- Fixed navbar -->
-  <nav class="navbar navbar-expand-lg  fixed-top"
+  <nav class="navbar navbar-expand-lg fixed-top"
        data-bs-theme="{{ settings.cms.ThemeSettings.navbar_colour_mode }}">
     <div class="container position-relative">
       <!-- Mobile: Main menu toggle (left) -->
@@ -21,7 +21,7 @@
       <div class="collapse navbar-collapse">
         <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
           {% cache 300 main_menu_desktop LANGUAGE_CODE %}
-            {% main_menu template="cms/menu/desktop_top_level_item.html" sub_menu_template="cms/menu/desktop_child_item.html" max_levels=2 %}
+            {% main_menu apply_active_classes=page template="cms/menu/desktop_top_level_item.html" sub_menu_template="cms/menu/desktop_child_item.html" max_levels=2 %}
           {% endcache %}
           {% if request.user.is_authenticated %}
             <!-- Desktop avatar -->

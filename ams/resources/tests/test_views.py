@@ -890,13 +890,10 @@ class TestResourceHomeMostViewed:
             ResourceComponentFactory(resource=resource)
             _record_view(resource)
             _record_view(resource)
-        # Measured baseline is 38-54 with this fixture depending on how warm
-        # Django's process-level caches (e.g. ContentType) already are from
-        # earlier tests in the run (site/locale middleware overhead plus
-        # three sliced resource lists x four prefetches each, the last of
-        # which is tags__category__tags so effective_colour's per-category
-        # cached_property doesn't hit the DB per tag). Ceiling gives headroom
-        # for that variance while still catching a new N+1 (which would add
-        # roughly one query per resource per list).
-        with django_assert_max_num_queries(62):
+        # The three sliced lists share one prefetch pass for their combined
+        # resources. The tags__category__tags lookup also prevents
+        # effective_colour's per-category cached_property from querying once
+        # per tag. The ceiling allows for middleware/cache variance while
+        # still catching a new per-resource query.
+        with django_assert_max_num_queries(23):
             client.get("/en/resources/")

@@ -8,7 +8,7 @@
   <div class="offcanvas-body">
     <ul class="nav flex-column gap-2">
       {% cache 300 main_menu_mobile LANGUAGE_CODE %}
-        {% main_menu template="cms/menu/mobile_top_level_item.html" sub_menu_template="cms/menu/mobile_child_item.html" max_levels=2 %}
+        {% main_menu apply_active_classes=page template="cms/menu/mobile_top_level_item.html" sub_menu_template="cms/menu/mobile_child_item.html" max_levels=2 %}
       {% endcache %}
       <li>
         <hr />

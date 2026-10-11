@@ -7,6 +7,7 @@ from django.core.exceptions import PermissionDenied
 from django.db.models import Count
 from django.db.models import F
 from django.db.models import Q
+from django.db.models import prefetch_related_objects
 from django.http import Http404
 from django.http import HttpResponseRedirect
 from django.utils import timezone
@@ -66,16 +67,19 @@ class ResourceHomeView(generic.TemplateView):
         qs = Resource.objects.filter(published=True)
         if not user_has_active_membership(self.request.user):
             qs = qs.exclude(visibility=Resource.Visibility.MEMBERS_ONLY)
-        context["resources"] = qs.order_by("-datetime_added").prefetch_related(
-            *_RESOURCE_LIST_PREFETCHES,
-        )[:LATEST_LIMIT]
-        context["resource_count"] = qs.count()
-        context["component_count"] = ResourceComponent.objects.filter(
-            resource__in=qs,
-        ).count()
+        counts = qs.aggregate(
+            resource_count=Count("pk", distinct=True),
+            component_count=Count("components"),
+        )
+        context["resource_count"] = counts["resource_count"]
+        context["component_count"] = counts["component_count"]
+
+        latest_resources = list(
+            qs.order_by("-datetime_added")[:LATEST_LIMIT],
+        )
 
         recent_cutoff = timezone.now() - timedelta(days=MOST_VIEWED_WINDOW_DAYS)
-        context["most_viewed_month"] = (
+        most_viewed_month = list(
             qs.annotate(
                 recent_views=Count(
                     "views",
@@ -83,14 +87,33 @@ class ResourceHomeView(generic.TemplateView):
                 ),
             )
             .filter(recent_views__gt=0)
-            .order_by("-recent_views")
-            .prefetch_related(*_RESOURCE_LIST_PREFETCHES)[:MOST_VIEWED_LIMIT]
+            .order_by("-recent_views")[:MOST_VIEWED_LIMIT],
         )
-        context["most_viewed_all_time"] = (
-            qs.filter(view_count__gt=0)
-            .order_by("-view_count")
-            .prefetch_related(*_RESOURCE_LIST_PREFETCHES)[:MOST_VIEWED_LIMIT]
+        most_viewed_all_time = list(
+            qs.filter(view_count__gt=0).order_by("-view_count")[:MOST_VIEWED_LIMIT],
         )
+
+        resources_by_pk = {
+            resource.pk: resource
+            for resource in latest_resources + most_viewed_all_time
+        }
+        resources_by_pk.update(
+            (resource.pk, resource) for resource in most_viewed_month
+        )
+        prefetch_related_objects(
+            list(resources_by_pk.values()),
+            *_RESOURCE_LIST_PREFETCHES,
+        )
+
+        context["resources"] = [
+            resources_by_pk[resource.pk] for resource in latest_resources
+        ]
+        context["most_viewed_month"] = [
+            resources_by_pk[resource.pk] for resource in most_viewed_month
+        ]
+        context["most_viewed_all_time"] = [
+            resources_by_pk[resource.pk] for resource in most_viewed_all_time
+        ]
         return context
 
 
