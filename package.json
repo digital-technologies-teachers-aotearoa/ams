@@ -15,7 +15,7 @@
     "babel-jest": "30.5.2",
     "browser-sync": "3.0.4",
     "gulp-concat": "2.6.1",
-    "cssnano": "9.0.5",
+    "cssnano": "9.1.2",
     "gulp": "5.0.1",
     "gulp-imagemin": "9.2.0",
     "gulp-mjml": "4.0.2",
@@ -31,7 +31,7 @@
     "pixrem": "5.0.0",
     "playwright": "1.63.0",
     "postcss": "8.5.28",
-    "sass": "1.105.0"
+    "sass": "1.105.1"
   },
   "engines": {
     "node": "26"
