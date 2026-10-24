@@ -53,6 +53,14 @@ updates:
     commit-message:
       prefix: 'chore(deps)'
 
+  # Enable version updates for Docker Compose images
+  - package-ecosystem: 'docker-compose'
+    directory: '/'
+    schedule:
+      interval: 'daily'
+    commit-message:
+      prefix: 'chore(deps)'
+
   # Enable version updates for Python/Pip - Production
   - package-ecosystem: 'pip'
     # Look for a `requirements.txt` in the `root` directory
