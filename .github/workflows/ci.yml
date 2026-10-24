@@ -157,6 +157,8 @@ jobs:
           cache-to: type=gha,scope=django,mode=max
 
       - name: Deploy to DigitalOcean App Platform (ams-dev)
+        # Disabled
+        if: false
         uses: digitalocean/app_action/deploy@v2
         with:
           token: ${{ secrets.DIGITALOCEAN_DEPLOY_TOKEN }}

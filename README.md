@@ -2,9 +2,7 @@
 
 **The open-source platform for modern association management**
 
-[**Explore the Documentation »**](https://digital-technologies-teachers-aotearoa.github.io/ams/)
-
-[View Demo](https://ams-dev.dtta.org.nz/)
+[**Explore the Documentation**](https://digital-technologies-teachers-aotearoa.github.io/ams/)
 &middot;
 [Report Bug](https://github.com/digital-technologies-teachers-aotearoa/ams/issues/new?template=bug_report.md)
 &middot;
