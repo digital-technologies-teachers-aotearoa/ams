@@ -2,7 +2,7 @@
 set -eo pipefail
 
 # run-init.sh - wait for app, ensure safe git dir, run pending migrations once, then run rails runner init script.
-# Mounted into the container and executed by the discourse_init service.
+# Mounted into the container and executed by the discourse-init service.
 
 echo "run-init.sh starting..."
 

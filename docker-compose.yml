@@ -77,9 +77,9 @@ services:
     env_file:
       - ./.envs/.local/discourse.ini
 
-  discourse_init:
+  discourse-init:
     image: discourse/discourse:2026.1.5
-    container_name: ams_discourse_init
+    container_name: ams_discourse-init
     depends_on:
       - discourse
     volumes:
