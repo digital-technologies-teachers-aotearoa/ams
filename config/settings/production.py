@@ -12,6 +12,7 @@ from config.settings.base import env
 
 # GENERAL
 # ------------------------------------------------------------------------------
+ENVIRONMENT = env("ENVIRONMENT")
 DEPLOYED = True
 # https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
 SECRET_KEY = env("DJANGO_SECRET_KEY")
@@ -57,19 +58,6 @@ SECURE_CONTENT_TYPE_NOSNIFF = env.bool(
     default=True,
 )
 # https://docs.djangoproject.com/en/dev/ref/settings/#secure-referrer-policy
-SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
-
-# CACHES
-# ------------------------------------------------------------------------------
-# https://docs.djangoproject.com/en/dev/ref/settings/#caches
-# Caching is disabled entirely until a shared cache backend (e.g. Redis) is
-# configurable.
-CACHES = {
-    "default": {
-        "BACKEND": "django.core.cache.backends.dummy.DummyCache",
-        "LOCATION": "",
-    },
-}
 
 # EMAIL
 # ------------------------------------------------------------------------------

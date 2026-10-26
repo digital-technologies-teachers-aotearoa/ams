@@ -152,6 +152,7 @@ USER django
 
 # Compile translation message files with required settings blanked.
 RUN DJANGO_SETTINGS_MODULE="config.settings.test" \
+  ENVIRONMENT="build" \
   POSTGRES_DB="" \
   POSTGRES_USER="" \
   POSTGRES_PASSWORD="" \

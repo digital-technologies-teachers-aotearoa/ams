@@ -4,7 +4,7 @@ from config.settings.base import MIDDLEWARE
 from config.settings.base import env
 
 # GENERAL
-# ------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#debug
 DEBUG = True
 # https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
@@ -18,18 +18,6 @@ NGROK_HOST = env("NGROK_HOST", default=None)
 if NGROK_HOST:
     ALLOWED_HOSTS.append(NGROK_HOST)
     CSRF_TRUSTED_ORIGINS = [f"https://{NGROK_HOST}"]
-
-# CACHES
-# ------------------------------------------------------------------------------
-# https://docs.djangoproject.com/en/dev/ref/settings/#caches
-# Disabled to match production (see config/settings/production.py) so dev
-# doesn't rely on cache behavior that doesn't hold in prod.
-CACHES = {
-    "default": {
-        "BACKEND": "django.core.cache.backends.dummy.DummyCache",
-        "LOCATION": "default-cache",
-    },
-}
 
 # EMAIL
 # ------------------------------------------------------------------------------

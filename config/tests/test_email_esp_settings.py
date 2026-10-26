@@ -8,6 +8,7 @@ import sys
 # settings module (which mutates the shared base.INSTALLED_APPS list and calls
 # sentry_sdk.init() at import time) can't leak into the rest of the test suite.
 REQUIRED_PRODUCTION_ENV = {
+    "ENVIRONMENT": "test",
     "DJANGO_SECRET_KEY": "test-secret-key",
     "DJANGO_ADMIN_URL": "admin/",
     "LOGTAIL_SOURCE_TOKEN": "test-logtail-token",

@@ -14,7 +14,7 @@ The `user_has_active_membership` function is likely to be called frequently acro
 
 **How it works**:
 
-- Caches results in Django's configured cache backend (Redis, Memcached, etc.)
+- Caches results in Django's configured cache backend (Valkey, Memcached, etc.)
 - Cache key: `user_has_active_membership_{user_id}`
 - Cache duration: 5 minutes (300 seconds)
 - Automatic cache invalidation when memberships change

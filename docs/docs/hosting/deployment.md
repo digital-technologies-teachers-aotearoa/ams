@@ -58,6 +58,7 @@ An automated check (see [Documentation conventions](../developer/docs-convention
 |---|---|---|---|
 | `SITE_DOMAIN` | ⚪ Optional | `ams.com` | The domain the website is hosted on. Defaults to `ams.com` — set this explicitly for any real deployment. |
 | `SITE_PORT` | ⚪ Optional | `80` | The port number the website is accessible at |
+| `ENVIRONMENT` | 🔴 Required in production | `production` | Unique deployment identifier used to prefix Django cache keys. Set a distinct value for every deployment sharing Redis/Valkey, such as `uat` and `production`. |
 | `POSTGRES_HOST` | 🔴 Required | `postgres` | The hostname of the PostgreSQL database server |
 | `POSTGRES_PORT` | ⚪ Optional | `5432` | The port of the PostgreSQL database server |
 | `POSTGRES_DB` | 🔴 Required | `ams` | The database name of the PostgreSQL database server |
