@@ -19,6 +19,7 @@ if READ_DOT_ENV_FILE:
 
 # GENERAL
 # ------------------------------------------------------------------------------
+ENVIRONMENT = env("ENVIRONMENT", default="local")
 # https://docs.djangoproject.com/en/dev/ref/settings/#debug
 DEBUG = env.bool("DJANGO_DEBUG", False)
 # Local time zone. Choices are
@@ -93,6 +94,28 @@ DATABASES = {
 }
 # https://docs.djangoproject.com/en/stable/ref/settings/#std:setting-DEFAULT_AUTO_FIELD
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+# CACHES
+# ------------------------------------------------------------------------------
+# https://docs.djangoproject.com/en/dev/ref/settings/#caches
+DATA_STORE_CONNECTION_STRING = env("DATA_STORE_CONNECTION_STRING", default=None)
+if DATA_STORE_CONNECTION_STRING:
+    CACHES = {
+        "default": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": DATA_STORE_CONNECTION_STRING,
+            "KEY_PREFIX": f"ams-{ENVIRONMENT}",
+        },
+    }
+else:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.dummy.DummyCache",
+            "LOCATION": "default-cache",
+        },
+    }
+
 
 # URLS
 # ------------------------------------------------------------------------------

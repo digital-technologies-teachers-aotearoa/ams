@@ -31,6 +31,9 @@ jobs:
       registry_type: GHCR
       repository: ams-django
     envs:
+      - key: ENVIRONMENT
+        scope: RUN_AND_BUILD_TIME
+        value: ${ENVIRONMENT}
       - key: SITE_DOMAIN
         scope: RUN_AND_BUILD_TIME
         value: ${SITE_DOMAIN}
@@ -182,6 +185,9 @@ jobs:
       registry_type: GHCR
       repository: ams-django
     envs:
+      - key: ENVIRONMENT
+        scope: RUN_AND_BUILD_TIME
+        value: ${ENVIRONMENT}
       - key: SITE_DOMAIN
         scope: RUN_AND_BUILD_TIME
         value: ${SITE_DOMAIN}
@@ -333,6 +339,9 @@ services:
     instance_size_slug: apps-s-1vcpu-0.5gb
     run_command: /start-web.sh
     envs:
+      - key: ENVIRONMENT
+        scope: RUN_AND_BUILD_TIME
+        value: ${ENVIRONMENT}
       - key: SITE_DOMAIN
         scope: RUN_AND_BUILD_TIME
         value: ${SITE_DOMAIN}
