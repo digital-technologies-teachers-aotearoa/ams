@@ -17,6 +17,8 @@ services:
     depends_on:
       postgres:
         condition: service_started
+      data-store:
+        condition: service_started
       mailpit:
         condition: service_started
       file-store-init:
