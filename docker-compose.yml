@@ -101,7 +101,7 @@ services:
       - ./.envs/.local/discourse_postgres.ini
 
   redis:
-    image: redis:7-alpine
+    image: redis:8-alpine
     container_name: ams_redis
     volumes:
       - ams_redis_data:/data
