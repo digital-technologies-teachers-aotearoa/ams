@@ -1,8 +1,12 @@
+from django.core.cache import cache
 from django.utils.formats import date_format
 from django.utils.timezone import now
+from django.utils.translation import get_language
 from django.views import generic
 from django_filters.views import FilterView
 
+from ams.events.cache import EVENT_MAP_CACHE_TTL
+from ams.events.cache import event_map_cache_key
 from ams.events.filters import PastEventFilter
 from ams.events.filters import UpcomingEventFilter
 from ams.events.models import Event
@@ -17,37 +21,42 @@ class HomeView(generic.TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        map_cache_key = event_map_cache_key(get_language())
+        map_locations = cache.get(map_cache_key)
         future_events = (
             Event.objects.filter(published=True, end__gte=now())
             .order_by("start")
             .prefetch_related("organisers", "locations", "sponsors")
             .select_related("series")
         )
-        raw_map_locations = {}
-        for event in future_events:
-            for location in event.locations.all():
-                if location.latitude is None or location.longitude is None:
-                    continue
-                key = location.pk
-                if key not in raw_map_locations:
-                    raw_map_locations[key] = {
-                        "coords": {
-                            "lat": float(location.latitude),
-                            "lng": float(location.longitude),
+        if map_locations is None:
+            raw_map_locations = {}
+            for event in future_events:
+                for location in event.locations.all():
+                    if location.latitude is None or location.longitude is None:
+                        continue
+                    key = location.pk
+                    if key not in raw_map_locations:
+                        raw_map_locations[key] = {
+                            "coords": {
+                                "lat": float(location.latitude),
+                                "lng": float(location.longitude),
+                            },
+                            "title": location.name,
+                            "events": [],
+                        }
+                    raw_map_locations[key]["events"].append(
+                        {
+                            "url": event.get_absolute_url(),
+                            "date": date_format(event.start, "j M Y")
+                            if event.start
+                            else "",
+                            "name": event.name,
                         },
-                        "title": location.name,
-                        "events": [],
-                    }
-                raw_map_locations[key]["events"].append(
-                    {
-                        "url": event.get_absolute_url(),
-                        "date": date_format(event.start, "j M Y")
-                        if event.start
-                        else "",
-                        "name": event.name,
-                    },
-                )
-        context["map_locations"] = list(raw_map_locations.values())
+                    )
+            map_locations = list(raw_map_locations.values())
+            cache.set(map_cache_key, map_locations, EVENT_MAP_CACHE_TTL)
+        context["map_locations"] = map_locations
         context["upcoming_events"] = future_events[:3]
         return context
 

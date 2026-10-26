@@ -1,9 +1,10 @@
 """View mixins for organisation permission checking."""
 
-from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
 from django.utils.translation import gettext_lazy as _
 
+from ams.organisations.cache import get_cached_organisation_admin
+from ams.organisations.cache import set_cached_organisation_admin
 from ams.organisations.models import OrganisationMember
 
 
@@ -28,9 +29,7 @@ def user_is_organisation_admin(user, organisation):
     if user.is_superuser:
         return True
 
-    # Check cache first
-    cache_key = f"user_is_org_admin_{user.id}_{organisation.id}"
-    cached_result = cache.get(cache_key)
+    cached_result = get_cached_organisation_admin(user.id, organisation.id)
     if cached_result is not None:
         return cached_result
 
@@ -41,8 +40,11 @@ def user_is_organisation_admin(user, organisation):
         role=OrganisationMember.Role.ADMIN,
     ).exists()
 
-    # Cache for 5 minutes (300 seconds)
-    cache.set(cache_key, is_admin, 300)
+    set_cached_organisation_admin(
+        user.id,
+        organisation.id,
+        is_admin=is_admin,
+    )
 
     return is_admin
 

@@ -11,6 +11,7 @@ class ResourcesAppConfig(AppConfig):
         from wagtailmenus.models import FlatMenuItem
         from wagtailmenus.models import MainMenuItem
 
+        from ams.resources import signals  # noqa: F401
         from ams.resources.validators import patch_menu_item_clean
 
         patch_menu_item_clean(MainMenuItem)

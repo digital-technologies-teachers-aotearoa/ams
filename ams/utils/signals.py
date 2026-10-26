@@ -1,13 +1,16 @@
 """Cache invalidation signals for permission utilities."""
 
-from django.core.cache import cache
 from django.db.models.signals import post_delete
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from ams.memberships.models import IndividualMembership
 from ams.memberships.models import OrganisationMembership
+from ams.organisations.cache import (
+    invalidate_organisation_admin_cache as invalidate_organisation_admin_cache_entry,
+)
 from ams.organisations.models import OrganisationMember
+from ams.utils.permissions_cache import invalidate_user_active_membership_cache
 
 
 @receiver(post_save, sender=IndividualMembership)
@@ -22,8 +25,7 @@ def invalidate_user_membership_cache(sender, instance, **kwargs):
     - A membership is deleted
     """
     if instance.user_id:
-        cache_key = f"user_has_active_membership_{instance.user_id}"
-        cache.delete(cache_key)
+        invalidate_user_active_membership_cache(instance.user_id)
 
 
 @receiver(post_save, sender=OrganisationMembership)
@@ -50,8 +52,7 @@ def invalidate_organisation_membership_cache(sender, instance, **kwargs):
         ).values_list("user_id", flat=True)
 
         for user_id in member_user_ids:
-            cache_key = f"user_has_active_membership_{user_id}"
-            cache.delete(cache_key)
+            invalidate_user_active_membership_cache(user_id)
 
 
 @receiver(post_save, sender=OrganisationMember)
@@ -69,8 +70,7 @@ def invalidate_organisation_member_cache(sender, instance, **kwargs):
     - A user is removed from an organisation
     """
     if instance.user_id:
-        cache_key = f"user_has_active_membership_{instance.user_id}"
-        cache.delete(cache_key)
+        invalidate_user_active_membership_cache(instance.user_id)
 
 
 @receiver(post_save, sender=OrganisationMember)
@@ -85,5 +85,7 @@ def invalidate_organisation_admin_cache(sender, instance, **kwargs):
     - Member status changes (declined/revoked)
     """
     if instance.user_id and instance.organisation_id:
-        cache_key = f"user_is_org_admin_{instance.user_id}_{instance.organisation_id}"
-        cache.delete(cache_key)
+        invalidate_organisation_admin_cache_entry(
+            instance.user_id,
+            instance.organisation_id,
+        )

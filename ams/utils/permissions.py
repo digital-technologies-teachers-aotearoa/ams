@@ -1,9 +1,10 @@
 """Permission utility functions for the AMS application."""
 
 from django.contrib.auth import get_user_model
-from django.core.cache import cache
 
 from ams.organisations.models import Organisation
+from ams.utils.permissions_cache import get_cached_user_active_membership
+from ams.utils.permissions_cache import set_cached_user_active_membership
 
 User = get_user_model()
 
@@ -61,20 +62,14 @@ def user_has_active_membership(user: User) -> bool:
     if user.is_superuser:
         return True
 
-    # Create a cache key based on user ID
-    cache_key = f"user_has_active_membership_{user.id}"
-
-    # Try to get from cache first
-    cached_result = cache.get(cache_key)
+    cached_result = get_cached_user_active_membership(user.id)
     if cached_result is not None:
         return cached_result
 
     # Call core logic to check membership
     has_active = _check_user_membership_core(user)
 
-    # Cache the result for 5 minutes (300 seconds)
-    # This is a reasonable balance between performance and data freshness
-    cache.set(cache_key, has_active, 300)
+    set_cached_user_active_membership(user.id, has_membership=has_active)
 
     return has_active
 
