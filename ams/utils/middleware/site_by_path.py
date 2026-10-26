@@ -3,10 +3,24 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from django.conf import settings
+from django.core.cache import cache
 from wagtail.models import Site
 
 if TYPE_CHECKING:
     from django.http import HttpRequest
+
+SITE_CACHE_TTL = 300
+SITE_CACHE_KEY_PREFIX = "ams:path-site:v1"
+_CACHE_MISS = object()
+
+
+def site_cache_key(language_code: str) -> str:
+    return f"{SITE_CACHE_KEY_PREFIX}:{language_code}"
+
+
+def invalidate_site_cache() -> None:
+    for language_code, _name in settings.LANGUAGES:
+        cache.delete(site_cache_key(language_code))
 
 
 class PathBasedSiteMiddleware:
@@ -60,10 +74,16 @@ class PathBasedSiteMiddleware:
         `request.LANGUAGE_CODE`. If none is found, falls back to the Wagtail
         default site (`is_default_site`).
         """
+        language_code = request.LANGUAGE_CODE
+        cache_key = site_cache_key(language_code)
+        cached_site = cache.get(cache_key, _CACHE_MISS)
+        if cached_site is not _CACHE_MISS:
+            return cached_site
+
         site = Site.objects.filter(
-            sitesettings__language=request.LANGUAGE_CODE,
+            sitesettings__language=language_code,
         ).first()
-        if site:
-            return site
-        # Fallback to default site if no match found
-        return Site.objects.filter(is_default_site=True).first()
+        # Fall back to the default site if no language match is found.
+        resolved_site = site or Site.objects.filter(is_default_site=True).first()
+        cache.set(cache_key, resolved_site, SITE_CACHE_TTL)
+        return resolved_site

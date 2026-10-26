@@ -10,6 +10,8 @@ from django.test import RequestFactory
 from django.utils import timezone
 from django.views.generic import DetailView
 
+from ams.organisations.cache import ORGANISATION_ADMIN_CACHE_TTL
+from ams.organisations.cache import organisation_admin_cache_key
 from ams.organisations.mixins import OrganisationAdminMixin
 from ams.organisations.mixins import user_is_organisation_admin
 from ams.organisations.models import Organisation
@@ -18,8 +20,12 @@ from ams.organisations.tests.factories import OrganisationFactory
 from ams.organisations.tests.factories import OrganisationMemberFactory
 from ams.users.tests.factories import UserFactory
 
+pytestmark = [
+    pytest.mark.django_db,
+    pytest.mark.usefixtures("locmem_cache"),
+]
 
-@pytest.mark.django_db
+
 class TestUserIsOrganisationAdmin:
     """Tests for user_is_organisation_admin helper function."""
 
@@ -89,7 +95,7 @@ class TestUserIsOrganisationAdmin:
         assert user_is_organisation_admin(user, org) is True
 
         # Verify no cache was set for superuser
-        cache_key = f"user_is_org_admin_{user.id}_{org.id}"
+        cache_key = organisation_admin_cache_key(user.id, org.id)
         assert cache.get(cache_key) is None
 
     def test_caches_result_for_admin(self):
@@ -106,7 +112,7 @@ class TestUserIsOrganisationAdmin:
         cache.clear()
 
         # First call should query DB and cache result
-        cache_key = f"user_is_org_admin_{user.id}_{org.id}"
+        cache_key = organisation_admin_cache_key(user.id, org.id)
         assert cache.get(cache_key) is None
 
         result = user_is_organisation_admin(user, org)
@@ -122,7 +128,7 @@ class TestUserIsOrganisationAdmin:
         cache.clear()
 
         # First call should query DB and cache result
-        cache_key = f"user_is_org_admin_{user.id}_{org.id}"
+        cache_key = organisation_admin_cache_key(user.id, org.id)
         assert cache.get(cache_key) is None
 
         result = user_is_organisation_admin(user, org)
@@ -142,14 +148,14 @@ class TestUserIsOrganisationAdmin:
         )
 
         cache.clear()
-        cache_key = f"user_is_org_admin_{user.id}_{org.id}"
+        cache_key = organisation_admin_cache_key(user.id, org.id)
 
         # First call
         result1 = user_is_organisation_admin(user, org)
         assert result1 is True
 
         # Manually set cache to False to verify second call uses cache
-        cache.set(cache_key, False, 300)  # noqa: FBT003
+        cache.set(cache_key, False, ORGANISATION_ADMIN_CACHE_TTL)  # noqa: FBT003
 
         # Second call should return cached False (not DB True)
         result2 = user_is_organisation_admin(user, org)
@@ -167,7 +173,7 @@ class TestUserIsOrganisationAdmin:
         )
 
         cache.clear()
-        cache_key = f"user_is_org_admin_{user.id}_{org.id}"
+        cache_key = organisation_admin_cache_key(user.id, org.id)
 
         # First call - should be False and cached
         result1 = user_is_organisation_admin(user, org)
@@ -197,7 +203,7 @@ class TestUserIsOrganisationAdmin:
         )
 
         cache.clear()
-        cache_key = f"user_is_org_admin_{user.id}_{org.id}"
+        cache_key = organisation_admin_cache_key(user.id, org.id)
 
         # First call - should be True and cached
         result1 = user_is_organisation_admin(user, org)
@@ -211,7 +217,6 @@ class TestUserIsOrganisationAdmin:
         assert cache.get(cache_key) is None
 
 
-@pytest.mark.django_db
 class TestOrganisationAdminMixin:
     """Tests for OrganisationAdminMixin."""
 

@@ -15,9 +15,9 @@ from django.views.generic import UpdateView
 from ams.memberships.models import OrganisationMembership
 from ams.organisations.models import OrganisationMember
 from ams.terms.mixins import TermsRequiredMixin
+from ams.users.cache import profile_completion_field_count
 from ams.users.forms import UserUpdateForm
 from ams.users.mixins import UserSelfOrStaffMixin
-from ams.users.models import ProfileField
 from ams.users.models import ProfileFieldResponse
 from ams.users.models import User
 from ams.users.tables import MembershipTable
@@ -103,10 +103,7 @@ class UserDetailView(
         context["has_organisations"] = accepted_organisations.exists()
 
         # Profile completion tracking
-        total_fields = ProfileField.objects.filter(
-            is_active=True,
-            counts_toward_completion=True,
-        ).count()
+        total_fields = profile_completion_field_count()
         if total_fields > 0:
             responses_count = ProfileFieldResponse.objects.filter(
                 user=user,

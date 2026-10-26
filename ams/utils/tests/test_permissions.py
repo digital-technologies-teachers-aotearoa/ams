@@ -16,8 +16,13 @@ from ams.utils.permissions import _check_user_membership_core
 from ams.utils.permissions import organisation_has_active_membership
 from ams.utils.permissions import user_has_active_membership
 from ams.utils.permissions import user_has_active_membership_request_cached
+from ams.utils.permissions_cache import USER_ACTIVE_MEMBERSHIP_CACHE_TTL
+from ams.utils.permissions_cache import user_active_membership_cache_key
 
-pytestmark = pytest.mark.django_db
+pytestmark = [
+    pytest.mark.django_db,
+    pytest.mark.usefixtures("locmem_cache"),
+]
 
 
 class TestUserHasActiveMembership:
@@ -141,16 +146,20 @@ class TestUserHasActiveMembership:
         # Arrange
         user = UserFactory()
         IndividualMembershipFactory(user=user, active=True)
-        cache_key = f"user_has_active_membership_{user.id}"
+        cache_key = user_active_membership_cache_key(user.id)
 
         # Act - First call should hit database and cache result
-        with patch("ams.utils.permissions.cache") as mock_cache:
+        with patch("ams.utils.permissions_cache.cache") as mock_cache:
             mock_cache.get.return_value = None  # Cache miss
             result1 = user_has_active_membership(user)
-            mock_cache.set.assert_called_once_with(cache_key, True, 300)  # noqa: FBT003
+            mock_cache.set.assert_called_once_with(
+                cache_key,
+                True,  # noqa: FBT003
+                USER_ACTIVE_MEMBERSHIP_CACHE_TTL,
+            )
 
         # Act - Second call should use cache
-        with patch("ams.utils.permissions.cache") as mock_cache:
+        with patch("ams.utils.permissions_cache.cache") as mock_cache:
             mock_cache.get.return_value = True  # Cache hit
             result2 = user_has_active_membership(user)
             mock_cache.set.assert_not_called()
@@ -171,13 +180,24 @@ class TestUserHasActiveMembership:
         result2 = user_has_active_membership(user2)
 
         # Assert - Different users should have different cache keys
-        cache_key1 = f"user_has_active_membership_{user1.id}"
-        cache_key2 = f"user_has_active_membership_{user2.id}"
+        cache_key1 = user_active_membership_cache_key(user1.id)
+        cache_key2 = user_active_membership_cache_key(user2.id)
 
         assert cache.get(cache_key1) is True
         assert cache.get(cache_key2) is False
         assert result1 is True
         assert result2 is False
+
+    def test_membership_delete_invalidates_cache(self, locmem_cache):
+        user = UserFactory()
+        membership = IndividualMembershipFactory(user=user, active=True)
+        assert user_has_active_membership(user) is True
+        cache_key = user_active_membership_cache_key(user.id)
+        assert locmem_cache.get(cache_key) is True
+
+        membership.delete()
+
+        assert locmem_cache.get(cache_key) is None
 
 
 class TestUserHasActiveMembershipRequestCached:

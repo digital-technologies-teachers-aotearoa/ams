@@ -2,6 +2,7 @@ from pathlib import Path
 
 import pytest
 from django.contrib.auth import get_user_model
+from django.core.cache import caches
 from django.utils.crypto import get_random_string
 from wagtail.models import Collection
 from wagtail.models import Locale
@@ -46,6 +47,20 @@ def wagtail_site(db):
 @pytest.fixture(autouse=True)
 def _media_storage(settings, tmpdir) -> None:
     settings.MEDIA_ROOT = tmpdir.strpath
+
+
+@pytest.fixture
+def locmem_cache(settings):
+    settings.CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "ams-test-cache",
+        },
+    }
+    test_cache = caches["default"]
+    test_cache.clear()
+    yield test_cache
+    test_cache.clear()
 
 
 @pytest.fixture

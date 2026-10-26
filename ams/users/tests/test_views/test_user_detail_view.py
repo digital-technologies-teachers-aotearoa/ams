@@ -4,6 +4,7 @@ import pytest
 from allauth.account.models import EmailAddress
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
+from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.test import RequestFactory
@@ -12,6 +13,8 @@ from django.utils import timezone
 
 from ams.organisations.tests.factories import OrganisationFactory
 from ams.organisations.tests.factories import OrganisationMemberFactory
+from ams.users.cache import PROFILE_COMPLETION_FIELD_COUNT_CACHE_KEY
+from ams.users.cache import profile_completion_field_count
 from ams.users.models import ProfileField
 from ams.users.models import ProfileFieldGroup
 from ams.users.models import ProfileFieldResponse
@@ -19,7 +22,10 @@ from ams.users.models import User
 from ams.users.tests.factories import UserFactory
 from ams.users.views import user_detail_view
 
-pytestmark = pytest.mark.django_db
+pytestmark = [
+    pytest.mark.django_db,
+    pytest.mark.usefixtures("locmem_cache"),
+]
 
 
 class TestUserDetailView:
@@ -310,6 +316,30 @@ class TestUserDetailView:
         assert response.status_code == HTTPStatus.OK
         assert response.context_data["profile_completion_percentage"] == 100  # noqa: PLR2004
         assert response.context_data["profile_incomplete_count"] == 0
+
+    def test_profile_field_count_cache_is_invalidated_on_field_change(
+        self,
+        locmem_cache,
+        django_capture_on_commit_callbacks,
+    ):
+        group = ProfileFieldGroup.objects.create(
+            name_translations={"en": "Test Group"},
+        )
+        assert profile_completion_field_count() == 0
+        assert locmem_cache.get(PROFILE_COMPLETION_FIELD_COUNT_CACHE_KEY) == 0
+
+        with django_capture_on_commit_callbacks(execute=True):
+            ProfileField.objects.create(
+                field_key="field1",
+                field_type=ProfileField.FieldType.TEXT,
+                label_translations={"en": "Field 1"},
+                group=group,
+                is_active=True,
+                counts_toward_completion=True,
+            )
+
+        assert cache.get(PROFILE_COMPLETION_FIELD_COUNT_CACHE_KEY) is None
+        assert profile_completion_field_count() == 1
 
     def test_profile_completion_context_with_incomplete_profile(
         self,

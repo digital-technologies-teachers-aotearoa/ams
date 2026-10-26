@@ -3,6 +3,7 @@ from datetime import timedelta
 
 from django.contrib.postgres.search import SearchQuery
 from django.contrib.postgres.search import SearchRank
+from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count
 from django.db.models import F
@@ -14,6 +15,8 @@ from django.utils import timezone
 from django.utils.translation import get_language
 from django.views import generic
 
+from ams.resources.cache import RESOURCE_HOME_CACHE_TTL
+from ams.resources.cache import resource_home_cache_key
 from ams.resources.forms import ResourceSearchForm
 from ams.resources.models import Resource
 from ams.resources.models import ResourceComponent
@@ -64,55 +67,85 @@ class ResourceHomeView(generic.TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["form"] = ResourceSearchForm(inline=True)
+        is_member = user_has_active_membership(self.request.user)
         qs = Resource.objects.filter(published=True)
-        if not user_has_active_membership(self.request.user):
+        if not is_member:
             qs = qs.exclude(visibility=Resource.Visibility.MEMBERS_ONLY)
-        counts = qs.aggregate(
-            resource_count=Count("pk", distinct=True),
-            component_count=Count("components"),
-        )
-        context["resource_count"] = counts["resource_count"]
-        context["component_count"] = counts["component_count"]
-
-        latest_resources = list(
-            qs.order_by("-datetime_added")[:LATEST_LIMIT],
-        )
-
-        recent_cutoff = timezone.now() - timedelta(days=MOST_VIEWED_WINDOW_DAYS)
-        most_viewed_month = list(
-            qs.annotate(
-                recent_views=Count(
-                    "views",
-                    filter=Q(views__datetime_viewed__gte=recent_cutoff),
-                ),
+        cache_key = resource_home_cache_key(is_member=is_member)
+        data = cache.get(cache_key)
+        if data is None:
+            counts = qs.aggregate(
+                resource_count=Count("pk", distinct=True),
+                component_count=Count("components"),
             )
-            .filter(recent_views__gt=0)
-            .order_by("-recent_views")[:MOST_VIEWED_LIMIT],
-        )
-        most_viewed_all_time = list(
-            qs.filter(view_count__gt=0).order_by("-view_count")[:MOST_VIEWED_LIMIT],
-        )
+            latest_resources = list(
+                qs.order_by("-datetime_added")[:LATEST_LIMIT],
+            )
 
-        resources_by_pk = {
-            resource.pk: resource
-            for resource in latest_resources + most_viewed_all_time
-        }
-        resources_by_pk.update(
-            (resource.pk, resource) for resource in most_viewed_month
-        )
+            recent_cutoff = timezone.now() - timedelta(
+                days=MOST_VIEWED_WINDOW_DAYS,
+            )
+            most_viewed_month = list(
+                qs.annotate(
+                    recent_views=Count(
+                        "views",
+                        filter=Q(views__datetime_viewed__gte=recent_cutoff),
+                    ),
+                )
+                .filter(recent_views__gt=0)
+                .order_by("-recent_views")[:MOST_VIEWED_LIMIT],
+            )
+            most_viewed_all_time = list(
+                qs.filter(view_count__gt=0).order_by("-view_count")[:MOST_VIEWED_LIMIT],
+            )
+            data = {
+                "resource_count": counts["resource_count"],
+                "component_count": counts["component_count"],
+                "latest_ids": [resource.pk for resource in latest_resources],
+                "month_views": [
+                    (resource.pk, resource.recent_views)
+                    for resource in most_viewed_month
+                ],
+                "all_time_ids": [resource.pk for resource in most_viewed_all_time],
+            }
+            cache.set(cache_key, data, RESOURCE_HOME_CACHE_TTL)
+            resources_by_pk = {
+                resource.pk: resource
+                for resource in latest_resources + most_viewed_all_time
+            }
+            resources_by_pk.update(
+                (resource.pk, resource) for resource in most_viewed_month
+            )
+        else:
+            resource_ids = set(
+                data["latest_ids"]
+                + [pk for pk, _views in data["month_views"]]
+                + data["all_time_ids"],
+            )
+            resources_by_pk = {
+                resource.pk: resource for resource in qs.filter(pk__in=resource_ids)
+            }
+            for resource_pk, recent_views in data["month_views"]:
+                if resource_pk in resources_by_pk:
+                    resources_by_pk[resource_pk].recent_views = recent_views
+
         prefetch_related_objects(
             list(resources_by_pk.values()),
             *_RESOURCE_LIST_PREFETCHES,
         )
 
+        context["resource_count"] = data["resource_count"]
+        context["component_count"] = data["component_count"]
         context["resources"] = [
-            resources_by_pk[resource.pk] for resource in latest_resources
+            resources_by_pk[pk] for pk in data["latest_ids"] if pk in resources_by_pk
         ]
         context["most_viewed_month"] = [
-            resources_by_pk[resource.pk] for resource in most_viewed_month
+            resources_by_pk[pk]
+            for pk, _views in data["month_views"]
+            if pk in resources_by_pk
         ]
         context["most_viewed_all_time"] = [
-            resources_by_pk[resource.pk] for resource in most_viewed_all_time
+            resources_by_pk[pk] for pk in data["all_time_ids"] if pk in resources_by_pk
         ]
         return context
 

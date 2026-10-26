@@ -11,6 +11,7 @@ class EventsAppConfig(AppConfig):
         from wagtailmenus.models import FlatMenuItem
         from wagtailmenus.models import MainMenuItem
 
+        from ams.events import signals  # noqa: F401
         from ams.events.validators import patch_menu_item_clean
 
         patch_menu_item_clean(MainMenuItem)

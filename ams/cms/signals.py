@@ -25,11 +25,15 @@ This ensures:
 """
 
 from django.core.cache import cache
+from django.db import transaction
 from django.db.models.signals import post_delete
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from wagtail.models import Site
 
+from ams.cms.models import SiteSettings
 from ams.cms.models import ThemeSettings
+from ams.utils.middleware.site_by_path import invalidate_site_cache
 
 
 @receiver(post_save, sender=ThemeSettings)
@@ -61,3 +65,11 @@ def clear_theme_cache_on_delete(sender, instance, **kwargs):
     version_cache_key = f"theme_version_site{instance.site_id}"
     cache.delete(css_cache_key)
     cache.delete(version_cache_key)
+
+
+@receiver(post_save, sender=Site)
+@receiver(post_delete, sender=Site)
+@receiver(post_save, sender=SiteSettings)
+@receiver(post_delete, sender=SiteSettings)
+def invalidate_path_site_cache_on_change(sender, **kwargs):
+    transaction.on_commit(invalidate_site_cache)

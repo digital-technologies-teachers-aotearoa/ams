@@ -3,10 +3,12 @@ from http import HTTPStatus
 from unittest.mock import patch
 
 import pytest
+from django.core.cache import cache
 from django.db.models import F
 from django.utils import timezone
 
 from ams.entities.tests.factories import EntityFactory
+from ams.resources.cache import resource_home_cache_key
 from ams.resources.models import Resource
 from ams.resources.models import ResourceComponentView
 from ams.resources.models import ResourceView
@@ -16,7 +18,10 @@ from ams.resources.tests.factories import ResourceFactory
 from ams.resources.tests.factories import ResourceTagFactory
 from ams.users.tests.factories import UserFactory
 
-pytestmark = pytest.mark.django_db
+pytestmark = [
+    pytest.mark.django_db,
+    pytest.mark.usefixtures("locmem_cache"),
+]
 
 
 class TestResourceHomeView:
@@ -864,6 +869,73 @@ class TestResourceHomeMostViewed:
         expected_recent_views = 3
         assert annotated.recent_views == expected_recent_views
 
+    def test_cached_month_ranking_preserves_recent_view_count(
+        self,
+        client,
+        locmem_cache,
+    ):
+        resource = ResourceFactory(published=True)
+        _record_view(resource)
+        _record_view(resource)
+
+        client.get("/en/resources/")
+        response = client.get("/en/resources/")
+
+        most_viewed = list(response.context["most_viewed_month"])
+        assert most_viewed[0] == resource
+        expected_views = 2
+        assert most_viewed[0].recent_views == expected_views
+        assert locmem_cache.get(resource_home_cache_key(is_member=False)) is not None
+
+    def test_home_cache_is_partitioned_by_membership(self, client, locmem_cache):
+        hidden = ResourceFactory(
+            published=True,
+            visibility=Resource.Visibility.MEMBERS_ONLY,
+        )
+
+        with patch(_MEMBERSHIP_PATCH, return_value=False):
+            nonmember_response = client.get("/en/resources/")
+        with patch(_MEMBERSHIP_PATCH, return_value=True):
+            member_response = client.get("/en/resources/")
+
+        assert hidden not in list(nonmember_response.context["resources"])
+        assert hidden in list(member_response.context["resources"])
+        assert locmem_cache.get(resource_home_cache_key(is_member=False)) is not None
+        assert locmem_cache.get(resource_home_cache_key(is_member=True)) is not None
+
+    def test_resource_change_invalidates_both_home_cache_variants(
+        self,
+        client,
+        locmem_cache,
+        django_capture_on_commit_callbacks,
+    ):
+        client.get("/en/resources/")
+        locmem_cache.set(resource_home_cache_key(is_member=True), {"cached": True}, 60)
+
+        with django_capture_on_commit_callbacks(execute=True):
+            ResourceFactory(published=True)
+
+        assert locmem_cache.get(resource_home_cache_key(is_member=False)) is None
+        assert locmem_cache.get(resource_home_cache_key(is_member=True)) is None
+
+    def test_component_change_invalidates_both_home_cache_variants(
+        self,
+        locmem_cache,
+        django_capture_on_commit_callbacks,
+    ):
+        locmem_cache.set(resource_home_cache_key(is_member=False), {"cached": True}, 60)
+        locmem_cache.set(resource_home_cache_key(is_member=True), {"cached": True}, 60)
+        resource = ResourceFactory(published=True)
+
+        with django_capture_on_commit_callbacks(execute=True):
+            ResourceComponentFactory(
+                resource=resource,
+                component_url="https://example.com/",
+            )
+
+        assert locmem_cache.get(resource_home_cache_key(is_member=False)) is None
+        assert locmem_cache.get(resource_home_cache_key(is_member=True)) is None
+
     def test_home_page_query_count(self, client, django_assert_max_num_queries):
         # Several resources, each with multiple components/tags/authors, and
         # views spread across them, so a per-row query (an N+1) shows up as
@@ -895,5 +967,8 @@ class TestResourceHomeMostViewed:
         # effective_colour's per-category cached_property from querying once
         # per tag. The ceiling allows for middleware/cache variance while
         # still catching a new per-resource query.
+        client.get("/en/resources/")
+        cache.delete(resource_home_cache_key(is_member=False))
+        cache.delete(resource_home_cache_key(is_member=True))
         with django_assert_max_num_queries(23):
             client.get("/en/resources/")

@@ -4,6 +4,9 @@ from wagtail.models import Site
 
 from ams.cms.models import SiteSettings
 from ams.utils.middleware.site_by_path import PathBasedSiteMiddleware
+from ams.utils.middleware.site_by_path import site_cache_key
+
+pytestmark = pytest.mark.usefixtures("locmem_cache")
 
 
 @pytest.fixture
@@ -173,3 +176,62 @@ def test_middleware_handles_multiple_sites_with_same_language(sites, db):
 
     # Should get one of the English sites (implementation uses .first())
     assert request.site.sitesettings.language == "en"
+
+
+def test_site_resolution_caches_language_specific_result(sites, locmem_cache):
+    request = RequestFactory().get("/")
+    request.LANGUAGE_CODE = "mi"
+
+    resolved_site = PathBasedSiteMiddleware._resolve_site(request)  # noqa: SLF001
+
+    assert resolved_site == sites["mi"]
+    assert locmem_cache.get(site_cache_key("mi")) == sites["mi"]
+    assert locmem_cache.get(site_cache_key("en")) is None
+
+
+def test_site_resolution_caches_missing_result(
+    sites,
+    locmem_cache,
+    django_capture_on_commit_callbacks,
+):
+    with django_capture_on_commit_callbacks(execute=True):
+        Site.objects.all().delete()
+
+    request = RequestFactory().get("/")
+    request.LANGUAGE_CODE = "mi"
+
+    assert PathBasedSiteMiddleware._resolve_site(request) is None  # noqa: SLF001
+    assert locmem_cache.get(site_cache_key("mi"), "missing") is None
+
+
+def test_site_settings_change_invalidates_all_language_keys(
+    sites,
+    locmem_cache,
+    django_capture_on_commit_callbacks,
+):
+    locmem_cache.set(site_cache_key("en"), sites["en"], 300)
+    locmem_cache.set(site_cache_key("mi"), sites["mi"], 300)
+
+    with django_capture_on_commit_callbacks(execute=True):
+        settings = SiteSettings.objects.get(site=sites["mi"])
+        settings.language = "en"
+        settings.save()
+
+    assert locmem_cache.get(site_cache_key("en")) is None
+    assert locmem_cache.get(site_cache_key("mi")) is None
+
+
+def test_site_change_invalidates_all_language_keys(
+    sites,
+    locmem_cache,
+    django_capture_on_commit_callbacks,
+):
+    locmem_cache.set(site_cache_key("en"), sites["en"], 300)
+    locmem_cache.set(site_cache_key("mi"), sites["mi"], 300)
+
+    with django_capture_on_commit_callbacks(execute=True):
+        sites["en"].site_name = "Updated default site"
+        sites["en"].save()
+
+    assert locmem_cache.get(site_cache_key("en")) is None
+    assert locmem_cache.get(site_cache_key("mi")) is None
