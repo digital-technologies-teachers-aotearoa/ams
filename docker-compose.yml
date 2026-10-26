@@ -124,7 +124,7 @@ services:
       - ./docs/:/docs:z
 
   file-store:
-    image: rustfs/rustfs:1.0.1
+    image: rustfs/rustfs:1.0.3
     container_name: ams_file_store
     command: ['/data']
     env_file:
