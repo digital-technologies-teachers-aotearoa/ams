@@ -29,9 +29,9 @@
     "mjml": "4.15.3",
     "node-sass-tilde-importer": "1.0.2",
     "pixrem": "5.0.0",
-    "playwright": "1.64.0",
+    "playwright": "1.64.1",
     "postcss": "8.5.30",
-    "sass": "1.105.1"
+    "sass": "1.105.2"
   },
   "engines": {
     "node": "26"
