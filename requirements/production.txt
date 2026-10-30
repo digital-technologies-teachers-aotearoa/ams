@@ -5,7 +5,7 @@
 gunicorn==26.2.0  # https://github.com/benoitc/gunicorn
 psycopg[c]==3.3.6  # https://github.com/psycopg/psycopg
 sentry-sdk==2.73.0  # https://github.com/getsentry/sentry-python
-logtail-python==0.5.2  # https://github.com/logtail/logtail-python
+logtail-python==0.5.3  # https://github.com/logtail/logtail-python
 python-json-logger==4.2.0  # https://github.com/nhairs/python-json-logger
 
 # Django
