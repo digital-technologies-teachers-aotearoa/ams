@@ -104,7 +104,7 @@ services:
       - ./.envs/.local/discourse_postgres.ini
 
   data-store:
-    image: valkey/valkey:9.1-alpine
+    image: valkey/valkey:9.2-alpine
     container_name: ams_data-store
     volumes:
       - ams_data_store_data:/data
